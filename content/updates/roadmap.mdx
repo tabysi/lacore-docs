@@ -3,64 +3,27 @@ title: Roadmap
 ---
 
 import { Callout } from 'nextra/components'
+import { RoadmapTimeline } from '../../components/Roadmap.jsx'
 
 # Roadmap
 
-Where LACORE is today and where it's heading. Versions and ordering are a **direction, not a dated
-promise** — priorities shift with community feedback.
+Where LACORE is today and where it's heading — a living plan, shaped by the community. Versions and
+ordering are a **direction, not a dated promise**; priorities shift with feedback.
 
 <Callout type="info">
-  The living roadmap, voting and feature requests happen on our
-  **[Discord](https://discord.gg/b6YbvVEvYp)**. Ideas flow:
-  `Idea (Discord) → planned → in-progress → shipped`.
+  Vote and request features on our **[Discord](https://discord.gg/b6YbvVEvYp)**.
+  Ideas flow: `Idea → planned → in-progress → shipped`.
 </Callout>
 
-## Where LACORE is today
-
-Current release: see the [Changelog](/updates/changelog).
-
-| Pillar | Maturity | Highlights already shipped |
-| --- | --- | --- |
-| **LEO / CAD / Dispatch** | 🟢 Very mature | 4 MDTs (LAPD / LASD / Agency / EMS), dispatch console, CCTV suite (scanner + field cameras + map), BOLOs, charges & citations, evidence & reports, penal code, zone/district editor |
-| **Identity / Profiles** | 🟢 Mature | Multi-character, persistent digital file, records, vehicles, achievements/XP, visibility-gating |
-| **Operations / Security** | 🟢 Mature | Admin menu, Big Brother logging, IP-lock, event-honeypot anticheat, ACE + Discord permissions, ban hardening |
-| **Integration** | 🟢 Mature | Framework bridge (ESX / QBCore / QBox), external web dispatcher (Discord OAuth, Docker/Caddy) |
-| **Civilian** | 🟡 Partial | Emote radial + bridge, server-synced props, digital ID, orgs, turf war — *activities/jobs still to come* |
-| **Communications** | 🟠 In rework | Phone system being rebuilt; speech-to-text and a new address system in early stages |
-
-## Planned
-
-### 🎯 Next — Finish Line
-Complete the systems already in progress. Lowest risk, immediate value.
-- **Civilian activities & jobs** — RP-only clock-in tasks that reward **XP / achievements** (no economy), fully config-driven.
-- **Speech-to-text** — self-transcription piped into the dispatch / radio log (opt-in).
-- **New address system (NADS)** — richer street addresses surfaced in the MDT query, dispatch calls and profiles.
-- **EMS / Fire depth** — CAD feature parity (board, history, query), stretcher & hospital workflow polish.
-
-### 📱 Communications — Phone rework
-- A full modern phone: contacts, **structured 911/311 reports that feed dispatch**, messaging and RP tools — replacing the legacy phone.
-
-### 🧍 Civilian Depth II
-- Org / gang expansion (territory UI, ranks, MOTD), turf balancing.
-- Civilian interactions (show ID, hand over item), more props & tools.
-
-### 🚔 LEO Depth II
-- Warrant workflow (request → approval), court / DA integration.
-- Forensics (fingerprint / DNA evidence, custody chain).
-- ALPR / ANPR on CCTV & vehicle cameras (auto plate scan → BOLO hit).
-- Impound / tow loop, optional K9.
-
-### 🚀 Long-term Vision
-- Feature-toggle "app store" — modules on/off via config with clean dependencies.
-- Extended web portals (records / DA portal in the browser).
-- Deeper framework interop and more languages beyond EN / DE / RU.
-- A performance budget as a fixed release criterion.
+<RoadmapTimeline />
 
 ## Always ongoing
-Performance (gated loops, low resmon baseline), up-to-date docs, stability & QA, and prioritising
-community-requested features.
+
+Alongside the milestones above, every release keeps investing in **performance** (gated loops, low
+resmon baseline), **up-to-date documentation**, **stability & QA**, and **community-requested**
+features.
 
 <Callout type="info">
-  Want to shape what comes next? Vote and suggest on the
-  **[Discord](https://discord.gg/b6YbvVEvYp)** — demand, fit and effort decide what ships.
+  Want to shape what comes next? Suggest and vote on the
+  **[Discord](https://discord.gg/b6YbvVEvYp)** — demand, fit and effort decide what ships next.
 </Callout>
