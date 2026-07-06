@@ -5,6 +5,7 @@ export default {
   configuration: 'Configuration',
   features: 'Features',
   commands: 'Command Reference',
+  partners: 'Partners & Creators',
   support: 'Support & FAQ',
   updates: 'Updates & Changelog',
 }
