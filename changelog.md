@@ -3,6 +3,29 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [Unreleased] – Speech-to-Text Radio Transcript (offline / free)
+
+### Added — push-to-talk radio dictation + transcript log
+- **Offline speech recognition (Vosk / WebAssembly).** On-duty units hold a bindable **radio key**
+  (`+radiostt`, unbound by default — bind under FiveM → Settings → Keybinds → "Radio: hold to
+  transcribe"). Their own client transcribes their speech **entirely locally** via a Vosk model
+  running in WebAssembly inside the NUI — **no cloud, no API keys, no cost, no NUI focus taken**.
+  On release the final transcript is sent to the server. A small live "🎙 …" chip shows the partial.
+  *(Note: the browser SpeechRecognition API does not work in FiveM's CEF — no speech backend — so
+  LACORE uses Vosk instead. The `/sttcheck` probe reports both.)*
+- **Bundled model.** Ships the Vosk English small model in `nui/dist/models/` (~40 MB, downloaded
+  once per client). Override with your own model (e.g. German) via `STT.model` in `cfg-stt-sh.lua`.
+- **Searchable radio log.** The server attaches the sender's **callsign + department**, appends the
+  line to a rolling (optionally persisted) log and broadcasts it. Open with **`/radiolog`** — a
+  searchable transcript with timestamps and dept-coloured callsign badges (LAPD blue, LASD amber,
+  EMS red). Config in `configs/cfg-stt-sh.lua` (`STT.enabled/lang/model/maxLen/logSize/persist/store`).
+- **Graceful fallback.** Clients where the offline engine can't initialise simply can't transmit
+  (no crash) but can still read the log. Transmission is server-gated to on-duty units (callsign set).
+- Files: `configs/cfg-stt-sh.lua`, `modules/stt/stt-sv.lua` (new), `modules/stt/stt-cl.lua`,
+  `web/src/components/SttEngine.svelte` (Vosk) + `RadioLog.svelte` (new), `SttProbe.svelte` (probe +
+  Vosk test), store/messages/locales, `nui/dist/models/` (model), `fxmanifest.lua`
+  (`modules/stt/*-sv.lua`), dep `vosk-browser` (lazy-loaded chunk).
+
 ## [3.1.5] – CCTV Surveillance Suite, Scanner & Field Cameras
 
 Headline release: the CCTV system is now a full surveillance suite — a fixed-position camera

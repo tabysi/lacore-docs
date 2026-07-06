@@ -1,0 +1,71 @@
+---
+title: Radio Transcript (STT)
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Radio Transcript — Speech-to-Text
+
+Units can **speak on the radio and have it transcribed** into a shared, searchable log — powered by
+**fully offline speech recognition**. No cloud, no API keys, no per-use cost.
+
+<Callout type="info">
+  Recognition runs **locally on each client** via a Vosk model in WebAssembly. LACORE does **not**
+  use the browser SpeechRecognition API — it has no working speech backend in FiveM's CEF. The Vosk
+  model is bundled with the resource and downloaded once per client.
+</Callout>
+
+## How it works
+
+<Steps>
+
+### Bind the radio key
+
+The push-to-talk key is unbound by default so it never overrides your own choice. Bind it once under
+**FiveM → Settings → Keybinds → "Radio: hold to transcribe"**.
+
+### Hold, speak, release
+
+While on duty, **hold** the key and speak. A live **🎙 …** chip shows the partial transcript. On
+**release**, the final text is sent to the server.
+
+### It lands in the radio log
+
+The server tags the line with your **callsign + department**, appends it to a rolling (optionally
+persisted) log and broadcasts it to everyone.
+
+</Steps>
+
+## The radio log (`/radiolog`)
+
+Open the transcript panel with **`/radiolog`** — a searchable list of radio traffic with timestamps
+and **dept-coloured callsign badges** (LAPD blue, LASD amber, EMS/Fire red). Search by callsign or
+text. The log is server-authoritative and shared across the Dispatch console and MDT terminals.
+
+## Configuration
+
+Everything lives in `configs/cfg-stt-sh.lua`:
+
+```lua
+STT.enabled = true      -- master switch
+STT.lang    = "auto"    -- "auto" follows each client's UI locale, or "de"/"en"/"ru"
+STT.model   = ""        -- "" = bundled English small model; or a URL to your own Vosk model
+STT.maxLen  = 220       -- max characters per transmitted line
+STT.logSize = 60        -- how many recent lines are kept + sent on open
+STT.persist = true      -- keep the log across restarts
+STT.store   = "data/radio_log.json"
+```
+
+<Callout type="info">
+  **Custom / other-language model.** Point `STT.model` at any Vosk model `.tar.gz` (e.g. a German or
+  a larger, more accurate model you host). Each client downloads it once and caches it.
+</Callout>
+
+## Notes & limits
+
+- **On-duty only.** Transmission is server-gated to units with a callsign; civilians can't transmit.
+- **Graceful fallback.** A client where the offline engine can't initialise simply can't transmit
+  (no crash) — it can still read the log. Verify a client with **`/sttcheck`**.
+- **Accuracy** depends on the model and the speaker's mic/accent; the bundled small model is tuned
+  for size. Swap in a larger model via `STT.model` for better accuracy.
+- Recognition uses each client's **own CPU** — there is no server-side transcription cost.

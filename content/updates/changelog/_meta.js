@@ -1,8 +1,8 @@
 export default {
   index: 'All Releases',
+  unreleased: 'Unreleased / Dev',
   'v3-1-5': '3.1.5',
   'v3-1-3': '3.1.3',
-  unreleased: 'Unreleased / Dev',
   'v3-0-5h': '3.0.5h',
   'v3-0-5g': '3.0.5g',
   'v3-0-5f': '3.0.5f',
