@@ -1,0 +1,85 @@
+---
+title: "3.0.5g"
+---
+
+# [3.0.5g] – 2026-06-12 — Bugfixes, RP-Befehl-Lokalisierung & Discord-Presence
+
+
+### Fixed
+- **Ladereihenfolge im Manifest (Root-Cause für mehrere Bugs):** `shared_scripts`
+  (Sprachen, `configs/*-sh.lua` → `Achievements`/`Anticheat`/`Locale`/`T()`) wurde
+  **nach** `client_scripts` geladen, sodass diese Globals beim Laden der
+  Client-Module **`nil`** waren. FiveM lädt in Manifest-Reihenfolge — `shared`
+  ist **nicht** automatisch zuerst. Block jetzt **vor** client/server verschoben.
+  Behebt damit zugleich:
+  - **„Frieda Collector"**: Katzen wurden nicht gespawnt (Guard auf `Achievements`).
+  - **Easter Eggs** + **client-seitige Anticheat-Detections** liefen nie an.
+- **`/bblog` öffnete nicht:** `bb-cl.lua` hatte einen Guard auf die *server-only*
+  Config `BigBrother` (clientseitig `nil`). Guard entfernt — Zugriff erzwingt der
+  Server.
+- **LASD-CAD Status blieb nicht erhalten:** Status hing am geteilten
+  `player.status` (vom LAPD-MDT/Duty-System überschrieben). In eine eigene
+  `lasdStatus`-Variable entkoppelt.
+- **Big-Brother-Panel ließ sich nicht schließen:** `CloseBB` (Client) sendete
+  beim Klick auf ✕ kein `hideBigBrother` an das NUI — der Fokus ging weg, das
+  Panel blieb sichtbar und blockierte. `hideBigBrother` jetzt in `CloseBB`.
+- **Frieda-Katzen (robuster):** Das Modul brach beim Laden hart ab, falls die
+  `Achievements`-Config (Timing) noch nicht da war → dauerhaft tot. Jetzt
+  **wartet** es bis zu 10s auf die Config und gated seine Loops, statt
+  unwiderruflich auszusteigen.
+
+- **Big-Brother-Crash beim 2. Öffnen** (`each_key_duplicate`): doppelte Live-Logs
+  wurden mit identischer `id` eingefügt → doppelte Svelte-each-Keys. Jetzt werden
+  Duplikate beim Live-Insert verworfen und der each-Key ist garantiert eindeutig.
+- **LASD-CAD Status wurde nicht serverseitig übernommen:** `lasd:Unregister`
+  (beim Schließen der MDT) **löschte die Unit** → Status ging verloren und beim
+  erneuten Öffnen entstand eine frische `AVAIL`-Unit; Dispatch sah den Officer
+  bei geschlossener MDT gar nicht. Unit bleibt jetzt erhalten (nur `playerDropped`
+  räumt sie ab), Status persistiert.
+- **LASD-Status sprang im HUD (unten) sofort auf UNAVAILABLE zurück:** die
+  PCMS-Statuscodes liefen nur ins LASD-System, nicht in den gemeinsamen
+  MDT-Status — `syncPlayerList` überschrieb `player.status` darum wieder. Die
+  LASD-Codes werden jetzt auf MDT-Status gemappt (`AVAIL→CLEAR`, `ENRT→ENROUTE`,
+  `ONSCENE→ON SCENE`, `CODE6→CODE SIX`, `OBS/ACK→BUSY/ENROUTE`) und zusätzlich
+  via `SetMdtStatus` gesetzt → HUD + LAPD-Dispatch zeigen den Status korrekt.
+
+### Added — LASD-PCMS an das gemeinsame Dispatch-System angebunden (Bridge)
+- LASD-Einsätze landeten bisher in einer **separaten** `lasdIncidents`-Tabelle —
+  der **Dispatcher sah sie nicht**, und es gab **kein** Audit-Log/Webhook/Big
+  Brother. Jetzt spiegelt das PCMS Erstellen/Zuweisen/Notizen/Auflösen über
+  **dieselben Funktionen** wie das LAPD-MDT.
+- **Gemeinsame Helfer extrahiert** (`modules/mdt/mdt-sv.lua`): `AddDispatchCall(opts)`
+  und `ResolveDispatchCall(inc, reason, src)` — werden jetzt von LAPD **und** LASD
+  genutzt. LASD-Calls erscheinen in der Dispatcher-/MDT-Call-Liste, **markiert
+  mit `agency = "LASD"`** (goldenes Badge in `Mdt.svelte` + `Dispatch.svelte`).
+- LASD-Calls werden identisch **auditiert** (`RecordCallCreation`/`RecordCallEvent`
+  → `call_audit.json`, `calllog`), an **`Webhooks.DispatchLog`** gemeldet und in
+  **Big Brother** geloggt. *(Hinweis: dadurch werden nun auch LAPD-Call-Erstellungen
+  in Big Brother geloggt — gewollte Vereinheitlichung.)*
+- Neues Klarmelden: CLR-Maske löst den Einsatz über `lasd:ResolveIncident` →
+  `ResolveDispatchCall` auf (Resolved-State + DISPO + Audit), statt nur eine Notiz
+  zu schreiben.
+- **LASD-Einsätze werden jetzt persistiert** (`lasd_incidents` Store → DB +
+  `data/lasd_incidents.json`, wie `calls.json`): beim Start geladen, alte
+  aufgelöste Einsätze (>7 Tage) ausgemistet, `lasdSeq` kollisionssicher gesetzt.
+  Damit übersteht die PCMS-Einsatzansicht einen Server-Neustart. *(Saved Chars,
+  Char-Presets, Fahrzeuge, Achievements, Playtime etc. lagen bereits in der DB.)*
+
+### Changed — UI / Gameplay
+- **Profil- & Big-Brother-Panel: transparenter Backdrop** (kein Vollbild-Dimmen
+  / Blur mehr) — der Spielhintergrund bleibt sichtbar.
+- **Default-Charakter beim Spawn**: Spawn-Modell von `mp_m_freemode_01` auf
+  `u_m_m_partytarget` umgestellt (`DEFAULT_SPAWN_MODEL` in `client/events-cl.lua`).
+
+### Changed — RP-Befehle lokalisiert
+- `/run`, `/grun`, `/search`, `/gsearch` gaben fest englischen Text aus
+  („… runs … what comes back?"). Jetzt über das Lang-System
+  (`rp_run`, `rp_search`) in **EN/DE/RU**.
+
+### Added — Discord Rich Presence & Connect-Link (`configs/cfg-presence-sh.lua`)
+- Rich Presence (App-ID, Art-Assets, klickbare **Discord/Website-Buttons**,
+  rotierende Statuszeilen mit `{players}`/`{aop}`/`{discord}`) aus dem hartkodierten
+  Loop in eine **Config** ausgelagert.
+- Optionale **Discord-Karte auf dem Connect-Screen** (`connectCard`, Standard aus).
+- Convars `pvp_discord_invite` / `pvp_website` + Doku zum Server-Browser-„Corner"
+  (`sv_projectName` / `sv_projectDesc`) in `server.cfg.example`.

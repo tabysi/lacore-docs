@@ -1,43 +1,80 @@
 ---
-title: 3.1.5
+title: "3.1.5"
 ---
 
-# 3.1.5 — CCTV Surveillance Suite, Scanner & Field Cameras
+# [3.1.5] – CCTV Surveillance Suite, Scanner & Field Cameras
 
-The CCTV system became a full surveillance suite.
 
-## Added — CCTV camera viewer (`/cctv`)
+Headline release: the CCTV system is now a full surveillance suite — a fixed-position camera
+viewer with a targeting scanner, runtime-placeable field cameras, and dispatch-map integration.
+This section is the authoritative, final-state description of that work (the granular iteration
+notes under 3.1.3 below are superseded by it).
 
-- Fixed-position POV camera (WASD / arrows look, scroll zoom) with real area streaming (a clone ped
-  stays at your desk while the hidden real ped is teleported to the camera so the area streams).
-- Cameras grouped into networks, gated by job (`leo` / `security` / `all`).
-- You cannot fire your weapon while operating a camera.
+### Added — CCTV camera viewer (`/cctv`)
+- **Fixed-position POV camera.** Opens a scripted surveillance camera at each configured position.
+  **WASD** and the **arrow keys** look around (A/D pan, W/S tilt), **scroll** zooms — the camera
+  does not move (it's a wall camera). Look input is read natively while the NUI keeps a free mouse
+  cursor (`SetNuiFocusKeepInput(true)`). Backspace/Esc exits.
+- **Real area streaming.** On open, the player's spot is saved, a frozen clone ped is dropped at
+  their desk, and the hidden real ped is teleported to the camera so the world (and the entities
+  around it) actually stream and can be scanned. Restored on exit / resource stop.
+- **Networks + access.** Cameras are grouped into networks in `configs/cfg-cctv-sh.lua`, gated
+  server-side by job (`leo` / `security` / `all`). The overlay lists cameras (clickable) with a
+  `‹ NET ›` network selector.
+- Config: `CCTV.rotSpeed`, `CCTV.zoomMin/Max/Step`, `CCTV.scanTime` (old `panSpeed`/`panLimit`/
+  free-fly `moveSpeed` removed). You can't fire your weapon while operating a camera
+  (`DisablePlayerFiring` + attack controls blocked each frame).
 
-## Added — Targeting scanner
+### Added — CCTV targeting scanner
+- **Click-to-scan.** Left-clicking raycasts from the camera through the cursor
+  (`StartExpensiveSynchronousShapeTestLosProbe`) and classifies the hit: **player**, **NPC ped**
+  or **vehicle** (objects are ignored). Up to 5 concurrent scans; dead entities auto-drop.
+- **Animated scan sequence.** A corner-bracket targeting reticle over the target with a scanning
+  grid, a sweeping scan line, a live time-based percentage counter and an "ANALYZING…" caption,
+  plus a brief full-screen scan flash on each new scan. Duration = `CCTV.scanTime` (default
+  **6 s**, tune 5000–8000); the record is buffered and only revealed once the full sweep finishes.
+- **Info card anchored to the target.** On completion a card fades in and follows the entity on
+  screen (`GetScreenCoordFromWorldCoord` per frame): a compact **ped mugshot**
+  (`RegisterPedheadshotTransparent` → `nui-img`, freed on close), the identity, and — for
+  registered people — a compact **MDT block** (visible priors count, active BOLO count, up to
+  three recent records) reusing `RecordsVisibleTo` / `BolosForQuery`. Flags: **ACTIVE WARRANT**,
+  **BOLO ACTIVE**, **REPORTED STOLEN**, **UNREGISTERED**.
+- **Local-first, never hangs.** NPCs / NPC vehicles / unregistered targets resolve locally
+  (sex, or model + class); the server (`cctv:Scan` → `cctv:ScanResult`) only answers for
+  registered players/plates and overrides the local card with the real record. Record lookup is
+  gated to LEO / Security.
+- **Standin resolves to the real player.** The operator's desk clone is a *networked* ped
+  registered server-side (`cctv:RegisterStandin`, netId → src). Scanning that standin through a
+  camera returns the absent (or own) player's real record instead of UNIDENTIFIED. Cleaned up on
+  close / drop / resource stop.
 
-- Left-click raycasts a **person** or **vehicle** and runs an animated scan sequence (reticle,
-  sweeping line, live percentage). Duration `CCTV.scanTime` (default 6 s).
-- An info card follows the target on screen with a compact **mugshot** and, for registered people,
-  an **MDT summary** (priors, active BOLOs, up to three recent records).
-- Flags: **ACTIVE WARRANT**, **BOLO ACTIVE**, **REPORTED STOLEN**, **UNREGISTERED**.
-- NPCs / unregistered targets resolve locally so a scan never hangs; the server only enriches
-  registered players and plates.
-- The operator's desk standin is a networked ped that resolves to the real player when scanned.
+### Added — CCTV field cameras + dispatch-map integration
+- **CAM placement tool.** `/camtool` gives a pistol whose damage is neutralised while it's out;
+  firing raycasts from the gameplay camera and places a camera at the aimed point (looking back
+  toward where you stood). `/cameras` opens a manager panel (`CctvManager.svelte`) to rename /
+  delete placed cameras, jump the live view to one, and toggle the tool. Placed cameras are
+  persisted + LEO/Security-gated server-side (`cctv-sv.lua`, `data/cctv_cams.json`) and appear in
+  `/cctv` under a **"Field Cameras"** network. New client module `modules/cctv/cctv-place-cl.lua`.
+- **Cameras on the dispatch map.** `/dispatch open` shows every camera the dispatcher may see
+  (config + placed) as 📹 markers. Clicking one opens a "view this camera?" modal; confirming
+  **closes the console, shows the live CCTV view in front, and reopens the console automatically
+  when the operator leaves the camera** (`cctv:Request` accepts a `{net,cam}` focus). The console
+  requests the camera list on open and it refreshes whenever a camera is placed/removed.
 
-## Added — Field cameras + dispatch-map integration
+### Changed — Turf / Gang-War is now opt-in
+- **`Turf.enabled` master switch (default `false`)** in `configs/cfg-turf-sh.lua`. When off,
+  neither `turf-sv.lua` nor `turf-cl.lua` runs (no blips, HUD, kill reporting or capture logic).
+- `Turf.drawMarkers` also defaults to **off** (the full-radius ground cylinder was heavy and
+  noisy; map blips already show ownership).
 
-- `/camtool` places cameras by shooting a spot; `/cameras` manages them (rename / delete / view /
-  toggle tool).
-- Placed cameras persist (`data/cctv_cams.json`) and appear under a "Field Cameras" network.
-- The dispatch map shows all accessible cameras as 📹 markers; a "view this camera?" modal opens the
-  live view in front of the console and reopens the console on exit.
-
-## Changed
-
-- **Turf / Gang-War is now opt-in** — `Turf.enabled = false` by default; `Turf.drawMarkers` off too.
-
-## Fixed
-
-- Could shoot while inside a camera (now hard-blocked).
-- Dispatch console stayed in front of the live camera view.
-- Dispatch map position tracking tightened to ~1 s updates.
+### Fixed
+- **Dispatch UI stayed in front of the camera.** `dispatchOpen` is a *file-local* in
+  `mdt-nui-cl.lua`, so the CCTV module's `if dispatchOpen` check always saw `nil` and never closed
+  the console. Added a global `IsDispatchNuiOpen()` getter; viewing a camera from the map now
+  closes the console (CCTV in front) and reopens it on exit.
+- **Could shoot while in a camera.** Because the viewer keeps game input alive for WASD, the
+  hidden ped could still fire — now hard-blocked (`DisablePlayerFiring` + attack controls).
+- **Dispatch map player position lag.** Units report their position **every 1 s** (was 2 s) so the
+  marker tracks the real position closely instead of visibly lagging while moving. (A remaining
+  constant *offset* would be tile calibration in `web/src/lib/mapproj.js` and needs an in-game
+  reference point to tune.)

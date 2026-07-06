@@ -1,0 +1,63 @@
+---
+title: "3.0.5c"
+---
+
+# [3.0.5c] – 2026-06-11 — Spieler-Profil, Achievements & Easter Eggs
+
+
+Eine neue, moderne **Spieler-UI** (`/profile`) mit Playtime, Charakteren,
+Lizenzen, Fahrzeugen und **Achievements** – inklusive versteckter **Easter Eggs**
+und einem Sammel-Erfolg „Frieda Collector". Plus: **Funken bei offener
+Dispatch-Konsole** und durchgängige **Lokalisierung** der neuen UI.
+
+### Added — Spieler-Profil (`/profile`)
+- Eigenständiges **Dashboard** (Svelte) im modernen Dark-Look, unabhängig vom
+  MDT: links Profilkarte (Avatar, **Level** aus Playtime + XP-Bar, Rollen,
+  Mitgliedschaft), oben Stat-Karten, in der Mitte Tabs **Vehicles / Characters /
+  Licenses / Achievements**.
+- Neues Servermodul `modules/profile/profile-sv.lua` sammelt **vorhandene**
+  Daten in eine Payload (Playtime, Charakter + Lizenzen + Fahrzeuge,
+  `/char`-Presets, Discord-Rollen) – **keine neue Datenhaltung** nötig.
+- `modules/profile/profile-cl.lua`: `/profile`-Befehl, NUI-Bridge, Aktivieren
+  eines gespeicherten Charakters (über den bestehenden `civ:Save`-Flow).
+- ESC schließt; im Dev-Launcher als Karte **„Player Profile"** öffenbar.
+
+### Added — Achievements & Easter Eggs (`modules/profile/`)
+- **Achievements-Tab**: berechnete Erfolge (Willkommen, Mitglied, Veteran,
+  Legende, Garage, Sammler, Voll lizenziert, Saubere Weste …) mit ✓ bzw.
+  Fortschrittsbalken – live aus den Spielerdaten.
+- **Easter Eggs** (`achievements-sv.lua` / `achievements-cl.lua`,
+  `configs/cfg-achievements-sh.lua`): geheime, **persistente** Erfolge
+  (DB-Store `achievements`), config-gesteuert mit Trigger-Typen `coord`,
+  `command`, `konami`. Beispiel-Eggs: UFO, Bergspitze, `/42`, Konami-Code.
+  - **Anti-Spoofing:** Koordinaten-Eggs werden serverseitig gegen die echte
+    Spielerposition geprüft.
+  - **Toast** „🏆 Achievement unlocked!" beim Freischalten (`Toast.svelte`).
+  - In der UI als **„Secrets"** im Achievements-Tab; ungefundene zeigen 🔒 **???**.
+  - Server-Export-Style: `UnlockAchievement(src, id)` global für andere Module.
+
+### Added — „Frieda Collector" (Sammel-Egg)
+- Über die Map verteilte **Katzen** (`modules/profile/frieda-cl.lua`,
+  Modell `a_c_cat_01`), die lokal in Spielernähe spawnen. In der Nähe erscheint
+  ein **„Pet Frieda"**-Prompt; **10 gesammelt → Achievement**.
+- Fortschritt **serverseitig pro Spieler** gespeichert (DB-Store `friedas`),
+  Sammeln serverseitig positionsgeprüft (Anti-Spoof).
+- Eigenes **Bild-Icon** (`web/public/frieda.svg`); per `img = "frieda.png"` in
+  der Config gegen ein echtes Foto austauschbar.
+- 12 Beispiel-Spawnpunkte in der Config (an die eigene Map anzupassen).
+
+### Added — Funken bei offener Dispatch-Konsole
+- Die Dispatch-Konsole nutzt jetzt `SetNuiFocusKeepInput` (wie das MDT/LAPD-CAD):
+  bei offener Konsole kann man sich **bewegen und über pma-voice funken**; Maus
+  steuert nur den Cursor (Kamera/Waffe geblockt), beim Tippen in ein Feld wird
+  der Game-Input kurz unterdrückt (`modules/mdt/mdt-nui-cl.lua`).
+
+### Changed — Lokalisierung (English + Locales)
+- **Alle sichtbaren Profil-/Achievement-/Egg-/Frieda-Strings auf Englisch** und
+  über das `lang/`-System: ~60 neue Keys in `lang/en.json` / `de.json` /
+  `ru.json` (`profile_*`, `lic_*`, `ach_*`) sowie `frieda_prompt` /
+  `frieda_progress` in `lang/en.lua` / `de.lua` / `ru.lua`. Englisch ist Quelle,
+  DE + RU vollständig übersetzt.
+- **Dev-NUI komplett auf Englisch** (Launcher-Texte + Mock-Daten in `dev-data.js`).
+
+---

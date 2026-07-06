@@ -1,0 +1,68 @@
+---
+title: "3.0.5"
+---
+
+# [3.0.5] – 2026-06-07 — Multi-Language Support (DE / ES / FR / PL / RU / EN)
+
+
+The entire resource now ships with a **built-in i18n (internationalisation) system**
+covering both the server-side Lua layer and the NUI/Svelte front-end. A single
+config value switches the active language for all player-facing text at once — no
+code changes required.
+
+### Added
+
+- **`Language` config key** (`configs/config.lua`, default `"en"`).
+  Set to `"en"`, `"de"` or `"ru"` to switch the active language server-wide.
+- **Lua locale module** (`configs/locale-sh.lua`) — shared script (loaded on both
+  client and server) that defines string tables for all three languages and exposes
+  the global `T(key)` / `T(key, arg, …)` helper function.
+  - Falls back to English if a key is missing in the selected locale.
+  - Supports `string.format`-style placeholders (`%s`) for dynamic values.
+- **NUI locale JSON files** (`web/src/lib/locale/en.json`, `de.json`, `ru.json`) —
+  ~80 keys covering all visible MDT and Dispatch Console labels.
+- **`web/src/lib/i18n.js`** — NUI i18n helper with:
+  - `t(key, vars?)` — translates a key; `vars` is an optional `{placeholder: value}` map.
+  - `setLocale(lang)` — switches the active locale reactively (Svelte 5 `$state`-backed).
+  - `LOCALE_CODES` — array of all registered language codes for building a language picker.
+
+### Changed — Lua notifications & log entries
+
+All hardcoded English strings in the server scripts have been replaced with `T()` calls:
+
+### Changed — NUI / Svelte
+
+- **`S.locale`** field added to the central store (`store.svelte.js`).
+- **`messages.js`** calls `setLocale(d.locale)` when the server sends a `show` or
+  `showDispatch` NUI message — the language is delivered from `Language` in `config.lua`.
+- **`mdt-nui-cl.lua`** now includes `locale = Language` in both the `show` and
+  `showDispatch` `SendNUIMessage` payloads.
+- **`Mdt.svelte`** — all visible labels replaced with `t()`:
+  - Left-rail sub-tab labels (`railItems` converted to `$derived` for reactivity)
+  - Toolbar buttons (Home, Query, Traffic, C6, Calls, Dispatch, Enroute, Station, Dispo)
+  - Status grid (BUSY, UNAVAIL, CLEAR, ENROUTE, STATION, CODE 6, ON SCENE) — display only; the internal status values sent to the server are unchanged
+  - Request grid (LEO Backup, Fire/EMS, Coroner, Tow, Crime Broadcast)
+  - Command bar ("Enter commands", "GPS Online")
+  - Active Calls panel header + empty state
+- **`Dispatch.svelte`** — all visible labels replaced with `t()`:
+  - Top-bar title, Zones button, ATTENTION ALL UNITS tone button
+  - ACTIVE INCIDENTS, INCIDENT DETAIL, ON-DUTY UNITS, DISPATCH CHAT panel headers
+  - ASSIGN / RESOLVE action buttons + their select-placeholder options
+  - On-duty unit group headers (LAW ENFORCEMENT, FIRE / EMS)
+  - Unit table column headers (UNIT, INC)
+  - Sort dropdown options (Callsign, Status, Default)
+  - Dispatch chat input placeholder + Send button
+
+### Ressources
+
+- &lt;https://github.com/tabysi/lacore-community/blob/main/README.md#translations>
+- &lt;https://gitlocalize.com/repo/10802>
+
+### How to add a new language
+1. Create `web/src/lib/locale/<code>.json` (copy `en.json`, translate all values).
+2. In `web/src/lib/i18n.js` — add `import <code> from './locale/<code>.json'` and
+   register it in the `LOCALES` object.
+3. In `configs/locale-sh.lua` — add a `_L.<code> = { … }` block with all keys.
+4. Set `Language = "<code>"` in `configs/config.lua` and rebuild (`npm run build`).
+
+---

@@ -1,0 +1,43 @@
+---
+title: "3.0.5f"
+---
+
+# [3.0.5f] – 2026-06-11 — „Big Brother is watching you" (Admin-Logging)
+
+
+Ein neues, zentrales **Admin-Logging-/Überwachungssystem**. Jedes wichtige Event
+fließt in eine durchsuchbare DB, ein In-Game-Admin-Panel und optional Discord.
+
+### Added — Big Brother (`modules/bigbrother/`)
+- **Log-Backend** (`bb-sv.lua`): eigene append-only Tabelle **`pvp_logs`** (indexiert),
+  **gebufferte Batch-Inserts** (kein INSERT pro Event), **Auto-Retention**
+  (Standard 30 Tage), zentrale **`BBLog(category, src, action, detail, opts)`-API**.
+  Funktioniert auch ohne DB (Memory-Fallback).
+- **Event-Feeds** (`bb-feed-sv.lua`) für alle Kategorien — wo möglich als
+  *zusätzliche* Handler ohne Eingriff in die Originalmodule:
+  - **Connection** (Join/Leave + Session-Dauer), **Chat**, **MDT/LEO**
+    (Jail/Cuff/Drag/Coroner/Hospital/Dispatch), **Combat** (Client-Tod-Detektor
+    meldet Killer/Waffe/Distanz), **Vehicle** (`/dv`).
+  - **Admin** (Kick/Ban/Tempban — in `server.lua`, unter dem Ziel-Spieler geloggt)
+    und **Anticheat** (alle Flags, inkl. Staff-exempt) speisen direkt ein.
+- **In-Game-Panel** (`/bblog`, `BigBrother.svelte`): Live-Feed, Filter
+  (Kategorie/Spieler/Text), farbcodierte Log-Tabelle, **Spieler-Dossier**
+  (Counts pro Kategorie, First/Last Seen, Verlauf) und **Teleport** zum Log-Ort.
+  Zugriff **rollen-gated** (Staff/Dev/LeadDeveloper), EN/DE/RU.
+- **Discord-Embeds** pro Kategorie (eigene Kanäle via Convars
+  `pvp_bb_webhook*`), gefiltert nach Severity — Chat/Commands spammen Discord
+  standardmäßig nicht.
+- **Config** (`configs/cfg-bigbrother-sv.lua`, server-only wegen Webhook-Secrets):
+  Kategorien an/aus, Retention, Batch-Intervall, Zugriffs-Rollen, Discord.
+
+### Changed
+- `server.cfg.example`: Big-Brother-Webhook-Convars dokumentiert.
+- `fxmanifest.lua`: `modules/bigbrother/*` eingebunden.
+
+### Notes
+- Generisches „jeder getippte Command"-Logging ist in FiveM ohne
+  `RegisterCommand`-Wrapper nicht möglich — daher werden Chat + die wichtigen
+  Admin-Commands explizit geloggt; die `command`-Kategorie ist für eigene
+  Einspeisungen vorbereitet.
+
+---

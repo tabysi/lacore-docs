@@ -1,0 +1,1071 @@
+---
+title: "Unreleased / Development"
+---
+
+# Unreleased & Development Notes
+
+Pre-release development history (multiple `Unreleased` blocks from the changelog).
+
+## [Unreleased]
+
+
+### Added — Civilian Update
+- **Custom emote editor in /profile → Radial Menu.** Players can create their own emote
+  categories (with icon) and add their own emote entries. Persisted server-side per license
+  in `data/civ_custom_emotes.json`; custom entries are merged into the radial next to the
+  config-provided ones. Server enforces per-player limits (20 categories, 100 emotes) and
+  sanitises every string against injection.
+- **User-friendly emote picker.** Adding an emote is now one click: choose a target category
+  from a dropdown, browse a curated library of 32 popular presets (gestures / poses /
+  activities / dance) with search + group filter, hit the `+` button on any preset. Raw
+  animation-dictionary entry is still available for power users under a collapsible
+  "Advanced" section. Preset library lives in `web/src/lib/emote-library.js`.
+
+### Added — Migration from pvp-corev3
+- **Client-side KVP migration** (`client/migrate-cl.lua`). First-time-per-PC one-shot that
+  renames `PVP-CORE:*` → `LACORE:*` so legacy playtime, settings, last-vehicle position and
+  every stored character carry over untouched. Sets a `LACORE:MIGRATED` flag so the migration
+  runs exactly once. All client scripts (`loops-cl`, `menus-cl`, `vehicle-cl`, `world-cl`,
+  `character-cl`) now read/write under `LACORE:*`.
+
+### Changed — Emotes now bridge to DPEmotes / RPEmotes
+- **Removed the built-in animation/emote engine** (it clashed with the emote resources most
+  servers already run). LACORE no longer registers `/e`, plays `TaskPlayAnim`/scenarios, or
+  stores custom emotes.
+- **New emote bridge** (`modules/civilian/emotebridge-cl.lua`) auto-detects **RPEmotes-reborn**
+  (resource `rpemotes` or `rpemotes-reborn`) or **DPEmotes** (`dpemotes`) at load and routes the
+  civilian radial's emote buttons through it. Play = `/e <name>`, menu = `/emotemenu`, cancel =
+  `/emotecancel` (RPEmotes) or `/e c` (DPEmotes) — verified against the real resources. If
+  neither is installed the buttons notify the player. Exports `GetEmoteProvider`.
+- `configs/cfg-civilian-sh.lua` emote entries are now `{ cat, id, label, emote = "<dp/rp name>" }`
+  — each button just plays that emote via the detected resource (run `/emotemenu` to see names).
+- **Removed the custom-emote editor** from `/profile` (server events, `emote-library.js`,
+  `civ_custom_emotes` store, the picker UI). The Radial tab keeps the enable/disable toggles
+  for the config emotes + services.
+
+### Added — Admin GUI Menu
+- **`/admin` staff panel** (`modules/admin/` + `AdminMenu.svelte`). Server-gated to staff/dev;
+  three tabs:
+  - **Self:** noclip, god mode, invisible, heal, repair vehicle, spawn vehicle by model
+  - **Players:** live online list → goto, bring, spectate, freeze/unfreeze, revive, heal, kick,
+    ban (with reason)
+  - **World:** weather presets, time-of-day slider
+- Every action ON ANOTHER PLAYER is server-authoritative and validated with `HasPermission`
+  (kick needs `kick`, ban needs `ban`) + logged via Big Brother; self-only conveniences run
+  client-side. Reuses existing `BanPlayer` / `BBLog` / `GetPlayerByID`. Bindable key
+  (`RegisterKeyMapping "admin"`, no default). Locales en/de/ru.
+
+### Added — Turf / Gang War
+- **Kill-based territory capture** for civilian organisations (`modules/civilian/turf-sv.lua`
+  + `turf-cl.lua`, `configs/cfg-turf-sh.lua`). Circular turf zones with map blips + ground
+  markers. When a member of a rival org kills someone inside a zone it fills that org's capture
+  bar; reaching `killsToCapture` flips ownership, both orgs are notified, and the zone locks for
+  a cooldown. Progress decays if the fighting stops.
+- **Influence (RP prestige, no money)** — orgs earn influence per qualifying kill and a bonus on
+  capture; shown as ★ on the org panel (`CivOrg.svelte`). `/turf` prints zone ownership +
+  contest status + your influence.
+- **Turf HUD** (`TurfHud.svelte`) — while inside a zone: zone name, current owner, and a live
+  contest bar (attacker + progress) or a lock indicator during cooldown. State persisted to
+  `data/turf.json`; server broadcasts ownership to all clients.
+- Self-contained death detection (only fires inside a turf zone), server re-validates the
+  victim's position against the reported zone (anti-spoof), friendly-fire and own-turf kills
+  excluded. Locales en/de/ru.
+
+### Added — CCTV Surveillance System
+- **`/cctv` viewer** for on-duty LEO / Security (`modules/cctv/`). Fixed cameras grouped into
+  networks (`configs/cfg-cctv-sh.lua`); server validates access by LACORE job/dept
+  (`leo` / `security` / `all`) and only sends the networks the player may see.
+- Scripted game camera at each config position with a **CCTV overlay** (`Cctv.svelte`):
+  blinking REC, network + camera labels, live timestamp, camera list with the active one
+  highlighted, control hints, scanline + vignette. Cycle cameras (← →), cycle networks
+  (↑ ↓), mouse pan (clamped), scroll zoom, Backspace to exit. Camera is destroyed cleanly on
+  exit / resource stop. Locales en/de/ru.
+
+### Added — Evidence & Reports (LEO)
+- **Formal report + evidence system** integrated into the existing DEX person record
+  (`civilians[lic].records`) — inherits visibility, query, persistence and Big Brother logging,
+  no parallel store. New config `configs/cfg-evidence-sh.lua` (evidence types, report types,
+  tag prefix, length caps).
+- **File Report** — pick a report type (arrest / incident / use-of-force / field interview /
+  supplemental / traffic), write a narrative, add location / involved parties / incident #.
+  Rendered as a distinct blue-bordered card in the person record. Server event
+  `char:FileReport`.
+- **Log Evidence** — pick an evidence type (weapon / substance / fingerprint / DNA / document /
+  photo / …), description, location, incident #. Server assigns a unique tag
+  (`EV<YYMMDD>-<hex>`). Rendered as a teal-bordered card with a **chain-of-custody** log; any
+  on-duty officer can append custody entries (`char:EvidenceCustody`). Server events
+  `char:LogEvidence` / `char:EvidenceCustody`.
+- All three events are on-duty-unit gated, length-capped and target-validated by exact unique
+  name (same guard as citations). Shown in every MDT variant via the shared PersonRecord
+  component. Locales en/de/ru.
+
+### Added — Framework Bridge (ESX / QBCore / QBox)
+- **`modules/bridge/`** — compatibility layer so LACORE can run alongside an existing
+  framework instead of a second identity system. Auto-detects `es_extended` / `qbx_core` /
+  `qb-core` (config `Bridge.mode`), exposes a unified server + client API
+  (`Bridge.GetIdentifier / GetName / GetJob / IsLeo / IsEms / Notify`, exports
+  `GetFramework` / `BridgeGetJob`), and maps framework jobs → LACORE agencies via
+  `configs/cfg-bridge-sh.lua` `Bridge.jobMap` (police→LAPD, sheriff→LASD, ambulance→EMS, …).
+- **Job sync + optional auto-duty.** Fires `lacore:bridge:jobChanged` on the client when the
+  mapped dept changes; with `Bridge.autoDuty = true` it drives LACORE's authoritative
+  `/onduty` path (DutyRoles / CanGoOnDuty still validate) so the correct MDT opens
+  automatically. Default off.
+- **Anticheat honeypot conflict solved.** When a framework is detected the bridge tells the
+  anticheat to skip ESX/QB event names at honeypot registration, so legit framework traffic
+  isn't banned. The bridge itself uses exports (never the legacy `esx:getSharedObject` event),
+  so it never trips the honeypot. Detection runs synchronously at load (bridge loads before the
+  anticheat) so the skip is applied before handlers are armed.
+
+### Added — Launch Prep
+- **First-boot diagnostics** (`modules/security/diagnostics-sv.lua`). ~8 s after start LACORE
+  prints a boxed health check to the console: resource name, each dependency's start state,
+  devmode, database connection, Discord auth, webhooks, anticheat, framework bridge, IP-lock
+  state and server-hardening convars — colour-coded ✓/!/✗ with an ok/warn/error tally.
+  Re-runnable any time via **`/lacore doctor`** (also usable in-game by staff). Turns most
+  "why doesn't X work" tickets into self-service.
+- **`START-HERE.md`** — a concise buyer onboarding guide (requirements → install → server.cfg →
+  first boot → config → in-game → troubleshooting) that points to `/lacore doctor` and `DOCS.md`.
+
+### Added — Owner Command Suite
+- **`/lacore` in-game command** (`modules/security/owner-commands-sv.lua`). Read-only
+  diagnostics for operators / staff:
+  - `/lacore version`   → resource + FXServer version, timestamp
+  - `/lacore status`    → snapshot: version, uptime, hostname, slots, devmode, licence
+    state (from iplock), database (oxmysql or JSON fallback), web bridge, Discord auth,
+    anticheat status
+  - `/lacore db`        → DB connection state + list of known store keys
+  - `/lacore telemetry` → telemetry configuration + `lacore_owner_discord` convar
+  - `/lacore modules`   → checklist of loaded modules (iplock / db / discord / permissions
+    / bigbrother / anticheat / mdt / dispatch / civilian / webdispatch)
+  Console always allowed; in-game gated to Staff / Dev via `HasPermission(src, "lacore")`.
+
+### Added — Operator Telemetry
+- **Owner telemetry channel** (`modules/security/telemetry-sv.lua`). Escrow-encrypted
+  phone-home that reports server-level metadata to the operator's Discord webhook on start,
+  every 60 minutes and on graceful stop. Reports: public IPv4 (piggy-backing on iplock's
+  already-resolved value), sv_hostname, resource name + version, sv_licenseKey, optional
+  `lacore_owner_discord` convar, sv_maxClients and uptime. Sends NO player identifiers, DB
+  contents, file contents or secrets. Disclosed in the LACORE EULA and in the Tebex
+  product listing.
+
+### Security
+- **Hardened the Big Brother client-fed log events against audit pollution / DoS**
+  (`modules/bigbrother/bb-feed-sv.lua`). `bb:Death`, `bb:Vehicle` and `bb:Command` are
+  `RegisterNetEvent` handlers any client can fire directly, and each wrote to the admin log
+  with no throttle — a malicious client could flood the audit trail with fake entries + spam
+  the DB and live panel. Added a per-source rate limiter (death 1 s, vehicle 500 ms, command
+  250 ms) plus length-capping of the command name (40) and raw payload (200). Rate table
+  cleared on `playerDropped`. (`bb:Action` kick/ban/jail was already `hasAccess`-gated;
+  `bb:Query`/`bb:Dossier` already access-gated and SQL-parameterised — no change needed.)
+- **Hardened the civilian custom-emote / radial events against DoS abuse**
+  (`modules/civilian/civilian-sv.lua`). The `civ:RemoveCustomEmote` and
+  `civ:RemoveCustomCategory` handlers previously serialised and wrote the entire
+  `civ_custom_emotes` store to disk + DB on **every** call, even when nothing changed —
+  a client could flood them with junk ids for a cheap server-side disk/CPU DoS. They now
+  only persist when something actually changed. Added a shared per-source rate limiter
+  (`rateOk`) to all civilian write events (`AddCustomCategory / RemoveCustomCategory /
+  AddCustomEmote / RemoveCustomEmote / SetRadialPref`, min 400 ms apart), to
+  `civ:GetCustomEmotes` (1 s) and to `civ:ShowId` (1.5 s, stops NUI-spam at other players).
+  The rate-limit + activity-cooldown tables are now cleared on `playerDropped` so they can't
+  grow unbounded across reconnect churn.
+
+### Fixed
+- **Agency MDT: only the latest comment showing in the single incident view.** The
+  `mdt:setCallInformation` net-event handler in `mdt-nui-cl.lua` gated its `updateCallInfo`
+  forward to `mdtNuiOpen` only — Agency MDT / Dispatch never received the per-call refresh
+  after selecting an incident, so its `activeCall.comments` fell out of sync with newer
+  entries until the next full `SyncCalls` broadcast. Now forwards for LAPD MDT, Agency MDT
+  AND Dispatch.
+- **Radial keybind (B) sticking after rebind.** `RegisterKeyMapping("+civradial", ...)` no
+  longer sets a default key, so FiveM never re-applies "B" over the user's own binding after
+  the pvp-corev3 → lacore resource rename. First-time users bind their key once via
+  FiveM → Settings → Keybinds.
+
+---
+
+## [Unreleased] – Sprache (MDT separat) & Anticheat-Fix
+
+
+### Fixed (Radial — Hold + Fokus-Rahmen)
+- **Radial-Hold flackerte / öffnete nicht sauber.** Ursache: `SetNuiFocus` griff die Eingabe
+  synchron → Phantom-Key-Up. Jetzt via **`SetNuiFocusKeepInput(true)`**: die Spiel-Eingabe bleibt
+  aktiv, das Release-Event der Halte-Taste feuert zuverlässig und es entsteht kein Phantom →
+  echtes „offen solange **B** gehalten, Loslassen schließt". Bewegung/Kampf/Pausemenü werden
+  währenddessen geblockt; ESC/Backspace schließen ebenfalls.
+- **Weißes Viereck um die Buttons entfernt:** war der Browser-Fokus-Rahmen auf den SVG-Segmenten
+  beim Klick. `tabindex` von Segmenten/Hub entfernt (nicht mehr fokussierbar) + `outline: none`.
+
+### Added (LASD CAD — Auto-Adresse, Auto-Waypoint, Incident-Templates, LPR)
+- **Adresse auto-eingetragen:** beim Öffnen des „CREATE CALL"-Formulars wird das **LOC-Feld**
+  automatisch mit der aktuellen **Straße (+ Kreuzung + Postal)** des Officers vorbefüllt
+  (Callback `lasdGetLocation` → `lasdLocation`).
+- **Auto-Waypoint beim ACK:** schließt man sich einem Incident an (`AssignSelf`), wird automatisch
+  ein GPS-Wegpunkt zum Einsatzort gesetzt (Server sendet die Koords mit `lasd:Assigned`).
+- **Incident-Templates:** im „Create CFS"-Formular eine Template-Leiste (Traffic Stop, Suspicious
+  Vehicle/Person, Disturbance, Illegal Parking, Pursuit) → Ein-Klick füllt Code + Nature vor.
+- **LPR (License Plate Reader):** `/lpr` (oder CAD-Callback) scannt das **Fahrzeug direkt vor dem
+  Spieler** (Raycast), liest das Kennzeichen, führt die **VEH-Abfrage** aus und füllt beim
+  Traffic-Stop das **VEH-Feld** des Create-Formulars automatisch. Locale-Keys en/de/ru.
+
+### Changed (Civilian Update — Radial: Hold-to-open + konfigurierbar)
+- **Radial ist jetzt „gedrückt halten"** statt Toggle: Keybind hält das Menü offen (`+civradial`),
+  Loslassen schließt (`-civradial`); Items währenddessen mit der Maus anklicken. (`/e`/`/prop`
+  ohne Argument öffnen weiterhin per Toggle.)
+- **Keine Separatoren mehr** zwischen den Buttons (Segment-Gap 0, kein Stroke) — sauberer Ring.
+- **Radial im Profil konfigurierbar:** neuer Profil-Tab **„Radial Menu"** mit Toggles für jede
+  Emote (nach Kategorie) und jeden Service. Auswahl wird **pro Spieler persistiert**
+  (`data/civ_radialprefs.json`, nur deaktivierte IDs gespeichert → neue Items default an) und
+  filtert das Radial beim Öffnen. Events `civ:GetRadialPrefs`/`civ:SetRadialPref`/`civ:RadialPrefs`,
+  NUI `civRadialConfig`, Locale-Keys en/de/ru. Im Preview verifiziert (DOM).
+
+### Added (Civilian Update — Phase 4: Gang/Org-Rahmen)
+- **Organisationen/Gangs** (`modules/civilian/org-sv.lua`, persistiert `data/civ_orgs.json`):
+  anlegen, **nächsten Spieler einladen** (Owner/Officer) → `/orgaccept`, verlassen/auflösen,
+  **MOTD**, **Ränge** (Owner > Officer > Member) mit Kick/Promote. Ein Spieler ist in höchstens
+  einer Org.
+- **LEO sieht die Zugehörigkeit:** Beitritt/Austritt setzt die `faction` des aktiven Charakters
+  (neue Hilfsfunktion `SetCharFaction` in `characters-sv.lua` → Spiegel `civilians[lic]`),
+  womit die Gang in der MDT-Personenakte auftaucht.
+- **Org-Panel** (`web/src/components/CivOrg.svelte`), geöffnet über Radial → Services →
+  „Organisation": Header (Farbe/Tag), editierbares MOTD, Mitgliederliste mit Rang-Badges +
+  Online-Status, Promote/Kick (rechtebasiert), Invite/Leave/Disband. Store `S.citizen.org`,
+  Messages `showCivOrg`/`hideCivOrg`, Actions + Locale-Keys en/de/ru. **Beide Panel-Zustände
+  (Create + Management) im Preview verifiziert.**
+
+### Added (Civilian Update — Phase 3: Aktivitäten/Jobs, RP-only)
+- **Config-getriebene Civ-Aktivitäten** (`CivConfig.activities`): jede Aktivität ist eine Kette
+  von Wegpunkten — Step 1 = Clock-in-Hub (Blip + Marker), Ankunft am letzten Step schließt ab.
+  Beispiel „Garbage Run" enthalten (Koords sind **Platzhalter**, auf eigene Map anpassen).
+- **Ablauf:** am Hub `E` zum Starten → GPS führt zu den Stops → Abschluss am Ziel. `/canceljob`
+  bricht ab. Radial „Activities" setzt einen Wegpunkt zum nächsten Hub.
+- **Belohnung RP-only (kein Geld):** Abschluss schaltet ein optionales **Achievement** frei
+  (`UnlockAchievement`) und zählt einen **persistierten Fortschritt** pro Aktivität
+  (`data/civ_activities.json`, server-seitig, mit 10s-Anti-Spam). Server-Event `civ:ActivityDone`
+  validiert gegen die Config. Locale-Keys en/de/ru.
+
+### Added (Civilian Update — Phase 2: Services-Hub im Radial)
+- **Radial wird zum Bürger-Hub:** neue **„Services"-Sektion** im Bürger-Menü mit
+  **Register Vehicle** (`/vreg`), **My ID** (zeigt den eigenen Ausweis inkl. eigenem Mugshot),
+  **Call 911** und **Call 311**. Alles reine Wiederverwendung der bestehenden Core-Funktionen
+  (`OpenVehRegForm`, `/911`+`/311` → `call:Submit`); 911/311 fragen per On-Screen-Keyboard nach
+  einer Beschreibung. Adressiert das Feedback „Civs wissen nicht, was sie tun können".
+- Server `civ:ShowMyId` (eigener Ausweis, kein „shown by"); Karten-Builder refaktorisiert.
+  Store `S.citizen.services`, Action `civService`, Locale-Keys en/de/ru. Im Preview verifiziert
+  (DOM: Services-Segmente + Hub).
+
+### Added (Civilian Update — Phase 2: echte ID-Felder)
+- **Ausweis zeigt echte Charakter-Daten.** Im Profil-Charakter-Formular (`Profile.svelte`) sind
+  jetzt **Größe / Gewicht / Augen / Haare** editierbar (Augen/Haare als Auswahl BRN/BLU/…). Die
+  Werte landen über `physical` im Charakter (`characters-sv.lua`, server-sanitisiert) und im
+  CAD-Spiegel `civilians[lic]`. `civ:ShowId` sendet sie mit; die DL-Karte (`CivIdCard.svelte`)
+  nutzt **echte** Werte, wenn gesetzt — sonst den deterministischen RP-Filler. Locale-Keys en/de/ru.
+- **Live-Foto per Mugshot-Native.** Beim „Ausweis zeigen" registriert der **Empfänger** einen
+  `RegisterPedheadshot` vom (direkt benachbarten) Ped des Vorzeigers — das Txd ist clientlokal —
+  und zeigt es via FiveM-`nui-img`-Host als Portrait (Haupt- + Geister-Foto). Karte erscheint
+  sofort, das Foto wird asynchron nachgereicht (`civIdPhoto`); ein Headshot bleibt gleichzeitig
+  registriert (vorheriger wird freigegeben). Browser-Fallback: Platzhalter, wenn die nui-img-URL
+  nicht auflöst.
+
+### Added (Civilian Update — Phase 1: Emotes & Bürger-Menü)
+- **Neues Modul `modules/civilian/`** + Config `configs/cfg-civilian-sh.lua` (datengetrieben,
+  escrow-ignored). Start des RP-only Civilian-Updates (kein Geld-/Economy-System).
+- **Emote-System:** `/e <name>` spielt eine Emote, `/e` öffnet das Bürger-Menü, `/e c` bricht ab.
+  Unterstützt Anim- und Scenario-Emotes (alles Base-Game, keine Stream-Assets). Looping-Emotes
+  werden beim Bewegen/Einsteigen automatisch beendet. Sync über FiveMs Ped-Anim-Replikation
+  (kein Server-Relay nötig).
+- **Bürger-Menü als echtes Radial-Wheel (Svelte-NUI):** Keybind `pvp_civradial` (Default **B**,
+  frei bindbar) öffnet ein segmentiertes Kreis-Menü (SVG) mit Center-Hub + Hover-Highlight.
+  Oberste Ebene = Sektionen (Emote-Kategorien + „Props"); Auswahl öffnet die Items, Center =
+  „Zurück"/„Schließen". Esc/Rechtsklick schließt. `web/src/components/CivRadial.svelte`,
+  Store-Namespace `S.citizen`, Messages `showCivRadial`/`hideCivRadial`.
+- **Platzierbare Props (server-synchron):** server-autoritativ erzeugte, vernetzte Objekte
+  (jeder sieht sie). Im Radial unter „Props" platzieren bzw. „Aufheben" (nächstes eigenes),
+  oder `/prop <id>` / `/prop pickup`. Whitelist + Limit pro Spieler (`CivConfig.propLimit`),
+  Cleanup beim Disconnect. Neues Server-Modul `modules/civilian/civilian-sv.lua`.
+- **Radial schließt auf derselben Taste:** der Öffnen-Key (Default B) schließt das Menü auch
+  wieder (NUI bekommt den gebundenen Key mitgeteilt und schließt bei Tastendruck).
+- **Props per Third-Eye entfernen — auch fremde:** ox_target-Option „Prop entfernen" auf jedem
+  platzierten Prop. Funktioniert auf JEDEM getrackten Prop (auch von anderen Spielern), per
+  netId server-validiert (kann keine beliebigen Welt-Objekte löschen). Die Radial-„Aufheben"-
+  Aktion bleibt eigenes-nächstes; das Auge ist der globale Weg.
+- **Civ↔Civ: Ausweis zeigen.** Third-Eye-Option „Ausweis zeigen" auf Spielern → dem Gegenüber
+  poppt eine **realistische California-Driver-License-Karte** auf: Header (CALIFORNIA/USA/Bär/
+  Stern), Foto mit „SAMPLE"-Vertikalschrift + Mikroschrift-Streifen, Siegel-Wasserzeichen,
+  Laser-Perforation, Diagonal-Streifen-Ecke, Geister-Foto, Unterschrift, und das volle
+  Feld-Set (4d DLN, 4b EXP, 3 DOB, 1/2 Name, 8 Adresse+ZIP, 9 CLASS, 9a END, 12 REST, 4a ISS,
+  5 DD, 15 SEX, 16 HGT, 17 WGT, 18 EYES, 19 HAIR). **Reale** Felder (Name/DOB/Geschlecht/Adresse)
+  aus dem CAD-Spiegel `civilians[lic]`; DLN/EXP/ISS/HGT/WGT/EYES/HAIR sind deterministische
+  RP-Filler (echte Charakter-Felder folgen in Phase 2). Komponente `CivIdCard.svelte`,
+  Net-Events `civ:ShowId`/`civ:ReceiveId`. („Hände hoch" ist über die Emotes abgedeckt.)
+- Locale-Keys (en/de/ru, Lua + JSON), DevLauncher-Karte „Civilian Menu" für die NUI-Vorschau.
+- Radial-Wheel + ID-Karte im Vite-Preview visuell verifiziert (Drill-Down, Hover-Arc, Karte).
+
+### Fixed (Incident-Attachment — ganze Unit)
+- **Beim Erzeugen eines Einsatzes durch eine Unit wird jetzt die ganze Unit angehängt.**
+  `AddDispatchCall` (Backup/Traffic/Code6/manueller Incident) hat nur die anfragende
+  `source` an den Einsatz gehängt — ein Partner mit gleichem Callsign blieb unassigned.
+  Jetzt werden Status/Incident für **alle Mitglieder derselben Unit** gesetzt (wie schon bei
+  Self-Assign, Dispatcher-Assign und Statuswechsel).
+
+### Added / Fixed (Third-Eye & Cuffing)
+- **Neu: `ThirdEye`-Schalter in `configs/config.lua`.** `ThirdEye = true|false` aktiviert/
+  deaktiviert alle ox_target-Spieleroptionen (LEO/EMS/Coroner). Default an. Die Befehle
+  (`/release`, `/uncuff`, `/putin` …) bleiben unabhängig davon verfügbar.
+- **Gezogene (gedraggte) Person ins Fahrzeug setzen ohne Re-Targeting.** Sobald man jemanden
+  zieht, ist er an den Officer **attached** und kann mit dem Auge nicht mehr anvisiert werden
+  — die „in Fahrzeug"-Eye-Option war damit unerreichbar. Neuer Befehl/Keybind **`/putin`**
+  (`pvp_putin`, ohne Default-Taste — frei bindbar) setzt die **aktuell gezogene** Person ins
+  nächste Fahrzeug. `/uncuff` und `/release` (Keybind X) decken Entfesseln bzw. Loslassen ab.
+- **Cuff-Animation spielt zuverlässiger.** Der Loop, der die Fessel-Animation hält, lädt das
+  Anim-Dict (`anim@arrest_crooks`) jetzt selbst nach, falls der Load beim Cuffen fehlschlug
+  oder das Dict zwischenzeitlich entladen wurde (vorher: stilles No-Op → keine Animation).
+- **Cuff-Sound auch bei nicht-interagierenden Spielern.** Ein Zivilist, der die NUI nie
+  geöffnet hat, hat ggf. einen *suspended* Web-Audio-Context → der Cuff/Uncuff-Sound blieb
+  stumm. `playSound` weckt den Audio-Context jetzt vor dem Abspielen auf.
+
+### Fixed (Dispatcher-Karte — Marker-Position / „descale")
+- **Marker (Einheiten/Einsätze) sitzen wieder korrekt auf der Karte.** Die Projektion
+  Spielkoords→Tile-Pixel war über das Admin-Menü („Map Calibration": Scale/OffsetX/OffsetY)
+  **runtime-verstellbar**, server-weit persistiert (`data/map_config.json`) und an alle
+  Clients gebroadcastet — ein falscher Wert (z. B. `0.3 / 1 / 5550`) hat damit **alle**
+  Marker descaled/verschoben. Die Kalibrierung ist aber eine **feste Eigenschaft des
+  Tile-Rasters**, kein Tuning-Wert. Sie liegt jetzt zentral als Konstante in
+  `web/src/lib/mapproj.js` (Single Source of Truth für Dispatch- **und** Big-Brother-Karte);
+  die fehleranfälligen Kalibrierungs-Felder wurden aus dem Admin-Panel entfernt. Ein bereits
+  kaputt gespeicherter Wert wird ignoriert → die Karte heilt sich beim nächsten Build.
+
+### Fixed (EMS-CAD — nur EMS-relevante Calls)
+- **Im EMS-CAD landen keine reinen Polizei-Calls mehr.** Der Bridge ins EMS-CAD
+  (`AppendSharedDispatchCalls`) spiegelte **jeden** offenen Dispatcher-Einsatz. Jetzt nur
+  noch **echte EMS-Anforderungen** (`Requesting Fire/EMS`, `Requesting Coroner`) **oder**
+  Einsätze, an denen eine **EMS-Einheit hängt** (vom Dispatcher zugewiesen). Generisches
+  „911 Emergency" kommt nur noch rein, wenn EMS tatsächlich zugewiesen wird.
+
+### Fixed (MDT — Auto-Detach & 311-Calls)
+- **Man wird nicht mehr ungewollt vom Einsatz detached.** `mdt:SetStatus` überschrieb
+  `player.incident` IMMER mit dem mitgeschickten Wert — der Client sendet aber **0**
+  bei BUSY/UNAVAILABLE/CLEAR/OUT TO STATION → jeder solche Statuswechsel löste die
+  Zuweisung. Jetzt server-autoritativ: nur **CLEAR** detacht, ein expliziter Incident
+  übernimmt, sonst bleibt die bestehende Zuweisung erhalten.
+- **Self-Assign ist jetzt server-autoritativ (per `source`).** Die Zuweisung lief vorher
+  über `mdt:SetStatus(callsign, …)` mit **Callsign-Matching** — stimmte der Client-
+  Callsign nicht exakt mit `player.callsign`, schlug das Attach **lautlos** fehl und man
+  erschien beim nächsten 2s-Sync wieder „unassigned" (das vom User vermutete „Server-
+  Validierungs"-Problem). Neues Event `mdt:SelfAssign` ordnet sicher über die `src` zu.
+- **911/311-Calls kollidieren nicht mehr.** `CreateCallQueueIncident` zählte noch mit
+  rohem `+1` statt der rollierenden `NextIncidentNumber()` → ein Auto-Incident konnte
+  eine **bereits aktive** Nummer treffen und den Call überschreiben/„verschwinden"
+  lassen (betraf v.a. 311). Jetzt kollisionssicher (überspringt aktive Nummern).
+
+### Fixed (Agency-MDT — Settings/Query öffneten das LAPD-MDT)
+- **Settings öffnen nicht mehr das LAPD-Settings-Modal im Hintergrund.** Das Agency-MDT
+  nutzte `S.settingsOpen` → das **globale LAPD-Modal** (Modals.svelte) ploppte hinter dem
+  Fenster auf und blieb stuck. Jetzt hat das Agency-MDT ein **eigenes, gethemtes Settings-
+  Panel** (lokaler State, wie beim LASD CAD) — Opacity/Scale/Position, Reset, Done.
+- **Jemanden „runnen" öffnet nicht mehr das LAPD-MDT.** `RunPersonOrPlate` machte
+  `if not mdtNuiOpen then OpenMdtNui()` → bei offenem Agency-/LASD-MDT poppte das LAPD-MDT
+  im Hintergrund auf (und das LASD CAD blieb danach stuck). Der Helper respektiert jetzt
+  das **aktuell offene** MDT und öffnet das LAPD-Fenster nur, wenn KEIN MDT offen ist.
+
+### Fixed (Third-Eye — Release-Keybind + Englisch)
+- Der hardcodierte **deutsche Keybind-Text** ist jetzt **englisch** („Release carried /
+  Uncuff nearest"). Alle sichtbaren Strings laufen über die englische `en.lua`.
+- Da der X-Keybind kollidieren oder erst gebunden werden muss, gibt es jetzt auch die
+  **Chat-Commands `/release` und `/uncuff`** (gleiche Aktion: Getragenen absetzen bzw.
+  nächsten Gefesselten entfesseln). Mit Rückmeldungen (entfesselt / niemand gefesselt /
+  abgesetzt), damit man sieht, dass es feuert.
+
+### Fixed (Third-Eye — Cuff/Carry ließ sich nicht rückgängig machen)
+- Angehängte (getragene) bzw. weggebrachte Ziele kann man nicht mehr anvisieren →
+  Uncuff/Release per Third-Eye ging nicht. Neuer **Release-Keybind (Standard `X`,
+  umlegbar)**: trage ich jemanden → absetzen; sonst (LEO) → **nächsten gefesselten
+  Spieler in Reichweite entfesseln** (server-seitiges Cuff-Tracking).
+
+### Added (Field-Essentials — Breathalyser & Drugalyser)
+- Nativ in den Core integriert (eigenständig implementiert, kein Fremd-Framework):
+  **Alkomat** und **Drogen-Speicheltest** als RP-Tests. Officer fordert an (Third-Eye
+  „Breathalyse"/„Drug Test" **oder** `/breatha` / `/druga`, nächste Person), die
+  getestete Person liefert das Ergebnis selbst (`/breath <µg>` bzw.
+  `/saliva <cannabis> <cocaine>`; leer = verweigert). Grenzwert 35 µg/100ml, Ergebnisse
+  an Officer + Person, im Big-Brother-Log auditiert. Locales en/de/ru.
+- Cuffing/Dragging waren bereits im Core vorhanden und wurden nicht doppelt übernommen.
+
+### Added (Third-Eye / ox_target — Spieler-Interaktionen)
+- Neues Modul `modules/target/` registriert **ox_target**-Eye-Optionen auf Spielern,
+  jobabhängig (`canInteract`), verdrahtet auf bestehende + neue Server-Events:
+  - **LEO:** Fesseln/Lösen (`cuffPlayer`), Ziehen/Loslassen (`dragPlayer`),
+    Ins/aus Fahrzeug (`dragPlayer` vehicle).
+  - **EMS:** Sanitäter/Transport (`hospitalServer`), **Revive** (neu, `ems:Revive` →
+    `NetworkResurrectLocalPlayer`), **Puls prüfen** (lokal, zeigt Health/„kein Puls"),
+    **Coroner/Leichensack** (neu, `target:DeadBag`, Coroner ODER Fire/EMS).
+  - **CIV + alle:** **Tragen/Absetzen** (Fireman-Carry, `target:Carry`) — nur bei
+    bewusstlosen/toten Zielen (Grief-Schutz, client-seitig geprüft).
+- **Soft-Dependency:** ohne laufendes `ox_target` werden keine Targets registriert
+  (kein Crash, Hinweis in der Konsole). Locales `target_*` (en/de/ru).
+
+### Added (Anforderungen mit Detail-Eingabe)
+- Bei **LEO Backup · Fire/EMS · Coroner · Tow · Crime Broadcast** kann jetzt vor dem
+  Absetzen ein **optionaler Detail-Text** eingegeben werden (On-Screen-Keyboard; MDT bleibt
+  offen, wird kurz entfokussiert). Die Details werden an die Standard-Meldung
+  (`Callsign [Dept] — Typ`) angehängt und erscheinen im Einsatz/Dispatch. Gilt für alle
+  MDTs (LAPD/Agency/EMS), zentral in `SendBackupRequest`. Locale `mdt_backup_details_prompt`.
+
+### Fixed (Routing — AMR/Fire/EMS landete im Agency-MDT)
+- Eine Fire/EMS/Coroner-Unit fällt jetzt **nie** mehr aufs Agency-MDT durch. Vorher war
+  das Gate `if isEms and OpenEmsMdt` — fehlte das ems-Modul zur Laufzeit (`OpenEmsMdt` nil),
+  öffnete fälschlich das Agency-MDT. Jetzt: `if isEms then …` (early return), und falls
+  `OpenEmsMdt` fehlt, öffnet nichts + Konsolenhinweis „modules/ems geladen?".
+
+### Added (EMS / Fire CAD — neues MDT)
+- **Eigenes EMS/Fire-CAD-Terminal** (Dark-CAD-Look nach Mockup) für **Fire/EMS/Coroner**.
+  Eigenes Backend (`modules/ems/ems-sv.lua`, Persistenz `data/ems_incidents.json`) wie das
+  LASD-CAD, mit Bridge in das geteilte Dispatch-System (Dispatcher sieht EMS-Einsätze,
+  agency="EMS") und Einblendung der geteilten 911-Einsätze (PD-…).
+- **Layout** im echten RescueNet/FDM-Look: Top-Tab-Leiste (RM-Logo · UNITS · CAD · NEW) ·
+  links Kontakt-/Einsatzliste mit Suche · Mitte CAD-**Chat-Thread** (Zeitstempel +
+  Sprechblasen) mit kompakter INC/LOC/UNITS-Zeile und abgerundetem Eingabefeld + Send-Button ·
+  rechts farbcodierte Status-Rail **EN RTE (F1) · ON SCN (F2) · CLEAR · BUSY · UA · BACKUP ·
+  MN ACK · STGD · AT HSP** · unten Icon-Nav (Map/Incidents/Messages/Forms/Utilities) +
+  Unit-Chip, Status-Chip und Uhr/Datum.
+- **Bottom-Bar voll funktionsfähig:** **Map** (Einsatzliste mit „Waypoint setzen" →
+  In-Game-GPS via neuem `emsWaypoint`-Callback) · **Incidents** (Einsatztabelle, Zeile
+  öffnet den Thread, ACK je Zeile) · **Messages** (CAD-Chat) · **Forms** (Patient Care
+  Report → strukturierter Eintrag in den Einsatz) · **Utilities** (Terminal-Info,
+  Refresh-Sync, Close). Lokalisierung `ems_waypoint_set`.
+- **Display-Einstellungen** in Utilities: **Größe (70–130 %)** und **Durchsichtigkeit
+  (30–100 %)** per Slider, live angewandt (Scale/Opacity am Container) und lokal
+  gespeichert (`localStorage 'ems-display'`), plus „Reset display".
+- **Verschiebbar:** Top-Leiste ziehen → Fenster frei positionieren; Position wird
+  mitgespeichert (Default zentriert).
+- **EMS-Requests aus den anderen MDTs** (REQUEST BACKUP/EMS → „Requesting Fire/EMS",
+  „Requesting Coroner", 911) werden im EMS-CAD angezeigt, mit rotem **EMS REQ**-Badge
+  markiert und in der Liste nach oben priorisiert.
+- **UNITS-Tab** (oben) zeigt **alle aktiven Fire/EMS-Units** mit Unit/Name/Status/Incident —
+  inklusive on-duty Einheiten ohne offenes CAD (aus dem geteilten Roster, Status gemappt).
+- **Status** server-autoritativ (nur CLEAR detacht), gemappt auf den geteilten HUD-Status
+  inkl. **STAGED** und **AT HOSPITAL**. **ACK** = Einsatz attachen, **BACKUP** = Fire/EMS-
+  Anforderung (`relaySpecialContact`), **COMMENTS** ins Einsatz-Log + Audit gespiegelt.
+- **Routing** (`/mdt`): Job `Fire/EMS`/`Coroner` ODER dept `fire/ems/fd/medic` → EMS-CAD
+  (vor dem Agency-MDT). Neues `/ems`-Command. Im DevLauncher als „EMS / Fire CAD".
+
+### Fixed (Profil — aktiver Charakter wird beim Connect on-screen angewandt)
+- Desync behoben: UI zeigte einen aktiven Charakter, on-screen (Nick) aber „keiner aktiv".
+  Ursache: der aktive Charakter wurde nur beim **Öffnen** des Profils / **Erstellen**
+  angewandt (Nick gesetzt), nicht beim **Spawn**. Neu: Client meldet `char:RestoreActive`
+  beim Spawn → `EnsureActiveCharacter` wendet den aktiven Charakter an (Nick + Civilian-
+  Spiegel) bzw. aktiviert den zuletzt aktiven, falls keiner gesetzt ist. Damit erscheint
+  der Nick sofort, ohne dass man /char öffnen oder einen 2. Charakter erstellen muss.
+
+### Fixed (Profil — kein aktiver Charakter nach /char)
+- Beim Anlegen eines Charakters (`char:Create`) wurde `activeId` nie gesetzt → der
+  **erste** Charakter war nicht aktiv, im Profil-UI war nichts markiert und es war kein
+  Session-Nick gesetzt. Jetzt wird der erste Charakter **automatisch aktiviert**
+  (`SetActiveCharacter` inkl. Nick + Civilian-Spiegel). Zusätzlich: `profile:Request`
+  aktiviert bei Altdaten (Charaktere vorhanden, keiner aktiv) automatisch den zuletzt
+  aktiven — so ist nach `/char` immer ein aktiver Charakter gesetzt.
+
+### Changed (`/char` öffnet das Profil-UI statt des alten Char-Creators)
+- `/char` (und `/character`) öffnen jetzt das **Player-Profile-UI direkt auf dem
+  „Characters"-Tab** (Charaktere anlegen/aktivieren/bearbeiten/löschen) statt des
+  alten separaten Civ-Datenblatts. Neue globale `OpenProfile(section)` in
+  `profile-cl.lua`; `showProfile` trägt eine `section`, die das Profil-UI übernimmt
+  (`/profile` bleibt auf „Overview"). Verifiziert.
+
+### Fixed (MDT — „Request Backup / EMS / Tow" taten nichts)
+- Die Backup-Buttons in **allen** MDTs riefen das Command `mdt_request_backup` auf, das
+  **nirgends registriert** war → die Buttons hatten keine Funktion. Jetzt erzeugen sie
+  über einen gemeinsamen Helper (`SendBackupRequest`) einen echten **Special-Contact-
+  Einsatz** an der Unit-Position (`relaySpecialContact`), der an Dispatch und alle Units
+  (MDTs) gebroadcastet wird. Betrifft REQUEST BACKUP, EMS, TOW, Coroner, Crime Broadcast
+  und „Created Incident" — und ist damit auch fürs geplante **EMS/Fire-MDT** nutzbar.
+- **„Tow Truck"** erzeugt jetzt ebenfalls einen Einsatz (fehlte in der Server-Typliste).
+- Neue Lokalisierung `mdt_backup_sent` (en/de/ru) als Bestätigungs-Notification.
+
+### Fixed (Agency-MDT — Incident-History wurde nie befüllt)
+- Die **Incident-History** blieb im Agency-MDT immer leer: der Client leitete
+  `mdt:IncidentHistory` nur weiter, wenn das **LAPD-MDT** offen war (`if mdtNuiOpen`).
+  Jetzt auch für **Agency- und LASD-MDT** (`agencyMdtOpen`/`lasdOpen`) — verifiziert,
+  zeigt die aufgelösten Einsätze.
+
+### Added (Agency-MDT — Theme-Switcher)
+- **Farbschema-Wechsler** im Settings-Panel: **CHP Blue · SAHP Gold · Ranger Green ·
+  Fire/EMS Red · Slate · White (Light) · Black**. Die Kernfarben laufen jetzt über CSS-
+  Variablen (`--a-*` inkl. `--a-on-accent`); jedes Theme tauscht das komplette Palette-Set
+  (Hintergrund, Panels, Akzent, Text). Hartkodierte `#fff`-Vordergründe wurden auf
+  Variablen umgestellt, damit der **Light-Modus** sauber lesbar ist. Auswahl wird lokal
+  gespeichert (`localStorage 'amdt-theme'`) und beim Öffnen wiederhergestellt.
+
+### Added (Agency-MDT — eigene Personen-/Fahrzeug-Such-UI)
+- **Gestaltete Query-Oberfläche** (CHP-Dark-Blue) statt der eingebetteten LAPD-`QueryView`,
+  die im dunklen Theme ohne Design dastand: linke **QUERIES**-Leiste (Person/Vehicle/
+  Plate), gestaltete Formularkarte (Person: Name/DOB/Sex · Fahrzeug: Plate/Type/State/
+  VIN/Year) mit Focus-Highlight, **Search/Clear**. Ergebnisse erscheinen auf einer hellen
+  „Printout"-Karte (`PersonRecord` inkl. Cite/Charge + BOLO-Treffer). Nutzt dieselben
+  Daten/Aktionen (`runQuery`, `S.query.results`) — kein neues Backend.
+
+### Added (Agency-MDT — Resolve, getrennte Abfragen)
+- **RESOLVE INCIDENT**-Button **direkt unter der Incident-Nummer** im Header (löst den
+  Einsatz auf, `mdt:ResolveCall`, danach zurück zu CALLS).
+- **11-27 = nur Personen, 10-28 = nur Kennzeichen** — die Funktionstasten öffnen die
+  Query-Ansicht jetzt direkt mit der passenden Maske (Person bzw. Plate/Tag).
+- **Funktionstaste „10-6 / 10-99" → „10-8 / 10-98"** und setzt den Status auf **CLEAR**
+  (10-8 = im Dienst/verfügbar) statt BUSY.
+
+### Added (Agency-MDT — Settings & LAPD/LASD-Funktionen)
+- **Settings-Page** (Zahnrad in der Titelleiste) — nutzt dasselbe Modal wie das
+  LAPD-MDT: **Opacity / Scale / Position / Theme**, persistent. Das Agency-MDT liest
+  jetzt `mdtStyle(S.settings)` (verifiziert: Opacity wirkt) und ist per Titelleiste
+  **verschiebbar** (Position wird gespeichert).
+- **Funktionen aus LAPD/LASD nachgerüstet:** **Dispatch-Chat** (MAIL/RETURNS),
+  **Schwarzes Brett** (BOARD), **Incident-History** (HISTORY) und **Backup-
+  Anforderungen** (REQUEST BACKUP / EMS / TOW / CODE 6) in der Aktionsleiste.
+
+### Added (Agency-MDT — BOLO, Citations & Field-Tabs)
+- **WATCH LIST → BOLO-Ansicht** im Agency-MDT (`BoloView`); **Citations/Charges**
+  laufen über die Query-Ansicht (`PersonRecord` mit ⚖-Charge-Picker + BOLO-Treffern,
+  PenalCode beim Öffnen geladen) — Parität zum LAPD-MDT.
+- **Incident-Field-Tabs funktional:** INFO (Typ/Code/Area/Beat/Location/State/Notes),
+  UNITS (angehängte Einheiten), CALLER (Anrufer/Meldung), PRIORS (frühere Einsätze am
+  selben Beat).
+
+### Added (Drittes MDT — Agency-MDT für alle übrigen Exekutiven)
+- Neues **Agency-MDT** (`web/.../AgencyMdt.svelte`) im **CHP/PremierOne-IMPACT-Stil**
+  (dunkelblau) für **jede Exekutive außer LAPD und LASD**. Nachgebaut aus den
+  Referenzbildern in `preview/`: Funktionsleiste (FOLLOW/STOP/10-6·10-99/11-27/10-28/
+  CALLS/UNITS/WATCH LIST/MAIL·RETURNS) + Status, **ACTIVE/PENDING CALLS**, Incident-
+  Detail (Header + INC#, Feldraster, Tabs UNITS/INFO/CALLER/PRIORS, COMMENTS + Add),
+  rechte Aktionsleiste (SELF-ASSIGN/MAP IT/GET ROUTE/AUTO ZOOM/MORE), Units- und
+  Query-Ansicht.
+- **Re-Skin, kein eigenes Backend:** nutzt exakt dieselben geteilten Daten/Actions
+  wie das LAPD-MDT (`S.calls`/`activeCall`/`units`, `selectCall`/`addComment`/
+  `setStatus`/`selfAssign`/`setGps`/`requestBackup`).
+- **Routing (`mdt-nui-cl.lua`):** `/mdt` → LAPD = PremierOne-MDT · LASD/Sheriff/BCSO =
+  CAD/PCMS · **alle anderen = Agency-MDT** (`OpenAgencyMdt`). Eigener Open/Close +
+  Control-Block + Escape-Schutz; Dev-Launcher-Card „Agency MDT".
+
+### Added (Dispatch — Karten-Kalibrierung gegen Pos-Versatz, #3)
+- Die **Marker-Kalibrierung** (`scale/ox/oy`) ist jetzt **server-konfigurierbar** (Teil
+  der MapConfig, persistent) und im **Admin-Modus live einstellbar** — inkl. Klick-auf-
+  Karte-Koordinaten-Ablesung. Marker bewegen sich sofort mit (verifiziert). Wird auch
+  von der **Big-Brother-Karte** gelesen, sodass beide Karten konsistent bleiben. Damit
+  lässt sich der „Spieler-Position immer verschoben"-Versatz ohne Rebuild beheben.
+
+### Fixed (BOLO funktionierte nicht — Recherche #7)
+- **BOLOs ließen sich auf dem Live-Server nicht anlegen/aufheben.** Der Berechtigungs-
+  Check nutzte `IsUnit`, das aber **lokal** in `mdt-civilian-sv.lua` definiert und im
+  BOLO-Modul `nil` ist → der Gate war immer „verboten" (außer in devmode), das Anlegen
+  schlug lautlos fehl. Ersetzt durch `MayBolo` (on-duty Unit via `ResolveRequestingUnit`
+  oder Dispatcher via `IsDispatcher`). Auto-Treffer bei Abfragen waren nicht betroffen.
+
+### Changed (Incident-Nummerierung)
+- **LAPD CAD:** Incident-IDs sind jetzt **4-stellig, 1000–9999, rollierend** (nach 9999
+  zurück auf 1000); aktive Nummern werden übersprungen (`NextIncidentNumber`).
+- **LASD CAD:** Format **`[STATION][MMDDYY]-[TAG]`** (z. B. `CPT082923-0001`). TAG ist
+  ein **per-Station** fortlaufender 4-stelliger Zähler (0001–9999, rollierend).
+  Stationskürzel je Area (`Compton→CPT`, `Industry→IND`, erweiterbar). **Andere
+  Agencies** (kein Sheriff) bekommen **kein Kürzel** → `082923-0001`.
+
+### Fixed / Added (Dispatcher & LASD)
+- **LASD: angehängte Units gehen nicht mehr verloren.** Die angezeigten Units eines
+  Einsatzes sind jetzt die **Vereinigung** aus CAD-Liste und Live-Zuweisung
+  (dedupliziert, `MergedUnits`) — eine weitere Unit überschreibt keine andere mehr.
+- **Escape öffnet nicht mehr die GTA-Karte.** Beim Schließen von MDT/Dispatch wird das
+  Pausemenü (Controls 199/200) ~0,5 s lang geblockt, sodass der schließende Escape
+  nicht ins Spiel durchschlägt.
+- **„Message Unit" ist jetzt eine echte Funktion:** taggt der Dispatcher eine Unit im
+  Dispatch-Chat mit **`@Callsign`**, bekommt diese Unit eine **On-Screen-Benachrichtigung
+  + Ton** (auch bei geschlossener MDT). `@`-Parsing serverseitig, dedupliziert.
+- **Maptiles:** Leaflet-Ladeoptimierung (`keepBuffer`, `updateWhenIdle/Zooming=false`,
+  `crossOrigin`) → weniger Re-Fetches/Last beim Tile-Server.
+
+### Added (Dispatch-Console — Admin-Modus: Stadt & Bezirke)
+- **Dispatch ⇄ Admin-Switch** in der Dispatch-Console (nur für Staff/Dispatcher
+  sichtbar, `canEdit`). Im Admin-Modus lassen sich **Stadt**, die **Bezirksliste**
+  (frei anlegen/umbenennen/Farbe/löschen) und der **Standard-Kartenstil** setzen;
+  der Zone-Editor und der Bezirksgrenzen-Zeichner liegen jetzt ebenfalls hier.
+- **Bezirke sind jetzt server-konfigurierbar** statt fest im Frontend
+  (`modules/mdt/mdt-mapconfig-sv.lua`, persistent `data/map_config.json`, an alle
+  gebroadcastet). Die Dropdowns im Zone-/Polygon-Editor und die Polygon-Farben lesen
+  die Liste (`districtNames`/`districtColor`, Fallback auf die alte feste Liste). Die
+  konfigurierte **Stadt** dient als Default-Region (Zone-„clear"-Wert). Editieren nur
+  Staff/Dispatcher/devmode.
+
+### Fixed (LASD CAD — Status/Attach)
+- **Status-Wechsel löst die Einsatz-Zuweisung nicht mehr auf.** `lasd:SetStatus`
+  setzte `u.incident` bei leerem `incidentId` auf "" → man wurde beim Statuswechsel
+  ungewollt detached und der Einsatz bekam den Status nicht mit. Jetzt: nur **AVAIL
+  (10-98)** detacht, sonst bleibt die Zuweisung erhalten; geloggt wird in den Einsatz,
+  auf dem die Unit tatsächlich ist.
+- **Nach MDT-Neustart ist man wieder dem Einsatz zugewiesen.** Beim (Neu-)Öffnen des
+  CAD wählt die UI automatisch den Einsatz aus, an dem die Unit serverseitig hängt
+  (`inc.units` enthält die eigene Callsign) — vorher war man optisch „keinem Incident
+  zugewiesen".
+
+### Added (Death-Sync — tote Spieler)
+- **Tote Spieler werden jetzt an Spieler im Umkreis korrekt synchronisiert**
+  (`modules/deathsync-*.lua`). Ein toter Spieler funkt seine echte Position; andere
+  Clients filtern nach Radius (90 m) und bringen die Leiche per Ragdoll an die wahre
+  Position (Netzwerk-Kontrolle wird nur bei spürbarem Drift angefordert → kein
+  Rubberbanding). Behebt „Toter steht / Leiche driftet/flackert". *(Nur im echten
+  Multiplayer testbar.)*
+
+### Added (Feature-Parität — BOLO im LASD CAD)
+- Das **LASD CAD** hat jetzt dieselbe BOLO-Funktion wie das LAPD-MDT: ein **BOLO-
+  Funktionsbutton** öffnet die Liste aktiver Fahndungen und ein **BROADCAST-BOLO**-
+  Formular (Person/Vehicle/Plate, Grund, 10-32). **BOLO-Treffer erscheinen jetzt auch
+  in LASD-DEX-Abfragen** (`BolosForQuery` im `lasd:Query`-DEX-Pfad). Nutzt dasselbe
+  Backend (`mdt:BoloCreate`/`mdt:BoloSync`) wie das LAPD-MDT.
+
+### Added (Playerlist — 911-Dispatcher-Status)
+- Das **I-Menü (Playerlist)** zeigt jetzt in der Server-Info-Box, ob ein **911-Dispatcher
+  im Dienst** ist (grün „Im Dienst (N)" / rot „Nicht besetzt"). Server broadcastet die
+  Dispatcher-Anzahl (`BroadcastDispatcherStatus` → `syncDispatcherStatus`) sofort bei
+  On/Off-Duty und alle 2 s als Fallback (deckt Disconnects ab). Locales EN/DE/RU.
+
+### Added (MDT — BOLO / Fahndungen)
+- **BOLO-System (`modules/mdt/mdt-bolo-sv.lua` + `web/.../BoloView.svelte`):** LEO legen
+  im neuen **BOLO-Tab** Fahndungen an (Person / Fahrzeug / Kennzeichen, Grund, Details,
+  „armed & dangerous" 10-32). Werden an alle on-duty LEO gebroadcastet (Ton + Notification),
+  laufen nach 24 h ab, persistent (`data/bolos.json`), Cancel jederzeit. Big-Brother- +
+  Webhook-Log. **Auto-Treffer:** bei jeder Personen-/Kennzeichen-Abfrage prüft der Server
+  aktive BOLOs (`BolosForQuery`) und zeigt sie als auffälligen Treffer in der Personenakte.
+
+### Added (MDT — Citations + Charges / Penal Code)
+- **Strafzettel & Anklagepunkte:** in der Personenakte öffnet ein **Charge-Picker**
+  (⚖) eine durchsuchbare Liste aus der neuen `configs/cfg-charges-sh.lua`
+  (Penal Code: Infraction/Misdemeanor/Felony, Bußgeld, Haftmonate). Officer wählt
+  mehrere Punkte, sieht die Live-Summe (Bußgeld + Haftzeit) und stellt eine
+  **Citation** oder einen **Arrest Report** aus.
+- **Server-autoritativ:** `char:IssueCharges` (in `characters-sv.lua`) berechnet
+  Bußgeld/Haftzeit aus dem Penal Code (Client-Werte werden ignoriert) und hängt das
+  Ganze als Akteneintrag (Kategorie `citation`, fraktions-sichtbar) an den Ziel-
+  Charakter — sichtbar in MDT-Akte und LASD-DEX. Notify an Officer + (falls online)
+  an die betroffene Person. Big-Brother- + Webhook-Log.
+
+### Added (Schutz — ACE-Permissions + Ban-Härtung)
+- **Discord-Rollen → ACE-Brücke (`modules/security/permissions-sv.lua`):** legt beim
+  Start ACE-Gruppen an (`group.pvp_dev` / `pvp_staff` / `pvp_mod` mit Vererbung) und
+  hängt erkannte Discord-Staff/Dev zur Laufzeit per `add_principal` in die passende
+  Gruppe (Entfernen bei `playerDropped`). Damit funktionieren die bereits
+  ACE-restricted Admin-Commands (`/ban`, `/kick`, `/tempban`, `/unban`, `/warn`,
+  `/staff`, `/dc`) endlich auch für In-Game-Staff — **ohne** Identifier von Hand in
+  die `server.cfg` einzutragen. Pollt die globale `players`-Tabelle (kein Eingriff in
+  server.lua nötig). `group.pvp_dev` erhält pauschal `command` (= alle Befehle).
+- **`HasPermission(src, perm)`** als einheitlicher Helfer für alle Module
+  (Konsole/devmode/Discord-Staff/ACE). `/myperms` zeigt die eigene erkannte Gruppe.
+- **Ban-Härtung (`server.lua`):** Ban-/Warn-Datensätze speichern jetzt **`name`,
+  `by` (Discord-ID des Issuers), `byName` und `created`** — vorher stand nur der
+  Grund drin. `/unban` validiert die Ban-ID (kein stiller Fehlschlag mehr) und loggt
+  in AdminLog + Big Brother. `BanPlayer`/`WarnPlayer` nehmen optional den Issuer-`src`.
+
+### Added (Schutz — IP-Lock mit Remote-Lizenzserver)
+- **IP-Lock (`modules/security/iplock-sv.lua`):** sperrt den gesamten Core auf
+  freigegebene Server-IP(s). Beim Start ermittelt das Modul die öffentliche
+  Server-IPv4 (mehrere Provider + Retry) und stoppt die Ressource via
+  `StopResource`, wenn die IP nicht freigegeben ist.
+- **Freigabe kommt live vom Lizenz-Server** (PocketBase, `LICENSE_URL`): das Modul
+  lädt die Lizenzliste und sucht einen Eintrag, dessen `serverIp` passt **und**
+  dessen `start`/`end`-Zeitfenster aktuell gültig ist. Neue Server schaltet man so
+  ohne neuen Build frei/sperrt sie (end-Datum in die Vergangenheit). Datumsvergleich
+  über `YYYYMMDDHHMMSS`-Strings (bewusst ohne `os.time` → kein Y2038-Problem bei
+  Laufzeiten > 2038). Optionale lokale Notfall-Liste `EXTRA_ALLOWED_IPS`.
+  `FAIL_OPEN=false` (Lizenzserver/IP nicht erreichbar → Stopp). Modul lädt früh im
+  Manifest (nach `configs/*-sv.lua`) und ist escrow-verschlüsselt.
+- **Discord-Webhook-Alarm:** bei einem Lock-Verstoß geht (optional) ein Embed an
+  einen hinterlegten Webhook raus (erkannte IP, Hostname, Zeit) — Stopp wird kurz
+  verzögert, damit der Request noch rausgeht (`ALERT_WEBHOOK` im Modul).
+- **Anti-Removal-Guard:** das Modul setzt beim Laden ein globales `_PVP_IPLOCK` mit
+  geheimem `SEC_TOKEN`. Ein Guard in der **verschlüsselten** `server/server.lua`
+  prüft nach 60 s, ob Token vorhanden/korrekt ist — fehlt das Lock-Modul (entfernt
+  oder Manifest-Zeile gelöscht), sperrt der Core sich selbst. `ENABLED=false`
+  behält den Token (legitimes Deaktivieren löst den Guard NICHT aus). `SEC_TOKEN`
+  in beiden Dateien muss identisch sein.
+
+### Added / Fixed (LASD CAD/PCMS — Tester-Feedback)
+- **Rechtsklick auf einen Einsatz** im DISPATCH INDEX öffnet ein Dropdown mit
+  **RESOLVE INCIDENT** (öffnet die CLR/Dispo-Maske) und **ACK / ATTACH** — wie in
+  der LAPD-Konsole (`openIncCtx` in `LasdMdt.svelte`).
+- **ACK auf einem ausgewählten Einsatz** hängt die Unit jetzt an den Einsatz an und
+  setzt den Status auf **ENROUTE** (wie LAPD) — statt nur den Status zu melden.
+  `lasdAssignSelf` zieht zusätzlich den geteilten MDT-/HUD-Status auf ENROUTE.
+- **10-98 löst den Einsatz jetzt auch auf gebrückten Dispatcher-/911-Einsätzen
+  (`PD-…`) auf.** Diese liegen nur im geteilten `emergencyCallList`, nicht in
+  `lasdIncidents` — `lasd:ResolveIncident`/`lasd:AssignSelf` erkennen die `PD-`-ID
+  jetzt und greifen direkt auf das geteilte System zu (`PdNumber`-Helfer). Das war
+  der Grund, warum „10-98 = resolve" vorher nichts tat.
+- **Angehängte Units werden im Einsatz-Record angezeigt** (`UNITS ATTACHED: …`,
+  sonst `NONE`). Für `PD-`-Einsätze werden die Units aus `player.incident`
+  abgeleitet (`AttachedUnitsFor`).
+- **Das LASD-CAD/PCMS-Terminal gilt jetzt für JEDE Agency außer LAPD** (LASD,
+  Fire/EMS, Coroner, BCSO, …). Nur das LAPD nutzt weiterhin das PremierOne-MDT
+  (Routing in `mdt-nui-cl.lua`).
+
+### Added (Dispatch-Konsole — Unit-Rechtsklickmenü)
+- **Rechtsklick auf eine Unit** in der Dispatch-Konsole öffnet ein Kontextmenü mit:
+  - **Einsatz erstellen** — legt einen neuen Einsatz an **und weist diese Unit sofort
+    zu** (ENROUTE). Öffnet das Erstellen-Formular mit Hinweis „→ &lt;Callsign>"
+    (`mdt:DispatcherCreateIncidentForUnit`, `dispatchCreateForUnit`).
+  - **Unit anrufen** — baut über **pma-voice** eine private Sprechverbindung zwischen
+    Dispatcher und Unit auf (Toggle; erneuter Klick / „Anruf beenden" / `/hangup`
+    trennt). Beide Seiten bekommen Ton + Hinweis; eine grüne **In-Call-Leiste** zeigt
+    „Im Gespräch mit &lt;Callsign>" und hebt die Unit-Zeile hervor
+    (`mdt:DispatchCallUnit` / `mdt:DispatchEndUnitCall`, reuse der Voice-Helfer aus
+    `mdt-callqueue-sv.lua`). Cleanup bei Disconnect **und** `/dispatch off`.
+  - **Aktuellen Einsatz anzeigen** — wählt den der Unit zugewiesenen Einsatz aus.
+  - **Auf Karte zeigen** (eigene Idee) — zentriert die Leaflet-Karte auf die Unit.
+  - **Unit anschreiben** (eigene Idee) — füllt den Dispatch-Chat mit `@<Callsign> `.
+  Alle sichtbaren Texte über Locale-Keys (`dispatch_ctx_*`, `dispatch_call_*`) in
+  EN/DE/RU.
+- **Rechtsklick direkt auf den Unit-Marker der Karte** öffnet dasselbe Menü
+  (`m.on('contextmenu')` in `renderMarkers`). Da die Dispatch-Karte **alle** Units
+  (LAPD **und** LASD) zeigt, steht das Menü dort automatisch auch für LASD-Units
+  bereit — ein separates Menü im LASD-PCMS-Einzelterminal ist nicht nötig.
+
+### Added
+- **Separate NUI-/MDT-Sprache:** neue Config `MdtLanguage` (configs/config.lua).
+  Leer = folgt `Language`. So kann Spiel/HUD z.B. Deutsch sein und das MDT
+  Englisch. Umgesetzt über den neuen Helfer `UiLocale()` (configs/locale-sh.lua);
+  alle NUI-Sender (MDT, Dispatch, Profil, Big Brother) nutzen ihn.
+
+### Added (WIP)
+- **Speech-to-Text — Machbarkeits-Probe (`/sttcheck`):** öffnet im FiveM-Client ein
+  Panel, das prüft, ob `SpeechRecognition` + Mikrofon (`getUserMedia`) im CEF
+  funktionieren, inkl. Live-Erkennungstest; Ergebnis auch in der F8-Konsole
+  (`modules/stt/stt-cl.lua`, `SttProbe.svelte`). Grundlage für das geplante
+  Selbst-Transkriptions-System (jeder Client schreibt sein eigenes Mikro mit →
+  Anrufer + Dispatcher ins Protokoll, ohne pma-voice-Audio anzugreifen).
+
+### Fixed / Added (Dispatch-Konsole — Tester-Feedback)
+- **Incidents ließen sich nicht auflösen:** ein reiner Dispatcher (Job evtl.
+  „Civilian") wurde von `ResolveRequestingUnit` abgewiesen. `ResolveDispatchCall`
+  erlaubt jetzt zusätzlich Dispatcher (`IsDispatcher`) → Label „DISPATCH".
+- **Status hängte Unit an ausgewählten Incident:** „C6" auf eine Unit wies sie
+  fälschlich dem gerade markierten Einsatz zu. Jetzt sinnvolle CAD-Semantik:
+  **ER** weist (bewusst) dem ausgewählten Einsatz zu, **C6** behält den eigenen
+  Einsatz der Unit, **CL** macht frei (Einsatz 0).
+- **Einsatz abwählen:** Klick auf den markierten Einsatz (oder den ✕-Button im
+  Detail-Header) hebt die Auswahl jetzt auf (vorher nur durch Anklicken eines
+  anderen möglich).
+- **NEU — Dispatcher kann Einsätze erstellen:** „+ Neu"-Formular (Typ/Ort/Details)
+  in der Detail-Leiste → `mdt:DispatcherCreateIncident` → `AddDispatchCall`
+  (keine Unit wird dabei zugewiesen).
+- **NEU — Dispatcher-Notizen:** Notiz-Editor pro Einsatz in der Detail-Leiste
+  (speichert über `mdt:SetNotes`).
+
+### Fixed (Dispatch/MDT)
+- **Dispatcher off-duty ließ Anrufe hängen:** `mdt:DispatcherOffDuty` räumte die
+  Call-Warteschlange/Session nicht auf. Neuer Helfer `HandleDispatcherGone` (aus
+  off-duty **und** disconnect): laufender Anruf wird **neu zugewiesen** (zurück in
+  die Queue, wenn andere Dispatcher online), sonst beendet; ist **kein** Dispatcher
+  mehr online, wird die Queue aufgelöst → **AutoIncident**. Caller bekommt
+  `call:Requeued`-Hinweis.
+- **Incidents fehlten im LASD-Message-Index:** Die LASD-PCMS zeigte nur LASD-eigene
+  Einsätze. Dispatcher-erstellte und 911-Call-Incidents (geteilte `emergencyCallList`)
+  werden jetzt in die LASD-Sync gemischt (als `agency="PD"`, mit Aktivitäts-Eintrag
+  → erscheinen im Message Index). LASD-Origin-Calls werden nicht doppelt gezeigt.
+- **ACK markierte ALLE Ungelesenen als gelesen:** Das Öffnen des Calls-Tabs rief
+  `markCallsRead` (leerte `S.unread` komplett). Jetzt wird ein Call **erst beim
+  Anklicken** als gelesen markiert (`selectCall`), nicht pauschal beim Tab-Wechsel.
+
+### Fixed / Debug
+- **911-Call (pma-voice) — lautloses Scheitern + Debug:** `SetVoiceCall` rief
+  `exports['pma-voice']:SetCallChannel` in einem **`pcall`, das Fehler verschluckte**
+  — passte der Export-Name nicht zur pma-voice-Version, verband die Voice **nie,
+  ohne Meldung**. Jetzt: Fehler werden **ausgegeben**, plus Fallback auf
+  `setPlayerCall`, plus Prüfung, ob die Resource `pma-voice` überhaupt läuft.
+- **Durchgängige Debug-Prints** für den 911/311-Flow (Flag `CallCenter.Debug`,
+  standardmäßig **an**): Client `/911` registriert/gesendet; Server `call:Submit`
+  (alle Guards: Enabled, Typ, Befehl-vs-Telefon, Dispatcher online), Queue/
+  AutoIncident, `call:Answer` (Dispatcher-Check, Anruf gefunden) und der Voice-
+  Channel-Aufbau. So sieht man in der Server-Konsole genau, wo ein Anruf hängt.
+
+### Fixed
+- **Halb-übersetzte Strings nachgezogen:** Der HUD-Standort zeigte „Area of Play"
+  auch auf Deutsch/Russisch (der Übersetzungs-*Wert* war englisch geblieben, nicht
+  der Key). Jetzt **Spielgebiet** (DE) / **Зона игры** (RU); ebenso `aop_vote`.
+  Außerdem konsistent: `Private Sitzung`, `auf/ab`/`вверх/вниз`, sowie im NUI
+  `bb_cat_combat → Kampf`, `bb_jail → Einsperren`, `Sortieren: Status`.
+  (Ein Vergleich EN↔DE/RU bestätigte: der Rest sind bewusste Lehnwörter/CAD-Begriffe
+  wie GPS, Status, Dispatch, Code 6, BIG BROTHER.)
+- **Big Brother DB-Crash (`pvp_logs` INSERT):** „Truncated incorrect DECIMAL value".
+  Der Batch-Insert nutzte `params[#params + 1] = v`; bei `nil`-Feldern (optionale
+  `zone`, oder `x/y/z` ohne Koordinaten) legt Lua nichts ab und `#` wandert nicht
+  weiter → alle Folgewerte verrutschen um eine Position (ein String landet in einer
+  DECIMAL-Spalte). Jetzt expliziter Positions-Zähler → `nil` bleibt als sauberes
+  SQL `NULL`, nichts verrutscht mehr.
+- **Anticheat NoClip — False-Positives/„False-Bans":** `GetEntityCollisionDisabled()`
+  ist auch bei legitimen Zuständen `true` (Teleport/Spawn/Streaming, Screen-Fade,
+  Tod/Ragdoll, Player-Switch, Fallen). Diese werden jetzt **ausgeschlossen** und das
+  Zeitfenster auf **~8 s ununterbrochen** erhöht → praktisch keine Fehlauslösungen
+  mehr beim Respawn/Jail-Teleport. (Hinweis: Admins, die legitim per vMenu noclippen,
+  brauchen weiterhin die Discord-Rolle `Staff`/`Dev` → sie werden nie bestraft.)
+- **Richtungsanzeige (Kompass):** nutzt bereits `T("dir_*")` und übersetzt mit
+  `Language` korrekt (EN/DE/RU). Setze `Language = "de"` für deutsche Richtungen
+  (O/NO/SO …); das MDT bleibt über `MdtLanguage` unabhängig einstellbar.
+
+---
+
+## [Unreleased] – Web-Dispatcher-Portal (Phase 1)
+
+
+Beginn eines externen, browserbasierten Dispatcher-Portals (eigener VPS).
+**Phase 1 (Fundament, Live-Ansicht):**
+- **FiveM-Brücke** (`modules/webdispatch/webdispatch-sv.lua`): pusht alle 2s einen
+  State-Snapshot (`BuildCallList`/`BuildUnitList`/`BuildCallQueue`) an eine externe
+  Node-Bridge und stellt einen token-gesicherten Inbound-Endpoint bereit
+  (Aktionen folgen in Phase 4). Standardmäßig **aus** (Convars `pvp_bridge_url`/
+  `pvp_bridge_token` leer = kein Overhead).
+- **Node-Bridge** (`bridge/`, eigenständiger Dienst, nicht escrow): `POST /ingest`
+  (Token) → In-Memory-State → **WebSocket-Broadcast** an verbundene Browser;
+  `GET /health`. Lokal end-to-end getestet (Ingest → WS-Broadcast, Bad-Token → 401).
+- Discord-Login (Phase 3) und voll interaktive Aktionen (Phase 4) folgen.
+
+**Phase 2 (externe Web-App, Live-Ansicht im Browser):**
+- **Transport-Abstraktion:** `nui()` (`web/src/lib/nui.js`) routet Aktionen über die
+  Bridge, wenn `window.__pvpWsSend` registriert ist — **in-game unverändert**.
+- **Bridge-Client** (`web/src/lib/bridge-client.js`): verbindet per WebSocket
+  (Auto-Reconnect mit Backoff), speist den State in **dieselbe** Message-Pipeline
+  wie die NUI (`updateCalls`/`updateUnits`) → `Dispatch.svelte` wird unverändert
+  wiederverwendet.
+- **Eigener Build:** `web/dispatch.html` + `dispatch-main.js` + `DispatchApp.svelte`
+  (nur Dispatch + Verbindungsanzeige); `npm run build:web` → `web/dist-web`
+  (deploybar). Die In-Game-NUI (`../nui/dist`) bleibt davon unberührt.
+- Lokal verifiziert: Browser lädt `/dispatch.html?bridge=…` → **LIVE**; Calls/Units
+  (inkl. LASD-Badge) erscheinen und **aktualisieren sich live** ohne Reload; keine
+  JS-Fehler. (Karten-Tiles brauchen einen externen Host via `mapBase`/`?map=`.)
+
+**Plug-and-Play-Deploy (ein Dienst, ein Befehl):**
+- Die **Bridge liefert jetzt alles aus einem Dienst**: WebSocket **+** die gebaute
+  Dispatch-App (`/`) **+** die Karten-Tiles (`/mdt/map`). Die App verbindet
+  automatisch „same-origin" — kein separates Hosting, Karte funktioniert sofort.
+  (`bridge/lib/static.js`, `npm run build:web` → `bridge/public`.)
+- **Web-Setup-Assistent** (`/setup`): beim ersten Start druckt die Bridge einen
+  einmaligen Setup-Key ins Log; die geschützte Seite erzeugt das Token, speichert
+  die Config (Volume `config.json`) und zeigt die fertigen `server.cfg`-Convars zum
+  Kopieren. Danach gesperrt. Discord-Felder vorbereitet (Phase 3).
+- **Docker-Compose + Caddy**: `docker compose up -d --build` startet Bridge +
+  automatisches **HTTPS/WSS** (nur Domain draufzeigen). `bridge/Dockerfile`,
+  `bridge/deploy/{docker-compose.yml,Caddyfile,.env.example}`.
+- Lokal verifiziert: Setup-Key-Gate, Token-Speichern → Ingest sofort gültig,
+  falsches Token 401, `/` liefert die App; `docker compose config` valide.
+
+**Phase 3 (Discord-Login + Rollen-Gate):**
+- **OAuth2-Login** an der Bridge (`bridge/lib/auth.js`, `/auth/login`,`/callback`,
+  `/me`,`/logout`): Discord-Consent → Code-Tausch → Guild-Mitgliedschaft + erlaubte
+  Rolle (via Bot-Token) → HMAC-signierte Session-Cookie. Rollen-Allow-Liste,
+  CSRF-State, 8h-Session.
+- **WebSocket-Gate:** ohne gültige Session/Rolle **kein** Socket (`verifyClient`).
+- **Login-Screen** in der Web-App (`DispatchApp.svelte`): prüft `/auth/me`, zeigt
+  sonst „Mit Discord anmelden"; Fehlertexte (keine Rolle / abgebrochen / nicht
+  konfiguriert).
+- **Dev-Bypass** (`DEV_BYPASS_AUTH=1`) für lokale Tests ohne echte Discord-App.
+- Lokal verifiziert: Bypass → `/auth/me` 200 + WS verbindet; erzwungen ohne Session
+  → `/auth/me` 401, `/auth/login` → `/?login=unavailable`, **WS abgewiesen (401)**;
+  Login-Screen rendert.
+
+**Phase 4 (Aktionen scharf — voll interaktiv):**
+- **Externe Actor-Unterstützung** im MDT-Kern: `ResolveDispatchCall`/`AddDispatchCall`
+  und das Audit (`ActorOf`/`RecordCall*`) akzeptieren jetzt einen externen Actor
+  (Discord-Identität des Web-Dispatchers) statt nur eines In-Game-`src` — rückwärts-
+  kompatibel.
+- **FiveM `/action`-Endpoint** (`modules/webdispatch`): führt Web-Aktionen über
+  **dieselben** Funktionen aus — `status`/`assign` → `setUnitStatus`, `resolve` →
+  `ResolveDispatchCall`, `create` → `AddDispatchCall` — + sofortiger Re-Sync und
+  **Big-Brother-Audit** mit Discord-Identität.
+- **Bridge-Relay:** WS-Aktionen werden gegen eine **Whitelist** gemappt und mit
+  Token + Discord-Actor an `fivemUrl/action` weitergeleitet (Setup-Wizard-Feld
+  „FiveM-Server-URL"). Die Session-Identität hängt am Socket.
+- Lokal verifiziert: WS-Aktion → Bridge → Mock-FiveM erhält die gemappte Aktion
+  mit korrektem Token + Actor; nicht-whitelistete Aktion wird **nicht** weiter-
+  geleitet. → Der externe Dispatcher ist **voll interaktiv**.
+
+---
+
+## [Unreleased] – 2026-06-02 — MDT, Dispatch & CAD
+
+
+Großer Ausbau und Redesign des **MDT-, Dispatch- und CAD-Systems** im Stil des
+„PremierOne Mobile Client" (echtes Police-CAD), inklusive Kommentaren und einem
+admin-only Audit-Log.
+
+### Added
+- **MDT (Mobile Data Terminal)** komplett im PremierOne-CAD-Look (Hochformat,
+  In-Vehicle-Terminal, bottom-right): Icon-Toolbar (Home/Query/Traffic/C6/Calls/
+  Units/Persons/Station/Dispo), Kommando-/Status-Strip (Dept · Callsign · Status ·
+  GPS · Zeit), linke Tab-Spalte, **„Active Incident"-Feldmaske**, **Comments/
+  Narrative**-Feld und untere Aktionsleiste. Getrennt von der Dispatch-Konsole
+  (`/mdt` vs. `/dispatch open`).
+- **Dispatch-Konsole** (Fullscreen) im gleichen Look: echte **GTA-V-Kartenkacheln**
+  (Leaflet, `nui/mdt/map/styleAtlas`), **Live-Unit-Marker** (Name + GPS-Position),
+  **Incident-Marker**, Klick-Zuweisung von Einheiten (Auto-Enroute + GPS), Status
+  setzen und Calls auflösen direkt aus der Konsole.
+- **Kommentare (IC):** Einheiten können zeitgestempelte Kommentare an einen
+  Incident schreiben (`mdt:AddComment`); sie erscheinen im Comments-Log und werden
+  live auf allen offenen Terminals aktualisiert. Autor/Callsign werden serverseitig
+  gesetzt (kein Spoofing), Text wird bereinigt und begrenzt.
+- **Admin-Audit (OOC):** neues, rein serverseitiges Modul
+  `modules/mdt/mdt-audit-sv.lua`. Speichert pro Call **wer** ihn erstellt hat (inkl.
+  Identifiers: license/discord/steam …), **wann** (UTC), **wo** (Koordinaten +
+  Postal + Adresse) und eine **Timeline** (Zuweisungen, State-Änderungen, Notes,
+  Comments) in `data/call_audit.json`. **Wird nie an Clients/NUI gesendet.**
+  Admin-Befehl **`calllog <incidentNumber>`** (Server-Konsole immer, in-game via
+  Ace `command.calllog`).
+- **„Active Incident" beim Öffnen laden:** `mdt:GetMyActiveCall` lädt den aktuell
+  zugewiesenen Incident des Spielers **serverautoritativ** ins MDT; Self-Assign
+  befüllt das Panel sofort; leert sauber, wenn kein Incident zugewiesen ist.
+- **Traffic-/C6-Toolbar-Buttons** im MDT funktionsfähig: erstellen einen Incident
+  für die Einheit im Format `<UNIT> // TRAFFIC STOP // <LOCATION>` bzw.
+  `<UNIT> // CODE6 // <LOCATION>`, hängen die Einheit an (Status ON SCENE/CODE SIX)
+  und öffnen ihn direkt im „Active Incident"-Panel zum Kommentieren
+  (`mdt:CreateUnitIncident`).
+- **Bürger-/Charakter-Datensystem** (serverseitig, persistent in
+  `data/civilians.json`): `/char` öffnet ein NUI-Formular für Name, Geburtsdatum,
+  Adresse, Führerschein-Status und Haftbefehl (aktiv + Grund). Reminder beim Spawn
+  (Chat + oben rechts). Neue Module `modules/mdt/mdt-civilian-{cl,sv}.lua`.
+- **MDT-Query** (Beamten-„Run"): der **Query**-Tab fragt eine Person per Name oder
+  Server-ID ab und zeigt Adresse, DL, Warrant (rot hervorgehoben) und registrierte
+  Fahrzeuge. Wird jemand abgefragt, der keine Daten hinterlegt hat, öffnet sich bei
+  ihm automatisch das `/char`-Popup.
+- **Fahrzeug-Registrierung:** beim Einsteigen in ein nicht registriertes Fahrzeug
+  erscheint eine Erinnerung (oben rechts); `/vreg` öffnet ein Popup zum Hinterlegen
+  des Fahrzeugs (Kennzeichen → Profil). Keine harte Fahrsperre (nur Erinnerung).
+- **1:1-PremierOne-Layout** (max. spec): zweizeilige Command-Bar mit Dropdowns
+  (Incident / Logged in / Unread / Night / In Vehicle / Status / GPS Online), volle
+  CAD-Feldmaske (Mod Circum, Loc Name, Apt/Unit, Report #, City, Description, Cross
+  Streets, Call Initiated, Beat), Icons in der linken Leiste, `< >`-Incident-
+  Navigation und exakte Bottom-Bar (Close View / Primary Unit / Import to Incident /
+  Locate on Mobile Map). Echte Toolbar-Icons unter `nui/mdt/icons/`
+  (Plate / STOP / Pending / Radio).
+- **Charakter-Profil erweitert (Merge mit `/character`):** Geschlecht,
+  Körperbeschreibung (Größe/Gewicht/Haare/Augen) und voller Lizenzsatz
+  (Driver/Commercial/Boating/Pilot/CCW/Hunting). `/character` ist jetzt ein Alias
+  für `/char`.
+- **Query per Kennzeichen:** Beamte können zusätzlich nach einem registrierten
+  Kennzeichen suchen (neben Name / Server-ID).
+- **Unread-Calls:** der „Unread (n)"-Chip zählt neu eingehende Calls; ungelesene
+  Zeilen sind in der Calls-Liste markiert; Öffnen des Calls-Tabs (oder Klick auf den
+  Chip) markiert sie als gelesen.
+- **White-/Normal-Mode:** Theme-Umschalter (Knopf in der Titelleiste, gespeichert in
+  `localStorage`) zwischen dem dunklen PremierOne-Look und einem hellen „White"-Mode
+  — inkl. der `/char`- und `/vreg`-Popups. Auch als Command `/mdttheme [white|normal]`.
+- **Disposition-Resolve:** Dispatch-RESOLVE mit Reason-Dropdown (ADV/ARR/ARM/CIT/
+  GOA/FAL/CCB/CMP). Beim Auflösen wird `DISPO // <Uhrzeit> // <REASON> // <UNIT>` in
+  die Notes geschrieben (`mdt:ResolveCall`).
+- **Manuelles Incident:** Klick auf das „Incident"-Dropdown öffnet ein Fenster, in
+  dem ein Officer den Anlass eintippt → erstellt ein Incident `&lt;UNIT> // INC //
+  &lt;Text> // &lt;Location>` an seiner Position.
+- **Toolbar-Status-Buttons:** Station → UNAVAILABLE, Enroute → ENROUTE, Traffic →
+  CODE SIX (+ Incident), Code 6 → CODE SIX (+ Incident).
+- Toolbar-Reihenfolge: Home · Query · Traffic · C6 · Calls · Dispatch · Enroute ·
+  Station · Dispo, mit echten Icons unter `nui/mdt/icons/`.
+- **Dispatch-Live-Chat:** gemeinsamer Echtzeit-Kanal zwischen Einheiten (MDT) und
+  Dispatchern (Konsole). Dispatcher bekommen beim On-Duty eine zufällige
+  **Operator-Nummer** (z. B. „Operator 4256"); Einheiten erscheinen mit ihrem
+  Callsign. Schreibt eine Einheit, während ein Dispatcher die Konsole nicht offen
+  hat, bekommt er eine **Benachrichtigung** (oben rechts + Sound). Chat-Panel im
+  MDT (Home) und in der Dispatch-Sidebar; Verlauf wird beim Öffnen geladen.
+- Branding-Assets unter `branding/`: Produktbild `pvp-core.png` und eine
+  Tebex-Produktbeschreibung `tebex-description.html` (HTML-Import).
+
+### Changed
+- **Design auf „älteren" Win32-Look** umgestellt (nur MDT): flache Vollfarben statt
+  Verläufe, harte 3D-Bevel-Ränder, System-Font (MS Sans Serif/Tahoma), eckige
+  Ecken, klassische Scrollbars und ein **schwarzes CAD-Terminal** (grüner
+  Monospace) für die Kommentare. Dispatch-Konsole separat im gleichen Blau-Theme.
+- **Dispatch-Karte kalibriert:** Game→Pixel-Umrechnung empirisch aus `map.png`
+  bestimmt (Landmarken; Skala ≈ 0,68 px/Spieleinheit, Offsets statt symmetrischer
+  −4096..4096-Bounds) → Marker sitzen jetzt korrekt. `bounds` am TileLayer ergänzt
+  (kein weißer Rand um die Insel mehr).
+- Voll- und periodischer Sync liefern **Unit-Positionen dauerhaft**
+  (`BuildUnitList`/`BuildCallList`); **neueste Incidents zuerst**; max. **10**
+  Incident-Marker auf der Karte.
+- `GetPostalCoords` nutzt jetzt einen **O(1)-Index** (Memoization) statt linearer
+  Suche — verhindert Ruckler beim Coords-Backfill vieler Calls.
+- Neue Calls speichern ein `comments`-Feld.
+
+### Fixed
+- **Incident-Marker fehlten:** Alt-Calls aus `calls.json` ohne Koordinaten bekommen
+  ihre Position jetzt über den **Postal-Code** (`EnsureCallCoords` +
+  `GetPostalCoords`) — 704/706 Postals abgedeckt.
+- **Karten-Offset:** Marker landeten im Ozean (falsche, symmetrische Bounds) →
+  korrekte, asymmetrische Kalibrierung.
+- `SetNuiFocus is not defined` in der NUI entfernt (NUI-Fokus wird nur in Lua
+  gesetzt).
+- Calls/Units wurden im Dispatcher nicht geladen (Sync prüfte nur `mdtNuiOpen`) →
+  `or dispatchOpen` + 1-s-Retry beim Öffnen.
+- Unit-Koordinaten waren nur temporär (periodischer Sync überschrieb sie ohne
+  x/y/z) → einheitliche Helfer.
+- **`leo-only`/`ems-only`-Buttons** (CODE 6, Crime Broadcast) wurden nie angezeigt
+  (Inline-`display=''` fiel auf CSS `none` zurück) → Klassen-Toggle `.role-hidden`.
+- Active-Incident-Daten erschienen nicht beim Zuweisen bzw. erneuten Öffnen → über
+  `mdt:GetMyActiveCall` und Befüllen bei Self-Assign behoben.
+
+### Removed
+- Temporärer Map-Debug-Modus (gelber Marker + Koordinaten-Overlay), nachdem die
+  Kalibrierung verifiziert war.
+
+---
+
+## [Unreleased] – 2026-06-01
+
+
+Großes Refactoring von Sicherheit, Struktur und Konfiguration. Es wurde **kein
+Gameplay-Verhalten** absichtlich geändert.
+
+> ⚠️ **Migration erforderlich:** Discord-Webhooks liegen nicht mehr im Code,
+> sondern werden aus Convars gelesen. Siehe `server.cfg.example` und trage die
+> `set pvp_webhook_*`-Werte in deine `server.cfg` ein, sonst ist das
+> Discord-Logging deaktiviert. Die alten, im Code hinterlegten Webhooks gelten
+> als kompromittiert und sollten in Discord **neu generiert** werden.
+
+### Security
+- Berechtigungsprüfungen für client-auslösbare Server-Events ergänzt: `jailServer`,
+  `coronerServer`, `hospitalServer`, `cuffPlayer`, `dragPlayer`,
+  `putPlayerInVehicle` prüfen jetzt Job/Staff und die Existenz des Ziels.
+  Zuvor konnte **jeder** Client diese Aktionen gegen beliebige Spieler auslösen.
+- Sämtliche hartkodierten Discord-Webhook-URLs aus dem Code entfernt (waren über
+  `server.lua`, `phone-sv.lua`, `pages-sv.lua`, `bleeter-sv.lua` verteilt) und
+  durch server-seitige Convars ersetzt (werden nicht an Clients gesendet).
+
+### Fixed
+- Ban-/Warn-Grund wurde durch eine globale Variable statt den `reason`-Parameter
+  gespeichert → falscher/zufälliger Grund in der Banliste.
+- Server-Start-Crash bei leerer `calls.json` (nil-Index) abgefangen.
+- Falscher Event-Name: `responseSpecialContact`-Handler hing am Event
+  `relaySpecialContact` (lief doppelt beim Notruf, nie bei der Antwort).
+- Operator-Präzedenzfehler im Explosions-Filter (`~= nil and ... or ...`).
+- Mögliche Endlosschleife bei der Discord-Rollenabfrage (Wert wurde in der
+  `while`-Schleife nie neu geladen).
+- Echtes Lock (`while` statt `if`) für Ban-/Warn-/Unban-Schreibzugriffe auf
+  `banlist.json` (verhinderte verlorene Schreibvorgänge bei Parallelität).
+- `PerformHttpRequest(ServerLog, ...)` (Tabelle als URL) in mehreren Modulen
+  durch `LogWebhook(Webhooks.ServerLog, ...)` ersetzt.
+- `LogWebhook` ignoriert nun leere/`nil`-URLs.
+
+### Changed
+- **Ordnerstruktur** eingeführt: `client/`, `server/`, `shared/` sowie `data/`
+  für zur Laufzeit geschriebene JSON-Dateien (`banlist`, `calls`, `address`,
+  `bleets`). Alle Datei-Pfade und das Manifest entsprechend angepasst.
+- **`client.lua` (≈5485 Zeilen) in 13 fokussierte Module aufgeteilt** unter
+  `client/`: `core`, `util`, `plates`, `menus`, `events`, `drawtext`, `world`,
+  `blips`, `vehicle`, `hud`, `loops`, `commands`, `weapons`. Ladereihenfolge ist
+  explizit im Manifest festgelegt. Aufteilung erfolgte verlustfrei (per
+  byte-identischem bzw. zeilen-multiset-identischem Abgleich verifiziert).
+- Dateiübergreifend benötigte `local`-Variablen zu Globals gemacht, damit der
+  Split in FiveM (getrennte Lua-Chunks) korrekt funktioniert.
+- FiveM-Antipattern `RegisterServerEvent("name", strayArg)` an 18 Stellen
+  bereinigt (überflüssiges zweites Argument entfernt).
+- Debug-`print`-Ausgaben entfernt (u. a. Spam in einer `Wait(0)`-Schleife).
+- Diverse lose globale Schleifenvariablen lokalisiert.
+
+### Added
+- `configs/cfg-server-sv.lua` – zentrale, kommentierte Server-Konfiguration
+  (Webhooks & `devmode` über Convars).
+- `server.cfg.example` – Vorlage mit allen `set pvp_*`-Convars.
+- `README.md` – Abhängigkeiten, Installation, Konfiguration, Projektstruktur.
+- Git-Repository als Sicherheitsnetz initialisiert; jeder Schritt als eigener Commit.
+
+### Security-Hinweis (offen)
+- `ondutyServer` ist weiterhin ungeschützt – Jobs sind selbst zuweisbar, wodurch
+  die o. g. Job-Checks keinen harten Schutzwall bilden. Empfehlung: Department-
+  Zuweisung per Discord-Rolle whitelisten.

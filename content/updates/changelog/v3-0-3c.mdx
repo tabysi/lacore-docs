@@ -1,0 +1,33 @@
+---
+title: "3.0.3c"
+---
+
+# [3.0.3c] – 2026-06-05 — Hotfixes (MDT-Fokus & Politur)
+
+
+Nachbesserungen rund um die Eingabe-/Maus-Steuerung im MDT und kleinere Korrekturen.
+
+### Added
+- **Persons-Tab zeigt Personendaten:** Der „Persons"-Sub-Tab im MDT-Home zeigt jetzt
+  den abgefragten Personendatensatz (Name + Warrant-Status, DOB/Geschlecht, Adresse,
+  **Notes**, Lizenzen, registrierte Fahrzeuge) — dieselbe Karte wie im Query-Tab
+  (neue, wiederverwendbare `PersonRecord`-Komponente, kein Duplikat). Bei einem
+  Treffer (per `/run` oder MDT-Suche) springt das MDT **automatisch** auf den
+  Persons-Tab, sodass die Person sofort aufpoppt.
+
+### Fixed
+- **MDT-Maus & Funk:** Bei offenem MDT bleibt die **Maus jetzt auf der UI** — die
+  Kamera dreht sich nicht mehr mit (Look-Controls werden per Frame deaktiviert).
+  Gleichzeitig kann man sich weiter **bewegen** und über **pma-voice funken** (die
+  Funktaste ist ein `RegisterKeyMapping`-Command und feuert trotz NUI-Fokus, dank
+  `SetNuiFocusKeepInput`).
+- **Kein Fehlschuss beim Klicken:** Attack/Aim/Melee/Waffen-Controls werden bei
+  offenem MDT geblockt — Klicks landen nur in der UI, lösen keinen Schuss/Schlag aus.
+  Tippen in ein Textfeld schaltet kurz auf vollen Tastatur-Fokus.
+- **MDT-Settings:** Die Position-Option **„Custom (dragged)"** ist jetzt wähl-/
+  anzeigbar — beim Ziehen der Titelleiste zeigt das Dropdown korrekt den freien Modus.
+
+### Changed
+- **California-Theme:** `State`-Dropdown im Query-Formular von „San Andreas" auf
+  California umgestellt (CA / NV / AZ / OR). (Der GTA-Textur-Name `driver_san_andreas`
+  und das interne Blip-Default-Konzept „San Andreas" bleiben — sind Engine-Begriffe.)

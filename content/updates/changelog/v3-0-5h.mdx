@@ -1,0 +1,64 @@
+---
+title: "3.0.5h"
+---
+
+# [3.0.5h] – 2026-06-14 — Profilsystem: echte Multi-Charaktere („digitale Akte")
+
+
+Das Profil wird vom Einzel-Profil zu einem vollwertigen **Multi-Charakter-System**:
+jeder Charakter ist eine eigenständige digitale Akte mit eigenen Fahrzeugen,
+Akteneinträgen, Timeline und Stats.
+
+### Added — Multi-Charaktere (`modules/profile/characters-sv.lua`)
+- Neuer **`characters`-Store** (DB + `data/characters.json`) als Quelle der
+  Wahrheit. Der **aktive Charakter** wird in `civilians[lic]` gespiegelt, sodass
+  das gesamte **CAD/MDT/LASD-Lookup unverändert** weiterläuft.
+- **Migration** beim Start: bestehende `char_presets` + `civilians` werden
+  verlustfrei in Charaktere überführt (Presets → Charaktere, aktives Profil inkl.
+  Fahrzeuge → aktiver Charakter).
+- CRUD: `char:Create/Edit/Delete/Activate`. Charakterwechsel setzt Session-Nick
+  und lädt die komplette Akte.
+- **Fahrzeuge pro Charakter** statt pro Spieler; Charakterwechsel leert sie
+  **nicht** mehr.
+
+### Added — Profil-UI-Restruktur (`Profile.svelte` + neue Komponenten)
+- **Sidebar-Navigation** mit zwei Zuständen: ohne aktiven Charakter nur
+  *Übersicht* + *Charaktere*; mit aktivem Charakter zusätzlich *Fahrzeuge*,
+  *Akteneinträge*, *Einstellungen* (gegated mit Schloss-Symbol).
+- **Charakter-Roster** (aktivieren/erstellen/bearbeiten/löschen) + Inline-Formular.
+- **Fahrzeugübersicht** (`ProfileVehicles.svelte`): Klasse (autom. via
+  `GetVehicleClassFromName`), Kaufdatum (= Registrierzeit), Versicherungs-Schalter,
+  Suche + Klassenfilter + Detailansicht.
+- **Akteneinträge** (`ProfileRecords.svelte`): Kategorien, Privat/Fraktion-Flag,
+  Archivieren, sowie ein **Zeitstrahl** (Geburtsjahr + datierte Einträge).
+- EN/DE/RU-Locales für alle neuen Strings.
+
+### Added — Akten-Rechte & CAD-Integration
+- Besitzer hat volle Rechte an seiner Akte. **„Öffentlich für Fraktionen"**-Einträge
+  sind für Mitglieder derselben Fraktion sichtbar, **Staff** sieht alle.
+- Die CAD-Personenakte (`PersonRecord.svelte`) zeigt Officern die fraktions-/
+  staff-sichtbaren Akteneinträge der abgefragten Person.
+
+### Added — Konsolidierung & Erweiterungen (Multichar)
+- **LASD-Parität:** Die LASD-PCMS-DEX-Abfrage zeigt jetzt ebenfalls die sichtbaren
+  Akteneinträge („FILE NOTES").
+- **Officer-Aktenvermerk:** On-duty-Units können aus dem CAD einen fraktions-
+  sichtbaren Vermerk an eine Person hängen (Ziel per eindeutigem Namen).
+- **Bild-URLs** für Fahrzeuge und Akteneinträge (kein Datei-Upload — nur URL).
+- **Stats pro Charakter:** Tode/Kills (über den Client-Tod-Melder erfasst) sowie
+  **Spielzeit pro Charakter** (60s-Tick, dem aktiven Charakter gutgeschrieben).
+- **Beziehungen pro Charakter:** Familie/Partner/Freund/Bekannter/Rivale/Sonstige
+  mit Notiz; eigener Profil-Tab „Beziehungen".
+- **Big-Brother-Kategorie `profile`:** Charaktererstellung/-wechsel/-löschung und
+  Akteneinträge werden geloggt.
+- **Vereinheitlicht:** `/char` bearbeitet nur noch den aktiven Charakter; die
+  komplette Verwaltung (erstellen/aktivieren/löschen) läuft über `/profile`. Das
+  alte Preset-System schreibt nicht mehr (verhindert zwei konkurrierende Quellen).
+
+### Fixed
+- **Privacy-Leak:** Bei einer CAD-Personenabfrage wurde das rohe `records`-Feld
+  (inkl. **privater** Akteneinträge) an den Officer-Client gesendet, obwohl die UI
+  nur die gefilterten zeigte. Es wird jetzt nur noch eine bereinigte Kopie mit den
+  sichtbaren Einträgen übertragen (LAPD **und** LASD).
+- **Aktiven Charakter löschen** ist nicht mehr möglich (sonst kein Session-Nick) —
+  Server-Guard + ausgeblendeter Löschen-Button.

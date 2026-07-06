@@ -1,0 +1,86 @@
+---
+title: "3.0.3"
+---
+
+# [3.0.3] – 2026-06-05 — Svelte-NUI, CAD-Ausbau & Escrow
+
+
+Komplette Migration der NUI auf **Svelte 5 + Vite**, großer Funktionsausbau von
+MDT / Dispatch / Query sowie ein lokales Obfuskations-/Escrow-Buildsystem.
+
+### Added
+- **NUI komplett auf Svelte 5 + Vite migriert** (`web/` → Build nach `nui/dist`).
+  Das Lua-/Message-Protokoll blieb unverändert, das Win98/CAD-CSS wurde 1:1
+  übernommen. `ui_page` zeigt jetzt auf `nui/dist/index.html`.
+- **MDT-Einstellungen** (Zahnrad in der Titelleiste): Opacity, Skalierung, Position
+  (Presets) und **freies Verschieben durch Ziehen der Titelleiste** — pro Client in
+  `localStorage` gespeichert. Inkl. Theme-Toggle.
+- **Bewegen & Funken im MDT:** während das (Hochkant-)MDT offen ist, kann man sich
+  weiter bewegen und über pma-voice **funken** (Cursor-only-Fokus; volle Tastatur
+  nur beim Tippen in ein Feld).
+- **`/run <Name|Kennzeichen>`:** öffnet das MDT direkt auf dem Query-Tab und zeigt
+  die Person sofort an. Jeder Run (per `/run` **oder** MDT-Suche) postet
+  `<Callsign> ran "<Query>"` in den **Game-Chat** (für alle OnDuty-Units).
+- **Query im PremierOne-Stil:** linker Query-Typ-Rail (Person / Vehicle / Plate),
+  strukturierte Formulare mit gelb hervorgehobenem „Key"-Feld.
+- **Live-Kennzeichen-Run + Diebstahl-Logik:** runt ein Beamter ein unbekanntes
+  Kennzeichen, bekommt der **aktuelle Fahrer** ein VREG-Formular mit **15-Sekunden-
+  Countdown** im MDT des Beamten. Ausgefüllt → registriert; abgebrochen/abgelaufen →
+  Fahrzeug **als gestohlen geflaggt** (rotes Banner, persistent in
+  `data/stolen_plates.json`). VREG-Formular um Owner/Color/Type/Year erweitert.
+- **`/char`-Notes:** Freitext-Feld (z. B. Gang-RP-Kontext), das Beamten beim Run im
+  CAD angezeigt wird.
+- **`/char`-Presets:** beliebig viele Charakter-Presets, pro Spieler-Identifier
+  gespeichert (`data/char_presets.json`).
+- **„UNITS"/Unit-Details-Ansicht** im MDT-Rail: volle OnDuty-Liste mit Spalten
+  UNIT / ST / Location / Inc / Type / Code, Filter (LEO / FD-EMS / Coroner) und
+  Sortierung.
+- **Dispatcher-Alarmton** („ATTENTION ALL UNITS"): spielt `sound/3beep.ogg` bei allen
+  OnDuty-LEO ab.
+- **Pfeiltasten-Steuerung** im MDT (Tabs ←/→, Liste/Incident ↑/↓).
+- **Lokales ESCROW-Buildsystem** (`build/escrow.js` + `.\escrow.ps1`): packt die
+  Resource obfuskiert (Lua minified + Locals umbenannt, NUI als fertiges Vite-Bundle)
+  als ready-to-use Ordner + ZIP nach `/ESCROW/<name>-<version>/`. Der GitHub-Release-
+  Workflow nutzt dasselbe Tool. **Hinweis:** Obfuskation, kein echtes Cfx-Escrow.
+
+### Changed
+- **On-Duty-Unit-Listen:** Spieler mit demselben Callsign werden zu **einer Unit**
+  zusammengeführt; in der Dispatch-Konsole sind **LEO und Fire/EMS getrennt**
+  gelistet, mit Sortier-Optionen (Callsign natürlich / Status / Default).
+- **Eigener Status per Dropdown** im Command-Bar setzbar (alle rollen-gültigen Codes).
+- **Dispatch sendet nur noch aktive Calls** an die Clients (`BuildCallList`) — das
+  verhindert eine riesige NUI-Payload und sorgt dafür, dass neue Incidents zuverlässig
+  in Calls-Tab und Dispatcher erscheinen.
+- **Comments doppeln als Aktivitäts-/Audit-Log:** Zuweisungen und Disposition werden
+  zusätzlich ins sichtbare Incident-Protokoll geschrieben; ein resolvter Incident
+  bleibt nach „Clear Incident" sichtbar.
+- **Unit-Location** (Straßenname) wird mit der Position mitgesendet und in der
+  UNITS-Ansicht angezeigt.
+- `fxmanifest.lua` auf reine String-Literale umgestellt (keine `local`-Variablen
+  mehr) — behebt „failed to parse fxmanifest" beim Cfx-/Keymaster-Upload.
+
+### Fixed
+- **Devmode:** Traffic/C6/Manual-Incidents, Dispatcher-Assign/Status und Resolve
+  funktionieren jetzt auch ohne On-Duty (Fallback-Callsign) statt still
+  fehlzuschlagen; Nicht-Units bekommen eine On-Screen-Meldung.
+- **`/char` & Session:** das Absenden von `/char` setzt jetzt den Session-Nick → man
+  kann danach der RP-Session beitreten (vorher blieb man hängen). Vehicles werden
+  beim Char-Erstellen zurückgesetzt.
+- **Query im White-Mode:** Suchergebnisse waren weiß auf hell (unsichtbar) → behoben.
+- **Dispatcher-UI passt in den Screen** (Layout-Overflow behoben) und der
+  `DispatchMapStyle` aus der Config greift jetzt wirklich.
+- **CI:** CfxLua-Backtick-Hashes (`` `WEAPON_UNARMED` ``) durch `GetHashKey(...)`
+  ersetzt (brachen luacheck **und** luamin); luacheck-Config bereinigt (`.luarocks`
+  ausgeschlossen).
+
+### Performance
+- Mehrere dauerhafte `Wait(0)`-Client-Loops schlafen jetzt im Idle (Headlight,
+  Anti-Whip, Weapon-Drop, Mask, Seatbelt, Drag, Report-Queue) → niedrigere
+  Resource-Last.
+- **`data/calls.json` wird beim Serverstart geprunt** (resolvte Incidents älter als
+  `CallRetentionDays`, Default 7) + einmaliges Backup; neue Incidents bekommen
+  `createdAtUnix`.
+
+### Removed
+- Alte Vanilla-JS-NUI (`nui/index.html`, `nui/mdt/js/app.js`, `nui/mdt/css/`) sowie
+  tote `.bak`-Dateien entfernt — durch den Svelte-Build ersetzt.

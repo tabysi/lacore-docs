@@ -1,0 +1,204 @@
+---
+title: "3.0.4"
+---
+
+# [3.0.4] – 2026-06-05 — Datenbank-Persistenz (oxmysql) & Local/DB-Sync
+
+
+Alle persistenten Daten werden jetzt zusätzlich in einer **MySQL-Datenbank über
+oxmysql** gespeichert. Die lokalen `data/*.json`-Dateien bleiben als jederzeit
+synchroner Offline-Cache erhalten — die DB ist die dauerhafte Quelle der Wahrheit.
+Ziel: **keine Daten gehen mehr verloren**, auch nicht bei Crash/Neustart/Update.
+
+### Added — MDT: Status-Codes, Location, Response-Code, History & Schwarzes Brett
+- **ST-Spalte = 2-Buchstaben-Status-Code** (schmal): `CL` Clear, `AS` On Scene,
+  `EN` Enroute, `C6` Code 6, `BY` Busy, `UA` Unavailable, `ST` Out to Station
+  (`EX` reserviert). Voller Status weiterhin als Tooltip.
+- **UNIT-Location status-abhängig:** Standard = letzte Straße; bei `CL` leer; bei
+  `ST` „OUT TO STATION" als Default. **Eigene Unit kann die Location überschreiben**
+  (Klick auf die Location-Zelle → editierbar, z. B. fremde Station bei BY/UA/ST) —
+  serverseitig pro Unit gespeichert (`mdt:SetLocationOverride`).
+- **Response-Code-Spalte (`Code`):** leer ohne Incident; **311 → Code 2**, **911 →
+  Code 3** automatisch beim Anlegen; alle anderen Codes **manuell** im Incident
+  wähl-/änderbar (`Code`-Dropdown im Summary/Incident-Info, `mdt:SetIncidentCode`).
+- **Incident History abrufbar:** Der „Incident History"-Tab listet jetzt **alle
+  abgeschlossenen Incidents** (aus dem Store, neueste zuerst) mit „View" zum Laden
+  (`mdt:RequestIncidentHistory`).
+- **Schwarzes Brett (Attachment-Tab):** gemeinsames Board, an das **alle On-Duty**
+  Notizen pinnen können (interne Regelung, kein Hard-Lock). Persistiert im neuen
+  DB-Store `board` (+ `data/board.json`), an alle offenen MDTs gesynct; löschen darf
+  der Ersteller oder Staff (`modules/mdt/mdt-board-sv.lua`, `board:Post/Delete/Request`).
+- **Sound-Cues (`sound/mdtentry.ogg`):** wird abgespielt, wenn ein Officer im MDT
+  einen Incident erstellt (Traffic / Code 6 / manuell) — an **alle On-Duty-Units** —
+  und wenn ein **Kommentar** zu einem Incident hinzugefügt wird — an **alle attachten Units**.
+  Neuer generischer Client-Trigger `mdt:PlaySound(index)` (Index 7 = mdtentry);
+  spielt auch bei geschlossenem MDT.
+
+### Added
+- **Zentraler Persistenz-Layer** (`modules/db/db-sv.lua`): eine Tabelle
+  `pvp_core_store` (Key → JSON-Blob), beim Start automatisch angelegt. Generische
+  Helfer `DBLoadStore(key, file)` / `DBSaveStore(key, file, tbl)` plus `SaveCalls()`.
+- **Automatische Migration:** Ist die DB für einen Store noch leer, werden die
+  vorhandenen lokalen JSON-Daten beim ersten Start übernommen. Beim Laden gewinnt
+  die DB und aktualisiert die lokale Spiegeldatei.
+- **Config-Schalter** `UseDatabase` (`configs/config.lua`, Standard `true`). Auf
+  `false` verhält sich das Script wie bisher (reine JSON-Speicherung).
+
+### Changed
+- **Alle Stores laufen über den DB-Layer:** Zivilisten-/Charakter-Profile,
+  `/char`-Presets, registrierte Fahrzeuge, **gestohlene Kennzeichen**, Dispatch-
+  **Calls** (alle Speicherstellen via `SaveCalls()`), **Call-Audit-Log**, **Banliste**
+  (Connect-Check + Ban/Warn/Unban), Bleets und NADS-Adressen. Jeder Save schreibt
+  **immer lokal und in die DB** → lokal/DB stets synchron.
+- **Playtime jetzt server-autoritativ & in der DB** (`modules/db/playtime-sv.lua`):
+  die Spielzeit wird pro Spieler-Identifier serverseitig gezählt und im `playtime`-
+  Store (DB + `data/playtime.json`) gespeichert — überlebt Neustarts, folgt dem
+  Spieler über PCs hinweg und ist nicht mehr clientseitig manipulierbar. Der Client
+  spiegelt den Wert nur noch für `/playtime` + die 10h-Mitgliedschafts-Meldung
+  (Events `pvp:SyncPlaytime` / `pvp:PlaytimeReached`). Der alte clientseitige
+  KVP-Zähler und das `playtimeReached`-Netevent entfallen.
+
+### Added (Playtime-Migration)
+- **Einmalige Übernahme der alten Playtime:** Beim ersten Join liest der Client den
+  alten lokalen KVP-Wert — inkl. des **Pre-Rebrand-Keys `SAR-CORE:PT`** (das Maximum
+  aus altem `SAR-CORE:PT` und neuem `PVP-CORE:PT`) — und schickt ihn an den Server
+  (`pvp:MigratePlaytime`).
+  Der Server importiert ihn **genau einmal pro Identifier** (persistentes Flag in
+  `data/playtime_migrated.json`) und nur, wenn er den aktuellen DB-Wert übersteigt
+  (mit Sanity-Cap) — so geht die bisherige Spielzeit nicht verloren und kann nicht
+  wiederholt zum Inflationieren missbraucht werden.
+- **fxmanifest:** `@oxmysql/lib/MySQL.lua` eingebunden, `modules/db/*-sv.lua` lädt
+  **vor** allen datennutzenden Modulen, `oxmysql` als Dependency ergänzt.
+
+### Changed — Map-Tiles in eigenes Resource ausgelagert
+- **Neues Resource `lacore-maps`** enthält jetzt die Leaflet-Map-Tiles
+  (~121 MB, ~4100 Tiles, Styles Atlas/Grid/Satelite). Sie sind **aus dem
+  Haupt-Resource entfernt** → werden **einmal** geladen und bei Core-Updates nicht
+  neu heruntergeladen (FiveM cached das stabile Tiles-Resource per Hash). `ensure
+  lacore-maps` alongside `lacore`.
+- **UI lädt Tiles via `https://cfx-nui-lacore-maps/mdt/map/`** (`MAP_TILE_BASE`).
+  Zur Laufzeit per Server überschreibbar (`showDispatch.mapBase`) über die neue
+  Config **`DispatchTileBase`** — z. B. um Tiles von einem eigenen CDN zu laden.
+
+### Changed — Discord-Rollen-Auth eingebaut (kein `discordroles` mehr)
+- **`discordroles` als Dependency entfernt:** Die Discord-Rollen-Prüfung ist jetzt
+  **nativ in Lua eingebaut** (`modules/discord/discord-roles-sv.lua`). Sie liest die
+  Gilden-Rollen eines Spielers direkt über die Discord-API (Bot-Token) und stellt
+  dieselben Helfer bereit, die der Server nutzt: `GetDiscordRoles(src)` und
+  `IsDiscordRolePresent(src, name)` (ersetzen `exports.discordroles:GetRoles` /
+  `:IsRolePresent`). Ergebnisse werden pro Spieler gecached (`DiscordAuth.cacheSeconds`).
+- **Konfiguration:** Bot-Token & Guild über Convars **`pvp_discord_token`** /
+  **`pvp_discord_guild`**, Rollen-Namen → IDs in `DiscordAuth.roles`
+  (`configs/cfg-server-sv.lua`). Der Bot muss in der Gilde sein und die
+  **Server-Members-Intent** aktiviert haben. In `devmode` werden alle Rollen-Checks
+  übersprungen.
+- **Drop-in-Exports für andere Scripts:** dieselben Exports wie `discordroles`
+  (Callback-Stil, Rollen-**IDs**) sind verfügbar:
+  `exports['lacore']:isRolePresent(user, role, [guild], cb)`,
+  `:getUserRoles(user, [guild], cb)`, `:getUserData(user, [guild], cb)`. Fremde
+  Resources müssen nur `exports.discordroles` → `exports['lacore']` umstellen.
+
+### Changed (Breaking) — Rebrand SAR → PVP
+- **Convars umbenannt:** `sar_devmode` → **`pvp_devmode`**, `sar_webhook_*` →
+  **`pvp_webhook_*`** (serverlog/livechat/adminlog/dispatch/reports/prison/bleeter/
+  txadmin). **In der echten `server.cfg` anpassen**, sonst greifen Devmode &
+  Discord-Logging nicht mehr. Vorlagen aktualisiert (`server.cfg.example`,
+  `README.md`, `ANLEITUNG.md`).
+- **KVP-Keys umbenannt:** `SAR-CORE:*` → **`PVP-CORE:*`** (Client: Settings,
+  Playtime `PT`, gespeicherte Charaktere) und `SAR_CORE:*` → **`PVP_CORE:*`**
+  (Server: Playerlist, AOP, Server-Zeit). Alte unter `SAR(-|_)CORE:*` gespeicherte
+  Werte starten unter den neuen Keys frisch (rein clientseitige Caches, kein
+  Gameplay-Datenverlust).
+- **Branding bereinigt:** Header-Kommentar `--- SAR CORE SA` → `--- PVP CORE`,
+  Init-Print `sar_core initialised!` → `pvp_core initialised!`.
+
+### Notes
+- **Voraussetzung:** Die Resource **`oxmysql`** muss laufen (mit gesetztem
+  `mysql_connection_string`-Convar). Ist die DB nicht erreichbar, fällt das Script
+  mit einer einmaligen Warnung sauber auf reine JSON-Speicherung zurück.
+
+### Changed
+- **Counties entfernt → automatische Stadt-/Regionserkennung:** Die alte
+  County-Liste (Los Angeles County / Ventura County / San Bernardino County …) im
+  Location-System wurde entfernt. Stattdessen erkennt das Script die Region jetzt
+  **automatisch** anhand der GTA-Zone (`GetNameOfZone` → `CityZones`-Map in
+  `client/vehicle-cl.lua`, `GetCityFromCoords`). Regionen: **Thousand Oaks,
+  San Tierra, Los Angeles, West Hollywood, Beverly Hills, Santa Monica, Compton,
+  Industry** (Default „Los Angeles"). Die erkannte Stadt wird in **PLD** und in den
+  **MDT-Incidents** (`city`-Feld, City-Spalte im MDT) genutzt — durchgereicht über
+  Incident-Erstellung, 911/311, Panik & Crime-Broadcast. (Agentur-Namen wie
+  „… County Sheriff" bleiben unverändert — das sind Department-Namen, keine Region.)
+  Neuer Befehl **`/citydebug`** blendet live Zonen-Code, Zonen-Name, erkannte Region
+  und Koordinaten ein — zum Feinjustieren der `CityZones`-Map.
+- **Zone-Editor (Dispatcher-Konsole _und_ MDT-Dispatch-Tab):** Über den Button
+  **„⛬ Zones / Zone Editor"** lässt sich jede GTA-Zone einer Region zuordnen
+  (durchsuchbare Liste, Region-Dropdown). Die Overrides werden **serverseitig im
+  DB-Store `zone_regions` gespeichert**, live an alle Clients gesynct und haben
+  Vorrang vor der Default-Map (`GetCityFromCoords`). Nur Dispatcher/Staff dürfen
+  editieren (`modules/mdt/mdt-zones-sv.lua`). Eigene Komponente `ZoneEditor.svelte`,
+  global gerendert (Overlay `position:fixed`, `z-index:9999` — vorher lag das Modal
+  hinter der Leaflet-Karte und war unsichtbar).
+- **Polygon-/Boundary-Editor auf der Dispatch-Karte:** Regionen lassen sich jetzt
+  als **gezeichnete Polygone** direkt auf der Karte definieren („Draw Zone" →
+  Punkte klicken → Region wählen → Finish). Ein Punkt erbt die Region des Polygons,
+  in dem er liegt (Point-in-Polygon via `IsPointInBounds`) — **Priorität: Polygon >
+  Zonen-Code-Override > CityZones-Default > Los Angeles**. Polygone werden im
+  DB-Store `zone_polygons` gespeichert, live gesynct, farbig je Region dargestellt
+  und sind anklickbar (Region ändern / löschen). Nur Dispatcher/Staff.
+- **Map-Style direkt in der UI umschaltbar:** Dropdown in der Dispatcher-Konsole
+  (Atlas / Grid / Satellite); die Auswahl wird pro Client in `localStorage` gemerkt
+  und der Tile-Layer ohne Neuladen getauscht. (Config `DispatchMapStyle` bleibt der
+  Default.) Der Konsolen-Titel zeigt nicht mehr „LOS ANGELES COUNTY".
+- **Incident-Map-Blips abschaltbar:** Die GPS-Blips für aktive Incidents (pro Typ
+  eingefärbt) sind ein gewolltes CAD-Feature, aber jetzt per Config **`ShowIncidentBlips`**
+  (Standard `true`) komplett deaktivierbar.
+
+### Performance
+- **`IsLegal()` von O(n) auf O(1):** Die Funktion lief bei jedem Entity-Spawn
+  (~3–4/s) und führte pro Aufruf bis zu **186 `GetHashKey`-Aufrufe** für jede
+  Blacklist-Iteration aus (~180.000 native Calls in 5 Minuten). Die Hashes werden
+  jetzt **einmal beim Resource-Start** in ein Set-Lookup vorgerechnet
+  (`blacklistedVehicleHashes` / `blacklistedModelHashes`). Bonus: globale Variable
+  `hashkey` (Leak) entfernt.
+- **`entityCreating` schneller + sauberer:** doppelte `GetEntityModel`- und
+  `NetworkGetEntityOwner`-Aufrufe (bis zu 6 redundante Natives pro Spawn) auf
+  jeweils 1 reduziert; `metrotrain`-Hash gecached statt pro Spawn berechnet.
+- **`entityRemoved`: Bug-Fix + Speed:** `table.remove` in `ipairs`-Schleife
+  übersprang nachfolgende Einträge (subtiler Bug) und scannte unnötig weiter,
+  obwohl jede Entity-ID nur einmal vorkommt → jetzt mit frühem `return`, im
+  Schnitt halber Aufwand.
+- **Leere `Wait(0)`-Schleife entfernt** (`client/hud-cl.lua`): ein `while true do
+  Wait(0) end` mit nur einem Kommentar drin brannte jeden Frame CPU für nichts.
+
+### Fixed (Layout & Sound-Spam)
+- **Incident-History-Tab überläuft die UI nicht mehr:** bei vielen Einträgen lief
+  die Tabelle über die UNIT-STATUS- und REQUEST-Strips am unteren Rand des MDT.
+  Die History hat jetzt einen **eigenen scrollbaren Container** (`.pm-history-wrap`
+  / `.pm-history-list`) mit Sticky-Header — der Bottom-Bar-Bereich bleibt
+  unberührt, der aktive Incident steht oben (max. 25 % Höhe, ebenfalls scrollbar),
+  die History scrollt darunter.
+- **Sound-Cooldown gegen Spam (Ohrenschutz!):** zwei Drosseln verhindern, dass
+  Officer durch Knopfhämmern alle anderen Spieler beschallen können:
+  - **Client-seitig** (`mdt:PlaySound`): **3 Sekunden Cooldown pro Sound-Index**
+    pro Client — egal woher der Trigger kommt. Der einzelne Spieler hört
+    `mdtentry.ogg` & Co. niemals öfter als 1×/3 s.
+  - **Server-seitig** (`mdt:CreateUnitIncident`): pro Quelle **3 s Cooldown auf
+    Incident-Erstellung** (Traffic/Code 6/Manual). Spam-Clicks werden lautlos
+    verworfen, der Officer bekommt eine kleine Notify — kein Broadcast, kein Sync.
+
+### MDT UX
+- **MDT mit ESC oder Backspace schließen** (zusätzlich zur **O**-Taste). Backspace
+  wird ignoriert, wenn ein Textfeld fokussiert ist (sonst kann man dort nicht mehr
+  löschen). Schließt auch das Zone-Editor-Modal sauber, falls offen.
+- **Response-Codes nur noch 0/2/3/5** (statt 0-6) — passt zum tatsächlich genutzten
+  Code-Schema.
+- **MDT-Dispatch-Tab aufgeräumt:** die redundante „On-Duty Units"-Liste wurde
+  entfernt (die Units stehen schon im Unit-Details-Tab der Vollbild-Dispatch-Konsole).
+  Der **Zone-Editor-Button** wandert in den Dispatch-Chat-Header, damit er weiter
+  greifbar ist.
+
+### Fixed
+- **„Unread MDT Calls" bleibt hängen:** Der On-Screen-Hinweis `mdtUnread` wurde nie
+  zurückgesetzt und blieb daher dauerhaft eingeblendet (auch wenn nichts ungelesen
+  war / nach dem Schließen des MDT). Beim **Öffnen des MDT** wird er jetzt gelöscht
+  (= als gelesen markiert).

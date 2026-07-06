@@ -1,0 +1,69 @@
+---
+title: "3.0.5d"
+---
+
+# [3.0.5d] – 2026-06-11 — Vollständige Lokalisierung, Config-Ausbau & Härtung
+
+
+Großer Feinschliff-Release: der **komplette Core ist jetzt durchgängig
+lokalisiert** (EN-Quelle + DE/RU), praktisch alles Spieler-/Profil-/Rollen-
+bezogene ist **konfigurierbar**, und eine offene Sicherheitslücke wurde
+geschlossen.
+
+### Security
+- **`ondutyServer` abgesichert:** Die Job-Zuweisung (LEO/Fire/Coroner) wird jetzt
+  serverseitig per **Discord-Rolle** geprüft (`DutyRoles` in
+  `configs/cfg-server-sv.lua`). Vorher konnte sich **jeder Client** zu LEO machen
+  und damit MDT/Dispatch/Jail/Cuff nutzen. devmode + Staff/Dev umgehen die Prüfung;
+  leere Rolle = offen.
+
+### Added — Profil-Config (`configs/cfg-profile-sh.lua`)
+- **Discord-Rollen-Badges** frei konfigurierbar: Rolle → Label, Farbe, Icon
+  (Reihenfolge = Anzeigereihenfolge; weitere Rollen einfach ergänzen).
+- **Status-Farben**, **Member-Badge** (Icon/Farbe), **Level-Formel**
+  (`minutesPerLevel`) und **Stat-Erfolg-Schwellen** (Veteran/Legend/Garage…)
+  konfigurierbar. Alle Werte werden an die NUI durchgereicht → Server und Anzeige
+  bleiben synchron.
+- **Membership-Schwelle in STUNDEN** (`membershipHours`) als **eine** Quelle der
+  Wahrheit — gilt coreweit (Profil-Badge, „Member"-Erfolg, 10h-Benachrichtigung
+  in `playtime-sv.lua` + Webhook). Die In-Game-Meldung und die Erfolg-Beschreibung
+  passen sich dynamisch an.
+
+### Added — Spielwelt-Config
+- **Ingame-Zeit-Geschwindigkeit konfigurierbar:** `GameMinuteSeconds`
+  (`configs/config.lua`) = echte Sekunden pro Ingame-Minute (Standard 8). Steuert
+  den Tag/Nacht-Zyklus zentral (vorher hart `minuteDuration = 8000`).
+
+### Added — Achievements-Ausbau
+- **Stat-Erfolge serverseitig:** Veteran/Garage/… schalten beim Erreichen frei
+  (Toast + persistent „erreicht am"), erste Runde pro Spieler still (kein
+  Toast-Spam beim ersten Deployment).
+- **Meta-Erfolg „Completionist":** automatisch, wenn alle Eggs gefunden sind.
+- **Unlock-Datum** wird bei Eggs und Stat-Erfolgen angezeigt.
+- **Frieda:** Katzen werden sauber auf den Boden gesetzt (`GetGroundZFor_3dCoord`,
+  kein Schweben/Versinken mehr) und liegen in einer ruhigen Pose.
+
+### Changed — Vollständige Lokalisierung (EN/DE/RU)
+Alle verbleibenden hardcodierten, spielerseitigen Strings laufen jetzt über das
+`lang/`-System (`T()` Lua-seitig, `t()` NUI-seitig):
+- **Player-/Server-Board (Taste „i"):** Online-Spieler, Sessions, Seitenzahl,
+  AOP-Texte, Server-Status, Einheiten-Zähler.
+- **Server:** Kick-/Ban-Meldungen, `/dc`-Befehl. **LASD-Modul:** die deutschen
+  Reste auf Englisch + lokalisiert.
+- **Client-Notifications:** Charakter/Fahrzeug (`/char`, `/vreg`, Stolen-Plate…),
+  MDT/Dispatch (Usage, GPS, „assigned to incident"…), Whitelist, NADS.
+- **NUI-Komponenten:** `CallSession`, `QueryView`, `PersonRecord`, `ZoneEditor`,
+  **`Modals`** (komplette `/char`/`/vreg`-Formulare, Disposition, MDT-Settings),
+  sowie die generischen Chrome-Strings von `LasdMdt`.
+- **Befehls-Hilfetexte** (`chat:addSuggestion`) für ~27 Befehle + das Telefon.
+
+Bewusst **englisch belassen** (Begründung im Code): authentisches LASD-CAD-/Funk-
+Jargon (10-98, NCIC, RMK…), serverseitige Daten-Werte (Male/Sedan/Valid…) und
+literale Befehls-Keywords.
+
+### Changed — Escrow
+- **`build/escrow.js`:** `lang/`-Dateien werden nicht mehr obfuskiert (wie
+  `configs/`), damit Käufer die Übersetzungen bearbeiten können. `lang/*` auch in
+  `escrow_ignore` (Cfx-Keymaster) ergänzt.
+
+---

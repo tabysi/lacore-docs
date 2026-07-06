@@ -1,33 +1,140 @@
 ---
-title: 3.1.3
+title: "3.1.3"
 ---
 
-# 3.1.3 — Rebranding to LACORE + release-ready
+# [3.1.3] – Rebranding to LACORE + release ready
 
-## Changed (breaking — read the upgrade steps)
 
-- **Resource rename** `pvp-corev3` → `lacore`. Rename the folder to `resources/lacore` and use
-  `ensure lacore`.
-- **Convar rename** `pvp_*` → `lacore_*` (all convars).
-- **ACE group rename** `group.pvp_*` → `group.lacore_*`.
-- **Command / keybind rename** `pvp_*` → `lacore_*` — players re-bind custom keys once.
+### Added — CCTV field cameras + dispatch-map integration
+- **CAM placement tool.** `/camtool` gives a pistol whose damage is neutralised while it's out;
+  the **bullet impact** marks where the camera is placed (looking back toward where you stood).
+  `/cameras` opens a manager panel (`CctvManager.svelte`) to rename / delete placed cameras, jump
+  the live CCTV view to one, and toggle the tool. Placed cameras are persisted + LEO/Security-
+  gated server-side (`cctv-sv.lua`, `data/cctv_cams.json`) and appear in `/cctv` under a "Field
+  Cameras" network. New client module `modules/cctv/cctv-place-cl.lua`.
+- **Cameras on the dispatch map.** `/dispatch open` now shows every camera the dispatcher may see
+  (config + placed) as 📹 markers. Clicking one opens a "view this camera?" modal; confirming
+  **closes the console, shows the live CCTV view in front, and reopens the console automatically
+  when the operator leaves the camera** (`cctv:Request` accepts a `{net,cam}` focus). The console
+  requests the camera list on open and it refreshes whenever a camera is placed/removed.
 
-## Added
+### Fixed — dispatch map player position lag
+- Units now report their position **every 1s** (was 2s), so the map marker tracks the real
+  position much more closely instead of visibly lagging/jumping while moving (`mdt-nui-cl.lua`).
+  (If the marker still looks *offset* rather than *laggy*, that is tile calibration in
+  `web/src/lib/mapproj.js` and needs an in-game reference point to tune.)
 
-- **Automatic DB migration** — the legacy `pvp_core_store` table is renamed to `lacore_core_store`,
-  and `pvp_logs` to `lacore_logs`, on start. No data loss on upgrade.
-- `server.cfg.example` with the complete current convar block.
-- `DOCS.md` — central documentation, and `LICENSE.md` — full EULA covering IP-lock enforcement.
+### Changed — CCTV: POV camera + targeting scanner
+- **Reworked into a fixed-position surveillance camera with a scanner** (`cctv-cl.lua`,
+  `cctv-sv.lua`, `Cctv.svelte`, `cfg-cctv-sh.lua`). The old pan-clamp model is replaced:
+  - **Fixed position, POV only.** The camera stays at its config `pos`; **WASD** and the **arrow
+    keys** look around (A/D pan, W/S tilt), **scroll** zooms. It's a wall camera, not a free-fly
+    drone. Look input is read natively in Lua (`SetNuiFocusKeepInput(true)`) so the mouse stays
+    free as a cursor. The hidden operator ped is teleported once to the camera so its area (and
+    entities) streams and can be scanned.
+  - **Click-to-scan.** A left-click raycasts from the camera through the cursor
+    (`StartExpensiveSynchronousShapeTestLosProbe`) and classifies the hit: player / NPC ped /
+    vehicle / object.
+  - **Local-first, never hangs.** Every target resolves locally after the scan sweep — NPCs show
+    sex, NPC/unregistered vehicles show model + class + an **UNREGISTERED** flag. The server
+    (`cctv:Scan` → `cctv:ScanResult`) only answers for **registered** players/plates and then
+    overrides the local card with the real record (name / DOB / address / DL / **ACTIVE WARRANT**,
+    owner / **REPORTED STOLEN**). This is why NPCs and NPC vehicles now scan instead of hanging.
+  - **Anchored info cards.** Each scan shows a scanning animation, then an info card that anchors
+    to the entity on screen and follows it (`GetScreenCoordFromWorldCoord` per frame). Up to 5
+    concurrent scans; dead entities auto-drop. Record lookup is gated to LEO / Security.
+  - Camera list is clickable; a NET ‹ › selector switches networks. Config: `rotSpeed` /
+    `scanTime` + zoom (old `panSpeed` / `panLimit` / free-fly `moveSpeed` removed).
+  - **Standin resolves to the real player.** The operator's desk clone is now a *networked* ped
+    and registered server-side (`cctv:RegisterStandin` netId → src). When another operator (or the
+    operator themselves) scans that standin through a camera, the server returns the real record
+    instead of UNIDENTIFIED. Cleaned up on close / drop / resource stop. Only ped/vehicle hits
+    scan now (objects are ignored).
+  - **Mugshot + MDT summary.** Scan cards now show a compact ped mugshot
+    (`RegisterPedheadshotTransparent` → `nui-img` texture, freed on card close) and, for
+    registered people, a compact MDT block: visible priors count, active BOLO count and up to
+    three recent records (category + title) reusing `RecordsVisibleTo` / `BolosForQuery`.
+  - **Animated scan sequence.** The scanning phase is now a proper targeting sequence: a corner
+    bracket reticle over the target with a scanning grid, a sweeping scan line, a live percentage
+    counter, an "ANALYZING…" caption with a blinking cursor, and a brief full-screen scan flash +
+    sweep on each new scan. The record card then fades/zooms in on completion.
 
-## Fixed
+### Changed — Turf / Gang-War is now opt-in
+- **`Turf.enabled` master switch (default `false`)** in `configs/cfg-turf-sh.lua`. When off, neither
+  `turf-sv.lua` nor `turf-cl.lua` runs (no blips, HUD, kill reporting or capture logic) — both files
+  early-return on `not Turf.enabled`. Enable it explicitly to use kill-based territory capture.
 
-- **Connect hang on "Checking bans..."** — a DB schema-init hang blocked the connect ban check.
-  Fixed, with a hard cap on schema init so a stalled database can never freeze joins again.
+### Changed — CCTV: real area streaming + mouse look
+- **CCTV now streams the remote area** (`cctv-cl.lua`). Opening the viewer saves the player's
+  spot, drops a frozen clone ped there, and teleports the (hidden, frozen, invincible) real ped
+  to the active camera — so the world actually loads at the camera instead of showing an
+  unloaded black view. `SetFocusPosAndVel` + `RequestCollisionAtCoord` reinforce streaming;
+  switching cameras re-streams. On exit the ped is teleported back and the clone removed
+  (also on resource stop).
+- **Mouse pan fixed.** Two real bugs stacked on top of each other:
+  1. Native look-control reads (`GetControlNormal` / `GetDisabledControlNormal`) are unreliable
+     while a scripted cam renders over a frozen ped. Replaced by NUI input capture: the viewer
+     gives the NUI focus + cursor (`SetNuiFocus(true, true)`), a full-screen capture layer in the
+     overlay reads the absolute cursor position (pointer-lock is blocked in FiveM's CEF) and
+     forwards it as `-1..1` via a `cctvAim` callback → mapped onto the pan angle.
+  2. The camera still would not turn because `PointCamAtCoord` keeps a live "point at" that
+     overrides `SetCamRot` every frame. Now `StopCamPointing` is called after the base aim is
+     captured, so manual pan rotation takes effect.
+  Arrows cycle cameras/networks, scroll zooms, Backspace/Esc exits — all forwarded from the
+  overlay (`cctvCycle` / `cctvNet` / `cctvZoom` / `cctvExit`). Range via `CCTV.panLimit`.
+  - Note: the teleported operator is briefly not visible to other players at the CCTV desk (the
+    clone is a local placeholder). Acceptable for a surveillance terminal.
 
-## Security — post-launch hardening
+### Fixed — Turf marker performance
+- `Turf.drawMarkers` now defaults to **off**. The in-world marker drew a cylinder at
+  `radius * 2` (up to ~280 m) every frame — heavy and visually noisy. Map blips already show
+  ownership; enable the marker only if you want an in-world boundary.
 
-- **Turf capture farming exploit** fixed — the reported killer must be inside the same zone, plus a
-  per-victim cooldown.
-- **Admin spectate** rewritten with a proper on/off toggle + exit key + cleanup on resource stop.
-- **Admin noclip** state restored on resource stop, so a restart mid-noclip can't leave a player
+### Security / Fixed — post-launch hardening pass
+- **Turf capture farming exploit fixed** (`turf-sv.lua`). `turf:Death` only validated the
+  victim's zone position, so a modified client could name an arbitrary org member as the
+  "killer" and suicide-report in a loop to farm influence + captures without real combat. Now
+  the reported killer must ALSO be inside the same zone (server-checked ped coords), plus a
+  20 s per-victim cooldown on qualifying contributions. Cooldown table cleared on disconnect.
+- **Admin spectate rewritten** (`admin-cl.lua`). The old toggle expression
+  (`not IsPlayerFreeAiming(...) and true`) was nonsensical and had no way to exit. Now a proper
+  on/off toggle with a Backspace exit key, a "target not loaded" guard, and cleanup on resource
+  stop so nobody is left stuck in spectator mode.
+- **Admin noclip cleanup** — noclip state is now restored (collision / visibility /
+  invincibility / freeze) on resource stop, so a restart mid-noclip can't leave a player
   ghosted.
+
+### Fixed — Connect hang on "Checking bans..."
+- The DB auto-migration used `MySQL.single.await(query)` **without a params argument**, which
+  hangs on some oxmysql builds instead of returning. That left schema init stuck in its
+  "working" state, so every `DBLoadStore` — including the connect ban check — blocked forever,
+  freezing joins at "Checking bans...". Fixed in `db-sv.lua` and `bb-sv.lua`: the table-exists
+  check now uses `MySQL.query.await(... WHERE TABLE_NAME = ? ..., { name })` wrapped in pcall.
+- Added a **hard 10 s cap** to the schema-init wait loop so a stalled database can never freeze
+  the whole server again — it falls back to local JSON instead.
+- Hardened the `playerConnecting` ban check with a pcall + `ban.ident or {}` guard so a
+  malformed ban entry or DB hiccup can never leave the connect deferral pending.
+
+### Changed (BREAKING — read the upgrade steps!)
+- **Resource rename** `pvp-corev3` → `lacore`. Rename the folder to `resources/lacore` and
+  set `ensure lacore` in `server.cfg` (instead of `ensure pvp-corev3`/`pvp-core`).
+- **Convar rename** `pvp_*` → `lacore_*` — affects ALL convars in `server.cfg`
+  (`pvp_devmode`, `pvp_discord_token`/`_guild`, every `pvp_webhook_*`, every `pvp_bb_webhook*`,
+  `pvp_bridge_url`/`_token`). Legacy convar names are no longer read — see
+  `server.cfg.example` or `DOCS.md §4` for the full list.
+- **ACE group rename** `group.pvp_dev`/`pvp_staff`/`pvp_mod` → `group.lacore_*`. Update any
+  manually placed `add_principal identifier.xxx group.pvp_staff` lines accordingly.
+- **Command / keybind rename** `pvp_release`/`pvp_cuff`/`pvp_drag`/`pvp_putin`/`pvp_civradial`
+  etc. → `lacore_*`. Players with custom keybinds have to rebind once.
+
+### Added
+- **DB auto-migration:** on start, `db-sv.lua` automatically renames the legacy
+  `pvp_core_store` table to `lacore_core_store`; `bb-sv.lua` does the same for
+  `pvp_logs` → `lacore_logs`. No data loss on upgrade.
+- `server.cfg.example` (replaces the outdated `pvp_config.cfg`) with the complete current
+  convar block.
+- `DOCS.md` — central complete documentation (setup, config, modules, MDT, dispatch, DB,
+  bridge, exports, FAQ).
+- `LICENSE.md` — full EULA covering the IP-lock enforcement, resale prohibition, warranty and
+  jurisdiction.
+- `docs/LASD_CAD.md` — previously empty file, now filled with content.
