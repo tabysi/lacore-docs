@@ -42,30 +42,53 @@ Open the transcript panel with **`/radiolog`** — a searchable list of radio tr
 and **dept-coloured callsign badges** (LAPD blue, LASD amber, EMS/Fire red). Search by callsign or
 text. The log is server-authoritative and shared across the Dispatch console and MDT terminals.
 
+## 911/311 call transcription
+
+When a caller and a dispatcher are connected on a 911/311 call, **both sides are transcribed
+automatically** while they talk. Each phrase is appended to the **call transcript** — shown **live**
+in the call session and **saved to the call log**. Callers speak naturally, so call transcription
+always uses **free recognition** (the radio grammar below is not applied to calls). Toggle it with
+`STT.calls`.
+
+## Accuracy — model & radio grammar
+
+Two levers, both built in:
+
+- **A larger model.** LACORE bundles `vosk-model-en-us-0.22-lgraph` — a bigger, more accurate model
+  than the tiny "small" ones. Point `STT.model` at any other Vosk model `.tar.gz` (e.g. German) to
+  override; each client downloads it once and caches it.
+- **A radio grammar (the big win for radio).** `STT.grammar` constrains the **push-to-talk radio**
+  vocabulary to ten-codes, the phonetic alphabet and common jargon — dramatically improving accuracy
+  for codes. Keep `"[unk]"` in the list so words outside it still recognise. This requires a
+  `-lgraph` model (the bundled one is) and is **not** applied to 911/311 calls.
+
+<Callout type="info">
+  You can't practically re-train a Vosk model — but the grammar above is the domain-adaptation lever
+  that gets you most of the way for radio traffic, without any training.
+</Callout>
+
 ## Configuration
 
 Everything lives in `configs/cfg-stt-sh.lua`:
 
 ```lua
 STT.enabled = true      -- master switch
+STT.calls   = true      -- auto-transcribe 911/311 dispatcher calls (both sides)
 STT.lang    = "auto"    -- "auto" follows each client's UI locale, or "de"/"en"/"ru"
-STT.model   = ""        -- "" = bundled English small model; or a URL to your own Vosk model
+STT.model   = ""        -- "" = bundled lgraph model; or a URL to your own Vosk model .tar.gz
+STT.grammar = { "[unk]", "code four", "ten four", "adam", "boy", ... } -- radio (PTT) vocabulary
 STT.maxLen  = 220       -- max characters per transmitted line
 STT.logSize = 60        -- how many recent lines are kept + sent on open
 STT.persist = true      -- keep the log across restarts
 STT.store   = "data/radio_log.json"
 ```
 
-<Callout type="info">
-  **Custom / other-language model.** Point `STT.model` at any Vosk model `.tar.gz` (e.g. a German or
-  a larger, more accurate model you host). Each client downloads it once and caches it.
-</Callout>
-
 ## Notes & limits
 
-- **On-duty only.** Transmission is server-gated to units with a callsign; civilians can't transmit.
+- **On-duty only.** Radio transmission is server-gated to units with a callsign; civilians can't
+  transmit. Call transcription is gated to the call's participants.
 - **Graceful fallback.** A client where the offline engine can't initialise simply can't transmit
   (no crash) — it can still read the log. Verify a client with **`/sttcheck`**.
-- **Accuracy** depends on the model and the speaker's mic/accent; the bundled small model is tuned
-  for size. Swap in a larger model via `STT.model` for better accuracy.
-- Recognition uses each client's **own CPU** — there is no server-side transcription cost.
+- **Accuracy** depends on the model, the radio grammar, and the speaker's mic/accent.
+- Recognition uses each client's **own CPU** — there is no server-side transcription cost. The model
+  is downloaded once per client (~128 MB) and cached.

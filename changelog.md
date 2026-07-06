@@ -13,14 +13,24 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   On release the final transcript is sent to the server. A small live "🎙 …" chip shows the partial.
   *(Note: the browser SpeechRecognition API does not work in FiveM's CEF — no speech backend — so
   LACORE uses Vosk instead. The `/sttcheck` probe reports both.)*
-- **Bundled model.** Ships the Vosk English small model in `nui/dist/models/` (~40 MB, downloaded
-  once per client). Override with your own model (e.g. German) via `STT.model` in `cfg-stt-sh.lua`.
+- **Bundled model + radio grammar.** Ships the larger, more accurate
+  `vosk-model-en-us-0.22-lgraph` (~128 MB, downloaded once per client) — a dynamic-graph model that
+  supports a **radio grammar**: `STT.grammar` in `cfg-stt-sh.lua` constrains **push-to-talk** radio
+  recognition to ten-codes, the phonetic alphabet and common jargon for much higher accuracy.
+  The grammar is applied to the radio only; **911/311 calls always use free recognition** (callers
+  speak naturally). Override the model (e.g. German) via `STT.model`.
 - **Searchable radio log.** The server attaches the sender's **callsign + department**, appends the
   line to a rolling (optionally persisted) log and broadcasts it. Open with **`/radiolog`** — a
   searchable transcript with timestamps and dept-coloured callsign badges (LAPD blue, LASD amber,
   EMS red). Config in `configs/cfg-stt-sh.lua` (`STT.enabled/lang/model/maxLen/logSize/persist/store`).
+- **911/311 call transcription.** When a caller and a dispatcher are connected, **both sides are
+  auto-transcribed** and each phrase is appended to the call transcript — shown **live** in the call
+  session and **saved to the call log** (transcript log only; it is not copied into the incident
+  notes). Reuses the existing `sess.transcript` pipeline; server toggles continuous mode per call
+  (paused on hold). Toggle with `STT.calls` in `cfg-stt-sh.lua`.
 - **Graceful fallback.** Clients where the offline engine can't initialise simply can't transmit
-  (no crash) but can still read the log. Transmission is server-gated to on-duty units (callsign set).
+  (no crash) but can still read the log. Radio transmission is server-gated to on-duty units
+  (callsign set); call transcription is gated to the call's participants.
 - Files: `configs/cfg-stt-sh.lua`, `modules/stt/stt-sv.lua` (new), `modules/stt/stt-cl.lua`,
   `web/src/components/SttEngine.svelte` (Vosk) + `RadioLog.svelte` (new), `SttProbe.svelte` (probe +
   Vosk test), store/messages/locales, `nui/dist/models/` (model), `fxmanifest.lua`
