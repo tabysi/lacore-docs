@@ -1,0 +1,92 @@
+---
+title: Profile & Achievements
+---
+
+import { Callout } from 'nextra/components'
+
+# Profile & Achievements
+
+## Profile — `configs/cfg-profile-sh.lua`
+
+Controls the `/profile` UI: displayed Discord roles, the membership threshold, the level formula, and
+stat-achievement thresholds.
+
+```lua
+ProfileConfig = {
+    -- Playtime (HOURS) at which a player counts as "Member". Used core-wide:
+    -- profile badge, "Member" achievement, progress bar, AND the membership
+    -- threshold in modules/db/playtime-sv.lua (10h notification + webhook).
+    membershipHours = 10,
+
+    -- "Level" = playtime / minutesPerLevel (default: 1 level per hour).
+    minutesPerLevel = 60,
+
+    -- Membership badge ("★ Member")
+    memberBadge = { icon = "★", color = "#ff9a9a" },
+
+    -- Discord roles shown as profile badges (role = a name from DiscordAuth.roles)
+    roles = {
+        { role = "Dev",    label = "Developer",       color = "#b9c6ff", icon = "🛠" },
+        { role = "Staff",  label = "Staff",           color = "#ffb38a", icon = "🛡" },
+        { role = "LE",     label = "Law Enforcement", color = "#84e7b6", icon = "🚔" },
+        { role = "Member", label = "Member",          color = "#ff9a9a", icon = "★" },
+    },
+
+    -- Status badge colours (status name → hex)
+    statusColors = {
+        ["CLEAR"]    = "#84e7b6",
+        ["ON SCENE"] = "#84e7b6",
+        -- …
+    },
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `membershipHours` | Playtime (hours) to become a "Member". Changing it here changes it everywhere. |
+| `minutesPerLevel` | Minutes of playtime per profile level (60 = 1 level/hour). |
+| `roles` | Which Discord roles show as badges, and their label/colour/icon. Only present roles appear. |
+| `statusColors` | Colour per HUD status. |
+
+<Callout type="info">
+  `roles[].role` must match a key in `DiscordAuth.roles`
+  ([Discord & Duty](/configuration/discord)). Add Supporter / Donator / VIP badges by adding entries.
+</Callout>
+
+## Achievements & easter eggs — `configs/cfg-achievements-sh.lua`
+
+The "normal" achievements (Veteran, Garage …) are computed live in the UI from player data and need
+no config. This file holds only the **secret easter eggs**, unlocked by hidden triggers and stored
+server-side.
+
+```lua
+Achievements = {
+    notify  = true,    -- NUI toast on unlock
+    webhook = false,   -- also log unlocks to Webhooks.AdminLog
+
+    EasterEggs = {
+        -- Reach a location
+        { id = "ufo", icon = "🛸", secret = true,
+          trigger = { type = "coord", x = 2490.0, y = 3776.0, z = 2414.0, radius = 40.0 } },
+
+        -- Type a command
+        { id = "answer", icon = "🔢", secret = true,
+          trigger = { type = "command", command = "42" } },
+
+        -- Konami code (↑↑↓↓←→←→ B A)
+        { id = "konami", icon = "🎮", secret = true, trigger = { type = "konami" } },
+    },
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Unique key. Name/description come from `lang/*.json` under `ach_<id>_name` / `ach_<id>_desc`. |
+| `icon` | Emoji for the UI. |
+| `secret` | `true` = shown as "???" until found. |
+| `trigger` | `coord` (reach a spot), `command` (type `/<command>`), or `konami`. |
+
+<Callout type="info">
+  Coordinate eggs are verified server-side (no spoofing). To add your own egg: add an entry here plus
+  the two `lang` keys (`ach_<id>_name`, `ach_<id>_desc`).
+</Callout>

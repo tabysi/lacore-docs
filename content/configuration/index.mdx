@@ -1,0 +1,60 @@
+---
+title: Configuration
+---
+
+import { Callout, Cards } from 'nextra/components'
+
+# Configuration
+
+LACORE is configured in three layers:
+
+1. **Convars** in `server.cfg` — secrets (Discord token, webhooks) and a few runtime toggles.
+2. **`config.lua`** — the main gameplay/world config (agencies, call center, time, transit, …).
+3. **`configs/*-sh.lua` / `*-sv.lua`** — per-feature config files.
+
+<Callout type="info">
+  All files in `configs/` and `config.lua` are **escrow-ignored** — you can open and edit them
+  freely. Convars keep secrets out of the code and out of client downloads.
+</Callout>
+
+## Config file map
+
+| File | Scope | Documents |
+| --- | --- | --- |
+| `config.lua` | shared | [Main config](/configuration/main) — agencies, call center, time, transit, AOPs, props |
+| `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, webhooks |
+| `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
+| `configs/cfg-evidence-sh.lua` | shared | [Evidence & reports](/configuration/law-enforcement) — item + report types |
+| `configs/cfg-civilian-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — radial, emote catalogue |
+| `configs/cfg-turf-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — turf / gang war |
+| `configs/cfg-props-cl.lua` | client | [Civilian & emotes](/configuration/civilian) — placeable props |
+| `configs/cfg-cctv-sh.lua` | shared | [CCTV Surveillance](/features/cctv) — camera networks |
+| `configs/cfg-anticheat-sh.lua` | shared | [Anticheat & security](/configuration/security) |
+| `configs/cfg-blacklist-sh.lua` | shared | [Anticheat & security](/configuration/security) — member-only vehicles |
+| `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
+| `configs/cfg-presence-sh.lua` | shared | [Anticheat & security](/configuration/security) — Discord Rich Presence |
+| `configs/cfg-profile-sh.lua` | shared | [Profile & achievements](/configuration/profile) |
+| `configs/cfg-achievements-sh.lua` | shared | [Profile & achievements](/configuration/profile) — easter eggs |
+| `configs/cfg-bridge-sh.lua` | shared | [Framework Bridge](/features/bridge) |
+| `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) |
+| `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) |
+| `configs/cfg-weapons-cl.lua` | client | [World, blips & props](/configuration/world) |
+
+## Start here
+
+<Cards>
+  <Cards.Card title="Server Convars" href="/configuration/convars" arrow />
+  <Cards.Card title="Discord & Duty" href="/configuration/discord" arrow />
+  <Cards.Card title="Main Config" href="/configuration/main" arrow />
+</Cards>
+
+## Localisation
+
+All user-facing strings are localised:
+
+- **Lua** (server/client): `T("key")` → `lang/en.lua` (+ `de.lua`, `ru.lua`).
+- **NUI**: `t("key")` → `lang/en.json` (+ `de.json`, `ru.json`).
+
+The active language is set by `Language` in `config.lua`; the MDT/NUI can use a separate language via
+`MdtLanguage`. To add a language, copy the `en` files, translate, and register the code in
+`configs/locale-sh.lua`.

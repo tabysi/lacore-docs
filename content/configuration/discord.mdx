@@ -1,0 +1,89 @@
+---
+title: Discord & Duty
+---
+
+import { Callout } from 'nextra/components'
+
+# Discord & Duty — `configs/cfg-server-sv.lua`
+
+Server-only config (never sent to clients). Handles dev mode, the built-in Discord role
+authentication, the on-duty whitelist, and the webhook log channels.
+
+## Dev mode
+
+```lua
+devmode = GetConvar("lacore_devmode", "false") == "true"
+```
+
+See the [`lacore_devmode` convar](/configuration/convars#dev-mode). When on, it disables webhooks,
+bypasses **all** connect checks, and grants every player full staff/dev permissions. Never on in
+production.
+
+## Discord role authentication (built-in)
+
+LACORE reads Discord roles directly via a bot token (no external `discordroles` resource). Roles are
+cached per player and exposed via `GetDiscordRoles()` / `IsDiscordRolePresent()`.
+
+```lua
+DiscordAuth = {
+    token        = GetConvar("lacore_discord_token", ""),
+    guild        = GetConvar("lacore_discord_guild", ""),
+    cacheSeconds = 300,   -- how long fetched roles are cached
+
+    -- Map role NAMES (used in code) → your Discord role IDs.
+    -- Enable Developer Mode in Discord, right-click a role → Copy Role ID.
+    roles = {
+        Member        = "1271895547485356203",
+        Staff         = "1234427956432994321",
+        Dev           = "1280438326582837278",
+        LeadDeveloper = "1395534398299832431",
+        LOA           = "1310081058762653696",
+        LE            = "1285460493619953720",
+        -- Supporter / Donator tiers … (leave empty = "never present")
+    },
+}
+```
+
+<Callout type="info">
+  The bot must be **in your guild** and have the **Server Members Intent** enabled (Developer Portal
+  → Bot → Privileged Gateway Intents). Leave a role ID empty to treat it as never present.
+</Callout>
+
+Role names referenced elsewhere (profile badges, Big Brother access, duty whitelist) must match keys
+in this `roles` table.
+
+## Duty whitelist
+
+Closes the gap where any client could self-assign a duty job. Checked server-side in `ondutyServer`.
+
+```lua
+DutyRoles = {
+    ["Law Enforcement"] = "LE",  -- requires the LE role
+    ["Fire/EMS"]        = "",    -- open by default
+    ["Coroner"]         = "",    -- open by default
+}
+```
+
+- `devmode` and `Staff` / `Dev` bypass the check.
+- An empty value (`""`) means no restriction — anyone may take that job.
+- Values are role names from `DiscordAuth.roles`.
+
+## Webhooks
+
+Webhook URLs are read from convars so they never live in the code. Any left empty disables that
+channel.
+
+```lua
+Webhooks = {
+    ServerLog       = GetConvar("lacore_webhook_serverlog", ""),
+    FiveMLiveChat   = GetConvar("lacore_webhook_livechat", ""),
+    AdminLog        = GetConvar("lacore_webhook_adminlog", ""),
+    DispatchLog     = GetConvar("lacore_webhook_dispatch", ""),
+    UserReports     = GetConvar("lacore_webhook_reports", ""),
+    PrisonLog       = GetConvar("lacore_webhook_prison", ""),
+    BleeterLog      = GetConvar("lacore_webhook_bleeter", ""),
+    txAdminAdminLog = GetConvar("lacore_webhook_txadmin", ""),
+}
+```
+
+Set the matching convars in `server.cfg` — see [Server Convars](/configuration/convars#discord-webhooks).

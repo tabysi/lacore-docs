@@ -1,0 +1,100 @@
+---
+title: Main Config (config.lua)
+---
+
+import { Callout } from 'nextra/components'
+
+# Main Config — `config.lua`
+
+The central gameplay/world config. Escrow-ignored — edit freely.
+
+## General settings
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `trainsEnabled` | `true` | Enable metro trains (only metros by default — others can bug out). |
+| `ThirdEye` | `true` | Enable ox_target player interactions (cuff / drag / put-in-vehicle / medic / revive / carry …). Requires `ox_target`. Chat commands (`/release`, `/uncuff` …) stay available regardless. |
+| `GameMinuteSeconds` | `8` | Real seconds per in-game minute. `8` → a full day ≈ 3.2 real hours. `60` = real time (1:1). |
+| `Language` | `"en"` | Locale for all server/HUD Lua text. Supported: `en`, `de`, `ru`. |
+| `MdtLanguage` | `""` | Separate language for the NUI (MDT / Dispatch / Profile). Empty = follow `Language`. |
+| `UseDatabase` | `true` | Mirror every persistent store to MySQL (oxmysql). `false` = local JSON only. |
+| `DispatchMapStyle` | `"styleGrid"` | Dispatch map tile style: `styleAtlas`, `styleGrid`, or `styleSatelite`. |
+| `ShowIncidentBlips` | `false` | Show a GTA map blip for every active incident to on-duty units. |
+| `DispatchTileBase` | `""` | Override the map-tile source (leave empty for the `lacore-maps` resource). |
+| `CallRetentionDays` | `7` | Days resolved dispatch incidents are kept before pruning. Active incidents are always kept. |
+
+## Call Center (911 / 311)
+
+The `CallCenter` table configures the incoming call queue:
+
+```lua
+CallCenter = {
+    Enabled          = true,   -- master switch for the 911/311 system
+    UseVoice         = true,   -- connect caller ↔ dispatcher via pma-voice
+    VoiceChannelBase = 1000,   -- first of 100 voice channels used for sessions
+    AutoIncident     = true,   -- auto-create an MDT incident when no dispatcher is online
+    MaxCallLogs      = 500,    -- archived calls kept in data/call_logs.json
+    MaxLogResults    = 100,    -- max results per dispatcher log query
+    AllowCommands    = true,   -- allow /911 and /311 chat commands
+    Debug            = true,   -- verbose 911/311 flow prints (set false in production)
+}
+```
+
+<Callout type="warning">
+  `VoiceChannelBase` occupies 100 channels (`base … base+99`). Make sure that range doesn't collide
+  with other pma-voice usage.
+</Callout>
+
+## Agencies
+
+`agencies` is the master list of departments used across the CAD/MDT. Each entry defines the
+department shown on duty and its loadout:
+
+```lua
+agencies = {
+  {
+    type = "Law Enforcement",           -- routes the MDT (see below)
+    short = "LAPD",
+    long = "Los Angeles Police Department",
+    motto = "To Protect and Serve",
+    equipment = {
+      { weapon = "WEAPON_SERVICEPISTOL", components = { "COMPONENT_AT_PI_FLSH" } },
+      { weapon = "WEAPON_TASER7", tint = 1 },
+      { weapon = "WEAPON_DD11_B", rack = "rifle", components = { ... } },
+      -- …
+    },
+    wallpaper = { "hacking_pc_desktop_3", "hacking_pc_desktop_3" },
+  },
+  -- … many more
+}
+```
+
+The `type` field controls which terminal a member gets and how dispatch treats them:
+
+| `type` | Terminal / role |
+| --- | --- |
+| `Law Enforcement` | LAPD / LASD / Agency MDT (by `short`/dept name). |
+| `Fire/EMS` | EMS / Fire CAD. |
+| `Coroner` | Coroner tools. |
+| `Tow Truck` | Tow contacts. |
+| `Private Security` | CCTV `security` access + limited tools. |
+| `Animal Control` / `Public Works` | Utility departments. |
+
+`equipment` entries support `components`, `tint`, and `rack` (weapon on a station rack). `wallpaper`
+is the MDT background (texture names or an RGB triple).
+
+## Other lists in `config.lua`
+
+| List | Purpose |
+| --- | --- |
+| `textEntries` | Custom GTA text labels (advertisement titles, session messages, restriction notices). |
+| `customIcon` | Phone/contact icons (name → Discord-style handle + GTA icon). |
+| `BusStops` / `BusRoutes` | Public transit stops and routes. |
+| `RegisterPrices` | Store register item prices. |
+| `initialAOPs` | Starting Areas of Patrol for the AOP voting system. |
+| `indestructibleProps` | Props made indestructible (traffic signs, hydrants, streetlights …). |
+| `SpeedLimits` | Per-road speed limits (with directional overrides). |
+
+<Callout type="info">
+  Coordinates in these lists are placeholders tuned for a specific map — adjust them to your server.
+</Callout>

@@ -1,0 +1,74 @@
+---
+title: World, Blips & Props
+---
+
+import { Callout } from 'nextra/components'
+
+# World, Blips & Props
+
+Client-side world configuration.
+
+## Map blips — `configs/cfg-blips-cl.lua`
+
+Static map blips for businesses, government, transport and public spaces.
+
+```lua
+blips = {
+    { category = "Business", type = "Bank", id = 108, x = -109.7, y = 6463.6,
+      name = "Blaine County Savings Paleto", image = "bcs_paleto" },
+    { category = "Business", type = "Gun Store", id = 110, x = 1697.7, y = 3753.2,
+      name = "Ammunation Sandy Shores", image = "ammunation_sandy",
+      phone = "1-999-WEAPONS", bleeter = "@Ammunation" },
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `category` | `Business`, `Government`, `Public Transport`, or `Public Space`. |
+| `type` | Sub-type label. |
+| `id` | GTA blip sprite id. |
+| `x` / `y` | World position. |
+| `name` | Blip name. |
+| `image` | Streamed `.ytd` texture shown top-left on hover (optional). |
+| `phone` / `bleeter` | Optional contact tags. |
+| `location` | Optional map region (e.g. Cayo Perico); defaults to San Andreas. |
+
+## Areas — `configs/cfg-areas-cl.lua`
+
+Named world areas/regions used for location display (street/area names). `AreaDefinitions` groups
+`AreaPoints` (coordinate vertices) into named areas and regions:
+
+```lua
+AreaDefinitions = {
+    { area = "Sandy Shores", region = "San Tierra", configpoints = { 1, 2, 3, 4 } },
+}
+
+AreaPoints = {
+    { x = 2296.43, y = 3773.26 },
+    { x = 1359.96, y = 3254.03 },
+    -- …
+}
+```
+
+## Weapon-on-back — `configs/cfg-weapons-cl.lua`
+
+Positions weapons on players' backs (if enabled client-side). `weaponOnBackSettings` sets the bone,
+offset and rotation, plus per-weapon prop hashes:
+
+```lua
+weaponOnBackSettings = {
+    back_bone = 24816,
+    x = 0.075, y = -0.15, z = -0.02,
+    x_rotation = 0.0, y_rotation = 165.0, z_rotation = 0.0,
+    compatable_weapon_hashes = {
+        ["w_me_bat"]            = -1786099057,
+        ["prop_ld_jerrycan_01"] = 883325847,
+        -- …
+    },
+}
+```
+
+<Callout type="info">
+  These are cosmetic/world lists. None are required to run LACORE — leave them empty to disable the
+  feature, or populate them for your map.
+</Callout>

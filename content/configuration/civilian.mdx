@@ -1,0 +1,92 @@
+---
+title: Civilian & Emotes
+---
+
+import { Callout } from 'nextra/components'
+
+# Civilian & Emotes
+
+## Civilian radial & emotes — `configs/cfg-civilian-sh.lua`
+
+Data-driven lists for the civilian layer (RP-only). LACORE does **not** play animations itself — it
+bridges to DPEmotes or RPEmotes (auto-detected) and each radial button runs `/e <emote>` on the
+detected resource.
+
+```lua
+CivConfig = CivConfig or {}
+
+-- Key that opens the civilian radial (rebindable under Settings → Key Bindings).
+CivConfig.radialKey = "B"
+
+-- Emote catalogue. `emote` = the DPEmotes/RPEmotes name run via /e.
+CivConfig.emotes = {
+    { cat = "Gestures", id = "wave",     label = "Wave",      emote = "wave" },
+    { cat = "Poses",    id = "handsup",  label = "Hands Up",  emote = "handsup" },
+    { cat = "Idle",     id = "smoke",    label = "Smoke",     emote = "smoke" },
+    { cat = "Idle",     id = "leancar",  label = "Lean",      emote = "lean" },
+    -- …
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `cat` | Groups buttons into radial pages. |
+| `id` | Unique internal key. |
+| `label` | Text shown on the button. |
+| `emote` | **Must** match an emote name in your installed DPEmotes/RPEmotes catalogue. |
+
+<Callout type="info">
+  Run `/emotemenu` in-game to see the exact emote names your emote pack provides, then use those in
+  `emote`. The defaults are common DP/RP names — adjust to your pack. See
+  [Civilian Layer](/features/civilian).
+</Callout>
+
+## Turf / gang war — `configs/cfg-turf-sh.lua`
+
+Kill-based territory capture for civilian orgs. **Off by default.**
+
+```lua
+Turf.enabled     = false   -- master switch (false = nothing runs)
+Turf.drawMarkers = false   -- in-world zone cylinder (off — heavy; blips show ownership)
+
+Turf.zones = {
+    { id = "grove", label = "Grove Street",
+      center = vector3(-100.0, -1620.0, 30.0), radius = 90.0, color = "#2ecc71" },
+    -- add your own zones
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Unique zone key. |
+| `label` | Display name. |
+| `center` | World centre `vector3`. |
+| `radius` | Zone radius (metres). |
+| `color` | Hex colour for the map blip/HUD. |
+
+<Callout type="warning">
+  Enable with `Turf.enabled = true` and set your own zone coordinates — the samples are placeholders.
+  Anti-farm protection requires the killer to be inside the zone and applies a per-victim cooldown.
+</Callout>
+
+## Placeable props — `configs/cfg-props-cl.lua`
+
+The props civilians can place via the prop tool, grouped into categories:
+
+```lua
+PropConfig = {
+    {
+        categoryName = "Roadworks",
+        description  = "Road signs used for public works related roleplay",
+        components = {
+            { name = "Large Striped Cone", spawn = "prop_roadcone01a" },
+            { name = "Flagger Paddle",     spawn = "prop_flagger_sign_01" },
+            -- …
+        },
+    },
+    -- more categories
+}
+```
+
+Add a category with a `categoryName`, `description`, and a `components` list of `{ name, spawn }`
+(the `spawn` is the GTA prop model name).

@@ -1,0 +1,108 @@
+---
+title: Anticheat & Security
+---
+
+import { Callout } from 'nextra/components'
+
+# Anticheat & Security
+
+## Anticheat — `configs/cfg-anticheat-sh.lua`
+
+<Callout type="error">
+  **Do not enable without configuring it first.** `Anticheat.Enabled = false` by default. Read every
+  threshold below and tune it to your server before switching it on.
+</Callout>
+
+Per-detection action:
+
+| Action | Effect |
+| --- | --- |
+| `"log"` | Discord webhook (`Webhooks.AdminLog`) only. |
+| `"kick"` | Webhook + kick. |
+| `"ban"` | Webhook + permanent ban (via `BanPlayer`). |
+
+Bypass: `lacore_devmode = true` disables it entirely; players with the `Staff` / `Dev` Discord role
+are never punished (only logged).
+
+```lua
+Anticheat = {
+    Enabled = false,
+
+    Explosions = {
+        action = "ban",
+        blocked = {          -- explosion types a client can never legitimately trigger
+            [30] = true,     -- buried mine
+            [59] = true,     -- orbital cannon
+            [72] = true,     -- script missile
+            -- …
+        },
+        ratePer10s = 8,      -- more than X explosions in 10s → punish
+    },
+
+    WeaponDamage = {
+        action    = "kick",
+        maxDamage = 250,     -- above this = damage modifier (sniper headshot ≈ 200)
+    },
+
+    EntitySpam = {
+        action       = "kick",
+        maxPerMinute = 20,   -- max client-spawned entities per minute
+    },
+    -- … more checks
+}
+```
+
+## Member-only vehicles — `configs/cfg-blacklist-sh.lua`
+
+Vehicle **classes** and specific **models** only "members" (playtime threshold) may drive:
+
+```lua
+memberOnlyVehicles = {
+    18, 16, 15, 19, 7, 22,   -- vehicle CLASSES (see FiveM vehicle class list)
+    -- specific models:
+    "kosatka", "technical", "terbyte",   -- armoured / armed
+    "bestiagts", "corsita",              -- rare / expensive
+    "monster", "rcbandito",              -- abuse-prone niche
+    -- …
+}
+```
+
+Add class **numbers** or model **name strings**. The member threshold is `ProfileConfig.membershipHours`
+(see [Profile & Achievements](/configuration/profile)).
+
+## Big Brother (admin logging) — `configs/cfg-bigbrother-sv.lua`
+
+Server-only. Every important event flows through `BBLog()` into a searchable DB table and optionally
+to Discord. Viewed in-game via `/bblog` (role-gated).
+
+```lua
+BigBrother = {
+    enabled     = true,
+    accessRoles = { "Staff", "Dev", "LeadDeveloper" },   -- who may open /bblog
+    retentionDays = 30,     -- logs older than this are pruned on start + daily
+    flushSeconds  = 5,      -- buffered writes flush interval …
+    maxBuffer     = 250,    -- … or when the buffer exceeds this
+
+    categories = {          -- toggle whole categories on/off
+        connection = true,  -- join/leave, identifiers, session length
+        combat     = true,  -- kills / deaths
+        admin      = true,  -- kick/ban/jail/warn
+        anticheat  = true,  -- anticheat flags
+        chat       = true,
+        command    = true,
+        vehicle    = true,  -- spawns / deletes
+        mdt        = true,  -- MDT / dispatch actions
+    },
+}
+```
+
+Discord mirroring uses the `lacore_bb_webhook*` convars — see
+[Server Convars](/configuration/convars#big-brother-admin-logging).
+
+## Discord Rich Presence — `configs/cfg-presence-sh.lua`
+
+Controls the Discord status players see while playing and the invite link on the connect screen.
+Requires a Discord Application (Developer Portal → New Application) for the `appId` and uploaded art
+assets. The `Discord`/`Website` buttons appear in the player's Discord profile — great for organic
+recruiting. Both the invite and website fall back to the `lacore_discord_invite` / `lacore_website`
+convars when left blank.

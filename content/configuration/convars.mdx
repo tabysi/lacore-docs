@@ -1,0 +1,112 @@
+---
+title: Server Convars
+---
+
+import { Callout } from 'nextra/components'
+
+# Server Convars
+
+Convars keep secrets (bot tokens, webhook URLs) out of the code and out of client downloads. Set
+them in your `server.cfg`. The complete list ships in `server.cfg.example` at the resource root.
+
+<Callout type="error">
+  Always use `set` — never `setr`. `setr` replicates the value to every client, which would leak
+  your bot token and webhook URLs. Use `set` for everything below.
+</Callout>
+
+## Full reference
+
+### Dependencies
+
+```ini
+set mysql_connection_string "mysql://user:pass@localhost/database?charset=utf8mb4"
+```
+
+### Discord role authentication (built-in)
+
+The bot needs the **Server Members Intent** (Discord Developer Portal → Bot → Privileged Gateway
+Intents). Role **IDs** are mapped in `configs/cfg-server-sv.lua`.
+
+```ini
+set lacore_discord_token "YOUR_BOT_TOKEN"
+set lacore_discord_guild "YOUR_GUILD_ID"
+```
+
+### Dev mode
+
+```ini
+set lacore_devmode "false"
+```
+
+<Callout type="warning">
+  When `lacore_devmode` is `true`: all Discord webhooks are disabled, **all connect checks are
+  bypassed** (ban / whitelist / Discord role / name length), every player is treated as full
+  staff/dev with all LEO/EMS features, and anticheat punishments are disabled. **Never enable on a
+  production server.**
+</Callout>
+
+### Discord webhooks
+
+Any webhook left unset simply disables that log channel.
+
+| Convar | Channel |
+| --- | --- |
+| `lacore_webhook_serverlog` | General server events |
+| `lacore_webhook_livechat` | Public in-game live chat |
+| `lacore_webhook_adminlog` | Staff actions (kick / ban / warn) |
+| `lacore_webhook_dispatch` | LEO / EMS / FD dispatch |
+| `lacore_webhook_reports` | In-game `/report` |
+| `lacore_webhook_prison` | Prison sentences |
+| `lacore_webhook_bleeter` | Bleeter posts |
+| `lacore_webhook_txadmin` | txAdmin events |
+
+```ini
+set lacore_webhook_serverlog "https://discord.com/api/webhooks/xxx/yyy"
+set lacore_webhook_adminlog  "https://discord.com/api/webhooks/xxx/yyy"
+set lacore_webhook_dispatch  "https://discord.com/api/webhooks/xxx/yyy"
+# … the rest as needed
+```
+
+### Big Brother (admin logging)
+
+Logs always go to the database + the in-game `/bblog` panel. These webhooks only **mirror** them to
+Discord. Per-category URLs fall back to `lacore_bb_webhook` when empty.
+
+```ini
+set lacore_bb_webhook "https://discord.com/api/webhooks/xxx/yyy"   # default / fallback
+# set lacore_bb_webhook_connection ""
+# set lacore_bb_webhook_combat     ""
+# set lacore_bb_webhook_admin      ""
+# set lacore_bb_webhook_anticheat  ""
+# set lacore_bb_webhook_chat       ""
+# set lacore_bb_webhook_command    ""
+# set lacore_bb_webhook_vehicle    ""
+# set lacore_bb_webhook_mdt        ""
+```
+
+### Discord Rich Presence (fallbacks)
+
+Only used if not set in `configs/cfg-presence-sh.lua`.
+
+```ini
+set lacore_discord_invite "https://discord.gg/yourinvite"
+set lacore_website        "https://your-website.tld"
+```
+
+### External web dispatcher (optional)
+
+Only needed when you deploy the `bridge/` on your own VPS. Leave empty to disable the outbound push.
+See [Web Dispatcher](/features/webdispatch).
+
+```ini
+set lacore_bridge_url   ""
+set lacore_bridge_token ""
+```
+
+## Start order
+
+```ini
+ensure oxmysql
+ensure lacore-maps   # optional map tiles
+ensure lacore
+```

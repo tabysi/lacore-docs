@@ -1,0 +1,93 @@
+---
+title: Penal Code & Evidence
+---
+
+import { Callout } from 'nextra/components'
+
+# Penal Code & Evidence
+
+## Penal code — `configs/cfg-charges-sh.lua`
+
+The list of charges used for **citations** (tickets) and **arrest reports** in the MDT. Read by both
+the client (charge picker) and the server (fine + jail calculation).
+
+Each entry:
+
+| Field | Meaning |
+| --- | --- |
+| `code` | Short reference (e.g. `T1`, `F7`). |
+| `title` | Human-readable offence name. |
+| `class` | `I` = Infraction, `M` = Misdemeanor, `F` = Felony. |
+| `fine` | Fine in USD. |
+| `jail` | Jail time in months (`0` = none). |
+
+```lua
+PenalCode = {
+    -- Traffic / Infractions
+    { code = "T1", title = "Speeding (1-15 over)",       class = "I", fine = 150,  jail = 0 },
+    { code = "T3", title = "Reckless Driving",           class = "M", fine = 500,  jail = 0 },
+    -- Misdemeanors
+    { code = "M4", title = "Resisting a Peace Officer",  class = "M", fine = 750,  jail = 2 },
+    -- Felonies
+    { code = "F3", title = "Armed Robbery (211)",        class = "F", fine = 5000, jail = 20 },
+    { code = "F7", title = "Murder (187)",               class = "F", fine = 10000, jail = 60 },
+    -- …
+}
+
+-- Fast lookup by code (used by the server for calculation)
+PenalCodeByCode = {}
+for _, c in ipairs(PenalCode) do PenalCodeByCode[c.code] = c end
+```
+
+<Callout type="info">
+  Tailor the codes, titles, classes, fines and jail times to your server's legal system. The server
+  totals `fine` + `jail` from the applied codes — keep the `PenalCodeByCode` lookup block at the
+  bottom.
+</Callout>
+
+## Evidence & reports — `configs/cfg-evidence-sh.lua`
+
+Drives the LEO evidence locker + formal report system. Both attach to the person's DEX record
+(`civilians[lic].records`), inheriting the existing visibility, query, persistence and Big Brother
+logging.
+
+### Evidence item types
+
+Shown in the "Log Evidence" picker (`id` → label + icon):
+
+```lua
+Evidence.types = {
+    { id = "weapon",      label = "Weapon",      icon = "🔫" },
+    { id = "substance",   label = "Substance",   icon = "💊" },
+    { id = "fingerprint", label = "Fingerprint", icon = "🖐" },
+    { id = "dna",         label = "DNA Sample",  icon = "🧬" },
+    { id = "document",    label = "Document",     icon = "📄" },
+    { id = "digital",     label = "Digital Media",icon = "💾" },
+    -- …
+}
+```
+
+### Report types
+
+Shown in the "File Report" picker:
+
+```lua
+Evidence.reportTypes = {
+    { id = "arrest",   label = "Arrest Report" },
+    { id = "incident", label = "Incident Report" },
+    { id = "uof",      label = "Use of Force Report" },
+    { id = "fi",       label = "Field Interview" },
+    { id = "supp",     label = "Supplemental Report" },
+    { id = "traffic",  label = "Traffic Collision" },
+}
+```
+
+### Limits & tags
+
+```lua
+Evidence.tagPrefix      = "EV"    -- auto tag numbers, e.g. EV250704-A3F2
+Evidence.maxNarrative   = 4000    -- report body max length (server-enforced)
+Evidence.maxDescription = 600     -- evidence item description max length
+```
+
+See the [Evidence & Reports](/features/evidence-reports) feature page for how these appear in-game.
