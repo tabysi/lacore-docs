@@ -1,0 +1,37 @@
+---
+title: BOLOs & Charges
+---
+
+import { Callout } from 'nextra/components'
+
+# BOLOs & Charges
+
+## BOLOs
+
+A **BOLO** (Be On the Look-Out) is created from the MDT or the LASD CAD against a name or plate. It
+is stored server-side, broadcast to on-duty units, and **surfaces as a hit** when someone runs a
+matching person or plate query. BOLOs can be cancelled when resolved.
+
+## Charges & citations
+
+Charges are driven by a configurable **penal code**. From a person's record an officer can:
+
+- apply one or more **charges** (each with its penal-code reference and severity), or
+- issue a **citation** (a lighter, fine-style entry).
+
+Both are written to the subject's record and appear in the MDT query and person card. The penal
+code lives in the charges config so you can tailor it to your server's legal system.
+
+<Callout type="info">
+  BOLOs and charges are shared across the LAPD, LASD and Agency terminals — creating one in any of
+  them is visible in the others.
+</Callout>
+
+## Where they show up
+
+| Surface | Shows |
+| --- | --- |
+| MDT query | BOLO hits + charges/citations on the record |
+| Dispatch console | BOLO list |
+| Person card | Charges, citations, warrant status |
+| CCTV scanner | BOLO ACTIVE / ACTIVE WARRANT flags + recent records |

@@ -1,0 +1,40 @@
+---
+title: What's New
+---
+
+import { Callout, Cards } from 'nextra/components'
+
+# What's New
+
+The latest LACORE release at a glance. For the complete, granular history see the
+[Full Changelog](/updates/changelog).
+
+<Callout type="info">
+  The authoritative, line-by-line changelog also ships with the resource in `changelog.md`.
+</Callout>
+
+## 3.1.5 — CCTV Surveillance Suite, Scanner & Field Cameras
+
+The CCTV system became a full surveillance suite.
+
+- **CCTV camera viewer** (`/cctv`) — fixed-position POV camera with real area streaming, gated by
+  network + job.
+- **Targeting scanner** — click-to-scan people and vehicles with an animated scan sequence, a
+  compact **mugshot** and an **MDT summary** (priors / BOLO / recent records).
+- **Field cameras** — `/camtool` places cameras at runtime, `/cameras` manages them; they persist
+  and show up in `/cctv` and on the dispatch map.
+- **Dispatch-map cameras** — 📹 markers with a "view this camera?" modal that opens the live view
+  in front of the console and reopens the console on exit.
+- **Turf is now opt-in** (`Turf.enabled = false` by default).
+- Fixes: no firing while operating a camera, dispatch console foreground handling, tighter map
+  position tracking.
+
+<Cards>
+  <Cards.Card title="Full Changelog" href="/updates/changelog" arrow />
+  <Cards.Card title="CCTV Surveillance" href="/features/cctv" arrow />
+</Cards>
+
+## 3.1.3 — Rebranding to LACORE + release-ready
+
+- Resource / convar / ACE / command rename `pvp-corev3` → `lacore`, with automatic DB migration.
+- Connect-hang fix, post-launch security hardening, complete docs + EULA.

@@ -1,0 +1,74 @@
+---
+title: Configuration
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+LACORE is configured in two places: **convars** in `server.cfg`, and **config files** in the
+`configs/` folder.
+
+## Convars (`server.cfg`)
+
+All convars use the `lacore_*` prefix. The complete, current list lives in `server.cfg.example` —
+copy it into your `server.cfg` and fill in your values. The most important ones:
+
+| Convar | Purpose |
+| --- | --- |
+| `lacore_devmode` | Enables dev tooling / relaxed gates. **Off in production.** |
+| `lacore_discord_token` / `lacore_discord_guild` | Discord bot token + guild for the role → ACE bridge. |
+| `lacore_owner_discord` | Owner Discord ID used by telemetry + owner commands. |
+| `lacore_webhook_*` | Discord webhooks for the various log channels. |
+| `lacore_bb_webhook*` | Big Brother admin-log webhooks. |
+| `lacore_bridge_url` / `lacore_bridge_token` | External web-dispatcher bridge endpoint. |
+
+<Callout type="warning">
+  Legacy `pvp_*` convar names are no longer read. If you are upgrading from `pvp-corev3`, rename
+  every convar to `lacore_*`.
+</Callout>
+
+### Example `server.cfg` block
+
+```ini
+# --- LACORE ---
+set lacore_devmode 0
+set lacore_discord_token "YOUR_BOT_TOKEN"
+set lacore_discord_guild "YOUR_GUILD_ID"
+set lacore_owner_discord "YOUR_DISCORD_ID"
+set lacore_webhook_general "https://discord.com/api/webhooks/..."
+set lacore_bb_webhook "https://discord.com/api/webhooks/..."
+# Optional external web dispatcher:
+# set lacore_bridge_url "https://dispatch.example.com"
+# set lacore_bridge_token "SHARED_SECRET"
+
+ensure oxmysql
+ensure lacore-maps   # optional map tiles
+ensure lacore
+```
+
+## Config files (`configs/`)
+
+Shared config files (`*-sh.lua`) are `escrow_ignore` — you can edit them freely.
+
+| File | Configures |
+| --- | --- |
+| `cfg-cctv-sh.lua` | CCTV camera networks + camera controls ([CCTV](/features/cctv)). |
+| `cfg-turf-sh.lua` | Turf / gang-war zones. **`Turf.enabled = false` by default.** |
+| `cfg-civilian-sh.lua` | Civilian emotes (DP/RP names), props, activities. |
+| `cfg-evidence-sh.lua` | Evidence + report types for the LEO tools. |
+| `cfg-bridge-sh.lua` | Framework bridge (ESX / QBCore / QBox) + job → department mapping. |
+| `cfg-profile-sh.lua` | Character profile fields. |
+
+## Framework bridge
+
+LACORE auto-detects **ESX**, **QBCore** or **QBox** at load and exposes a uniform API
+(`Bridge.GetJob`, `GetName`, `GetIdentifier`, `IsLeo`, `IsEms`, `Notify`). Map framework jobs to
+LACORE departments in `cfg-bridge-sh.lua`. If no framework is present, LACORE uses its own identity
+layer.
+
+## Localisation
+
+All user-facing strings are localised. Server/client strings live in `lang/en.lua` (+ `de.lua`,
+`ru.lua`); NUI strings in `lang/en.json` (+ `de.json`, `ru.json`). Never hardcode visible text — add
+a locale key.

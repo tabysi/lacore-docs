@@ -1,0 +1,50 @@
+---
+title: Command Reference
+---
+
+import { Callout } from 'nextra/components'
+
+# Command Reference
+
+Every command LACORE registers, grouped by area. Access is enforced server-side — the table notes
+who can use each one.
+
+## Law enforcement
+
+| Command | Access | Description |
+| --- | --- | --- |
+| `/mdt` | LEO / EMS | Open the Mobile Data Terminal (routed to LAPD / LASD / Agency / EMS by department). |
+| `/dispatch` | LEO | Open the dispatch console. |
+| `/dispatch on` \| `off` | LEO | Go on / off duty as a dispatcher. |
+| `/dispatch open` | LEO | Open the dispatch console explicitly. |
+| `/cctv` | LEO / Security | Open the CCTV surveillance viewer. |
+| `/camtool` | LEO / Security | Toggle the field-camera placement tool. |
+| `/cameras` | LEO / Security | Manage placed field cameras. |
+
+## Civilian
+
+| Command | Access | Description |
+| --- | --- | --- |
+| `/profile` | All | Open the character profile + emote radial editor. |
+| `/char` | All | Set the active character / RP nick. |
+| Radial keybind | All | Open the civilian radial (rebindable in FiveM keybind settings). |
+
+<Callout type="info">
+  Emotes are provided by **DPEmotes** or **RPEmotes** — use their commands (`/e <name>`,
+  `/emotemenu`, `/emotecancel`). LACORE bridges the radial buttons to whichever is installed. See
+  [Civilian Layer](/features/civilian).
+</Callout>
+
+## Admin & owner
+
+| Command | Access | Description |
+| --- | --- | --- |
+| `/admin` | Staff | Open the admin menu (players / self / world). |
+| `/bblog` | Staff | Open the Big Brother admin-log feed. |
+| `/lacore version` | Console / staff | Show build + version. |
+| `/lacore status` | Console / staff | Module + DB status. |
+| `/lacore db` | Console / staff | Database status. |
+| `/lacore modules` | Console / staff | List loaded modules. |
+| `/lacore doctor` | Console / staff | Run the first-boot health check. |
+| `/lacore telemetry` | Console / staff | Owner telemetry status. |
+| `/lacore help` | Console / staff | List all `/lacore` subcommands. |

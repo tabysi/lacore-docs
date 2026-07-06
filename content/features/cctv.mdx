@@ -1,0 +1,91 @@
+---
+title: CCTV Surveillance
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# CCTV Surveillance
+
+A full surveillance suite for LEO / Security: a fixed-position camera viewer with a **targeting
+scanner**, **runtime-placeable field cameras**, and **dispatch-map integration**.
+
+## The viewer (`/cctv`)
+
+Opens a scripted camera at each configured position. The camera does not move — it's a wall camera.
+
+| Control | Action |
+| --- | --- |
+| **W A S D** / arrow keys | Look around (A/D pan, W/S tilt) |
+| **Scroll** | Zoom |
+| **Left-click** | Scan the target under the cursor |
+| **Backspace / Esc** | Exit |
+
+On open, the operator is streamed to the camera (a placeholder clone stays at the desk) so the area
+and its entities load and can be scanned. You cannot fire your weapon while operating a camera.
+
+## The scanner
+
+Left-clicking a **person** or **vehicle** runs a raycast and starts a scan:
+
+<Steps>
+
+### Targeting
+
+A bracket reticle locks onto the target with a sweeping scan line and a live percentage counter.
+The scan takes `CCTV.scanTime` (default **6 s**, tune 5000–8000 ms).
+
+### Reveal
+
+An info card fades in and follows the target on screen, showing a compact **mugshot** and — for
+registered people — an **MDT summary** (priors count, active BOLOs, recent records). Flags surface
+**ACTIVE WARRANT**, **BOLO ACTIVE**, **REPORTED STOLEN** and **UNREGISTERED**.
+
+</Steps>
+
+<Callout type="info">
+  NPCs and unregistered targets resolve locally so a scan never hangs; the server only enriches
+  **registered** players and plates. Record lookup is gated to LEO / Security.
+</Callout>
+
+## Field cameras
+
+Place cameras anywhere at runtime:
+
+- `/camtool` — gives a camera-placement tool (damage neutralised). Fire at a spot to place a camera
+  there. `/camtool` again to put it away.
+- `/cameras` — a manager panel to rename / delete placed cameras, jump the live view to one, and
+  toggle the tool.
+
+Placed cameras are persisted server-side (`data/cctv_cams.json`), gated to LEO / Security, and appear
+in `/cctv` under a **Field Cameras** network.
+
+## Dispatch map
+
+`/dispatch open` shows every camera you may access as 📹 markers. Click one → **"view this
+camera?"** → the console closes, the live CCTV view opens in front, and the console reopens
+automatically when you leave the camera.
+
+## Configuration
+
+Cameras and controls live in `configs/cfg-cctv-sh.lua`:
+
+```lua
+CCTV.networks = {
+  {
+    id = 'cityhall', label = 'City Hall', access = 'leo',
+    cameras = {
+      { id = 'ch_lobby', label = 'Lobby',
+        pos = vector3(-545.0, -204.0, 45.0), look = vector3(-545.0, -210.0, 42.0), fov = 55.0 },
+    },
+  },
+}
+
+CCTV.rotSpeed = 70.0   -- look speed (deg/s)
+CCTV.scanTime = 6000   -- scan duration (ms)
+CCTV.zoomMin  = 20.0
+CCTV.zoomMax  = 70.0
+```
+
+<Callout type="warning">
+  The sample cameras are placeholders — move `pos` / `look` to real locations on your map.
+</Callout>

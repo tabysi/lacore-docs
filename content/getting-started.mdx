@@ -1,0 +1,63 @@
+---
+title: Getting Started
+---
+
+import { Steps, Callout, Tabs } from 'nextra/components'
+
+# Getting Started
+
+This guide gets LACORE running on a fresh FiveM server.
+
+<Callout type="warning">
+  The resource folder **must** be named `lacore` and started with `ensure lacore`. The name is used
+  internally (NUI host, exports, tile resource).
+</Callout>
+
+<Steps>
+
+### Install the resource
+
+Drop the resource into your server's resources folder so the path is `resources/lacore`.
+
+### Install dependencies
+
+- [oxmysql](https://github.com/overextended/oxmysql) — required for persistence.
+- *(Optional)* a map-tiles resource `lacore-maps` for the dispatch map.
+- *(Optional)* `dpemotes` or `rpemotes-reborn` for civilian emotes.
+
+### Configure the database
+
+Point oxmysql at your MySQL database (`set mysql_connection_string ...`). LACORE creates its own
+tables (`lacore_core_store`, `lacore_logs`) automatically on first start and migrates legacy
+`pvp_*` tables if present.
+
+### Set your convars
+
+Copy the settings from `server.cfg.example` into your `server.cfg` and fill in your values (Discord
+token, webhooks, owner IDs). See [Configuration](/configuration) for the full list.
+
+### Start the resource
+
+```ini
+ensure oxmysql
+ensure lacore-maps   # optional
+ensure lacore
+```
+
+### Verify
+
+Join the server and run `/mdt`, `/dispatch`, and `/cctv` on a duty character. Check the server
+console for the first-boot diagnostics (`/lacore doctor` re-runs them).
+
+</Steps>
+
+## Owner commands
+
+LACORE exposes an owner command suite for quick health checks — run from console or in-game (staff):
+
+```
+/lacore version   # build + version
+/lacore status    # module + DB status
+/lacore doctor    # full first-boot health check
+/lacore help      # list all subcommands
+```

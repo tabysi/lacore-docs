@@ -1,0 +1,50 @@
+---
+title: Introduction
+---
+
+import { Cards, Callout } from 'nextra/components'
+
+# LACORE
+
+**LACORE** is the configurable roleplay core for **Pacific Valley Roleplay** on FiveM — a single,
+cohesive resource that ships a full law-enforcement toolset (MDT/CAD, dispatch console, CCTV
+surveillance), a civilian layer, character profiles, admin tooling, and a hardened security stack.
+
+It is a **configurable core**, not a bare framework: features work out of the box and are tuned
+through config files and convars, with an optional bridge to ESX / QBCore / QBox for jobs and
+identity.
+
+<Cards>
+  <Cards.Card title="Getting Started" href="/getting-started" arrow />
+  <Cards.Card title="Configuration" href="/configuration" arrow />
+  <Cards.Card title="MDT & Dispatch" href="/features/mdt-and-dispatch" arrow />
+  <Cards.Card title="CCTV Surveillance" href="/features/cctv" arrow />
+</Cards>
+
+## What's inside
+
+- **MDT / CAD** — three re-skinned mobile data terminals (LAPD PremierOne, LASD CAD/PCMS, Agency
+  CHP) sharing one backend, plus an EMS/Fire terminal.
+- **Dispatch console** — a live incident + unit map (`/dispatch`) with zones, BOLOs, charges and a
+  dispatcher ⇄ unit workflow.
+- **CCTV surveillance suite** — a camera viewer with a targeting scanner, runtime-placeable field
+  cameras, and dispatch-map integration.
+- **Civilian layer** — emotes (bridged to DPEmotes / RPEmotes), props, digital ID, self-service
+  vehicle registration, and an org/gang framework.
+- **Profiles & multi-character** — persistent characters, records, vehicles and achievements.
+- **Security** — IP-lock anti-piracy enforcement, anticheat, permissions (ACE + Discord bridge),
+  and Big Brother admin logging.
+
+## Requirements
+
+- A FiveM server (`fx_version cerulean`, `game gta5`).
+- A MySQL database via [oxmysql](https://github.com/overextended/oxmysql) (falls back to local
+  JSON if unavailable).
+- *(Optional)* [DPEmotes](https://github.com/andristum/dpemotes) or
+  [RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn) for the civilian emote
+  bridge.
+
+<Callout type="info">
+  All in-game text is English and fully localised (`lang/en`, `de`, `ru`). Documentation and code
+  comments are English.
+</Callout>

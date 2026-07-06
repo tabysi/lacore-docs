@@ -1,0 +1,37 @@
+---
+title: Security & Admin
+---
+
+import { Callout } from 'nextra/components'
+
+# Security & Admin
+
+## IP-lock (anti-piracy)
+
+LACORE ships an **IP-lock enforcement** system backed by a license server. If a server violates the
+license agreement, its IP can be locked. This is the owner's protection mechanism and is **not
+customer-configurable** — do not attempt to remove or weaken it.
+
+<Callout type="error">
+  Tampering with the IP-lock, telemetry, or license checks is a breach of the EULA (`LICENSE.md`).
+</Callout>
+
+## Permissions
+
+Access is gated through ACE groups (`group.lacore_dev` / `lacore_staff` / `lacore_mod`) with an
+optional **Discord role → ACE bridge**. Modules check `HasPermission(src, perm)`.
+
+## Anticheat
+
+An event-honeypot anticheat guards server events; the framework bridge marks legitimate framework
+events so they are never flagged.
+
+## Big Brother (admin logging)
+
+`/bblog` opens an admin log feed. Actions across the core are logged via `BBLog(category, src,
+action, detail, opts)` and can be mirrored to Discord webhooks.
+
+## Admin menu
+
+`/admin` opens a staff panel (server-authoritative): kick / ban / revive / heal / freeze / goto /
+bring, plus self-only conveniences (noclip / god / invisible) and world controls (weather / time).

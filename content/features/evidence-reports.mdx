@@ -1,0 +1,41 @@
+---
+title: Evidence & Reports
+---
+
+import { Callout } from 'nextra/components'
+
+# Evidence & Reports
+
+LEO can file structured **reports** and log **evidence** against a person's record, straight from
+the MDT.
+
+## Reports
+
+Officers file a report by type (configured in `configs/cfg-evidence-sh.lua`) with a narrative. The
+report is stored on the subject's record and is visible to authorised units (faction / staff)
+through the MDT query.
+
+## Evidence
+
+Logging evidence creates a tagged entry (`EV<YYMMDD>-<hex>`) with a description and optional custody
+chain. Evidence entries appear on the person's record alongside reports, charges and citations.
+
+## Record visibility
+
+Records are visibility-gated: a record is shown to the owner, to staff, or to units of the matching
+faction (`RecordsVisibleTo`). Private entries are never sent to unauthorised clients — the CCTV
+scanner and MDT query both respect this.
+
+## Configuration
+
+Report and evidence types are defined in `configs/cfg-evidence-sh.lua`:
+
+```lua
+Evidence.reportTypes = { 'Incident Report', 'Arrest Report', 'Use of Force', ... }
+Evidence.types       = { 'Physical', 'Digital', 'Photograph', ... }
+```
+
+<Callout type="info">
+  Records feed multiple surfaces: the MDT query, the person card, and the compact MDT summary on the
+  [CCTV scanner](/features/cctv).
+</Callout>

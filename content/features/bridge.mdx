@@ -1,0 +1,46 @@
+---
+title: Framework Bridge
+---
+
+import { Callout } from 'nextra/components'
+
+# Framework Bridge
+
+LACORE runs standalone with its own identity layer, but it can also **bridge to an existing
+framework** so jobs and identity come from ESX, QBCore or QBox.
+
+## Auto-detection
+
+At load, the bridge (`modules/bridge/`) detects the active framework and exposes a uniform API:
+
+| Function | Returns |
+| --- | --- |
+| `Bridge.GetJob(src)` | The player's job. |
+| `Bridge.GetName(src)` | The player's character name. |
+| `Bridge.GetIdentifier(src)` | A stable identifier. |
+| `Bridge.IsLeo(src)` / `Bridge.IsEms(src)` | Duty checks. |
+| `Bridge.Notify(src, msg)` | Framework-native notification. |
+
+## Job → department mapping
+
+Map your framework's job names to LACORE departments in `configs/cfg-bridge-sh.lua`:
+
+```lua
+Bridge.jobToDept = {
+  police  = 'lapd',
+  sheriff = 'lasd',
+  ambulance = 'AMR',    -- EMS/Fire in-game job string
+  -- ...
+}
+
+Bridge.autoDuty = false  -- optionally auto-set duty from the framework job
+```
+
+## Anticheat interop
+
+The bridge marks legitimate framework events so LACORE's event-honeypot anticheat never flags them
+(`Bridge.IsFrameworkEvent`).
+
+<Callout type="info">
+  No framework? LACORE uses its own multi-character identity — nothing else to configure.
+</Callout>

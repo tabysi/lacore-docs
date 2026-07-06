@@ -1,0 +1,42 @@
+---
+title: Civilian Layer
+---
+
+import { Callout } from 'nextra/components'
+
+# Civilian Layer
+
+The civilian layer gives non-LEO players meaningful roleplay tools — **RP-only, no economy**.
+
+## Emotes (bridged)
+
+LACORE does **not** ship its own animation engine (it would clash with the emote resource most
+servers already run). Instead it auto-detects and bridges to:
+
+- [DPEmotes](https://github.com/andristum/dpemotes) (`dpemotes`)
+- [RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn) (`rpemotes` / `rpemotes-reborn`)
+
+The civilian radial's emote buttons play the mapped emote through whichever is installed. Configure
+the mapping in `cfg-civilian-sh.lua` (each entry is `{ cat, id, label, emote = "<dp/rp name>" }`).
+
+<Callout type="info">
+  Run `/emotemenu` in-game to see the exact emote names your emote resource provides.
+</Callout>
+
+## Tools & identity
+
+- **Digital ID** — driver licence / ID built from the active character; show it to nearby players.
+- **Self-service vehicle registration** — register a plate to your character; it then shows up in
+  LEO queries.
+- **Props** — place cones, barriers, signs, chairs (server-synced, per-player limit).
+
+## Organisations / gangs
+
+Create or join an org (name, tag, colour, MOTD, ranks) — persisted server-side and shown in the
+LEO MDT query. An optional **Turf / gang-war** system lets orgs fight over territories for
+influence (kill-based capture).
+
+<Callout type="warning">
+  Turf is **off by default**. Enable it with `Turf.enabled = true` in `cfg-turf-sh.lua` and set your
+  own zone coordinates.
+</Callout>

@@ -1,0 +1,44 @@
+---
+title: MDT & Dispatch
+---
+
+import { Callout } from 'nextra/components'
+
+# MDT & Dispatch
+
+LACORE ships a shared law-enforcement backend that powers several **Mobile Data Terminals** and a
+live **Dispatch console**.
+
+## The terminals
+
+Open with `/mdt`. Which terminal you get is routed by your department:
+
+| Terminal | Look | Department trigger |
+| --- | --- | --- |
+| **LAPD** PremierOne | white / grey | department contains `lapd` |
+| **LASD** CAD / PCMS | amber / teal (own backend) | `lasd` / `sheriff` / `bcso` |
+| **Agency** MDT | CHP dark-blue (re-skin of LAPD data) | any other department |
+| **EMS / Fire** | dark CAD | `AMR` / `fire` / `ems` / `medic` |
+
+All terminals share the same incident/unit data, so a re-skin never means duplicated work.
+
+## Dispatch console
+
+Open with `/dispatch` (go on duty with `/dispatch on`, open the console with `/dispatch open`). It
+shows a live tile map of incidents, units and callers, with:
+
+- **Zones & districts** — editable polygons + district colouring.
+- **BOLOs & charges** — create BOLOs, apply penal-code charges, run person / plate queries.
+- **Dispatcher ⇄ unit workflow** — assign, message (`@callsign`), voice-call, resolve.
+- **CCTV cameras on the map** — see [CCTV](/features/cctv).
+
+<Callout type="info">
+  Incident numbers roll `1000–9999` for LAPD (skipping active numbers); LASD uses its own
+  `[STATION][MMDDYY]-[TAG]` scheme. Never assume a raw `+1`.
+</Callout>
+
+## Statuses
+
+Call states are `Outstanding → Assigned → On Scene → Resolved`. Unit statuses include `CLEAR`,
+`ENROUTE`, `ON SCENE`, `CODE SIX`, `BUSY`, `UNAVAILABLE`. Only `CLEAR` detaches a unit from its
+incident.
