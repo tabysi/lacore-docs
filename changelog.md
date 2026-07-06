@@ -3,6 +3,30 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [Unreleased] – Security hardening
+
+### Security
+- **NADS: server-side staff gate.** `AddNADSStreet` now requires `HasPermission(src, "nads")`
+  (staff / dev bypass) — the client-only `player.staff` check could be bypassed by a crafted event
+  to inject addresses or spam the Discord webhook. The payload is also type-checked.
+- **LASD / EMS unit registration gated to job.** `lasd:Register` and `ems:Register` now require an
+  on-duty LEO / Fire-EMS-Coroner (or staff) via `PlayerIsAuthorized`. Previously any client could
+  register as a unit and then pass every `IsLasdUnit` / `IsEmsUnit` gate — creating incidents,
+  running **record queries**, changing status, etc.
+
+### Robustness
+- **Guarded `json.decode`.** The player-list KVP restore (server boot), the character KVP restore
+  (`/character`), and the legacy phone screenshot-upload response are now wrapped in `pcall` with
+  type checks, so a corrupt value can't throw during boot or at runtime.
+
+### Changed — console hygiene
+- **Gated debug logging.** New shared `Debug(...)` / `IsDebug()` helper (off by default). Developer
+  trace `print()`s — most notably the client boot sequence in `world-cl.lua` (~25 lines that spammed
+  every player's F8 console) plus vehicle/plates/CCTV/weapons/events traces and a couple of server
+  score/AOP dumps — now route through `Debug()`. Enable with `setr lacore_debug 1`. **Intentional
+  output is kept as `print()`**: security/IP-lock alerts, DB & startup status, missing-dependency
+  warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
+
 ## [3.1.6] – Speech-to-Text Radio Transcript (experimental — disabled by default)
 
 > ⚠️ **This feature ships DISABLED (`STT.enabled = false`).** It is experimental and does not yet
@@ -18,7 +42,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   On release the final transcript is sent to the server. A small live "🎙 …" chip shows the partial.
   *(Note: the browser SpeechRecognition API does not work in FiveM's CEF — no speech backend — so
   LACORE uses Vosk instead. The `/sttcheck` probe reports both.)*
-- **Bundled model + radio grammar.** Ships the larger, more accurate
+- **Self-hosted model + radio grammar.** The Vosk model is **not bundled** with the resource — Cfx
+  Keymaster rejects assets that contain archives, so you host the model `.tar.gz` yourself (any
+  static host / CDN) and point `STT.model` at it. Recommended: the larger, more accurate
   `vosk-model-en-us-0.22-lgraph` (~128 MB, downloaded once per client) — a dynamic-graph model that
   supports a **radio grammar**: `STT.grammar` in `cfg-stt-sh.lua` constrains **push-to-talk** radio
   recognition to ten-codes, the phonetic alphabet and common jargon for much higher accuracy.

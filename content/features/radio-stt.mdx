@@ -18,7 +18,8 @@ Units can **speak on the radio and have it transcribed** into a shared, searchab
 <Callout type="info">
   Recognition runs **locally on each client** via a Vosk model in WebAssembly. LACORE does **not**
   use the browser SpeechRecognition API — it has no working speech backend in FiveM's CEF. The Vosk
-  model is bundled with the resource and downloaded once per client.
+  model is **not bundled** (Cfx assets can't contain archives) — you host it and point `STT.model`
+  at it; each client downloads it once.
 </Callout>
 
 ## How it works
@@ -60,13 +61,15 @@ always uses **free recognition** (the radio grammar below is not applied to call
 
 Two levers, both built in:
 
-- **A larger model.** LACORE bundles `vosk-model-en-us-0.22-lgraph` — a bigger, more accurate model
-  than the tiny "small" ones. Point `STT.model` at any other Vosk model `.tar.gz` (e.g. German) to
-  override; each client downloads it once and caches it.
+- **The model (self-hosted).** The model is **not shipped with the resource** — Cfx Keymaster
+  rejects assets containing archives. Host a Vosk model `.tar.gz` yourself (any static host / CDN)
+  and set `STT.model` to its URL. Recommended: `vosk-model-en-us-0.22-lgraph` — bigger and more
+  accurate than the tiny "small" models, and it supports the radio grammar below. Each client
+  downloads it once and caches it.
 - **A radio grammar (the big win for radio).** `STT.grammar` constrains the **push-to-talk radio**
   vocabulary to ten-codes, the phonetic alphabet and common jargon — dramatically improving accuracy
   for codes. Keep `"[unk]"` in the list so words outside it still recognise. This requires a
-  `-lgraph` model (the bundled one is) and is **not** applied to 911/311 calls.
+  `-lgraph` model and is **not** applied to 911/311 calls.
 
 <Callout type="info">
   You can't practically re-train a Vosk model — but the grammar above is the domain-adaptation lever
@@ -81,7 +84,7 @@ Everything lives in `configs/cfg-stt-sh.lua`:
 STT.enabled = true      -- master switch
 STT.calls   = true      -- auto-transcribe 911/311 dispatcher calls (both sides)
 STT.lang    = "auto"    -- "auto" follows each client's UI locale, or "de"/"en"/"ru"
-STT.model   = ""        -- "" = bundled lgraph model; or a URL to your own Vosk model .tar.gz
+STT.model   = ""        -- REQUIRED to enable: URL to a self-hosted Vosk model .tar.gz (not bundled)
 STT.grammar = { "[unk]", "code four", "ten four", "adam", "boy", ... } -- radio (PTT) vocabulary
 STT.maxLen  = 220       -- max characters per transmitted line
 STT.logSize = 60        -- how many recent lines are kept + sent on open
@@ -96,5 +99,5 @@ STT.store   = "data/radio_log.json"
 - **Graceful fallback.** A client where the offline engine can't initialise simply can't transmit
   (no crash) — it can still read the log. Verify a client with **`/sttcheck`**.
 - **Accuracy** depends on the model, the radio grammar, and the speaker's mic/accent.
-- Recognition uses each client's **own CPU** — there is no server-side transcription cost. The model
-  is downloaded once per client (~128 MB) and cached.
+- Recognition uses each client's **own CPU** — there is no server-side transcription cost. The
+  self-hosted model is downloaded once per client (~128 MB for lgraph) and cached.
