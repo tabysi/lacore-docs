@@ -3,7 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [Unreleased] – Speech-to-Text Radio Transcript (offline / free)
+## [3.1.6] – Speech-to-Text Radio Transcript (experimental — disabled by default)
+
+> ⚠️ **This feature ships DISABLED (`STT.enabled = false`).** It is experimental and does not yet
+> work reliably enough for production (offline recognition accuracy varies by client). The full
+> implementation is included and can be enabled in `configs/cfg-stt-sh.lua` to try it — see the
+> [Radio Transcript docs](https://tabysi.github.io/lacore-docs/features/radio-stt/).
 
 ### Added — push-to-talk radio dictation + transcript log
 - **Offline speech recognition (Vosk / WebAssembly).** On-duty units hold a bindable **radio key**
@@ -31,6 +36,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 - **Graceful fallback.** Clients where the offline engine can't initialise simply can't transmit
   (no crash) but can still read the log. Radio transmission is server-gated to on-duty units
   (callsign set); call transcription is gated to the call's participants.
+- **Audio capture** runs on an **AudioWorklet** (audio thread — no main-thread jank, no deprecation
+  warning), with a ScriptProcessorNode fallback for clients that can't load the worklet
+  (`web/public/stt-worklet.js`).
 - Files: `configs/cfg-stt-sh.lua`, `modules/stt/stt-sv.lua` (new), `modules/stt/stt-cl.lua`,
   `web/src/components/SttEngine.svelte` (Vosk) + `RadioLog.svelte` (new), `SttProbe.svelte` (probe +
   Vosk test), store/messages/locales, `nui/dist/models/` (model), `fxmanifest.lua`

@@ -6,6 +6,12 @@ import { Callout, Steps } from 'nextra/components'
 
 # Radio Transcript — Speech-to-Text
 
+<Callout type="warning">
+  **Experimental — disabled by default.** This feature ships with `STT.enabled = false`. Offline
+  recognition accuracy varies by client and it isn't production-ready yet. The full implementation is
+  included; enable it in `configs/cfg-stt-sh.lua` to try it.
+</Callout>
+
 Units can **speak on the radio and have it transcribed** into a shared, searchable log — powered by
 **fully offline speech recognition**. No cloud, no API keys, no per-use cost.
 
