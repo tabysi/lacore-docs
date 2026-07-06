@@ -25,6 +25,19 @@ npm run start
 
 Edit or add pages under `content/`. Each folder can have a `_meta.js` to control order + titles.
 
+## Changelog pages
+
+The per-version changelog pages under `content/updates/changelog/` are **generated** from the
+`changelog.md` at the repo root. After editing `changelog.md`, regenerate them:
+
+```bash
+npm run changelog
+```
+
+This splits `changelog.md` on `## [version]` headers into one page per release (newest first),
+merges the `[Unreleased]` blocks into a single "Unreleased / Dev" page, and rebuilds `_meta.js` +
+the All-Releases index. Don't hand-edit the generated files — edit `changelog.md` and re-run.
+
 ## Hosting on GitHub Pages
 
 The site is a static export (`output: 'export'` → `out/`) and deploys automatically via
