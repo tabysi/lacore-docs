@@ -1,0 +1,43 @@
+---
+title: 3.1.5
+---
+
+# 3.1.5 — CCTV Surveillance Suite, Scanner & Field Cameras
+
+The CCTV system became a full surveillance suite.
+
+## Added — CCTV camera viewer (`/cctv`)
+
+- Fixed-position POV camera (WASD / arrows look, scroll zoom) with real area streaming (a clone ped
+  stays at your desk while the hidden real ped is teleported to the camera so the area streams).
+- Cameras grouped into networks, gated by job (`leo` / `security` / `all`).
+- You cannot fire your weapon while operating a camera.
+
+## Added — Targeting scanner
+
+- Left-click raycasts a **person** or **vehicle** and runs an animated scan sequence (reticle,
+  sweeping line, live percentage). Duration `CCTV.scanTime` (default 6 s).
+- An info card follows the target on screen with a compact **mugshot** and, for registered people,
+  an **MDT summary** (priors, active BOLOs, up to three recent records).
+- Flags: **ACTIVE WARRANT**, **BOLO ACTIVE**, **REPORTED STOLEN**, **UNREGISTERED**.
+- NPCs / unregistered targets resolve locally so a scan never hangs; the server only enriches
+  registered players and plates.
+- The operator's desk standin is a networked ped that resolves to the real player when scanned.
+
+## Added — Field cameras + dispatch-map integration
+
+- `/camtool` places cameras by shooting a spot; `/cameras` manages them (rename / delete / view /
+  toggle tool).
+- Placed cameras persist (`data/cctv_cams.json`) and appear under a "Field Cameras" network.
+- The dispatch map shows all accessible cameras as 📹 markers; a "view this camera?" modal opens the
+  live view in front of the console and reopens the console on exit.
+
+## Changed
+
+- **Turf / Gang-War is now opt-in** — `Turf.enabled = false` by default; `Turf.drawMarkers` off too.
+
+## Fixed
+
+- Could shoot while inside a camera (now hard-blocked).
+- Dispatch console stayed in front of the live camera view.
+- Dispatch map position tracking tightened to ~1 s updates.

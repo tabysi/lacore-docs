@@ -1,0 +1,37 @@
+---
+title: All Releases
+---
+
+import { Cards, Callout } from 'nextra/components'
+
+# Changelog — All Releases
+
+Every LACORE release has its own page. Pick a version for the full notes.
+
+<Cards>
+  <Cards.Card title="3.1.5 — CCTV Surveillance Suite" href="/updates/changelog/v3-1-5" arrow />
+  <Cards.Card title="3.1.3 — Rebranding + release-ready" href="/updates/changelog/v3-1-3" arrow />
+</Cards>
+
+## Release index
+
+| Version | Highlights |
+| --- | --- |
+| [3.1.5](/updates/changelog/v3-1-5) | CCTV Surveillance Suite, targeting scanner, field cameras, dispatch-map cameras; turf opt-in. |
+| [3.1.3](/updates/changelog/v3-1-3) | Rebrand to LACORE, automatic DB migration, security hardening, connect-hang fix. |
+
+## Earlier releases
+
+<Callout type="info">
+  Full details for these are in `changelog.md` shipped with the resource.
+</Callout>
+
+- **Web Dispatcher portal** — external browser dispatcher via a FiveM ↔ Node bridge with Discord
+  OAuth + role gating.
+- **Agency & EMS terminals** — CHP-styled Agency MDT and a dedicated EMS/Fire CAD, sharing the LEO
+  backend.
+- **BOLOs, charges & citations** — penal-code-driven charges, citations and server-broadcast BOLOs.
+- **Multi-character profiles** — persistent characters ("digital file"), records, vehicles and
+  achievements.
+- **Big Brother** — admin action logging (`/bblog`) with Discord webhooks.
+- **Map config** — editable city / districts / zone polygons for the dispatch map.

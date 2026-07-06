@@ -1,0 +1,33 @@
+---
+title: 3.1.3
+---
+
+# 3.1.3 — Rebranding to LACORE + release-ready
+
+## Changed (breaking — read the upgrade steps)
+
+- **Resource rename** `pvp-corev3` → `lacore`. Rename the folder to `resources/lacore` and use
+  `ensure lacore`.
+- **Convar rename** `pvp_*` → `lacore_*` (all convars).
+- **ACE group rename** `group.pvp_*` → `group.lacore_*`.
+- **Command / keybind rename** `pvp_*` → `lacore_*` — players re-bind custom keys once.
+
+## Added
+
+- **Automatic DB migration** — the legacy `pvp_core_store` table is renamed to `lacore_core_store`,
+  and `pvp_logs` to `lacore_logs`, on start. No data loss on upgrade.
+- `server.cfg.example` with the complete current convar block.
+- `DOCS.md` — central documentation, and `LICENSE.md` — full EULA covering IP-lock enforcement.
+
+## Fixed
+
+- **Connect hang on "Checking bans..."** — a DB schema-init hang blocked the connect ban check.
+  Fixed, with a hard cap on schema init so a stalled database can never freeze joins again.
+
+## Security — post-launch hardening
+
+- **Turf capture farming exploit** fixed — the reported killer must be inside the same zone, plus a
+  per-victim cooldown.
+- **Admin spectate** rewritten with a proper on/off toggle + exit key + cleanup on resource stop.
+- **Admin noclip** state restored on resource stop, so a restart mid-noclip can't leave a player
+  ghosted.
