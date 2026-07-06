@@ -4,6 +4,8 @@ title: CCTV Surveillance
 
 import { Callout, Steps } from 'nextra/components'
 
+export const base = process.env.NEXT_PUBLIC_BASE_PATH || ''
+
 # CCTV Surveillance
 
 A full surveillance suite for LEO / Security: a fixed-position camera viewer with a **targeting
@@ -46,6 +48,16 @@ registered people — an **MDT summary** (priors count, active BOLOs, recent rec
   NPCs and unregistered targets resolve locally so a scan never hangs; the server only enriches
   **registered** players and plates. Record lookup is gated to LEO / Security.
 </Callout>
+
+## Preview
+
+The scanner locking onto a subject and revealing the MDT summary card:
+
+<img src={base + '/cctv/scanner.png'} alt="CCTV targeting scanner reveal card"
+  style={{ width: '100%', borderRadius: 10, marginTop: '0.5rem' }} />
+
+<video src={base + '/cctv/preview.mp4'} poster={base + '/cctv/scanner.png'} controls preload="none"
+  style={{ width: '100%', borderRadius: 10, marginTop: '1rem' }} />
 
 ## Field cameras
 
