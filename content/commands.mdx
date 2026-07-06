@@ -6,45 +6,166 @@ import { Callout } from 'nextra/components'
 
 # Command Reference
 
-Every command LACORE registers, grouped by area. Access is enforced server-side — the table notes
-who can use each one.
-
-## Law enforcement
-
-| Command | Access | Description |
-| --- | --- | --- |
-| `/mdt` | LEO / EMS | Open the Mobile Data Terminal (routed to LAPD / LASD / Agency / EMS by department). |
-| `/dispatch` | LEO | Open the dispatch console. |
-| `/dispatch on` \| `off` | LEO | Go on / off duty as a dispatcher. |
-| `/dispatch open` | LEO | Open the dispatch console explicitly. |
-| `/cctv` | LEO / Security | Open the CCTV surveillance viewer. |
-| `/camtool` | LEO / Security | Toggle the field-camera placement tool. |
-| `/cameras` | LEO / Security | Manage placed field cameras. |
-
-## Civilian
-
-| Command | Access | Description |
-| --- | --- | --- |
-| `/profile` | All | Open the character profile + emote radial editor. |
-| `/char` | All | Set the active character / RP nick. |
-| Radial keybind | All | Open the civilian radial (rebindable in FiveM keybind settings). |
+Every `<arg>` is required, `[arg]` is optional. Many commands only work in a certain role
+(Civilian / LEO / Fire-EMS / Coroner / Dispatcher / Staff).
 
 <Callout type="info">
-  Emotes are provided by **DPEmotes** or **RPEmotes** — use their commands (`/e <name>`,
-  `/emotemenu`, `/emotecancel`). LACORE bridges the radial buttons to whichever is installed. See
-  [Civilian Layer](/features/civilian).
+  Command availability and agency codes depend on your server's config — when in doubt, ask your
+  server team or check the [Support & FAQ](/support).
 </Callout>
 
-## Admin & owner
+## 🧍 Character & session
 
-| Command | Access | Description |
-| --- | --- | --- |
-| `/admin` | Staff | Open the admin menu (players / self / world). |
-| `/bblog` | Staff | Open the Big Brother admin-log feed. |
-| `/lacore version` | Console / staff | Show build + version. |
-| `/lacore status` | Console / staff | Module + DB status. |
-| `/lacore db` | Console / staff | Database status. |
-| `/lacore modules` | Console / staff | List loaded modules. |
-| `/lacore doctor` | Console / staff | Run the first-boot health check. |
-| `/lacore telemetry` | Console / staff | Owner telemetry status. |
-| `/lacore help` | Console / staff | List all `/lacore` subcommands. |
+| Command | Who | What it does |
+|---------|-----|--------------|
+| `/char` | Everyone | Open your character data sheet. **Saving sets your RP name** and joins you to the session. Supports unlimited presets. |
+| `/character` | Everyone | Alias of `/char`. |
+| `/vreg` | Everyone | Register the vehicle you're currently driving (plate, make, model, colour, owner…). |
+| `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config). |
+
+## 👮 Duty & jobs
+
+| Command | Who | What it does |
+|---------|-----|--------------|
+| `/onduty <agency> <callsign>` | Member | Go on duty for an agency with a callsign (e.g. `/onduty LAPD 1A-12`). Sets dept, motto and loadout. |
+| `/offduty` | On-duty | Go off duty, clear weapons & callsign. |
+| `/job [name]` | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
+
+## 🚓 MDT & CAD
+
+| Command | Who | What it does |
+|---------|-----|--------------|
+| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → PremierOne, others → LASD CAD, Fire/EMS → EMS CAD. |
+| `/lasd` | LEO / Fire-EMS / Coroner | Always opens the LASD CAD / PCMS. |
+| `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
+| `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |
+| `/dispatch [on\|off\|open]` | LEO / Dispatcher | `on`/`off` = dispatcher duty; no arg or `open` = open the dispatch console. |
+
+See [Using the MDT](/user-guide/mdt) and [Dispatch Console](/user-guide/dispatch-console).
+
+## 📹 CCTV (LEO / Security)
+
+| Command | What it does |
+|---------|--------------|
+| `/cctv` | Open the CCTV surveillance viewer (fixed cameras + placed field cameras). |
+| `/camtool` | Toggle the field-camera placement tool (fire at a spot to place a camera). |
+| `/cameras` | Manage placed field cameras (rename / delete / view / toggle tool). |
+
+See [CCTV Surveillance](/features/cctv).
+
+## 📟 LEO / Fire-EMS field commands
+
+| Command | Who | What it does |
+|---------|-----|--------------|
+| `/p` | LEO / Fire-EMS | **Panic button** — broadcasts your callsign & location to all units. |
+| `/xmit <message>` | LEO / Fire-EMS | Transmit a dispatch radio message. |
+| `/cb <message>` | LEO | Crime broadcast with your callsign & current street. |
+| `/leoreq <unit>` | On-duty | Request a unit to your scene (RP, unit "arrives" after a delay). |
+| `/jail <id> <minutes> [reason]` | LEO | Jail a player. |
+| `/unjail <id> [reason]` | LEO | Release a jailed player. |
+| `/hospital <id> <minutes>` | LEO / Fire-EMS | Send a player to hospital. |
+| `/unhospital <id>` | LEO / Fire-EMS | Release from hospital. |
+| `/coroner <id> <minutes>` | Coroner / LEO / Fire-EMS | Mark a player deceased. |
+| `/uncoroner <id>` | Coroner / LEO / Fire-EMS | Revive. |
+
+## 🔫 Equipment (on-duty)
+
+| Command | What it does |
+|---------|--------------|
+| `/rack` | Put your drawn long-gun back on the rack. |
+| `/unrack [number\|name]` | Take a weapon from your vehicle rack (no arg lists options). |
+| `/drop` | Drop your currently equipped weapon. |
+| `/firingmode` | Toggle your weapon's firing mode. |
+| `/headlightmode` | Toggle headlight mode. |
+
+## 🎭 Roleplay
+
+| Command | What it does |
+|---------|--------------|
+| `/me <action>` | Local emote — "**You** do X" to nearby players. |
+| `/gme <action>` | Global version of `/me`. |
+| `/do <text>` | Local scene description ("The door is locked"). |
+| `/gdo <text>` | Global version of `/do`. |
+| `/search <target>` | RP: "searches X, what do I find?" (local). `/gsearch` = global. |
+| `/give <item>` | RP: hand something over (local). |
+| `/report <id> <message>` | Report a player / issue to staff. |
+
+> RP commands need a name set first (run `/char`).
+
+Emotes are provided by DPEmotes / RPEmotes (`/e <name>`, `/emotemenu`) — LACORE's civilian radial
+bridges to whichever is installed. See [Civilian Layer](/features/civilian).
+
+## 🚗 Vehicle controls
+
+| Command | What it does |
+|---------|--------------|
+| `/engine` | Toggle engine (default **G**). |
+| `/seatbelt` | Toggle seatbelt (default **K**). |
+| `/door <1-4\|front\|rear\|all>` | Open/close door(s). 1=FL, 2=FR, 3=RL, 4=RR. |
+| `/window <1-4\|front\|rear\|all> <up\|down>` | Roll windows up/down. |
+| `/trunk` | Open/close the trunk. |
+| `/hood` | Open/close the hood. |
+
+## 🌍 World & navigation
+
+| Command | What it does |
+|---------|--------------|
+| `/postal <code>` | Draw a GPS route to a postal code. |
+| `/bus <route name>` | Draw a bus route on the map. |
+| `/playerlist` | Toggle the player list (default **I**). |
+| `/playtime` | Show your playtime. |
+| `/showid` | Show your server ID. |
+| `/dismiss` | Dismiss the nearest spawned ped/world prompt. |
+| `/prop` | Open the prop menu. |
+| `/hu` | Hands up (default **U**). |
+| `/hh` | Hand on holster (default **X**). |
+| `/settings` / `/vehicle` / `/session` | Open the matching in-game menus. |
+
+## 🛠️ Server staff / admin
+
+Restricted to staff — listed for server owners. Many require ACE permissions.
+
+| Command | What it does |
+|---------|--------------|
+| `/admin` | Open the admin GUI menu (players / self / world). |
+| `/bblog` | Open the Big Brother admin-log panel. |
+| `/aop <text>` | Set the Area of Play. |
+| `/aopvote A/B/C` | Start an AOP vote. |
+| `/alert <text>` | Server-wide alert banner. |
+| `/warn <id> <reason>` / `/advise <id> <text>` | Warn / advise a player. |
+| `/kick <id> <reason>` | Kick a player. |
+| `/ban <id> <reason>` · `/tempban <id> <time> <reason>` · `/unban <id>` | Ban management. |
+| `/dc <id>` | Force-disconnect a player. |
+| `/msg <id> <text>` · `/smsg <id> <text>` | Direct message / staff message. |
+| `/staff` | Toggle staff mode. |
+| `/wl ...` | Whitelist management. |
+| `/time <h> [m]` · `/freezetime` | World time control. |
+| `/ft` · `/rft` | Freeze / unfreeze time helpers. |
+| `/deleteentity` · `/dv` | Delete the entity / vehicle you're aiming at / in. |
+| `/patrolhost` | Patrol host controls. |
+| `/calllog` | Print the MDT call/audit log (staff). |
+| `/rd` | Dismiss a player's report. |
+
+## 🧰 Owner commands (`/lacore`)
+
+Console or staff — health checks and diagnostics:
+
+| Command | What it shows |
+|---------|---------------|
+| `/lacore version` | Build + version. |
+| `/lacore status` | Module + database status. |
+| `/lacore db` | Database connectivity + table state. |
+| `/lacore modules` | Loaded modules. |
+| `/lacore doctor` | Full first-boot health check. |
+| `/lacore telemetry` | Owner telemetry status. |
+| `/lacore help` | List every subcommand. |
+
+## 📡 Dispatcher text commands
+
+These mirror the dispatch console buttons (dispatcher duty required):
+
+`/ddispatcher <onduty|offduty>` · `/denroute <callsign> <inc>` · `/donscene <callsign>` ·
+`/dcode6 <callsign>` · `/dbusy <callsign>` · `/dclear <callsign>` ·
+`/dunavailable <callsign>` · `/dattach <callsign> <inc>` · `/ddetach <callsign>`
+
+See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).

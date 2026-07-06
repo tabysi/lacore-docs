@@ -1,0 +1,66 @@
+---
+title: "Citations & Charges"
+---
+
+# Citations & Charges
+
+Write a **citation** (ticket) or an **arrest report** against a person straight from their record in the MDT. Pick charges from the server's **penal code**, and the system adds up the **fine** and **jail time** for you and files it to the subject's record.
+
+> 📑 **Related:** [Query: People & Plates](/user-guide/mdt-query) · [Using the MDT](/user-guide/mdt) · [LASD CAD](/user-guide/lasd-cad)
+
+---
+
+## ⚖ Issuing charges
+
+1. **Pull up the person** — run them in the [Query](/user-guide/mdt-query) tab, or open them from the **Persons** rail tab.
+2. On their record card, click **⚖ Cite / Charge**.
+3. Choose the report type: **Citation** (ticket / fine) or **Arrest** (booking + jail time).
+4. **Search and pick charges** from the penal code list. Each charge shows its class:
+
+   | Badge | Class | Meaning |
+   |:----:|-------|---------|
+   | 🟦 `I` | Infraction | Minor — fine only |
+   | 🟨 `M` | Misdemeanor | Mid-level — fine, sometimes short jail |
+   | 🟥 `F` | Felony | Serious — high fine + jail time |
+
+5. The footer shows a **live total**: number of charges, total **fine** and total **jail** (months).
+6. Add optional **notes**, then press **Issue**.
+
+```
+┌──────────────────────────────────────────────┐
+│ [Citation] [Arrest]      [Search charges… ]  │
+│ ──────────────────────────────────────────── │
+│ 🟦 T1  Speeding (1-15 over)          $150     │
+│ 🟥 F3  Armed Robbery (211)    $5000 · 20mo  ✓ │
+│ 🟨 M4  Resisting a Peace Officer $750 · 2mo ✓ │
+│ ──────────────────────────────────────────── │
+│ Notes: …                                      │
+│ 2 · $5750 · 22 mo                  [ Issue ]  │
+└──────────────────────────────────────────────┘
+```
+
+![The charge picker on a person record](./images/mdt-charge-picker.png)
+
+---
+
+## 📁 Where it goes
+
+When you issue charges, the system:
+
+- **Files a record** on the subject (a *Citation* or *Arrest Report*) listing every charge, the total fine and jail time, your callsign and the date.
+- That record is **faction-visible**, so it shows up on the person whenever an officer runs them — in both the **MDT** and the **[LASD CAD](/user-guide/lasd-cad)**.
+- **Notifies the subject** (if they're online) that they've been charged, with the total fine.
+- Logs the action for staff (admin audit) and the dispatch log.
+
+> ℹ️ The fine and jail totals are calculated **on the server** from the penal code — they can't be tampered with from the client.
+
+---
+
+## 🛠 For server owners
+
+The penal code lives in a config file (`configs/cfg-charges-sh.lua`) and is fully editable: add/remove charges, set the **class** (`I`/`M`/`F`), **fine** (USD) and **jail** (months). Your changes appear in the charge picker automatically — no rebuild of the UI required.
+
+```lua
+{ code = "F3", title = "Armed Robbery (211)", class = "F", fine = 5000, jail = 20 },
+```
+

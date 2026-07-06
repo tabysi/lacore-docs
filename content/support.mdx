@@ -1,0 +1,98 @@
+---
+title: Support & FAQ
+---
+
+import { Callout } from 'nextra/components'
+
+# Support & FAQ
+
+LACORE has a **community repo** for bugs, feature requests and feedback:
+[github.com/tabysi/pvp-corev3-community](https://github.com/tabysi/pvp-corev3-community).
+The source itself stays private — the repo is the public feedback channel.
+
+## 🐞 Found a bug?
+
+Open a **[Bug report](https://github.com/tabysi/pvp-corev3-community/issues/new/choose)** and include:
+
+- **Version** (e.g. `3.1.5`)
+- **What you did** → **what happened** → **what you expected**
+- **Steps to reproduce** (numbered)
+- **Console/F8 errors** (copy the text, not just a photo)
+- A **screenshot or short clip** if it's visual
+
+## 💡 Want a feature?
+
+Open a **[Feature request](https://github.com/tabysi/pvp-corev3-community/issues/new/choose)** and describe:
+
+- The problem you're trying to solve (not just the solution)
+- How it should work (UI, command, behaviour, examples)
+- Which **area** it touches (MDT, Dispatch, Query/Civilian, Vehicles, CCTV, Performance…)
+
+## 🗣️ Feedback, questions & chat
+
+- Small ideas / QoL → **[Feedback / Idea](https://github.com/tabysi/pvp-corev3-community/issues/new/choose)**
+- Questions & open-ended chat → **[Discussions](https://github.com/tabysi/pvp-corev3-community/discussions)** or the **[Discord](https://discord.gg/4Q8qdUAgBv)**
+
+<Callout type="info">
+  **Voting:** the most-requested ideas bubble up. Add a **👍 reaction** to issues/discussions you
+  want — please don't post "+1" comments.
+</Callout>
+
+## Status labels
+
+| Label | Meaning |
+|-------|---------|
+| `feedback` | General feedback or idea, under consideration. |
+| `enhancement` | A concrete feature request. |
+| `bug` | Confirmed or reported defect. |
+| `needs-info` | Waiting on more detail from you. |
+| `planned` | Accepted — on the roadmap, not started yet. |
+| `in-progress` | Actively being worked on. |
+| `shipped` | Released — check the [Changelog](/updates/changelog). |
+| `duplicate` | Already tracked elsewhere. |
+| `wontfix` | Out of scope (reason in the comments). |
+
+## Roadmap
+
+The living roadmap is a pinned discussion the community can comment and vote on:
+**[Roadmap & status](https://github.com/tabysi/pvp-corev3-community/discussions/2)**.
+
+```
+Idea (Discussions / 👍) → planned → in-progress → shipped
+```
+
+## FAQ
+
+### Where is the source code?
+LACORE is a private, paid product by [@tabysi](https://github.com/tabysi) — the source is not
+published. The community repo exists for bugs, ideas and feedback.
+
+### How do I get the script / installation support?
+Through the official channels you purchased it from, and the
+**[Discord](https://discord.gg/4Q8qdUAgBv)**. For self-help, see
+[Server Installation](/getting-started/installation) and the
+[Configuration](/configuration) section.
+
+### I found a security issue. Where do I report it?
+**Do not** open a public issue. Contact the maintainer privately (Discord DM) so it can be fixed
+before disclosure.
+
+### Will my feature request definitely be added?
+No promises. Requests are weighed by demand (👍), fit and effort — watch the roadmap.
+
+### The MDT won't open
+You're not on duty. Run `/onduty <agency> <callsign>` first — see
+[First Steps](/getting-started/first-steps).
+
+### The dispatch map shows blank tiles
+The `lacore-maps` resource isn't started, or `DispatchTileBase` points at an unreachable URL. Run
+`ensure lacore-maps`.
+
+### Emotes don't play
+Install [DPEmotes](https://github.com/andristum/dpemotes) or
+[RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn) — the civilian radial bridges
+to whichever is present. See [Civilian Layer](/features/civilian).
+
+### Players are stuck "out of the session"
+No name/nick is set yet — run `/char`, fill it in, save. See
+[Civilian & Vehicles](/user-guide/civilian-vehicles).

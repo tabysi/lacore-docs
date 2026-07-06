@@ -1,0 +1,55 @@
+---
+title: Onboarding
+---
+
+import { Cards, Callout, Steps } from 'nextra/components'
+
+# Getting Started
+
+Welcome to LACORE! This section takes you from zero to playing — whether you're the **server owner**
+installing the resource, or a **player** spawning in for the first time.
+
+## Pick your path
+
+<Cards>
+  <Cards.Card title="🖥 I run the server — Installation" href="/getting-started/installation" arrow />
+  <Cards.Card title="🎮 I'm a player — First Steps" href="/getting-started/first-steps" arrow />
+</Cards>
+
+## The 5-minute overview
+
+<Steps>
+
+### Server owner: install & configure
+
+Place the resource as `resources/lacore`, connect [oxmysql](https://github.com/overextended/oxmysql),
+copy the convars from `server.cfg.example`, and `ensure lacore`. Full guide:
+[Server Installation](/getting-started/installation).
+
+### Player: create your character
+
+Run `/char`, fill in your name + details, **save**. That sets your RP name and joins you to the
+session. Full guide: [First Steps](/getting-started/first-steps).
+
+### Go on duty
+
+```
+/onduty <agency> <callsign>     e.g. /onduty LAPD 1A-12
+```
+
+### Open your terminal
+
+Press **O** (or `/mdt`). LAPD gets the PremierOne MDT; every other agency gets the
+[LASD CAD / PCMS](/user-guide/lasd-cad); Fire/EMS gets the EMS CAD.
+
+### Learn the tools
+
+The [User Guide](/user-guide) walks through every screen — the MDT, queries, incidents, BOLOs,
+citations, the dispatch console and the civilian side.
+
+</Steps>
+
+<Callout type="info">
+  Stuck? Check the [Support & FAQ](/support) page, the
+  [Command Reference](/commands), or ask in the community Discord.
+</Callout>

@@ -1,0 +1,83 @@
+---
+title: "First Steps (Player Onboarding)"
+---
+
+# First Steps (Player Onboarding)
+
+This page walks you from spawning in to working a unit in the CAD.
+
+## 1. Set your character & join the session
+Open your character sheet and fill in your name + details:
+
+```
+/char
+```
+
+When you **save**, your name becomes your roleplay name (nick) and you join the active session. You can save **multiple presets** (one click to switch between characters) — they're stored per your identifier. See [Civilian & vehicles](/user-guide/civilian-vehicles).
+
+> If you ever feel "stuck out of the session", it's almost always because no name/nick is set yet — run `/char`, fill it in, save.
+
+## 2. Go on duty (LEO / Fire / EMS)
+Pick an agency **short code** and a **callsign**:
+
+```
+/onduty <agency> <callsign>
+```
+
+Examples:
+- `/onduty LSPD 1A-12`
+- `/onduty BCSO 12-S-04`
+- `/onduty EMS M-7`
+
+This sets your department, callsign, motto and issues your loadout. Go off duty with:
+
+```
+/offduty
+```
+
+> The exact agency short codes (LSPD, BCSO, SAHP/CHP, EMS, …) depend on your server's config. Type `/onduty` with no callsign to see nothing happen — ask your server team for the valid list.
+
+## 3. Open the MDT
+Press **`O`** or type:
+
+```
+/mdt
+```
+
+Only on-duty **Law Enforcement, Fire/EMS or Coroner** can open it. From here you set your status, work incidents, and run people/plates. Full walkthrough: [Using the MDT](/user-guide/mdt).
+
+## 4. Run someone or a plate
+From anywhere:
+
+```
+/run John Doe
+/run 12ABC345
+```
+
+This opens the MDT straight to the **Query** result and posts the run to the radio/chat for nearby units. Running an **unregistered plate** gives the driver 15 seconds to register via `/vreg` — or the vehicle is flagged **stolen**.
+
+## 5. Dispatcher (optional)
+If you're working dispatch, go on dispatcher duty and open the console:
+
+```
+/dispatch on
+/dispatch
+```
+
+See [Dispatch console](/user-guide/dispatch-console).
+
+---
+
+### Quick reference
+| Goal | Command / key |
+|------|---------------|
+| Character sheet / join session | `/char` |
+| Go on / off duty | `/onduty <ag> <callsign>` · `/offduty` |
+| Open MDT | **O** · `/mdt` |
+| Run person/plate | `/run <name or plate>` |
+| Register your vehicle | `/vreg` |
+| Panic button | `/p` |
+| Dispatcher console | `/dispatch on` then `/dispatch` |
+
+Full list: [Command reference](/commands).
+

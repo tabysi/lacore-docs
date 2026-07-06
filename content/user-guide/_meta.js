@@ -1,0 +1,12 @@
+export default {
+  index: 'Overview',
+  mdt: 'Using the MDT',
+  'mdt-toolbar': 'MDT Toolbar & Status',
+  'mdt-incidents': 'Working with Incidents',
+  'mdt-query': 'Query: People & Plates',
+  bolo: 'BOLO',
+  'citations-charges': 'Citations & Charges',
+  'dispatch-console': 'Dispatch Console',
+  'lasd-cad': 'LASD CAD / PCMS',
+  'civilian-vehicles': 'Civilian & Vehicles',
+}
