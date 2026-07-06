@@ -3,6 +3,12 @@
 import { useState } from 'react'
 import './partner-cards.css'
 
+// GitHub Pages serves under a subpath (basePath). Raw <img> tags are NOT
+// prefixed automatically by Next.js — only next/image and next/link are —
+// so build the asset URL with the basePath ourselves.
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || ''
+const asset = (p) => (p && p.startsWith('/') ? BASE + p : p)
+
 // Deterministic accent colour from a name (so avatars/cards look varied but stable).
 function hue(name) {
   let h = 0
@@ -16,7 +22,7 @@ function initials(name) {
 
 function Avatar({ name, logo, accent }) {
   if (logo) {
-    return <img className="pc-avatar" src={logo} alt={name} />
+    return <img className="pc-avatar" src={asset(logo)} alt={name} />
   }
   return (
     <div className="pc-avatar" style={{ background: `linear-gradient(135deg, ${accent}, hsl(${(hue(name) + 40) % 360} 70% 40%))` }}>
