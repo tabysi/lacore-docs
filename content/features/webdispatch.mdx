@@ -2,14 +2,14 @@
 title: Web Dispatcher
 ---
 
-import { Callout } from 'nextra/components'
+import { Callout, Steps } from 'nextra/components'
 
 # Web Dispatcher (external portal)
 
 Beyond the in-game console, LACORE can feed an **external browser dispatcher** so a dispatcher can
-work from a second screen or off the server entirely.
+work from a second screen — or entirely off the game server.
 
-## How it works
+## Architecture
 
 ```
 FiveM (lacore)  ──▶  Node bridge  ──▶  Web app (browser)
@@ -17,21 +17,47 @@ FiveM (lacore)  ──▶  Node bridge  ──▶  Web app (browser)
       └──────────  actions relayed  ◀───────┘
 ```
 
-- The FiveM resource pushes live incident / unit / caller data to a **Node bridge**.
-- The bridge broadcasts over WebSocket to the **web app** and serves the app + map tiles from one
-  origin.
-- Dispatcher actions in the browser are relayed back to FiveM.
+- The FiveM resource **pushes** live incident / unit / caller data to a **Node bridge**.
+- The bridge **broadcasts over WebSocket** to the web app and serves the app + map tiles from a
+  single origin (same-origin, no CORS headaches).
+- Dispatcher **actions** performed in the browser are relayed back into FiveM and executed there.
 
-## Auth
+## Authentication
 
-The portal is gated by **Discord OAuth + role checks**, so only authorised dispatchers can log in.
+The portal is gated by **Discord OAuth + role checks** — only members with an authorised role can log
+in. Actors from the web are audited the same way as in-game dispatchers.
 
-## Deployment
+## Setup
 
-The bridge ships with a Docker Compose + Caddy (automatic HTTPS) setup for a plug-and-play deploy.
-Configure the endpoint with the `lacore_bridge_url` / `lacore_bridge_token` convars.
+<Steps>
+
+### Configure the FiveM side
+
+Point LACORE at your bridge with convars:
+
+```ini
+set lacore_bridge_url "https://dispatch.example.com"
+set lacore_bridge_token "SHARED_SECRET"
+```
+
+### Deploy the bridge
+
+The bridge ships with a **Docker Compose + Caddy** setup (automatic HTTPS). Run it on any host with a
+domain pointed at it; Caddy provisions the certificate and serves the web app + tiles.
+
+### Set up Discord OAuth
+
+Create a Discord application, add the OAuth redirect for your domain, and configure the allowed
+role(s). Dispatchers sign in with Discord and are gated by role.
+
+</Steps>
 
 <Callout type="warning">
-  The web dispatcher is optional. The in-game `/dispatch` console works fully on its own — the
-  portal is for teams that want an out-of-game dispatcher.
+  The web dispatcher is **optional**. The in-game `/dispatch` console works fully on its own — the
+  portal is for teams that want an out-of-game dispatcher on a separate machine.
+</Callout>
+
+<Callout type="info">
+  Because the portal accepts actions that affect the live server, keep the `lacore_bridge_token`
+  secret and only expose the bridge over HTTPS.
 </Callout>

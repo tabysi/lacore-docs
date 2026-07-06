@@ -2,41 +2,86 @@
 title: Civilian Layer
 ---
 
-import { Callout } from 'nextra/components'
+import { Callout, Steps } from 'nextra/components'
 
 # Civilian Layer
 
-The civilian layer gives non-LEO players meaningful roleplay tools — **RP-only, no economy**.
+The civilian layer gives non-LEO players meaningful roleplay tools. It is intentionally
+**RP-only — no economy, no money**; progression is handled by the achievements/XP layer instead.
 
 ## Emotes (bridged)
 
-LACORE does **not** ship its own animation engine (it would clash with the emote resource most
-servers already run). Instead it auto-detects and bridges to:
+LACORE does **not** ship its own animation engine — it would clash with the emote resource most
+servers already run. Instead it **auto-detects and bridges** to whichever of these is installed:
 
-- [DPEmotes](https://github.com/andristum/dpemotes) (`dpemotes`)
-- [RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn) (`rpemotes` / `rpemotes-reborn`)
+| Resource | Detected name(s) |
+| --- | --- |
+| [DPEmotes](https://github.com/andristum/dpemotes) | `dpemotes` |
+| [RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn) | `rpemotes` / `rpemotes-reborn` |
 
-The civilian radial's emote buttons play the mapped emote through whichever is installed. Configure
-the mapping in `cfg-civilian-sh.lua` (each entry is `{ cat, id, label, emote = "<dp/rp name>" }`).
+The civilian **radial** plays the mapped emote through the detected resource. Configure the mapping
+in `cfg-civilian-sh.lua` — each entry names the emote to play:
+
+```lua
+-- cfg-civilian-sh.lua
+Civilian.emotes = {
+  { cat = 'pose',  id = 'lean',  label = 'Lean',   emote = 'lean'  },
+  { cat = 'dance', id = 'dance', label = 'Dance',  emote = 'dance' },
+  -- emote = the DP/RP emote name (run /emotemenu in-game to see them all)
+}
+```
 
 <Callout type="info">
-  Run `/emotemenu` in-game to see the exact emote names your emote resource provides.
+  Run `/emotemenu` in-game to list the exact emote names your emote resource provides, then use those
+  in the config. If neither emote resource is installed, the radial buttons notify the player.
 </Callout>
+
+Provider exports: `GetEmoteProvider`. Play routes through `/e <name>`; cancel is `/emotecancel`
+(RPEmotes) or `/e c` (DPEmotes), handled automatically.
 
 ## Tools & identity
 
-- **Digital ID** — driver licence / ID built from the active character; show it to nearby players.
-- **Self-service vehicle registration** — register a plate to your character; it then shows up in
-  LEO queries.
-- **Props** — place cones, barriers, signs, chairs (server-synced, per-player limit).
+- **Digital ID** — a driver licence / ID card built from the active character (name, DOB, photo).
+  Show it to nearby players (they receive it on their screen).
+- **Self-service vehicle registration** — register a plate to your character; it then appears in LEO
+  queries and on your profile.
+- **Props** — place cones, barriers, signs, chairs, etc. Server-synced (everyone sees them), with a
+  per-player limit; pick up / delete your own.
 
 ## Organisations / gangs
 
-Create or join an org (name, tag, colour, MOTD, ranks) — persisted server-side and shown in the
-LEO MDT query. An optional **Turf / gang-war** system lets orgs fight over territories for
-influence (kill-based capture).
+An org framework lets civilians form groups:
+
+<Steps>
+
+### Create or join
+
+Create an org with a name, tag, colour and MOTD, or join an existing one. Membership and ranks are
+persisted server-side and use the character's `faction` field.
+
+### Territory & visibility
+
+Orgs can be tagged to zones, and LEO see gang affiliation in the MDT query.
+
+</Steps>
+
+## Turf / gang war (opt-in)
+
+An optional **kill-based territory capture** system. When a member of a rival org kills someone
+inside a turf zone, it adds to that org's capture bar; fill the bar and the zone flips, awarding
+**influence** (prestige — RP-only, no money).
 
 <Callout type="warning">
-  Turf is **off by default**. Enable it with `Turf.enabled = true` in `cfg-turf-sh.lua` and set your
-  own zone coordinates.
+  Turf is **off by default**. Enable it in `cfg-turf-sh.lua`:
+
+  ```lua
+  Turf.enabled = true
+  Turf.zones = {
+    { id = 'grove', label = 'Grove Street',
+      center = vector3(-100.0, -1620.0, 30.0), radius = 90.0, color = '#2ecc71' },
+  }
+  ```
+
+  Set your own zone coordinates — the samples are placeholders. Anti-farm protection requires the
+  killer to be inside the zone and applies a per-victim cooldown.
 </Callout>

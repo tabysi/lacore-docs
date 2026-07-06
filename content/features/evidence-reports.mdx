@@ -2,40 +2,62 @@
 title: Evidence & Reports
 ---
 
-import { Callout } from 'nextra/components'
+import { Callout, Steps } from 'nextra/components'
 
 # Evidence & Reports
 
-LEO can file structured **reports** and log **evidence** against a person's record, straight from
-the MDT.
+LEO can file structured **reports** and log tagged **evidence** against a person's record, directly
+from the MDT.
 
 ## Reports
 
-Officers file a report by type (configured in `configs/cfg-evidence-sh.lua`) with a narrative. The
-report is stored on the subject's record and is visible to authorised units (faction / staff)
-through the MDT query.
+<Steps>
+
+### Choose a type
+
+Report types are configured in `cfg-evidence-sh.lua` (e.g. *Incident Report*, *Arrest Report*,
+*Use of Force*).
+
+### Write the narrative
+
+Enter the report narrative. The report is stored on the subject's record with the filing officer and
+date.
+
+### Review
+
+Authorised units (faction / staff) see the report in the MDT query and person card.
+
+</Steps>
 
 ## Evidence
 
-Logging evidence creates a tagged entry (`EV<YYMMDD>-<hex>`) with a description and optional custody
-chain. Evidence entries appear on the person's record alongside reports, charges and citations.
+Logging evidence creates a **tagged entry** with the format `EV<YYMMDD>-<hex>` (e.g.
+`EV260706-a3f1`), a description, and an optional custody chain. Evidence entries appear on the
+person's record alongside reports, charges and citations.
+
+Evidence types are configured in `cfg-evidence-sh.lua`:
+
+```lua
+-- cfg-evidence-sh.lua
+Evidence.reportTypes = { 'Incident Report', 'Arrest Report', 'Use of Force', 'Witness Statement' }
+Evidence.types       = { 'Physical', 'Digital', 'Photograph', 'Firearm', 'Narcotics' }
+```
 
 ## Record visibility
 
-Records are visibility-gated: a record is shown to the owner, to staff, or to units of the matching
-faction (`RecordsVisibleTo`). Private entries are never sent to unauthorised clients — the CCTV
-scanner and MDT query both respect this.
+Everything filed here is **visibility-gated**. A record entry is shown to:
 
-## Configuration
+| Viewer | Sees |
+| --- | --- |
+| The owner | Their own entries. |
+| Staff | All entries. |
+| Same faction/department | Faction-visible entries. |
 
-Report and evidence types are defined in `configs/cfg-evidence-sh.lua`:
-
-```lua
-Evidence.reportTypes = { 'Incident Report', 'Arrest Report', 'Use of Force', ... }
-Evidence.types       = { 'Physical', 'Digital', 'Photograph', ... }
-```
+Private entries are never sent to unauthorised clients. This is enforced server-side
+(`RecordsVisibleTo`) and respected everywhere records appear — the MDT query, the person card, and
+the [CCTV scanner](/features/cctv) summary.
 
 <Callout type="info">
-  Records feed multiple surfaces: the MDT query, the person card, and the compact MDT summary on the
-  [CCTV scanner](/features/cctv).
+  Reports and evidence feed the same record store as charges, citations and warrants — see
+  [Profiles & Characters](/features/profiles) for how the record is structured.
 </Callout>
