@@ -6,45 +6,65 @@ import { Cards, Callout } from 'nextra/components'
 
 # LACORE
 
-**LACORE** is the configurable roleplay core for **Pacific Valley Roleplay** on FiveM — a single,
-cohesive resource that ships a full law-enforcement toolset (MDT/CAD, dispatch console, CCTV
-surveillance), a civilian layer, character profiles, admin tooling, and a hardened security stack.
+**LACORE** is an all-in-one, configurable **roleplay core for FiveM**, created by
+[@tabysi](https://github.com/tabysi). It bundles a complete, production-ready law-enforcement suite
+(MDT/CAD, dispatch console, CCTV surveillance), a civilian roleplay layer, persistent multi-character
+profiles, an admin toolkit, and a hardened security stack — all in **one cohesive resource**.
 
-It is a **configurable core**, not a bare framework: features work out of the box and are tuned
-through config files and convars, with an optional bridge to ESX / QBCore / QBox for jobs and
-identity.
+LACORE is a **configurable core, not a bare framework**: every feature works out of the box and is
+tuned through config files and convars. It runs standalone with its own identity layer, or bridges
+to **ESX / QBCore / QBox** when you already run a framework.
+
+<Callout type="info">
+  All in-game text is English and fully localised (`en` / `de` / `ru`). This documentation covers
+  setup, configuration, every feature, the command reference, and the changelog.
+</Callout>
+
+## Jump in
 
 <Cards>
   <Cards.Card title="Getting Started" href="/getting-started" arrow />
   <Cards.Card title="Configuration" href="/configuration" arrow />
-  <Cards.Card title="MDT & Dispatch" href="/features/mdt-and-dispatch" arrow />
-  <Cards.Card title="CCTV Surveillance" href="/features/cctv" arrow />
+  <Cards.Card title="Command Reference" href="/commands" arrow />
+  <Cards.Card title="Updates & Changelog" href="/updates" arrow />
 </Cards>
 
-## What's inside
+## Feature overview
 
-- **MDT / CAD** — three re-skinned mobile data terminals (LAPD PremierOne, LASD CAD/PCMS, Agency
-  CHP) sharing one backend, plus an EMS/Fire terminal.
-- **Dispatch console** — a live incident + unit map (`/dispatch`) with zones, BOLOs, charges and a
-  dispatcher ⇄ unit workflow.
-- **CCTV surveillance suite** — a camera viewer with a targeting scanner, runtime-placeable field
-  cameras, and dispatch-map integration.
-- **Civilian layer** — emotes (bridged to DPEmotes / RPEmotes), props, digital ID, self-service
-  vehicle registration, and an org/gang framework.
-- **Profiles & multi-character** — persistent characters, records, vehicles and achievements.
-- **Security** — IP-lock anti-piracy enforcement, anticheat, permissions (ACE + Discord bridge),
-  and Big Brother admin logging.
+### Law enforcement
+- **Mobile Data Terminals** — four skins on one shared backend: **LAPD** (PremierOne), **LASD**
+  (CAD/PCMS), **Agency** (CHP-styled re-skin for every other department), and **EMS/Fire**.
+- **Dispatch console** (`/dispatch`) — a live tile map of incidents, units and callers, with zone
+  polygons, districts, BOLOs, charges, a dispatcher ⇄ unit workflow, and CCTV cameras on the map.
+- **CCTV surveillance** (`/cctv`) — a fixed-position camera viewer with a **targeting scanner**
+  (mugshot + MDT summary), **runtime-placeable field cameras**, and dispatch-map integration.
+- **Evidence & reports**, **BOLOs**, **charges & citations** driven by a configurable penal code.
+
+### Civilian & identity
+- **Multi-character profiles** — persistent characters ("digital file"), records, vehicles and
+  achievements.
+- **Civilian layer** — emote radial (bridged to DPEmotes / RPEmotes), props, digital ID,
+  self-service vehicle registration, and an org/gang framework with optional turf war.
+
+### Operations & security
+- **Admin menu** (`/admin`) — server-authoritative moderation + world controls.
+- **Big Brother** (`/bblog`) — admin action logging with Discord webhooks.
+- **Security** — IP-lock license enforcement, event-honeypot anticheat, permissions (ACE + Discord
+  role bridge).
+- **Web dispatcher** — optional external browser dispatcher via a FiveM ↔ Node bridge with Discord
+  OAuth.
 
 ## Requirements
 
-- A FiveM server (`fx_version cerulean`, `game gta5`).
-- A MySQL database via [oxmysql](https://github.com/overextended/oxmysql) (falls back to local
-  JSON if unavailable).
-- *(Optional)* [DPEmotes](https://github.com/andristum/dpemotes) or
-  [RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn) for the civilian emote
-  bridge.
+| Requirement | Notes |
+| --- | --- |
+| FiveM server | `fx_version cerulean`, `game gta5`. |
+| [oxmysql](https://github.com/overextended/oxmysql) | Persistence. Falls back to local JSON if unavailable. |
+| MySQL / MariaDB | LACORE creates its own tables automatically. |
+| DPEmotes / RPEmotes *(optional)* | For the civilian emote bridge. |
 
-<Callout type="info">
-  All in-game text is English and fully localised (`lang/en`, `de`, `ru`). Documentation and code
-  comments are English.
-</Callout>
+## License
+
+LACORE is a paid product by [@tabysi](https://github.com/tabysi). Redistribution of the source is
+prohibited, and it ships with IP-lock license enforcement. See the EULA (`LICENSE.md`) that ships
+with the resource.

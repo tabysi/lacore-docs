@@ -4,13 +4,28 @@ import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 
 export const metadata = {
-  title: 'LACORE Documentation',
+  title: {
+    default: 'LACORE Documentation',
+    template: '%s — LACORE',
+  },
   description:
-    'Documentation for LACORE — the configurable roleplay core for FiveM (Pacific Valley Roleplay).',
+    'Official documentation for LACORE — the all-in-one configurable roleplay core for FiveM, by @tabysi.',
 }
 
-const navbar = <Navbar logo={<b>LACORE</b>} />
-const footer = <Footer>© {new Date().getFullYear()} LACORE — Pacific Valley Roleplay.</Footer>
+const navbar = (
+  <Navbar
+    logo={<b>LACORE</b>}
+    projectLink="https://github.com/tabysi"
+  />
+)
+
+const footer = (
+  <Footer>
+    LACORE — created by{' '}
+    <a href="https://github.com/tabysi" style={{ textDecoration: 'underline' }}>@tabysi</a>. ©{' '}
+    {new Date().getFullYear()}. All rights reserved.
+  </Footer>
+)
 
 export default async function RootLayout({ children }) {
   return (
@@ -21,7 +36,7 @@ export default async function RootLayout({ children }) {
           navbar={navbar}
           footer={footer}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/tabysi/lacore"
+          docsRepositoryBase="https://github.com/tabysi/lacore-docs/tree/main"
         >
           {children}
         </Layout>

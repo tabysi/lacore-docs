@@ -6,58 +6,112 @@ import { Steps, Callout, Tabs } from 'nextra/components'
 
 # Getting Started
 
-This guide gets LACORE running on a fresh FiveM server.
+This guide takes a fresh FiveM server to a running LACORE install.
 
 <Callout type="warning">
   The resource folder **must** be named `lacore` and started with `ensure lacore`. The name is used
-  internally (NUI host, exports, tile resource).
+  internally for the NUI host, exports, and the map-tile resource — renaming it breaks things.
 </Callout>
+
+## Prerequisites
+
+- A working **FiveM server** (txAdmin or manual).
+- **[oxmysql](https://github.com/overextended/oxmysql)** installed and connected to a MySQL /
+  MariaDB database.
+- *(Optional)* **[DPEmotes](https://github.com/andristum/dpemotes)** or
+  **[RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn)** for the civilian emote
+  bridge.
+- *(Optional)* a `lacore-maps` tile resource for the dispatch map.
+
+## Installation
 
 <Steps>
 
-### Install the resource
+### Place the resource
 
-Drop the resource into your server's resources folder so the path is `resources/lacore`.
+Extract LACORE into your resources folder so the path is exactly:
+
+```
+resources/lacore
+```
 
 ### Install dependencies
 
-- [oxmysql](https://github.com/overextended/oxmysql) — required for persistence.
-- *(Optional)* a map-tiles resource `lacore-maps` for the dispatch map.
-- *(Optional)* `dpemotes` or `rpemotes-reborn` for civilian emotes.
+Make sure oxmysql is present and started **before** LACORE.
+
+```ini
+ensure oxmysql
+```
 
 ### Configure the database
 
-Point oxmysql at your MySQL database (`set mysql_connection_string ...`). LACORE creates its own
-tables (`lacore_core_store`, `lacore_logs`) automatically on first start and migrates legacy
-`pvp_*` tables if present.
+Point oxmysql at your database in `server.cfg`:
+
+```ini
+set mysql_connection_string "mysql://user:password@localhost/lacore?charset=utf8mb4"
+```
+
+On first start LACORE creates its own tables (`lacore_core_store`, `lacore_logs`) automatically. If
+you are upgrading from `pvp-corev3`, it also migrates the old `pvp_*` tables — **no data loss**.
+
+<Callout type="info">
+  No database? LACORE degrades gracefully to local JSON persistence, but a real database is strongly
+  recommended for production.
+</Callout>
 
 ### Set your convars
 
-Copy the settings from `server.cfg.example` into your `server.cfg` and fill in your values (Discord
-token, webhooks, owner IDs). See [Configuration](/configuration) for the full list.
+Copy the block from `server.cfg.example` into your `server.cfg` and fill in your values (Discord
+token, webhooks, owner ID). See [Configuration](/configuration) for the full reference.
 
 ### Start the resource
 
 ```ini
 ensure oxmysql
-ensure lacore-maps   # optional
+ensure lacore-maps   # optional map tiles
 ensure lacore
 ```
 
-### Verify
+### Verify the install
 
-Join the server and run `/mdt`, `/dispatch`, and `/cctv` on a duty character. Check the server
-console for the first-boot diagnostics (`/lacore doctor` re-runs them).
+Join the server on a duty character and try:
+
+```
+/mdt          # opens the Mobile Data Terminal
+/dispatch     # opens the dispatch console
+/cctv         # opens the CCTV viewer (LEO / Security)
+```
+
+Then check the server console for the **first-boot diagnostics**. You can re-run them anytime with
+`/lacore doctor`.
 
 </Steps>
 
-## Owner commands
+## First-boot diagnostics & owner commands
 
-LACORE exposes an owner command suite for quick health checks — run from console or in-game (staff):
+LACORE runs a health check ~8 seconds after start and prints the result to the console. The owner
+command suite lets you re-check anytime (console, or in-game as staff):
 
-```
-/lacore version   # build + version
-/lacore status    # module + DB status
-/lacore doctor    # full first-boot health check
-/lacore help      # list all subcommands
-```
+| Command | Shows |
+| --- | --- |
+| `/lacore version` | Build + version. |
+| `/lacore status` | Module + database status. |
+| `/lacore db` | Database connectivity + table state. |
+| `/lacore modules` | Loaded modules. |
+| `/lacore doctor` | Full first-boot health check. |
+| `/lacore telemetry` | Owner telemetry status. |
+| `/lacore help` | List every subcommand. |
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
+| --- | --- |
+| Stuck at **"Checking bans..."** on connect | An old bug where DB schema init hung. Fixed in current builds; ensure you're up to date and oxmysql is reachable. |
+| Commands do nothing | You're likely not on a duty job/department — LEO tools are gated server-side. Check `/lacore status`. |
+| Emotes don't play | Install DPEmotes or RPEmotes; the radial bridges to whichever is present. |
+| Map markers offset | Tile calibration (`web/src/lib/mapproj.js`); needs an in-game reference point to tune. |
+
+<Callout type="warning">
+  Server-side and client-side Lua paths can only be verified on a live server — not in a browser
+  preview. Always test features in-game after a `restart lacore`.
+</Callout>

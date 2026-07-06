@@ -6,32 +6,58 @@ import { Callout } from 'nextra/components'
 
 # Security & Admin
 
-## IP-lock (anti-piracy)
+LACORE ships a hardened security stack and a staff toolkit.
 
-LACORE ships an **IP-lock enforcement** system backed by a license server. If a server violates the
-license agreement, its IP can be locked. This is the owner's protection mechanism and is **not
-customer-configurable** — do not attempt to remove or weaken it.
+## IP-lock (license enforcement)
+
+LACORE includes **IP-lock license enforcement** backed by a license server. If a server violates the
+license agreement, its IP can be locked. This is the author's anti-piracy protection and is **not
+customer-configurable**.
 
 <Callout type="error">
-  Tampering with the IP-lock, telemetry, or license checks is a breach of the EULA (`LICENSE.md`).
+  Tampering with the IP-lock, telemetry, or license checks is a breach of the EULA (`LICENSE.md`) and
+  will lock the server.
 </Callout>
+
+## Anticheat
+
+An **event-honeypot anticheat** guards server events against exploit tooling. The framework bridge
+marks legitimate framework events (`Bridge.IsFrameworkEvent`) so they are never flagged as exploits.
 
 ## Permissions
 
 Access is gated through ACE groups (`group.lacore_dev` / `lacore_staff` / `lacore_mod`) with an
-optional **Discord role → ACE bridge**. Modules check `HasPermission(src, perm)`.
+optional **Discord role → ACE bridge**. Configure the bot token + guild convars and map roles to
+groups; modules then check `HasPermission(src, perm)`. See [Configuration](/configuration#permissions).
 
-## Anticheat
+## Bans
 
-An event-honeypot anticheat guards server events; the framework bridge marks legitimate framework
-events so they are never flagged.
+The connect flow validates bans safely (guarded against malformed entries and DB hiccups so a bad
+record can never leave a player stuck on "Checking bans..."). Bans record who issued them, when, and
+the reason.
 
 ## Big Brother (admin logging)
 
-`/bblog` opens an admin log feed. Actions across the core are logged via `BBLog(category, src,
-action, detail, opts)` and can be mirrored to Discord webhooks.
+`/bblog` opens an admin log feed. Actions across the core are logged via
+`BBLog(category, src, action, detail, opts)` and can be mirrored to Discord webhooks
+(`lacore_bb_webhook*`). Categories include commands, profile changes, moderation actions and more.
 
 ## Admin menu
 
-`/admin` opens a staff panel (server-authoritative): kick / ban / revive / heal / freeze / goto /
-bring, plus self-only conveniences (noclip / god / invisible) and world controls (weather / time).
+`/admin` opens the staff panel. Player actions are **server-authoritative** (the client only
+requests; the server validates the caller's permission and performs the action):
+
+| Tab | Actions |
+| --- | --- |
+| **Players** | Kick, ban, revive, heal, freeze, goto, bring, spectate. |
+| **Self** | Noclip, godmode, invisible, heal, repair vehicle, spawn vehicle. |
+| **World** | Weather, time. |
+
+Noclip and spectate clean up correctly on resource stop, so a restart mid-action can't leave a player
+ghosted or stuck in spectator mode.
+
+## Owner telemetry
+
+On start / heartbeat / stop, LACORE reports server metadata (IP, hostname, version, license key,
+owner Discord, slots, uptime) to the author's webhook. This is part of license enforcement and ships
+escrow-encrypted.

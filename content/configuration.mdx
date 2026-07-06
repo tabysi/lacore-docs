@@ -2,31 +2,27 @@
 title: Configuration
 ---
 
-import { Callout } from 'nextra/components'
+import { Callout, Tabs } from 'nextra/components'
 
 # Configuration
 
 LACORE is configured in two places: **convars** in `server.cfg`, and **config files** in the
-`configs/` folder.
+`configs/` folder. Shared config files (`*-sh.lua`) are `escrow_ignore` — you can edit them freely.
 
 ## Convars (`server.cfg`)
 
-All convars use the `lacore_*` prefix. The complete, current list lives in `server.cfg.example` —
-copy it into your `server.cfg` and fill in your values. The most important ones:
+All convars use the `lacore_*` prefix. The complete, current list ships in `server.cfg.example`.
 
 | Convar | Purpose |
 | --- | --- |
-| `lacore_devmode` | Enables dev tooling / relaxed gates. **Off in production.** |
-| `lacore_discord_token` / `lacore_discord_guild` | Discord bot token + guild for the role → ACE bridge. |
-| `lacore_owner_discord` | Owner Discord ID used by telemetry + owner commands. |
+| `lacore_devmode` | Dev tooling / relaxed gates. **Set `0` in production.** |
+| `lacore_discord_token` | Discord bot token for the role → ACE bridge. |
+| `lacore_discord_guild` | Discord guild (server) ID. |
+| `lacore_owner_discord` | Owner Discord ID (telemetry + owner commands). |
 | `lacore_webhook_*` | Discord webhooks for the various log channels. |
 | `lacore_bb_webhook*` | Big Brother admin-log webhooks. |
-| `lacore_bridge_url` / `lacore_bridge_token` | External web-dispatcher bridge endpoint. |
-
-<Callout type="warning">
-  Legacy `pvp_*` convar names are no longer read. If you are upgrading from `pvp-corev3`, rename
-  every convar to `lacore_*`.
-</Callout>
+| `lacore_bridge_url` | External web-dispatcher bridge endpoint (optional). |
+| `lacore_bridge_token` | Shared secret for the bridge (optional). |
 
 ### Example `server.cfg` block
 
@@ -47,28 +43,57 @@ ensure lacore-maps   # optional map tiles
 ensure lacore
 ```
 
-## Config files (`configs/`)
+<Callout type="warning">
+  If you are migrating from an older `pvp-corev3` build, rename every `pvp_*` convar to `lacore_*`,
+  the ACE groups `group.pvp_*` to `group.lacore_*`, and the resource folder to `lacore`. Legacy names
+  are no longer read.
+</Callout>
 
-Shared config files (`*-sh.lua`) are `escrow_ignore` — you can edit them freely.
+## Config files (`configs/`)
 
 | File | Configures |
 | --- | --- |
-| `cfg-cctv-sh.lua` | CCTV camera networks + camera controls ([CCTV](/features/cctv)). |
+| `cfg-cctv-sh.lua` | CCTV camera networks + camera controls. See [CCTV](/features/cctv). |
 | `cfg-turf-sh.lua` | Turf / gang-war zones. **`Turf.enabled = false` by default.** |
 | `cfg-civilian-sh.lua` | Civilian emotes (DP/RP names), props, activities. |
 | `cfg-evidence-sh.lua` | Evidence + report types for the LEO tools. |
 | `cfg-bridge-sh.lua` | Framework bridge (ESX / QBCore / QBox) + job → department mapping. |
 | `cfg-profile-sh.lua` | Character profile fields. |
 
+<Callout type="info">
+  Config keys and their effects are documented on each feature page — start with
+  [Features](/features/mdt-and-dispatch).
+</Callout>
+
+## Permissions
+
+Access is gated through **ACE groups** with an optional **Discord role → ACE bridge**:
+
+```cfg
+# Direct ACE assignment
+add_principal identifier.fivem:XXXX group.lacore_staff
+```
+
+| Group | Typical use |
+| --- | --- |
+| `group.lacore_dev` | Full developer access. |
+| `group.lacore_staff` | Admin menu, Big Brother, owner commands. |
+| `group.lacore_mod` | Moderator subset. |
+
+Modules check `HasPermission(src, perm)` internally; the Discord bridge maps roles to these groups
+automatically when the bot token + guild are configured.
+
 ## Framework bridge
 
-LACORE auto-detects **ESX**, **QBCore** or **QBox** at load and exposes a uniform API
-(`Bridge.GetJob`, `GetName`, `GetIdentifier`, `IsLeo`, `IsEms`, `Notify`). Map framework jobs to
-LACORE departments in `cfg-bridge-sh.lua`. If no framework is present, LACORE uses its own identity
-layer.
+LACORE auto-detects **ESX**, **QBCore** or **QBox** at load and exposes a uniform API. Map framework
+jobs to LACORE departments in `cfg-bridge-sh.lua`. Details on the
+[Framework Bridge](/features/bridge) page.
 
 ## Localisation
 
-All user-facing strings are localised. Server/client strings live in `lang/en.lua` (+ `de.lua`,
-`ru.lua`); NUI strings in `lang/en.json` (+ `de.json`, `ru.json`). Never hardcode visible text — add
-a locale key.
+All user-facing strings are localised:
+
+- **Lua** (server/client): `T("key")` → `lang/en.lua` (+ `de.lua`, `ru.lua`).
+- **NUI**: `t("key")` → `lang/en.json` (+ `de.json`, `ru.json`).
+
+Never hardcode visible text — add a locale key. To add a language, copy the `en` files and translate.

@@ -2,43 +2,100 @@
 title: MDT & Dispatch
 ---
 
-import { Callout } from 'nextra/components'
+import { Callout, Steps } from 'nextra/components'
 
 # MDT & Dispatch
 
 LACORE ships a shared law-enforcement backend that powers several **Mobile Data Terminals** and a
-live **Dispatch console**.
+live **Dispatch console**. All terminals read and write the same incident/unit data, so a re-skin
+never means duplicated work — a BOLO created in the LAPD MDT shows in the LASD CAD and the Agency
+terminal alike.
 
 ## The terminals
 
-Open with `/mdt`. Which terminal you get is routed by your department:
+Open with `/mdt`. Which terminal you get is routed automatically by your department:
 
 | Terminal | Look | Department trigger |
 | --- | --- | --- |
 | **LAPD** PremierOne | white / grey | department contains `lapd` |
-| **LASD** CAD / PCMS | amber / teal (own backend) | `lasd` / `sheriff` / `bcso` |
-| **Agency** MDT | CHP dark-blue (re-skin of LAPD data) | any other department |
-| **EMS / Fire** | dark CAD | `AMR` / `fire` / `ems` / `medic` |
+| **LASD** CAD / PCMS | amber / teal (own incident backend) | `lasd` / `sheriff` / `bcso` |
+| **Agency** MDT | CHP dark-blue (re-skin of LAPD data) | any other LEO department |
+| **EMS / Fire** | dark CAD | `AMR` / `fire` / `ems` / `medic` / `fd` |
 
-All terminals share the same incident/unit data, so a re-skin never means duplicated work.
+Each terminal is draggable, opacity/scale adjustable, and theme-able (the Agency MDT ships several
+colour presets). Settings persist per player.
+
+## What the MDT does
+
+- **Person & vehicle queries** — run a name, plate, or online player ID. Results show identity,
+  licences, warrants, records, and **BOLO / charge hits**.
+- **Incidents** — view outstanding calls, self-assign, add comments, set your status, resolve.
+- **BOLOs** — create/cancel BOLOs against a name or plate; they broadcast to units and hit on query.
+- **Charges & citations** — apply penal-code charges or issue citations to a person's record.
+- **Evidence & reports** — file structured reports and log tagged evidence. See
+  [Evidence & Reports](/features/evidence-reports).
 
 ## Dispatch console
 
-Open with `/dispatch` (go on duty with `/dispatch on`, open the console with `/dispatch open`). It
-shows a live tile map of incidents, units and callers, with:
+Go on duty and open the console:
 
-- **Zones & districts** — editable polygons + district colouring.
-- **BOLOs & charges** — create BOLOs, apply penal-code charges, run person / plate queries.
-- **Dispatcher ⇄ unit workflow** — assign, message (`@callsign`), voice-call, resolve.
-- **CCTV cameras on the map** — see [CCTV](/features/cctv).
+<Steps>
+
+### Go on duty
+
+```
+/dispatch on
+```
+
+### Open the console
+
+```
+/dispatch open
+```
+
+</Steps>
+
+The console shows a **live tile map** of incidents, units and callers, plus:
+
+- **Zones & districts** — editable polygon boundaries with district colouring (admin-editable).
+- **Unit management** — right-click a unit (list or map marker) for a context menu: assign, message
+  (`@callsign`), voice-call, create an incident for them.
+- **BOLOs & charges** — the same shared data as the MDT.
+- **CCTV cameras on the map** — 📹 markers; click one to jump into the live camera. See
+  [CCTV Surveillance](/features/cctv).
+- **Attention tone** — play an alert tone to all on-duty units.
 
 <Callout type="info">
-  Incident numbers roll `1000–9999` for LAPD (skipping active numbers); LASD uses its own
-  `[STATION][MMDDYY]-[TAG]` scheme. Never assume a raw `+1`.
+  The console keeps game input alive (`SetNuiFocusKeepInput`) so you can still use voice (e.g.
+  pma-voice) while dispatching. Escape closes the console without opening the GTA pause map.
 </Callout>
 
-## Statuses
+## Call & unit states
 
-Call states are `Outstanding → Assigned → On Scene → Resolved`. Unit statuses include `CLEAR`,
-`ENROUTE`, `ON SCENE`, `CODE SIX`, `BUSY`, `UNAVAILABLE`. Only `CLEAR` detaches a unit from its
-incident.
+Incident (call) states progress:
+
+```
+Outstanding → Assigned → On Scene → Resolved
+```
+
+Unit statuses include `CLEAR`, `ENROUTE`, `ON SCENE`, `CODE SIX`, `BUSY`, `UNAVAILABLE`,
+`OUT TO STATION`. Only `CLEAR` detaches a unit from its incident — every other status keeps the
+attachment.
+
+## Incident numbering
+
+<Callout type="warning">
+  Never assume a raw `+1`. LAPD numbers roll **1000–9999** and skip currently-active numbers; LASD
+  uses its own `[STATION][MMDDYY]-[TAG]` scheme; other agencies have their own format.
+</Callout>
+
+## Backup, EMS & tow
+
+Backup / EMS / tow buttons create a real dispatch incident and broadcast it to all units. The
+special-contact types that spawn incidents include 911, 311, Panic, Requesting LEO, Fire/EMS,
+Coroner, Tow Truck, Crime Broadcast, Shot Spotter, and Created Incident.
+
+## External dispatcher
+
+Prefer an out-of-game dispatcher on a second screen? LACORE has an optional
+[Web Dispatcher](/features/webdispatch) portal that mirrors the console in the browser.

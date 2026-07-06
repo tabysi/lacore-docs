@@ -1,0 +1,52 @@
+---
+title: Profiles & Characters
+---
+
+import { Callout } from 'nextra/components'
+
+# Profiles & Characters
+
+LACORE gives every player a **multi-character system** with a persistent "digital file" per
+character — the backbone that the MDT queries, the CCTV scanner and the civilian tools all read from.
+
+## Multi-character
+
+- Each player can maintain multiple characters; the **active character** is mirrored into the
+  civilian record used across the core.
+- Characters are the source of truth — per-character **vehicles** and **records** are stored against
+  them.
+- Set / switch the active character and RP nick with `/char`.
+
+## The digital file (`/profile`)
+
+`/profile` opens the character profile UI, which includes:
+
+- **Identity** — name, DOB, gender, address, physical description.
+- **Licences** — driver / commercial / boating / pilot / CCW / hunting, each with a status.
+- **Vehicles** — self-registered vehicles (plate, model, colour, optional image).
+- **Records** — reports, evidence, charges, citations and officer notes (visibility-gated).
+- **Warrant** — active warrant flag + reason, surfaced in LEO queries and the CCTV scanner.
+- **Emote radial** — configure which civilian emotes appear (see [Civilian Layer](/features/civilian)).
+
+## Record visibility
+
+Records carry a visibility level and are only sent to authorised viewers:
+
+| Viewer | Sees |
+| --- | --- |
+| The owner | Their own records. |
+| Staff | All records. |
+| Same faction/department | Faction-visible records. |
+
+Private entries are never sent to unauthorised clients — the MDT query, person card and CCTV scanner
+all honour this (`RecordsVisibleTo`).
+
+## Achievements & progression
+
+An achievements / XP layer rewards activity (used by the civilian update as a progression system
+instead of an economy). It is RP-only — no money is involved.
+
+<Callout type="info">
+  Running a framework? The [Framework Bridge](/features/bridge) can source identity from ESX / QBCore
+  / QBox instead of LACORE's own character system.
+</Callout>
