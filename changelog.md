@@ -6,12 +6,14 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ## [3.2.0] – Global ban network protection
 
 ### Added
-- **Own standalone menu system — NativeUI dependency removed.** LACORE's in-world menus (settings,
-  phone booth, vehicle spawner, AOP vote, props, character) previously required the external
-  `NativeUILua_Reloaded` resource. They now run on **LACORE's own native-drawn menu library**
-  (`client/lacore_menu.lua`), so there's **one less resource to install** and the menu look is ours
-  (LACORE-blue, config-tunable at the top of the file). Drop-in — same menus, no setup change; just
-  remove `ensure NativeUILua_Reloaded` from your `server.cfg`.
+- **NativeLacoreUI — own standalone menu system, NativeUI dependency removed.** LACORE's in-world
+  menus (settings, phone booth, vehicle spawner, AOP vote, props, character) previously required the
+  external `NativeUILua_Reloaded` resource. They now run on **NativeLacoreUI**, LACORE's own
+  native-drawn menu library (`client/nativelacoreui.lua`), so there's **one less resource to install**
+  and the look is ours: a themed header with the community wordmark, an accent selection bar, zebra
+  rows, drawn checkboxes, a real scrollbar for long lists and a controls hint bar — the whole theme is
+  config-tunable at the top of the file. Drop-in — same menus, no setup change; just remove
+  `ensure NativeUILua_Reloaded` from your `server.cfg`.
 - **Third-party resource support (vames-store).** LACORE now plugs into popular paid resources when
   they're installed — no config wiring required, and it stays fully standalone without them:
   - **vms_housing** — a person's **registered property addresses now appear in the MDT** when you run
