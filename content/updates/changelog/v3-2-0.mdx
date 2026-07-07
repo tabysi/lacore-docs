@@ -11,6 +11,12 @@ title: "3.2.0"
   server. Only stable per-account identifiers are matched (never shared IPs), and the check is
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
+### Fixed
+- **Stuck CAD when switching department.** Opening a CAD/MDT is now exclusive: going on duty for
+  another department (or reopening on a new one) closes the previous CAD instead of leaving it
+  stuck on screen — the old one could no longer be moved or closed. Handled both on the department
+  change itself and whenever `/mdt` opens a CAD.
+
 ### Security
 - **Reusable hardening helpers** (`modules/security/harden-sv.lua`): per-key rate limiting, input
   sanitising, and identifier validation, applied to the network-ban tooling so bad input can't reach
