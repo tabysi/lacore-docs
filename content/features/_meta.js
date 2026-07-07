@@ -8,6 +8,5 @@ export default {
   civilian: 'Civilian Layer',
   security: 'Security & Admin',
   bridge: 'Framework Bridge',
-  'frameworks-scripts': 'Frameworks & Scripts',
   webdispatch: 'Web Dispatcher',
 }
