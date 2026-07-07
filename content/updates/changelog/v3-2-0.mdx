@@ -10,9 +10,11 @@ title: "3.2.0"
   menus (settings, phone booth, vehicle spawner, AOP vote, props, character) previously required the
   external `NativeUILua_Reloaded` resource. They now run on **NativeLacoreUI**, LACORE's own
   native-drawn menu library (`client/nativelacoreui.lua`), so there's **one less resource to install**
-  and the look is ours: a themed header with the community wordmark, an accent selection bar, zebra
-  rows, drawn checkboxes, a real scrollbar for long lists and a controls hint bar — the whole theme is
-  config-tunable at the top of the file. Drop-in — same menus, no setup change; just remove
+  and the look is ours: a framed panel with a themed header + community wordmark, an accent selection
+  bar, zebra rows, drawn checkboxes, **word-wrapped descriptions** (long help text no longer runs off
+  the panel), a real scrollbar for long lists and a controls/brand footer — the whole theme is
+  config-tunable at the top of the file. The **`/vehicle` spawner now actually spawns** the selected
+  vehicle (the item-select was never wired). Drop-in — same menus, no setup change; just remove
   `ensure NativeUILua_Reloaded` from your `server.cfg`.
 - **Third-party resource support (vames-store).** LACORE now plugs into popular paid resources when
   they're installed — no config wiring required, and it stays fully standalone without them:
