@@ -11,6 +11,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   visual upgrade over the plain native feed. Every existing `ShowNotification` call is routed through
   it automatically (GTA colour codes like `~r~`/`~g~` set the type and are stripped), and it falls
   back to the native feed if the UI can't be reached. First step of the 3.2.0 polish pass.
+- **Premium confirm dialogs.** A reusable, themed confirm dialog (keyboard-friendly: Enter/Esc) for
+  destructive actions, built on the LACORE design system. First adopted on **cancel BOLO**, which now
+  asks before removing a BOLO for everyone; more destructive actions adopt it as the release grows.
 - **Global ban network protection.** LACORE servers are part of a protected network: a player
   banned on the network is refused on connect, so known offenders can't just hop to another LACORE
   server. Only stable per-account identifiers are matched (never shared IPs), and the check is
