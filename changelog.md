@@ -45,6 +45,13 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **Time snapping back after an admin / vMenu change.** LACORE's time-sync loop kept forcing the
+  in-game clock, so changing the time via the admin panel (or vMenu) reverted within seconds. The
+  admin panel's time control is now **server-authoritative** — it updates LACORE's clock for everyone
+  and persists. A new **`SyncGameTime`** config flag also lets you hand the clock to another resource:
+  set it `false` and LACORE stops forcing the time, so vMenu (or any external time system) owns it
+  without snapping back. (Weather has no LACORE loop, so with vMenu's weather-sync off it already
+  sticks.)
 - **Vehicle HUD icons were invisible.** The car HUD draws its icons (fuel, engine, seatbelt, lights,
   turn signals, hood, trunk, limiter) from a streamed texture dictionary that was never requested,
   so nothing rendered. The HUD now requests the `vehicleui` dictionary before drawing (and keeps it
