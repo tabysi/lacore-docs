@@ -83,6 +83,10 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   along the road roughly every 15 m** and stay put (they no longer show once then delete themselves).
   The in-cam HUD gained more info: **gimbal pan/tilt angle**, **heli airspeed**, and the tracked
   vehicle's speed. Overlay density is config-tunable (`overlaySpacing` / `overlayGrid`).
+  **Locking is now a scan**: hold the crosshair steadily on a vehicle/person for a couple of seconds
+  (config `scanTime`) and the cam acquires and locks it — with an on-screen acquisition ring +
+  progress — instead of an instant press; **Spacebar** now reliably **unlocks** (it was read as a
+  disabled control before, so it did nothing). The **number-plate read-out was removed** from the cam.
 - **No-agency players could open the LAPD MDT.** `/mdt` (and the `O` keybind) fell through to the LAPD
   PremierOne MDT for anyone not matching another agency — including players with no department set
   (which in devmode bypasses the job gate). Now only actual LAPD members open it; with no agency
