@@ -29,7 +29,22 @@
   color: #fff;
   font-weight: 800;
 }
-.fc-tile-img { object-fit: cover; background: #fff; }
+/* Logo tiles: dark background, full logo (no crop), width grows for wide logos. */
+.fc-tile-logo {
+  width: auto;
+  min-width: 46px;
+  max-width: 132px;
+  padding: 5px 10px;
+  background: #0e131b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.fc-tile-logo img {
+  height: 32px;
+  width: auto;
+  max-width: 112px;
+  object-fit: contain;
+  display: block;
+}
 .fc-badge { font-size: 14px; letter-spacing: 0.3px; }
 .fc-icon { font-size: 20px; }
 

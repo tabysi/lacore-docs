@@ -9,7 +9,13 @@ const asset = (p) => (p && p.startsWith('/') ? BASE + p : p)
 
 function Tile({ logo, badge, icon, color, name }) {
   if (logo) {
-    return <img className="fc-tile fc-tile-img" src={asset(logo)} alt={name} />
+    // Dark tile, logo shown in full (contain). The tile grows in width for wide
+    // wordmark logos (e.g. ESX 2.66:1) so nothing gets cropped.
+    return (
+      <div className="fc-tile fc-tile-logo">
+        <img src={asset(logo)} alt={name} />
+      </div>
+    )
   }
   return (
     <div className="fc-tile" style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)` }}>

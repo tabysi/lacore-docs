@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next --turbopack",
     "build": "next build",
+    "postbuild": "pagefind --site out --output-subdir _pagefind",
     "start": "next start",
     "changelog": "node scripts/gen-changelog.mjs",
     "deploy": "node scripts/deploy.mjs"
@@ -20,5 +21,8 @@
   },
   "overrides": {
     "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "pagefind": "^1.5.2"
   }
 }
