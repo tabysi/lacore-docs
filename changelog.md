@@ -76,6 +76,17 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **Air Unit overhaul.** Locking a target (Spacebar/L) then engaging orbit now **keeps flying after you
+  leave the heli cam** — the lock persists so the auto-orbit keeps circling instead of dropping the
+  target when the cam closes. A **compact status HUD** now shows even with the cam closed (orbit / lock
+  / spotlight state, heli heading, speed and altitude, plus the tracked target). **Street names repeat
+  along the road roughly every 15 m** and stay put (they no longer show once then delete themselves).
+  The in-cam HUD gained more info: **gimbal pan/tilt angle**, **heli airspeed**, and the tracked
+  vehicle's speed. Overlay density is config-tunable (`overlaySpacing` / `overlayGrid`).
+- **No-agency players could open the LAPD MDT.** `/mdt` (and the `O` keybind) fell through to the LAPD
+  PremierOne MDT for anyone not matching another agency — including players with no department set
+  (which in devmode bypasses the job gate). Now only actual LAPD members open it; with no agency
+  assigned nothing opens and you get a notice.
 - **`/lacore` in the server console dumped a convar instead of running.** A server-browser info
   field was registered under the key `LACORE`, which collides with the `/lacore` console command — so
   typing `lacore status` in the console set a convar (`LACORE = "status"`) instead of running the
