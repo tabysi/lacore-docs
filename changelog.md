@@ -72,6 +72,10 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **`/lacore` in the server console dumped a convar instead of running.** A server-browser info
+  field was registered under the key `LACORE`, which collides with the `/lacore` console command — so
+  typing `lacore status` in the console set a convar (`LACORE = "status"`) instead of running the
+  command. The browser field is now `LACORE Discord`, so `/lacore …` works from the console again.
 - **`/lacore status` (and telemetry) showed `vadamant` instead of the real version.** The version
   reader matched the first `version '…'` line in `fxmanifest.lua`, which is `fx_version 'adamant'`
   (the substring "version" is inside "fx_version"). It now reads the resource `version` metadata
