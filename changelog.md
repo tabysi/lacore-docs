@@ -23,7 +23,8 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 - **Air Unit (police helicopter).** Realistic aviation tooling for a pilot or observer: **auto-orbit**
   (a hands-free circle around a GPS waypoint or the camera's lock point), a **controllable gimbal
   heli-cam** — usable by the pilot too — with pan / tilt / zoom, **night-vision and thermal (FLIR)**,
-  a ground **lock-on**, a live FLIR-style HUD, a **steerable spotlight** that follows the camera, and
+  a **ground or vehicle lock-on** (aim at a vehicle and press L — the cam auto-tracks it and reads its
+  **number plate**), a live FLIR-style HUD, a **steerable spotlight** that follows the camera, and
   an in-cam overlay of **real street names + road driving-direction arrows colour-coded by direction**
   (like a real air downlink).
   Keybinds are rebindable (defaults F5 cam / F6 orbit / F7 light). New `modules/airunit/` +
