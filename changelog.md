@@ -6,6 +6,13 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ## [3.2.0] – Global ban network protection
 
 ### Added
+- **Corrections / Jail system (server core).** Arrests now have consequences. An arrest report whose
+  Penal Code charges carry jail time automatically **books the suspect into jail** (jail-months →
+  seconds, configurable). Sentences are **server-authoritative and persistent** — a disconnect/relog
+  no longer escapes jail: the remaining time is stored per licence, restored on reconnect, and only
+  counts down while the inmate is online. The manual `/jail` command is now persistent too, and
+  `/releaseinmate <id>` frees someone early. New `modules/corrections/` + `configs/cfg-corrections-sh.lua`.
+  (Reuses the existing jail teleport mechanic; the MDT booking UI + inmate roster come next.)
 - **Premium notification system.** In-game notifications now render as modern, themed toasts
   (info / success / warning / error) with an icon, optional title and a draining timer bar — a big
   visual upgrade over the plain native feed. Every existing `ShowNotification` call is routed through
