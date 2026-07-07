@@ -66,6 +66,10 @@ title: "3.2.0"
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **`/lacore status` (and telemetry) showed `vadamant` instead of the real version.** The version
+  reader matched the first `version '…'` line in `fxmanifest.lua`, which is `fx_version 'adamant'`
+  (the substring "version" is inside "fx_version"). It now reads the resource `version` metadata
+  directly (with an anchored manifest fallback), so it reports `v3.2.0`.
 - **Characters not persisting to the database.** The persistence layer wrote to `lacore_core_store`
   but read back from the old `pvp_core_store` table — so the DB was effectively write-only, and if the
   local JSON mirror was lost on a redeploy/restart, a newly created character couldn't be recovered.
