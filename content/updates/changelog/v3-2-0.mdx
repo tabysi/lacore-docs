@@ -62,7 +62,10 @@ title: "3.2.0"
   config-tunable. Lock a vehicle with **L or Spacebar**, and the cam HUD gained **heading, distance to
   target, tracked-vehicle speed and the street name**. Locking or orbiting a target now drops a
   **private map blip on the target plus an orbit-radius circle** — visible only to the pilot — so you
-  can see where and how to fly.
+  can see where and how to fly. **Lock now works on any entity** — vehicle, ped, player or object,
+  not just vehicles — and **auto-orbit follows a moving target**: the circle re-centres on the locked
+  subject every frame and the heli is allowed to fly faster to catch up, so it no longer loses a
+  moving car and orbits an empty spot.
 - **Devmode now lifts all membership restrictions.** In `/dev` mode you can go on duty without
   membership, drive member-only vehicles (previously the restriction wrongly *also* fired in devmode —
   engine cut + controls blocked), keep member-only weapons, and use nitro. Job-gated features already
