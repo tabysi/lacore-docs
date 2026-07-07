@@ -47,6 +47,10 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **Devmode now lifts all membership restrictions.** In `/dev` mode you can go on duty without
+  membership, drive member-only vehicles (previously the restriction wrongly *also* fired in devmode —
+  engine cut + controls blocked), keep member-only weapons, and use nitro. Job-gated features already
+  respected devmode; this closes the membership gaps.
 - **Time snapping back after an admin / vMenu change.** LACORE's time-sync loop kept forcing the
   in-game clock, so changing the time via the admin panel (or vMenu) reverted within seconds. The
   admin panel's time control is now **server-authoritative** — it updates LACORE's clock for everyone
