@@ -57,9 +57,10 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   on-duty law-enforcement department.
 - **Heli cam fixes:** the camera now actually renders from the heli belly (was a HUD-only overlay);
   **L** toggles the ground lock (press again to unlock); the **scroll wheel zooms** without spinning
-  the weapon wheel (it's now blocked while in the cam); and **auto-orbit (F6) flies a smooth circle**
-  around the target instead of just flying off — a frame-time-based on-rails orbit with eased heading
-  (radius / altitude / speed config-tunable).
+  the weapon wheel (it's now blocked while in the cam); and **auto-orbit (F6) now physically flies a
+  smooth circle** around the target (velocity-driven — no more teleporting), radius / altitude / speed
+  config-tunable. Lock a vehicle with **L or Spacebar**, and the cam HUD gained **heading, distance to
+  target, tracked-vehicle speed and the street name**.
 - **Devmode now lifts all membership restrictions.** In `/dev` mode you can go on duty without
   membership, drive member-only vehicles (previously the restriction wrongly *also* fired in devmode —
   engine cut + controls blocked), keep member-only weapons, and use nitro. Job-gated features already
