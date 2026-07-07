@@ -3,6 +3,8 @@ title: Frameworks & Scripts
 ---
 
 import { Callout } from 'nextra/components'
+import { FrameworkGrid, ScriptGrid } from '../components/FrameworkCards.jsx'
+import { frameworks, scripts } from '../lib/frameworks-scripts.js'
 
 # Frameworks & Scripts
 
@@ -13,45 +15,7 @@ standalone. Nothing here is ever required.
 
 ## Supported frameworks
 
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '12px', margin: '1.25rem 0' }}>
-
-  <div style={{ display: 'flex', alignItems: 'center', gap: '13px', padding: '14px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ width: 46, height: 46, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#1f6feb,#0b3d91)', color: '#fff', fontWeight: 800, fontSize: '15px', flexShrink: 0 }}>LA</div>
-    <div style={{ minWidth: 0 }}>
-      <div style={{ fontWeight: 700, lineHeight: 1.2 }}>Standalone</div>
-      <div style={{ opacity: 0.7, fontSize: '12.5px' }}>LACORE identity</div>
-    </div>
-    <span style={{ marginLeft: 'auto', fontSize: '11.5px', fontWeight: 700, color: '#1f6feb', whiteSpace: 'nowrap' }}>★ Default</span>
-  </div>
-
-  <div style={{ display: 'flex', alignItems: 'center', gap: '13px', padding: '14px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ width: 46, height: 46, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#3a4a5e,#1c2733)', color: '#fff', fontWeight: 800, fontSize: '14px', flexShrink: 0 }}>ESX</div>
-    <div style={{ minWidth: 0 }}>
-      <div style={{ fontWeight: 700, lineHeight: 1.2 }}>ESX</div>
-      <div style={{ opacity: 0.7, fontSize: '12.5px' }}>es_extended</div>
-    </div>
-    <span style={{ marginLeft: 'auto', fontSize: '11.5px', fontWeight: 700, color: '#16a34a', whiteSpace: 'nowrap' }}>✓ Supported</span>
-  </div>
-
-  <div style={{ display: 'flex', alignItems: 'center', gap: '13px', padding: '14px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ width: 46, height: 46, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#8b5cf6,#5b21b6)', color: '#fff', fontWeight: 800, fontSize: '15px', flexShrink: 0 }}>QB</div>
-    <div style={{ minWidth: 0 }}>
-      <div style={{ fontWeight: 700, lineHeight: 1.2 }}>QBCore</div>
-      <div style={{ opacity: 0.7, fontSize: '12.5px' }}>qb-core</div>
-    </div>
-    <span style={{ marginLeft: 'auto', fontSize: '11.5px', fontWeight: 700, color: '#16a34a', whiteSpace: 'nowrap' }}>✓ Supported</span>
-  </div>
-
-  <div style={{ display: 'flex', alignItems: 'center', gap: '13px', padding: '14px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ width: 46, height: 46, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#06b6d4,#0e7490)', color: '#fff', fontWeight: 800, fontSize: '13px', flexShrink: 0 }}>QBX</div>
-    <div style={{ minWidth: 0 }}>
-      <div style={{ fontWeight: 700, lineHeight: 1.2 }}>QBox</div>
-      <div style={{ opacity: 0.7, fontSize: '12.5px' }}>qbx_core</div>
-    </div>
-    <span style={{ marginLeft: 'auto', fontSize: '11.5px', fontWeight: 700, color: '#16a34a', whiteSpace: 'nowrap' }}>✓ Supported</span>
-  </div>
-
-</div>
+<FrameworkGrid items={frameworks} />
 
 When a framework is detected, LACORE pulls **jobs and identity** from it:
 
@@ -78,42 +42,7 @@ Map your framework jobs to agencies in `configs/cfg-bridge-sh.lua` — full API 
 Third-party resources LACORE plugs into when installed — configured in
 `configs/cfg-integrations-sh.lua` (each toggle `"auto"` = on when present, or `false` to disable).
 
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '12px', margin: '1.25rem 0' }}>
-
-  <div style={{ padding: '15px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-      <div style={{ width: 44, height: 44, borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#f59e0b,#b45309)', fontSize: '20px', flexShrink: 0 }}>🏠</div>
-      <div>
-        <div style={{ fontWeight: 700, lineHeight: 1.2 }}>vms_housing</div>
-        <div style={{ opacity: 0.7, fontSize: '12px' }}>Native export</div>
-      </div>
-    </div>
-    <div style={{ fontSize: '13px', opacity: 0.85 }}>A queried person's <b>registered property addresses</b> show in the MDT person record.</div>
-  </div>
-
-  <div style={{ padding: '15px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-      <div style={{ width: 44, height: 44, borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#6d28d9,#4c1d95)', fontSize: '20px', flexShrink: 0 }}>🪪</div>
-      <div>
-        <div style={{ fontWeight: 700, lineHeight: 1.2 }}>vms_identity</div>
-        <div style={{ opacity: 0.7, fontSize: '12px' }}>Via framework bridge</div>
-      </div>
-    </div>
-    <div style={{ fontSize: '13px', opacity: 0.85 }}>Character <b>identity (name)</b> is read automatically for MDT records.</div>
-  </div>
-
-  <div style={{ padding: '15px 16px', border: '1px solid rgba(128,128,128,0.22)', borderRadius: '14px', background: 'rgba(128,128,128,0.05)' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-      <div style={{ width: 44, height: 44, borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#0ea5e9,#0369a1)', fontSize: '20px', flexShrink: 0 }}>👥</div>
-      <div>
-        <div style={{ fontWeight: 700, lineHeight: 1.2 }}>vms_multichars</div>
-        <div style={{ opacity: 0.7, fontSize: '12px' }}>Via framework bridge</div>
-      </div>
-    </div>
-    <div style={{ fontSize: '13px', opacity: 0.85 }}>The <b>active character</b> is recognised; querying an online player with no LACORE profile still returns a record.</div>
-  </div>
-
-</div>
+<ScriptGrid items={scripts} />
 
 <Callout type="info">
   `vms_identity` and `vms_multichars` are framework resources (ESX / QBCore / QBox), so they work

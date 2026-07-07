@@ -1,0 +1,40 @@
+.fc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  margin: 1.25rem 0;
+}
+.fc-grid-wide { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+.fc-card {
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-radius: 14px;
+  background: rgba(128, 128, 128, 0.05);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.fc-card:hover { border-color: rgba(128, 128, 128, 0.4); transform: translateY(-1px); }
+
+.fc-card-row { display: flex; align-items: center; gap: 13px; padding: 14px 16px; }
+.fc-card-col { padding: 15px 16px; }
+.fc-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+
+.fc-tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  font-weight: 800;
+}
+.fc-tile-img { object-fit: cover; background: #fff; }
+.fc-badge { font-size: 14px; letter-spacing: 0.3px; }
+.fc-icon { font-size: 20px; }
+
+.fc-meta { min-width: 0; }
+.fc-name { font-weight: 700; line-height: 1.2; }
+.fc-sub { opacity: 0.7; font-size: 12.5px; }
+.fc-status { margin-left: auto; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.fc-desc { font-size: 13px; opacity: 0.85; }
