@@ -60,7 +60,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   the weapon wheel (it's now blocked while in the cam); and **auto-orbit (F6) now physically flies a
   smooth circle** around the target (velocity-driven — no more teleporting), radius / altitude / speed
   config-tunable. Lock a vehicle with **L or Spacebar**, and the cam HUD gained **heading, distance to
-  target, tracked-vehicle speed and the street name**.
+  target, tracked-vehicle speed and the street name**. Locking or orbiting a target now drops a
+  **private map blip on the target plus an orbit-radius circle** — visible only to the pilot — so you
+  can see where and how to fly.
 - **Devmode now lifts all membership restrictions.** In `/dev` mode you can go on duty without
   membership, drive member-only vehicles (previously the restriction wrongly *also* fired in devmode —
   engine cut + controls blocked), keep member-only weapons, and use nitro. Job-gated features already
