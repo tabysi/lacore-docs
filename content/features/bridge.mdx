@@ -26,15 +26,19 @@ At load, the bridge (`modules/bridge/`) detects the active framework and exposes
 Map your framework's job names to LACORE departments in `configs/cfg-bridge-sh.lua`:
 
 ```lua
-Bridge.jobToDept = {
-  police  = 'lapd',
-  sheriff = 'lasd',
-  ambulance = 'AMR',    -- EMS/Fire in-game job string
+Bridge.jobMap = {
+  ['police']    = { dept = 'lapd', job = 'Law Enforcement' },
+  ['sheriff']   = { dept = 'lasd', job = 'Law Enforcement' },
+  ['ambulance'] = { dept = 'ems',  job = 'AMR' },   -- EMS/Fire in-game job string
   -- ...
 }
 
 Bridge.autoDuty = false  -- optionally auto-set duty from the framework job
 ```
+
+A framework job that maps to an agency counts as **duty authorisation** — so an ESX/QB officer can go
+on duty without also holding a LACORE Discord duty role. See
+[Frameworks & Scripts](/features/frameworks-scripts) for the full compatibility list.
 
 ## Anticheat interop
 
