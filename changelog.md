@@ -3,6 +3,19 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.2.0] – Global ban network protection
+
+### Added
+- **Global ban network protection.** LACORE servers are part of a protected network: a player
+  banned on the network is refused on connect, so known offenders can't just hop to another LACORE
+  server. Only stable per-account identifiers are matched (never shared IPs), and the check is
+  **fail-open** — if the network can't be reached, your players are let in rather than locked out.
+
+### Security
+- **Reusable hardening helpers** (`modules/security/harden-sv.lua`): per-key rate limiting, input
+  sanitising, and identifier validation, applied to the network-ban tooling so bad input can't reach
+  the shared ban list.
+
 ## [3.1.6] – Security hardening, fixes, config backup, branding & experimental STT
 
 ### Added
