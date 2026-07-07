@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [Unreleased] – Security hardening
+## [3.1.6] – Security hardening, fixes, config backup, branding & experimental STT
 
 ### Added
 - **Branding config + full LACORE re-brand.** New `configs/cfg-branding-sh.lua` centralises the
@@ -45,6 +45,11 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   (`/character`), and the legacy phone screenshot-upload response are now wrapped in `pcall` with
   type checks, so a corrupt value can't throw during boot or at runtime.
 
+### Changed — branding of internal keys
+- **Server KVP keys renamed `PVP_CORE:*` → `LACORE:*`** (playerlist, world time, AOP). A one-shot
+  migration on boot copies any existing legacy values over and deletes the old keys, so no persisted
+  data is lost. (The client-side KVP migration for `PVP-CORE:*` player keys already existed.)
+
 ### Changed — console hygiene
 - **Gated debug logging.** New shared `Debug(...)` / `IsDebug()` helper (off by default). Developer
   trace `print()`s — most notably the client boot sequence in `world-cl.lua` (~25 lines that spammed
@@ -53,7 +58,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   output is kept as `print()`**: security/IP-lock alerts, DB & startup status, missing-dependency
   warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
-## [3.1.6] – Speech-to-Text Radio Transcript (experimental — disabled by default)
+### 🎙 Speech-to-Text — Radio Transcript (experimental — disabled by default)
 
 > ⚠️ **This feature ships DISABLED (`STT.enabled = false`).** It is experimental and does not yet
 > work reliably enough for production (offline recognition accuracy varies by client). The full
