@@ -47,6 +47,17 @@ title: "3.2.0"
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **Characters not persisting to the database.** The persistence layer wrote to `lacore_core_store`
+  but read back from the old `pvp_core_store` table — so the DB was effectively write-only, and if the
+  local JSON mirror was lost on a redeploy/restart, a newly created character couldn't be recovered.
+  Reads now use `lacore_core_store`; the database is a real source of truth again.
+- **Agency MDT opened for unemployed players.** The routing only required a non-empty department, and
+  a civilian's `Unemployed` dept counts as non-empty (notably in devmode). It now requires an actual
+  on-duty law-enforcement department.
+- **Heli cam fixes:** the camera now actually renders from the heli belly (was a HUD-only overlay);
+  **L** toggles the ground lock (press again to unlock); the **scroll wheel zooms** (the wheel is now
+  grabbed for the cam); and **auto-orbit (F6) flies a real circle** around the target instead of just
+  flying off — rebuilt as a manual on-rails orbit (radius / altitude / speed still config-tunable).
 - **Devmode now lifts all membership restrictions.** In `/dev` mode you can go on duty without
   membership, drive member-only vehicles (previously the restriction wrongly *also* fired in devmode —
   engine cut + controls blocked), keep member-only weapons, and use nitro. Job-gated features already
