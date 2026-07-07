@@ -12,6 +12,10 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
 
 ### Fixed
+- **Vehicle HUD icons were invisible.** The car HUD draws its icons (fuel, engine, seatbelt, lights,
+  turn signals, hood, trunk, limiter) from a streamed texture dictionary that was never requested,
+  so nothing rendered. The HUD now requests the `vehicleui` dictionary before drawing (and keeps it
+  loaded), and the `stream/vehicleui.ytd` sprite sheet ships with the resource.
 - **Stuck CAD when switching department.** Opening a CAD/MDT is now exclusive: going on duty for
   another department (or reopening on a new one) closes the previous CAD instead of leaving it
   stuck on screen — the old one could no longer be moved or closed. Handled both on the department
