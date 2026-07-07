@@ -55,9 +55,10 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   a civilian's `Unemployed` dept counts as non-empty (notably in devmode). It now requires an actual
   on-duty law-enforcement department.
 - **Heli cam fixes:** the camera now actually renders from the heli belly (was a HUD-only overlay);
-  **L** toggles the ground lock (press again to unlock); the **scroll wheel zooms** (the wheel is now
-  grabbed for the cam); and **auto-orbit (F6) flies a real circle** around the target instead of just
-  flying off — rebuilt as a manual on-rails orbit (radius / altitude / speed still config-tunable).
+  **L** toggles the ground lock (press again to unlock); the **scroll wheel zooms** without spinning
+  the weapon wheel (it's now blocked while in the cam); and **auto-orbit (F6) flies a smooth circle**
+  around the target instead of just flying off — a frame-time-based on-rails orbit with eased heading
+  (radius / altitude / speed config-tunable).
 - **Devmode now lifts all membership restrictions.** In `/dev` mode you can go on duty without
   membership, drive member-only vehicles (previously the restriction wrongly *also* fired in devmode —
   engine cut + controls blocked), keep member-only weapons, and use nitro. Job-gated features already
