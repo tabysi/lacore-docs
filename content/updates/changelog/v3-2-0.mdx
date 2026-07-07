@@ -12,7 +12,9 @@ title: "3.2.0"
   no longer escapes jail: the remaining time is stored per licence, restored on reconnect, and only
   counts down while the inmate is online. The manual `/jail` command is now persistent too, and
   `/releaseinmate <id>` frees someone early. New `modules/corrections/` + `configs/cfg-corrections-sh.lua`.
-  (Reuses the existing jail teleport mechanic; the MDT booking UI + inmate roster come next.)
+  Includes a **premium inmate roster** (`/inmates`, LEO) — see who's in custody, remaining time, and
+  release early (with a confirm). Reuses the existing jail teleport mechanic. (An MDT booking picker
+  comes next.)
 - **Premium notification system.** In-game notifications now render as modern, themed toasts
   (info / success / warning / error) with an icon, optional title and a draining timer bar — a big
   visual upgrade over the plain native feed. Every existing `ShowNotification` call is routed through
