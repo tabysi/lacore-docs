@@ -6,6 +6,15 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ## [3.2.0] – Global ban network protection
 
 ### Added
+- **ESX / QBCore / QBox framework compatibility (real integration).** The framework bridge now goes
+  beyond detection: on a framework server the **framework job is accepted as duty authorisation**, so
+  an ESX/QB police or EMS player can go on duty in LACORE (MDT, dispatch) **without also needing a
+  LACORE Discord duty role** — verified server-side, so it can't be spoofed. Job changes now sync
+  **instantly** via `esx:setJob` / `esx:playerLoaded` (and the QBCore equivalents) instead of a slow
+  poll, and the player's **framework character name is adopted as their LACORE RP name** automatically
+  (only if they haven't set one, so `/char` and multichar still win). Optional **auto-duty**
+  (`Bridge.autoDuty`) puts mapped jobs on/off duty the moment the framework job changes. Configure the
+  job→agency map in `configs/cfg-bridge-sh.lua`. Runs standalone by default (`Bridge.mode = "auto"`).
 - **Corrections / Jail system (server core).** Arrests now have consequences. An arrest report whose
   Penal Code charges carry jail time automatically **books the suspect into jail** (jail-months →
   seconds, configurable). Sentences are **server-authoritative and persistent** — a disconnect/relog
