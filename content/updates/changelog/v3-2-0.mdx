@@ -16,6 +16,10 @@ title: "3.2.0"
   release early (with a confirm). Booking happens from the existing MDT arrest charge picker; the
   officer now sees the sentence, the jail **location is configurable** (run your own prison), and the
   on-screen jail timer reads as `mm:ss`. Reuses the existing jail teleport mechanic.
+- **Impound / Tow lot.** LEO impound the vehicle they're in or nearest to with `/impound [reason]` —
+  it's logged (plate, model, reason, officer, fee) and removed from the world for everyone. A premium
+  **impound-lot panel** (`/impounds`) shows what's in the lot; LEO release a vehicle (with a confirm).
+  Persistent across restarts. New `modules/impound/` + `configs/cfg-impound-sh.lua`.
 - **Premium notification system.** In-game notifications now render as modern, themed toasts
   (info / success / warning / error) with an icon, optional title and a draining timer bar — a big
   visual upgrade over the plain native feed. Every existing `ShowNotification` call is routed through
