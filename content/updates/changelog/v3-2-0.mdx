@@ -20,6 +20,17 @@ title: "3.2.0"
   it's logged (plate, model, reason, officer, fee) and removed from the world for everyone. A premium
   **impound-lot panel** (`/impounds`) shows what's in the lot; LEO release a vehicle (with a confirm).
   Persistent across restarts. New `modules/impound/` + `configs/cfg-impound-sh.lua`.
+- **Air Unit (police helicopter).** Realistic aviation tooling for a pilot or observer: **auto-orbit**
+  (a hands-free circle around a GPS waypoint or the camera's lock point), a **controllable gimbal
+  heli-cam** — usable by the pilot too — with pan / tilt / zoom, **night-vision and thermal (FLIR)**,
+  a ground **lock-on**, a live FLIR-style HUD, and a **steerable spotlight** that follows the camera.
+  Keybinds are rebindable (defaults F5 cam / F6 orbit / F7 light). New `modules/airunit/` +
+  `configs/cfg-airunit-sh.lua`. (In-world native feature — orbit radius / altitude / speed are
+  config-tunable.)
+- **K9 Unit.** Deploy a police dog (`/k9`) that heels, holds position, **searches** an area and
+  alerts on an armed subject, **engages** the aimed / nearest suspect, and loads into the patrol car
+  — commands via `/k9 heel | stay | search | engage | car`. RP-only. New `modules/k9/` +
+  `configs/cfg-k9-sh.lua`.
 - **Premium notification system.** In-game notifications now render as modern, themed toasts
   (info / success / warning / error) with an icon, optional title and a draining timer bar — a big
   visual upgrade over the plain native feed. Every existing `ShowNotification` call is routed through
