@@ -29,19 +29,20 @@
   color: #fff;
   font-weight: 800;
 }
-/* Logo tiles: dark background, full logo (no crop), width grows for wide logos. */
+/* Logo tiles: no background — transparent PNGs sit directly on the card.
+   Full logo (no crop), width grows for wide logos. */
 .fc-tile-logo {
   width: auto;
   min-width: 46px;
   max-width: 132px;
-  padding: 5px 10px;
-  background: #0e131b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+  background: none;
+  border: none;
 }
 .fc-tile-logo img {
-  height: 32px;
+  height: 40px;
   width: auto;
-  max-width: 112px;
+  max-width: 124px;
   object-fit: contain;
   display: block;
 }
