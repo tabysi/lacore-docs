@@ -1,5 +1,6 @@
 export default {
   index: 'Overview',
+  branding: 'Branding & Backup',
   convars: 'Server Convars',
   main: 'Main Config (config.lua)',
   discord: 'Discord & Duty',

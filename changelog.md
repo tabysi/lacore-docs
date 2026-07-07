@@ -5,6 +5,32 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [Unreleased] – Security hardening
 
+### Added
+- **Branding config + full LACORE re-brand.** New `configs/cfg-branding-sh.lua` centralises the
+  visible community name (`Branding.label` / `Branding.community`). All remaining `Pacific Valley`
+  strings — the on-screen spawn welcome, the phone-booth panel, the weapon-wheel panel, and the
+  Discord connect title — are now LACORE-branded and driven by this config, so an operator can
+  re-brand every in-game label in one place. (Internal identifiers / KVP keys are deliberately left
+  untouched.)
+- **Config backup / restore across reinstalls.** New `/lacoreconfig backup | restore | status`
+  (console / staff) snapshots the hand-edited `configs/*.lua` files into the DB and can write them
+  back after a reinstall (which ships default configs). Backup is manual by design — no auto-backup
+  on start, which would clobber a good backup with fresh defaults right after a reinstall. `restore`
+  first snapshots the current on-disk configs (rollback), and a resource restart applies it.
+  (Runtime data in `data/*.json` is already DB-persisted and survives on its own with oxmysql.)
+
+### Fixed
+- **Characters lost on core restart.** After restarting the resource, connected players were
+  prompted to re-create their character. `playerSpawned` (which restores the active character) does
+  not fire on a resource restart, so the client now also re-requests it on `onClientResourceStart`
+  once the ped exists. Character data itself was always persisted — only the per-session link was
+  missing.
+- **Civilian props couldn't be removed.** The server used `GetEntityCoords` on a server-created
+  object (unreliable — often `0,0,0`) for the "nearest prop" check, so pickup found nothing; and
+  server-side `DeleteEntity` didn't propagate once a client owned the object. Now the stored
+  placement coords drive the distance check, and the server broadcasts the netId so the owning
+  client deletes it locally.
+
 ### Security
 - **NADS: server-side staff gate.** `AddNADSStreet` now requires `HasPermission(src, "nads")`
   (staff / dev bypass) — the client-only `player.staff` check could be bypassed by a crafted event

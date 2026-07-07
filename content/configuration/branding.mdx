@@ -1,0 +1,85 @@
+---
+title: Branding & Backup
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Branding & Config Backup
+
+## Branding (`cfg-branding-sh.lua`)
+
+LACORE ships fully **LACORE-branded**. To re-brand every in-game label that shows your community
+name, edit **one file** — `configs/cfg-branding-sh.lua`:
+
+```lua
+Branding = {}
+
+-- Short brand name — phone-booth panel + weapon-wheel panel.
+Branding.label = "LACORE"
+
+-- Full community / server name — on-screen spawn welcome + Discord connect title.
+Branding.community = "LACORE Roleplay"
+```
+
+These drive:
+
+| Where | Uses |
+| --- | --- |
+| On-screen **spawn welcome** ("Welcome to …") | `Branding.community` |
+| **Phone-booth** panel title | `Branding.label` |
+| **Weapon-wheel** panel label | `Branding.label` |
+| **Discord connect / deferral** title | `Branding.community` |
+
+<Callout type="info">
+  Only user-facing **text** is branded here. Internal identifiers (the resource name, KVP store keys)
+  are intentionally left untouched — changing those would break persistence and updates.
+</Callout>
+
+## Config backup & restore (`/lacoreconfig`)
+
+Reinstalling or updating LACORE ships the **default** `configs/*.lua`, which would overwrite your
+edits. Back them up to the database and restore them after a reinstall.
+
+<Steps>
+
+### Save your configs
+
+After you've finished configuring, run (console or staff):
+
+```
+/lacoreconfig backup
+```
+
+This snapshots every `configs/*.lua` into the DB store.
+
+### After a reinstall — restore
+
+```
+/lacoreconfig restore
+```
+
+It writes your saved configs back to disk (and first snapshots the current on-disk configs so a
+restore can be rolled back). **Restart the resource** for the restored config to take effect.
+
+### Check status
+
+```
+/lacoreconfig status
+```
+
+</Steps>
+
+<Callout type="warning">
+  Backup is **manual by design** — there is no auto-backup on start, because that would overwrite a
+  good backup with fresh defaults right after a reinstall. Run `backup` yourself when you're happy
+  with your config.
+
+  After a **major version update** that adds new config keys, review the new defaults afterwards — a
+  restore writes your saved files back whole, so brand-new keys from the update won't be present
+  until you merge them (the rollback snapshot helps).
+</Callout>
+
+<Callout type="info">
+  Runtime data in `data/*.json` (zones, map config, placed cameras, board…) is already DB-persisted
+  via the store helpers and survives a reinstall on its own when oxmysql is configured.
+</Callout>
