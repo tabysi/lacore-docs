@@ -6,6 +6,15 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ## [3.2.0] – Global ban network protection
 
 ### Added
+- **Third-party resource support (vames-store).** LACORE now plugs into popular paid resources when
+  they're installed — no config wiring required, and it stays fully standalone without them:
+  - **vms_housing** — a person's **registered property addresses now appear in the MDT** when you run
+    them (queried live from vms_housing). Officers see where a suspect lives right in the record.
+  - **vms_identity / vms_multichars** — these are framework (ESX/QBCore/QBox) resources, so they flow
+    through LACORE's framework bridge: the active character's **identity (name) and identifier** are
+    read automatically, and querying an online player who has no LACORE profile yet still returns a
+    record built from their framework identity. New `configs/cfg-integrations-sh.lua` (each integration
+    is `"auto"` = on when the resource is running, or `false` to disable).
 - **ESX / QBCore / QBox framework compatibility (real integration).** The framework bridge now goes
   beyond detection: on a framework server the **framework job is accepted as duty authorisation**, so
   an ESX/QB police or EMS player can go on duty in LACORE (MDT, dispatch) **without also needing a
