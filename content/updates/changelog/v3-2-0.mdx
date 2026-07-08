@@ -6,6 +6,28 @@ title: "3.2.0"
 
 
 ### Added
+- **New LACORE Phone — modern NUI phone (Phase 1).** The old native iFruit scaleform phone is being
+  replaced by a purpose-built **Svelte NUI phone** in the LACORE look: an on-screen device (opens on
+  **F1**, rebindable) with a phone **prop held in hand** so others see you're on the phone. Phase 1
+  ships the telephony core — **Calls** (dialer, in-call screen with a live timer, recents log, real
+  voice via pma-voice), **Messages** (SMS threads with per-conversation unread badges), **Contacts**
+  (add / edit / delete), an **Eyefind browser** that opens the community page from `Branding` (never a
+  hardcoded foreign site), and a **Settings** screen (number, wallpaper, branding). Each player gets a
+  **stable phone number**, and contacts / threads / call log are **DB-persisted**. RP-only — there is
+  no banking / money app. Config in `configs/cfg-phone-sh.lua` (`Phone.useNui`, key, apps, eyefind URL).
+  Dispatch/911, camera/gallery and social apps follow in later phases. *(NUI verified in preview;
+  in-game prop/anim, voice and cross-player delivery are for the live server.)*
+- **Phone Phase 2 — Emergency (911/311) + Camera apps.** The phone now has an **Emergency** app: pick
+  911 (emergency) or 311 (non-emergency), type what's happening, hit send — it files a dispatch call
+  through the existing call-center pipeline (`call:Submit`) with your location attached automatically.
+  A **Camera** app takes photos via `screenshot-basic` (the device hides itself for the shot) into a
+  persisted **gallery** you can browse and open full-screen; an optional upload endpoint
+  (`Phone.cameraUpload`) stores hosted URLs instead of inline images. Both apps are config-gated
+  (`Phone.apps.dispatch` / `.camera`). *(Camera needs the `screenshot-basic` resource; verified in
+  preview, live capture/upload is for the server.)*
+- **Phone branding leak fixed (Eyefind).** The legacy phone hardcoded a foreign community's websites
+  (`sarrp.org`) that the Eyefind browser loaded; it now uses the LACORE branding/phone URL, and the
+  legacy scaleform phone goes dormant while the new NUI phone is active.
 - **NativeLacoreUI — own standalone menu system, NativeUI dependency removed.** LACORE's in-world
   menus (settings, phone booth, vehicle spawner, AOP vote, props, character) previously required the
   external `NativeUILua_Reloaded` resource. They now run on **NativeLacoreUI**, LACORE's own
@@ -86,6 +108,16 @@ title: "3.2.0"
   on start, which would clobber a good backup with fresh defaults right after a reinstall. `restore`
   first snapshots the current on-disk configs (rollback), and a resource restart applies it.
   (Runtime data in `data/*.json` is already DB-persisted and survives on its own with oxmysql.)
+
+### Added — MDT messages unread ping
+- **Unread badge on the MDT messages portal.** The **DISPATCH** tab (the shared dispatch⇄units chat)
+  now shows a small **red count badge** and an accent bar when new messages arrive while you're on
+  another tab — so units notice a message without staring at the tab. **Purely visual, no sound.**
+  Opening the tab clears it; messages you receive while already reading it don't badge.
+
+### Changed
+- **LAPD unit list — no more `(N)` callsign suffix.** Partners sharing a callsign were listed as
+  e.g. `1A-12 (2)`. The unit row now shows just the callsign; the members still expand via the row.
 
 ### Fixed
 - **Air Unit overhaul.** Locking a target (Spacebar/L) then engaging orbit now **keeps flying after you
