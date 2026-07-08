@@ -47,8 +47,9 @@
 .cw-step.done { color: currentColor; }
 .cw-step-ico { font-size: 14px; }
 
-/* Body */
-.cw-body { padding: 18px 18px 8px; }
+/* Body — fixed height so the whole component never changes size between steps
+   (steps have different field counts); content scrolls inside instead. */
+.cw-body { padding: 18px 18px 8px; height: 460px; overflow-y: auto; scrollbar-width: thin; }
 .cw-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .cw-head h3 { margin: 0; font-size: 18px; }
 .cw-file {

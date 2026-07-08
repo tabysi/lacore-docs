@@ -7,13 +7,16 @@ import { ConfigWizard } from '../../components/ConfigWizard.jsx'
 
 # Config Editor
 
-Not sure which value goes where? Walk through the most-changed LACORE settings step by step — each one
-is explained inline — then **download the assembled config** and paste it into your files.
+Not sure which value goes where? Walk through the LACORE settings step by step — each one is explained
+inline — then **download the assembled config** and paste it into your files.
 
 <Callout type="info">
-  This covers the settings a server owner usually changes. Every setting is documented in full on the
-  per-file pages (see the [Configuration overview](/configuration)). The editor **never** asks for real
-  secrets — the `server.cfg` block it generates has placeholders you fill in locally.
+  Covers the scalar/toggle options across every major config file (branding, world, call center,
+  features, access control, notifications, phone, framework bridge, CCTV, corrections, impound, K9, air
+  unit, profile, presence, global-ban, anti-cheat). Large **data lists** — the penal code, emote
+  catalogue, camera positions, map blips — are edited directly in their files (see the per-file pages
+  from the [Configuration overview](/configuration)). The editor **never** asks for real secrets: the
+  `server.cfg` block it generates has placeholders you fill in locally.
 </Callout>
 
 <ConfigWizard />
