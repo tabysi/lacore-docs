@@ -69,7 +69,28 @@ Place cameras anywhere at runtime:
   toggle the tool.
 
 Placed cameras are persisted server-side (`data/cctv_cams.json`), gated to LEO / Security, and appear
-in `/cctv` under a **Field Cameras** network.
+in `/cctv` under the **Field Cameras** networks.
+
+### Camera groups (by locality)
+
+Placed field cameras are **auto-grouped by the in-game locality** they sit in — *Vinewood*,
+*Sandy Shores*, *Del Perro*, and so on. Each group becomes its own network in the `/cctv` viewer and its
+own section in the `/cameras` manager, so a long camera list stays organised.
+
+- The locality is resolved automatically the moment you place a camera.
+- In `/cameras` you can re-assign a camera's group by hand with the 🏷 button.
+- **Existing cameras are migrated fully automatically** — after a core update, the first player who
+  finishes loading resolves every ungrouped legacy camera into its locality group in one batch (no
+  operator has to open CCTV, and no job is required — resolving a locality from coordinates isn't
+  privileged). Every open viewer / manager / map updates the moment it's done.
+
+Turn grouping off (one flat "Field Cameras" network) or rename the prefix in
+`configs/cfg-cctv-sh.lua`:
+
+```lua
+CCTV.autoGroupField  = true     -- false = one flat "Field Cameras" network
+CCTV.fieldGroupPrefix = "Field"  -- label prefix, e.g. "Field · Vinewood"
+```
 
 ## Dispatch map
 

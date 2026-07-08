@@ -1,0 +1,34 @@
+---
+title: Config Editor
+---
+
+import { Callout } from 'nextra/components'
+import { ConfigWizard } from '../../components/ConfigWizard.jsx'
+
+# Config Editor
+
+Not sure which value goes where? Walk through the most-changed LACORE settings step by step — each one
+is explained inline — then **download the assembled config** and paste it into your files.
+
+<Callout type="info">
+  This covers the settings a server owner usually changes. Every setting is documented in full on the
+  per-file pages (see the [Configuration overview](/configuration)). The editor **never** asks for real
+  secrets — the `server.cfg` block it generates has placeholders you fill in locally.
+</Callout>
+
+<ConfigWizard />
+
+## How to apply the result
+
+1. Open the downloaded `lacore-config.txt`. It's split into labelled blocks, one per file.
+2. For each block, open the named file and **paste the block at the very end**. Because Lua runs
+   top-to-bottom, a re-assignment at the end cleanly overrides the default above it — you don't have to
+   hunt for the original line.
+3. The `server.cfg` block holds secret placeholders (Discord token, webhooks). Fill in the real values
+   **locally** and never commit them.
+4. **Restart the resource** (`ensure lacore` / `restart lacore`) so the changes load.
+
+<Callout type="warning">
+  All config files are escrow-open and covered by config backup, so editing them is safe. If something
+  looks wrong after a restart, check the server console — LACORE prints which config file failed to load.
+</Callout>

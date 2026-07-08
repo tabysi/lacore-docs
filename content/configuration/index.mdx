@@ -8,44 +8,83 @@ import { Callout, Cards } from 'nextra/components'
 
 LACORE is configured in three layers:
 
-1. **Convars** in `server.cfg` — secrets (Discord token, webhooks) and a few runtime toggles.
-2. **`config.lua`** — the main gameplay/world config (agencies, call center, time, transit, …).
-3. **`configs/*-sh.lua` / `*-sv.lua`** — per-feature config files.
+1. **Convars** in `server.cfg` — secrets (Discord token, webhooks) and a few runtime toggles. Secrets
+   live here so they never end up in the code or in client downloads. See [Server Convars](/configuration/convars).
+2. **`config.lua`** — the main gameplay/world config (agencies, call center, time (`SyncGameTime`), transit, AOPs, …).
+3. **`configs/*-sh.lua` / `*-cl.lua` / `*-sv.lua`** — one file per feature. The suffix is the realm:
+   `-sh` shared (client **and** server), `-cl` client-only, `-sv` server-only.
 
 <Callout type="info">
-  All files in `configs/` and `config.lua` are **escrow-ignored** — you can open and edit them
-  freely. Convars keep secrets out of the code and out of client downloads.
+  Every file in `configs/` and `config.lua` is **escrow-open** — you can open and edit them freely, and
+  most carry a comment header explaining each option. After editing, **restart the resource** for the
+  change to apply. Convars keep secrets out of the code and out of client downloads.
 </Callout>
 
 ## Config file map
 
-| File | Scope | Documents |
+Every config file, what it controls, and where it's documented. Files marked *(in-file)* are
+self-documented by the comment header at the top of the file.
+
+### Core & world
+
+| File | Scope | Controls |
 | --- | --- | --- |
-| `config.lua` | shared | [Main config](/configuration/main) — agencies, call center, time, transit, AOPs, props |
+| `config.lua` | shared | [Main config](/configuration/main) — agencies, call center, time (`SyncGameTime`), transit, AOPs |
+| `configs/cfg-features-sh.lua` | shared | [Feature Toggles](/configuration/features) — enable/disable any component (e.g. run only the MDT/CAD) |
 | `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, webhooks |
+| `configs/cfg-branding-sh.lua` | shared | [Branding & Backup](/configuration/branding) — your community/server name everywhere |
+| `configs/cfg-notify-sh.lua` | shared | [Notifications](/configuration/notifications) — LACORE / native GTA / custom notify resource |
+| `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) — map blips |
+| `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) — area labels / zones |
+| `configs/cfg-emojis-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat |
+| `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
+
+### Law enforcement & CAD
+
+| File | Scope | Controls |
+| --- | --- | --- |
 | `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
 | `configs/cfg-evidence-sh.lua` | shared | [Evidence & reports](/configuration/law-enforcement) — item + report types |
+| `configs/cfg-cctv-sh.lua` | shared | [CCTV Surveillance](/features/cctv) — camera networks |
+| `configs/cfg-airunit-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — Air Unit heli-cam (orbit, zoom, spotlight) |
+| `configs/cfg-corrections-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — jail location, sentence length |
+| `configs/cfg-impound-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — impound lot + fees |
+| `configs/cfg-k9-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — K9 unit behaviour |
+| `configs/cfg-stt-sh.lua` | shared | [Radio STT](/features/radio-stt) — offline speech-to-text (experimental, off by default) |
+
+### Player, civilian & phone
+
+| File | Scope | Controls |
+| --- | --- | --- |
+| `configs/cfg-phone-sh.lua` | shared | [Phone](/configuration/phone) — NUI phone: apps, ringtones, directory, prop hold |
+| `configs/cfg-profile-sh.lua` | shared | [Profile & achievements](/configuration/profile) — the `/profile` UI |
+| `configs/cfg-achievements-sh.lua` | shared | [Profile & achievements](/configuration/profile) — XP / easter eggs |
 | `configs/cfg-civilian-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — radial, emote catalogue |
 | `configs/cfg-turf-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — turf / gang war |
 | `configs/cfg-props-cl.lua` | client | [Civilian & emotes](/configuration/civilian) — placeable props |
-| `configs/cfg-cctv-sh.lua` | shared | [CCTV Surveillance](/features/cctv) — camera networks |
-| `configs/cfg-anticheat-sh.lua` | shared | [Anticheat & security](/configuration/security) |
+| `configs/cfg-weapons-cl.lua` | client | [World, blips & props](/configuration/world) — member-only weapons |
+
+### Integrations & security
+
+| File | Scope | Controls |
+| --- | --- | --- |
+| `configs/cfg-bridge-sh.lua` | shared | [Framework Bridge](/features/bridge) — ESX / QBCore / QBox job → agency map |
+| `configs/cfg-integrations-sh.lua` | shared | [Frameworks & Scripts](/frameworks-scripts) — third-party resources |
+| `configs/cfg-anticheat-sh.lua` | shared | [Anti-Cheat & Security](/anticheat) — detections, trust score, whitelist, server sweep |
 | `configs/cfg-blacklist-sh.lua` | shared | [Anticheat & security](/configuration/security) — member-only vehicles |
+| `configs/cfg-globalban-sh.lua` | shared | *(in-file)* — global-ban network participation |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
 | `configs/cfg-presence-sh.lua` | shared | [Anticheat & security](/configuration/security) — Discord Rich Presence |
-| `configs/cfg-profile-sh.lua` | shared | [Profile & achievements](/configuration/profile) |
-| `configs/cfg-achievements-sh.lua` | shared | [Profile & achievements](/configuration/profile) — easter eggs |
-| `configs/cfg-bridge-sh.lua` | shared | [Framework Bridge](/features/bridge) |
-| `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) |
-| `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) |
-| `configs/cfg-weapons-cl.lua` | client | [World, blips & props](/configuration/world) |
 
 ## Start here
 
 <Cards>
+  <Cards.Card title="⚡ Config Editor (interactive)" href="/configuration/editor" arrow />
+  <Cards.Card title="Feature Toggles" href="/configuration/features" arrow />
   <Cards.Card title="Server Convars" href="/configuration/convars" arrow />
-  <Cards.Card title="Discord & Duty" href="/configuration/discord" arrow />
   <Cards.Card title="Main Config" href="/configuration/main" arrow />
+  <Cards.Card title="Notifications" href="/configuration/notifications" arrow />
+  <Cards.Card title="Phone" href="/configuration/phone" arrow />
 </Cards>
 
 ## Localisation

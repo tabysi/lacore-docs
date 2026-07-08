@@ -1,0 +1,72 @@
+---
+title: Feature Toggles
+---
+
+import { Callout } from 'nextra/components'
+
+# Feature Toggles — `configs/cfg-features-sh.lua`
+
+Run **exactly the parts of LACORE you want**. Want to use *only* the MDT/CAD? Turn everything else off
+in one file. Every major component checks this config at load: a disabled feature's module simply
+**doesn't load** — no commands, no threads, no events, ~0 ms cost.
+
+<Callout type="info">
+  **Default is ON.** A missing or unset key counts as enabled, so leaving this file alone keeps every
+  feature exactly as before. Infrastructure (database, Discord, security/anti-cheat, framework bridge,
+  identity, profile, location) is **always on** and can't be disabled.
+</Callout>
+
+## How it works
+
+Every feature has a key in the `Features` table. A group can be a plain boolean, or a table with an
+`enabled` flag plus finer **sub-toggles**. Turning a group off turns all of its sub-features off too.
+
+```lua
+Features = {
+  -- Police CAD suite — set enabled = false to remove ALL of it,
+  -- or trim individual agencies/tools with the sub-toggles.
+  cad = {
+    enabled  = true,
+    lapd     = true,   -- LAPD PremierOne MDT
+    lasd     = true,   -- LASD CAD / PCMS
+    ems      = true,   -- EMS / Fire CAD
+    dispatch = true,   -- /dispatch console
+    bolo     = true,   -- BOLO system
+  },
+
+  phone       = true,  -- LACORE NUI phone
+  airunit     = true,  -- Air Unit heli-cam
+  cctv        = true,  -- CCTV surveillance
+  corrections = true,  -- jail / corrections
+  impound     = true,  -- impound lot
+  k9          = true,  -- K9 unit
+  field       = true,  -- field essentials (breathalyser)
+  nads        = true,  -- New Address System
+  stt         = true,  -- push-to-talk radio speech-to-text
+  admin       = true,  -- staff tools (Big Brother log + admin menu)
+  webdispatch = true,  -- external web dispatcher bridge
+
+  civilian = { enabled = true, org = true, turf = true },        -- emotes / props / orgs / turf
+
+  extras = { enabled = true, props = true, stretcher = true,     -- misc gameplay
+             trains = true, deathsync = true },
+}
+```
+
+## Example: MDT/CAD only
+
+```lua
+Features = {
+  cad = { enabled = true },   -- keep the police CAD suite …
+  phone = false, airunit = false, cctv = false, corrections = false,
+  impound = false, k9 = false, field = false, nads = false, stt = false,
+  admin = false, webdispatch = false,
+  civilian = { enabled = false },
+  extras   = { enabled = false },
+}
+```
+
+<Callout type="warning">
+  A resource **restart** is required for changes to apply (the config is read when modules load). The
+  file is escrow-open and covered by config backup.
+</Callout>

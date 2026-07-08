@@ -40,6 +40,28 @@ A framework job that maps to an agency counts as **duty authorisation** — so a
 on duty without also holding a LACORE Discord duty role. See
 [Frameworks & Scripts](/frameworks-scripts) for the full compatibility list.
 
+## ESX characters as the character source
+
+On an **ESX** server you don't want players filling out LACORE's `/char` on top of their existing ESX
+identity. With `Bridge.useFrameworkCharacters = true` (the default), LACORE reads each player's ESX
+character straight from the database on load and uses it everywhere — the MDT/CAD person lookup,
+`/profile`, and the on-screen name.
+
+| Pulled from ESX | Source |
+| --- | --- |
+| Name (first + last), date of birth, sex, height, phone number, job | `users` row for the current identifier |
+| Registered vehicles (plates in the CAD query) | `owned_vehicles` for that owner |
+
+It works with **esx_multicharacter** automatically: each ESX character is its own `users` row, so LACORE
+keeps one character per ESX character and re-syncs on every switch.
+
+<Callout type="warning">
+  While ESX drives the character, its **identity is read-only in LACORE** (name / DOB / sex / height /
+  phone / job) — ESX's database stays the single source of truth. Records, notes and relationships stay
+  editable in LACORE. Requires **oxmysql**. Set `Bridge.useFrameworkCharacters = false` to keep LACORE's
+  own `/char` identity even while ESX still handles jobs.
+</Callout>
+
 ## Anticheat interop
 
 The bridge marks legitimate framework events so LACORE's event-honeypot anticheat never flags them

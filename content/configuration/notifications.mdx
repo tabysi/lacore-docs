@@ -1,0 +1,51 @@
+---
+title: Notifications
+---
+
+import { Callout } from 'nextra/components'
+
+# Notifications — `configs/cfg-notify-sh.lua`
+
+Choose how LACORE's on-screen notifications look — or route them to **your own notification resource**.
+Every LACORE notice (there are hundreds of `ShowNotification` calls) obeys this one setting.
+
+## Mode
+
+```lua
+NotifyCfg = {
+  mode = "lacore",   -- "lacore" | "gta" | "custom"
+}
+```
+
+<Callout type="info">
+  The table is called `NotifyCfg` (not `Notify`) — a legacy global `Notify()` function exists in the
+  client, so the config table must not share that name.
+</Callout>
+
+| Mode | Result |
+| --- | --- |
+| `"lacore"` | The built-in **premium NUI toasts** (info / success / warning / error), the default. |
+| `"gta"` | The native, **lore-friendly GTA-V** top-left feed. |
+| `"custom"` | Your own handler — route to **any notify resource** (ox_lib, okokNotify, mythic_notify, ESX, …). |
+
+## Custom handler
+
+Only used when `mode = "custom"`. It receives the (colour-stripped) `text`, a `ntype`
+(`"info" | "success" | "warning" | "error"`), an optional `title` and a `duration` in ms. Wire it to
+whatever you run — uncomment one line:
+
+```lua
+NotifyCfg.customHandler = function(text, ntype, title, duration)
+  -- ox_lib:        exports.ox_lib:notify({ title = title, description = text, type = ntype, duration = duration })
+  -- okokNotify:    exports['okokNotify']:Alert(title or 'LACORE', text, duration or 5000, ntype)
+  -- mythic_notify: exports['mythic_notify']:SendAlert(ntype, text)
+  -- ESX:           TriggerEvent('esx:showNotification', text)
+end
+```
+
+<Callout type="info">
+  The type is inferred from GTA colour codes (`~r~` error, `~g~` success, `~y~`/`~o~` warning, else
+  info) when one isn't given, so it works in every mode. In `"gta"` mode `NotifyCfg.gtaShowTitle` shows a
+  title line above the message when one is provided. If a custom handler errors, LACORE falls back to
+  its own NUI toast so a notification is never lost.
+</Callout>

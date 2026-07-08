@@ -13,6 +13,25 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **CCTV camera groups by locality.** Runtime-placed field cameras (the CAM tool) are now auto-sorted
+  into **groups by the in-game locality** they sit in — e.g. *Vinewood*, *Sandy Shores*, *Del Perro*.
+  Each group is its own network in the CCTV viewer and its own section in the `/cameras` manager, so a
+  long camera list stays organised. Placing a camera resolves its locality automatically; the `/cameras`
+  manager lets you re-assign a camera's group (🏷) by hand. **Existing cameras are migrated
+  fully automatically** — after the update the first player who loads resolves every ungrouped legacy
+  camera into its locality group in one batch (no operator has to open CCTV). New options `CCTV.autoGroupField` (default on)
+  and `CCTV.fieldGroupPrefix` in `configs/cfg-cctv-sh.lua`. *(NUI grouping verified in preview; in-game
+  locality resolution + placement are for the live server.)*
+- **ESX characters as the character source.** On an **ESX** server LACORE now takes its characters
+  straight from the ESX database instead of asking players to fill out `/char` again. On load it reads
+  the player's `users` row — **name** (firstname + lastname), **date of birth**, **sex**, **height**,
+  **phone number** and **job** — plus their **`owned_vehicles`** (plates show up in the CAD vehicle
+  query), and mirrors it into the LACORE character used everywhere (MDT/CAD lookup, `/profile`,
+  on-screen name). Works with **esx_multicharacter**: each ESX character is its own LACORE character and
+  re-syncs on every switch. Because ESX is the source, that identity (name / DOB / sex / height / phone /
+  job) is **read-only** in LACORE's profile — records, notes and relationships stay editable. New toggle
+  `Bridge.useFrameworkCharacters` (default `true`) in `configs/cfg-bridge-sh.lua`; requires oxmysql.
+  *(DB read + in-game sync are for the live ESX server; syntax + NUI verified here.)*
 - **New LACORE Phone — modern NUI phone (Phase 1).** The old native iFruit scaleform phone is being
   replaced by a purpose-built **Svelte NUI phone** in the LACORE look: an on-screen device (opens on
   **F1**, rebindable) with a phone **prop held in hand** so others see you're on the phone. Phase 1
@@ -62,6 +81,12 @@ and an experimental radio **speech-to-text**.
   module simply doesn't load — no commands, threads or events, ~0 ms. **Default is ON**, so existing
   servers are unchanged; infrastructure (DB, Discord, security, framework bridge, identity, profile)
   always stays on and can't be disabled. The file is escrow-open and covered by config backup.
+- **Switchable notification system (`configs/cfg-notify-sh.lua`).** Every LACORE notice now obeys a
+  single `NotifyCfg.mode`: **`lacore`** (the built-in premium NUI toasts, default), **`gta`** (the native,
+  lore-friendly GTA-V top-left feed), or **`custom`** — route notifications to **your own resource**
+  (ox_lib / okokNotify / mythic_notify / ESX / …) via a one-line handler. `ShowNotification` gained an
+  optional `{ ntype, title, duration }` and both it and the dispatch toast now flow through the same
+  funnel, so the mode applies everywhere. Escrow-open + config backup.
 - **Anticheat overhaul — server-authoritative, trust-based, near-zero false positives.** The anticheat
   gained a much stronger and safer core:
   - **Server-authoritative sweep (OneSync).** The server itself reads each player's ped **health,
@@ -185,6 +210,23 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **Notification config name collision crashed `ShowNotification`.** The new notify config table shared
+  the name of a legacy global `Notify()` function in the client, which overwrote it — so any notification
+  (e.g. toggling the CCTV camera tool) threw `attempt to index a function value (local 'cfg')`. The config
+  table is now `NotifyCfg`; update `configs/cfg-notify-sh.lua` if you edited it (`Notify` → `NotifyCfg`).
+- **`/time` did nothing.** The shipped config had `SyncGameTime = false`, which tells clients to
+  ignore LACORE's clock (hand it to vMenu) — so `/time` set the server hour but no client applied it.
+  Default is now `true` (LACORE owns the clock, as documented), so `/time` and the admin time slider
+  work out of the box; `/time` now also **applies instantly** (broadcasts immediately instead of waiting
+  for the next sync tick), validates the input (`/time <0-23> [0-59]`), persists, and replies with usage
+  on bad input. Set `SyncGameTime = false` only if another resource (vMenu) should own the clock.
+- **RPEmotes / DPEmotes not detected (emote radial).** The emote-provider detection ran **once** ~1.5 s
+  after LACORE started, so an emote resource that starts later (load order) was missed — the civilian
+  radial then reported "no provider". Detection now **retries for ~20 s**, **re-checks when a resource
+  starts** and **lazily on first use**, recognises more folder names (`rpemotes`, `rpemotes-reborn`,
+  `rpemotesv2`, `dpemotes`, `dp-emotes`), and a **`lacore_emote_resource` convar** lets you force a
+  custom folder name. Note: **LACORE never registers `/e` itself** — it routes through your emote
+  resource — so it does not block RPEmotes/DPEmotes `/e`.
 - **Phone prop sits right in the hand + is tunable.** The in-hand phone prop used call-to-ear attach
   values, so it lay flat/awkwardly while reading the phone. The hold offset/rotation/bone are now in
   `configs/cfg-phone-sh.lua` (`PhoneCfg.hold`) with a clean default, and a live tuner —

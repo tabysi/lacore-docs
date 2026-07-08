@@ -1,0 +1,73 @@
+---
+title: Phone
+---
+
+import { Callout } from 'nextra/components'
+
+# Phone — `configs/cfg-phone-sh.lua`
+
+Configures the LACORE **NUI phone** (an on-screen iPhone-style device with a prop held in the hand).
+RP-only — there is deliberately no banking / money app.
+
+<Callout type="info">
+  The phone is also gated by the [feature toggles](/configuration/features) (`Features.phone`). Turn it
+  off there to remove the phone entirely.
+</Callout>
+
+## Core options
+
+```lua
+PhoneCfg.useNui     = true            -- true = the new NUI phone; false = the legacy scaleform phone
+PhoneCfg.openKey    = "F1"            -- open/close key (players can rebind in FiveM keybind settings)
+PhoneCfg.requireNick = true           -- require a set RP nick before the phone opens (devmode bypasses)
+PhoneCfg.eyefindUrl = "https://lacore.gg"  -- the in-phone browser home page (your community, never a foreign site)
+PhoneCfg.numberPrefix = "555"         -- phone-number prefix (e.g. 555-0142)
+```
+
+## Apps
+
+Each app can be turned on/off individually:
+
+```lua
+PhoneCfg.apps = {
+  messages = true, contacts = true, dialer = true, eyefind = true,
+  dispatch = true,   -- 911 / 311 report
+  camera   = true,   -- camera + gallery (needs screenshot-basic)
+  social   = true,   -- Bleeter feed + messenger groups
+  notes = true, garage = true, wallet = true, weather = true,
+  calc = true, directory = true, torch = true, settings = true,
+}
+```
+
+## Ringtones, camera, directory
+
+```lua
+-- Ringtones (incoming call) + SMS notification sound — data-driven GTA frontend sounds.
+PhoneCfg.ringtones = { { id = "classic", label = "Classic", sound = "Text_Arrive_Tone", set = "Phone_SoundSet_Default" }, --[[ … ]] }
+PhoneCfg.notifSound = { sound = "Text_Arrive_Tone", set = "Phone_SoundSet_Default" }
+
+-- Camera upload endpoint (screenshot-basic). Empty = inline data-URI screenshot.
+PhoneCfg.cameraUpload = ""
+
+-- Business / services directory (the "directory" app). Merged with phone-tagged map blips.
+PhoneCfg.directory = { { name = "LSPD (non-emergency)", number = "311", category = "Government" }, --[[ … ]] }
+```
+
+## Prop hold in the hand
+
+If the phone prop looks off in the hand, tune these — or use the live tuner
+**`/phonehold <x> <y> <z> <rx> <ry> <rz>`** (while the phone is open) and copy the printed values here:
+
+```lua
+PhoneCfg.propModel = "prop_amb_phone"
+PhoneCfg.hold = {
+  bone = 28422,                         -- right-hand bone (SKEL_R_Hand)
+  pos  = { x = 0.0, y = 0.0, z = 0.0 }, -- offset (metres)
+  rot  = { x = 0.0, y = 0.0, z = 0.0 }, -- rotation (degrees)
+}
+```
+
+<Callout type="info">
+  Calls use **pma-voice**, the camera app needs **screenshot-basic**, and contacts / messages / call
+  log / notes / gallery are DB-persisted per character.
+</Callout>

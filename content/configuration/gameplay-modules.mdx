@@ -1,0 +1,106 @@
+---
+title: Gameplay & Misc Modules
+---
+
+import { Callout } from 'nextra/components'
+
+# Gameplay & Misc Modules
+
+The smaller, self-contained config files — one per feature. Each is escrow-open and carries a comment
+header in the file itself; this page is the quick reference. Toggle any of these off entirely in
+[Feature Toggles](/configuration/features).
+
+## Air Unit — `configs/cfg-airunit-sh.lua`
+
+The helicopter observation camera (heli-cam) for LEO air support: orbit a target, zoom, switch vision
+modes and drop a spotlight.
+
+```lua
+AirUnit.enabled = true
+AirUnit.jobs    = { "Law Enforcement" }   -- jobs allowed to use the heli-cam
+
+AirUnit.orbit = { radius = 150.0, altitude = 120.0, speed = 20.0 }  -- auto-orbit around the locked target
+AirUnit.cam = {
+  fovMax = 70.0, fovMin = 8.0,   -- zoom range (wide … tight)
+  fovSpeed = 5.0, panSpeed = 6.0, -- zoom + gimbal pan/tilt speed
+  scanTime = 2.5,                 -- seconds the crosshair must hold an entity to lock it
+  modes = { "normal", "night", "thermal" },
+}
+AirUnit.spotlight = { range = 300.0, brightness = 25.0, radius = 12.0 }
+```
+
+<Callout type="info">
+  The overlay can show live **street names / directions** under the crosshair (`AirUnit.overlay`),
+  sampled on a grid around the aim point.
+</Callout>
+
+## Corrections / Jail — `configs/cfg-corrections-sh.lua`
+
+Server-authoritative jail. An arrest with jail time books the suspect automatically (see the penal
+code), and the sentence persists across reconnects.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `Corrections.secondsPerMonth` | `30` | Real seconds served per sentenced "month". |
+| `Corrections.minSeconds` / `maxSeconds` | `30` / `1200` | Clamp on any single sentence. |
+| `Corrections.autoBookArrests` | `true` | An arrest report with jail time books the suspect automatically. |
+| `Corrections.persist` | `true` | Keep the remaining sentence across reconnects. |
+| `Corrections.jailCoords` / `releaseCoords` | — | Where inmates are held / released. Move these to your map. |
+
+## Impound — `configs/cfg-impound-sh.lua`
+
+Officers impound a nearby vehicle; owners retrieve it for a fee.
+
+```lua
+Impound.enabled     = true
+Impound.fee         = 500     -- retrieval fee
+Impound.maxDistance = 8.0     -- how close an officer must be to impound
+Impound.persist     = true    -- remember impounded vehicles across restarts
+```
+
+## K9 — `configs/cfg-k9-sh.lua`
+
+A police dog that follows its handler and searches for suspects / contraband.
+
+```lua
+K9.enabled        = true
+K9.jobs           = { "Law Enforcement" }
+K9.model          = "a_c_shepherd"   -- dog ped model
+K9.name           = "Rex"
+K9.followDistance = 1.6
+K9.searchRadius   = 12.0
+```
+
+## Global-ban network — `configs/cfg-globalban-sh.lua`
+
+Optional participation in a shared ban list across LACORE servers: a banned identifier on one
+participating server is refused on the others.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `GlobalBan.enabled` | `true` | Check joining players against the shared list. |
+| `GlobalBan.refreshMinutes` | `15` | How often the list is refreshed. |
+| `GlobalBan.checkTypes` | license/discord/… | Which identifier types are matched. |
+| `GlobalBan.failOpen` | `true` | If the list can't be reached, **let players in** (never lock out your server on a network hiccup). |
+| `GlobalBan.propagate` | `false` | Whether **your** bans are pushed to the network (off by default). |
+
+<Callout type="warning">
+  `failOpen = true` is the safe default — a network outage should never stop legitimate players from
+  joining. Only set it `false` if you'd rather refuse joins than risk letting a networked-banned player in.
+</Callout>
+
+## Radio speech-to-text — `configs/cfg-stt-sh.lua`
+
+Experimental offline push-to-talk transcription. See [Radio STT](/features/radio-stt). Off by default.
+
+## Smaller files
+
+| File | What it holds |
+| --- | --- |
+| `configs/cfg-emojis-sh.lua` | The `emojiList` map of `:shortcode:` → emoji used in chat / MDT text. Add your own entries. |
+| `configs/locale-sh.lua` | Registers the active `Locale` table from `Language` (and `MdtLanguage`). To add a language, translate `lang/en.*` and register the code here. |
+
+<Callout type="info">
+  These files rarely need editing. Emoji shortcodes and language registration are the only reasons to
+  open them.
+</Callout>

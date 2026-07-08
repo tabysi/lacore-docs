@@ -15,6 +15,7 @@ The central gameplay/world config. Escrow-ignored — edit freely.
 | `trainsEnabled` | `true` | Enable metro trains (only metros by default — others can bug out). |
 | `ThirdEye` | `true` | Enable ox_target player interactions (cuff / drag / put-in-vehicle / medic / revive / carry …). Requires `ox_target`. Chat commands (`/release`, `/uncuff` …) stay available regardless. |
 | `GameMinuteSeconds` | `8` | Real seconds per in-game minute. `8` → a full day ≈ 3.2 real hours. `60` = real time (1:1). |
+| `SyncGameTime` | `true` | Let LACORE own the world clock so it advances smoothly for everyone and `/time <hh> <mm>` works. Set `false` only if **another** resource controls the time — then LACORE won't touch it. |
 | `Language` | `"en"` | Locale for all server/HUD Lua text. Supported: `en`, `de`, `ru`. |
 | `MdtLanguage` | `""` | Separate language for the NUI (MDT / Dispatch / Profile). Empty = follow `Language`. |
 | `UseDatabase` | `true` | Mirror every persistent store to MySQL (oxmysql). `false` = local JSON only. |
