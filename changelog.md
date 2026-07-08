@@ -3,9 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.2.0] – NativeLacoreUI, Air Unit, Corrections, framework support, config backup & more
+## [3.2.0] – New NUI Phone, Feature Toggles, Air Unit, Corrections & more
+
+**Highlights:** a brand-new **iPhone-style NUI phone** (calls, SMS, apps and more), a **feature-toggle
+config** so you can run only the parts of LACORE you want (e.g. just the MDT/CAD), real
+**ESX / QBCore / QBox** compatibility, new gameplay systems (**Corrections / Jail**, **Impound**,
+**Air Unit**, **K9**), premium notifications & dialogs, a full LACORE re-brand, config backup/restore,
+and an experimental radio **speech-to-text**.
 
 ### Added
+
 - **New LACORE Phone — modern NUI phone (Phase 1).** The old native iFruit scaleform phone is being
   replaced by a purpose-built **Svelte NUI phone** in the LACORE look: an on-screen device (opens on
   **F1**, rebindable) with a phone **prop held in hand** so others see you're on the phone. Phase 1
@@ -25,9 +32,53 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   (`Phone.cameraUpload`) stores hosted URLs instead of inline images. Both apps are config-gated
   (`Phone.apps.dispatch` / `.camera`). *(Camera needs the `screenshot-basic` resource; verified in
   preview, live capture/upload is for the server.)*
+- **Phone Phase 3 — social: Bleeter feed + messenger groups.** A **Bleeter** app (Twitter-style RP
+  feed): post a short message, see a live server-wide timeline, and like/unlike posts. A **Groups**
+  app for group chats: create a group and invite members by phone number, then everyone in it sees
+  the shared thread live; leave any time. Feed and groups are **DB-persisted** and broadcast to online
+  players (each viewer gets their own like state). Config-gated by `Phone.apps.social`.
+  *(NUI verified in preview; cross-player delivery is for the live server.)*
+- **Phone Phase 4 — settings, ringtones & modes.** The Settings app now has real depth: pick a
+  **ringtone** (played on incoming calls) from a config-driven list with a **preview** button, a
+  **notification sound** for SMS, **Do Not Disturb** (mutes ringtone + notifications) and **Airplane
+  mode** (a "no service" indicator that blocks outgoing calls/SMS), plus a **wallpaper** picker — all
+  saved locally and synced to the client for sound behaviour. Ringtones/notification sound are
+  data-driven in `configs/cfg-phone-sh.lua` (`Phone.ringtones`, `Phone.notifSound`). This completes
+  the phased phone rework. *(NUI verified in preview; ringtone/notification playback is in-game.)*
+- **Phone — seven more apps.** The LACORE phone gains **Notes** (persisted notepad), **Garage** (your
+  registered vehicles, read from the CAD civilian mirror), **Wallet** (a digital ID card — name, DOB,
+  address, driver-licence status from your character), **Weather** (live in-game weather + clock),
+  **Calculator**, a **Directory** (business/services list from `PhoneCfg.directory` + phone-tagged map
+  blips, tap to call) and a **Flashlight** toggle. All config-gated via `PhoneCfg.apps`; RP-only.
 - **Phone branding leak fixed (Eyefind).** The legacy phone hardcoded a foreign community's websites
   (`sarrp.org`) that the Eyefind browser loaded; it now uses the LACORE branding/phone URL, and the
   legacy scaleform phone goes dormant while the new NUI phone is active.
+- **Feature toggles — enable/disable any component (`configs/cfg-features-sh.lua`).** You can now run
+  exactly the parts of LACORE you want — e.g. **only the MDT/CAD**. A single `Features` table gates every
+  major component: the **CAD suite** (with per-agency sub-toggles `lapd` / `lasd` / `ems` / `dispatch` /
+  `bolo`), **Phone**, **Air Unit**, **CCTV**, **Corrections**, **Impound**, **K9**, field essentials,
+  NADS, radio **STT**, staff **Admin** tools, **Web-Dispatch**, the **Civilian** update (with `org` /
+  `turf` sub-toggles) and misc **Extras** (props / stretcher / trains / death-sync). A disabled feature's
+  module simply doesn't load — no commands, threads or events, ~0 ms. **Default is ON**, so existing
+  servers are unchanged; infrastructure (DB, Discord, security, framework bridge, identity, profile)
+  always stays on and can't be disabled. The file is escrow-open and covered by config backup.
+- **Anticheat overhaul — server-authoritative, trust-based, near-zero false positives.** The anticheat
+  gained a much stronger and safer core:
+  - **Server-authoritative sweep (OneSync).** The server itself reads each player's ped **health,
+    position and model** every few seconds — these checks run entirely server-side and **can't be
+    patched out** by an executor that kills the client anticheat. Catches god-mode health, impossible
+    on-foot teleports and blacklisted / god ped models. Auto-disables with a console warning if OneSync
+    is off.
+  - **Trust score (escalate, don't insta-ban).** Detections add points by severity and points **decay**
+    during clean play, so a single false positive can't ban on its own — only a persistent offender
+    crosses the kick/ban threshold. Makes running in `kick`/`log` mode safe.
+  - **Immunity windows + whitelist.** Spawn / revive / jail-TP grant short immunity so legit
+    invincibility & teleports never flag, and admins with an ACE bypass permission are never punished
+    (still logged). New exports `AcImmune` / `AcFlag` for your own resources.
+  - **Evidence capture (optional).** On a serious detection the server can request a **screenshot** from
+    the flagged client and attach the link to the Discord admin log (needs `screenshot-basic`; off by
+    default). All configurable in `configs/cfg-anticheat-sh.lua` (`Trust`, `ServerSweep`, `Whitelist`,
+    `Evidence`, `BlacklistedPeds`).
 - **NativeLacoreUI — own standalone menu system, NativeUI dependency removed.** LACORE's in-world
   menus (settings, phone booth, vehicle spawner, AOP vote, props, character) previously required the
   external `NativeUILua_Reloaded` resource. They now run on **NativeLacoreUI**, LACORE's own
@@ -109,7 +160,6 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   first snapshots the current on-disk configs (rollback), and a resource restart applies it.
   (Runtime data in `data/*.json` is already DB-persisted and survives on its own with oxmysql.)
 
-### Added — MDT messages unread ping
 - **Unread badge on the MDT messages portal.** The **DISPATCH** tab (the shared dispatch⇄units chat)
   now shows a small **red count badge** and an accent bar when new messages arrive while you're on
   another tab — so units notice a message without staring at the tab. **Purely visual, no sound.**
@@ -118,8 +168,46 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 ### Changed
 - **LAPD unit list — no more `(N)` callsign suffix.** Partners sharing a callsign were listed as
   e.g. `1A-12 (2)`. The unit row now shows just the callsign; the members still expand via the row.
+- **Internal KVP keys re-branded `PVP_CORE:*` → `LACORE:*`** (playerlist, world time, AOP). A one-shot
+  migration on boot copies any existing legacy values over and deletes the old keys, so no persisted
+  data is lost. (The client-side KVP migration for `PVP-CORE:*` player keys already existed.)
+- **Console hygiene — gated debug logging.** New shared `Debug(...)` / `IsDebug()` helper (off by
+  default). Developer trace `print()`s — most notably the client boot sequence in `world-cl.lua`
+  (~25 lines that spammed every player's F8 console) plus vehicle/plates/CCTV/weapons/events traces
+  and a couple of server score/AOP dumps — now route through `Debug()`. Enable with `setr lacore_debug 1`.
+  **Intentional output is kept as `print()`**: security/IP-lock alerts, DB & startup status,
+  missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **Anticheat — false positives removed (God Mode + Anti-Dump) & localised messages.** Two detections
+  were wrongly punishing legit players:
+  - **God Mode** flagged `hp > GetEntityMaxHealth`, but full GTA health is **200** while
+    `GetEntityMaxHealth` reads inconsistently (a stale 175 vs. a live 200) — so a perfectly healthy
+    player was kicked (`invincible=false hp=200/175`). It now flags only **real invincibility**
+    (`GetPlayerInvincible`) or health **strictly above** a configurable ceiling (default 200, so 200
+    never trips), sustained across several checks and **never during spawn protection** (config
+    `GodMode.maxHealth` / `spawnGrace` / `strikes`).
+  - **Anti-Dump** counted *every* short session (<120 s) toward the 24 h connect block, so a player who
+    crashed or had a bad connection a few times got banned. It now only counts sessions where the
+    client **never completed the anticheat handshake** — i.e. genuine headless dump-bot behaviour;
+    real (verified) players are never blocked for short sessions.
+  - Kick/ban messages now show a **friendly, localised reason** (e.g. "God mode" / "Gottmodus" /
+    "Режим бога") instead of the raw internal code — the code still goes to the Discord admin log.
+- **Phone — move while it's open, typing still captured.** The phone no longer freezes you in place:
+  it now keeps game input so you can **walk and drive with the phone open**, and only grabs the
+  keyboard while a **text field is focused** (writing a message), handing movement back on blur.
+  Clicking the phone no longer shoots/swings and the pause menu is suppressed while it's open, and
+  **F1 now toggles** the phone (so it always closes, even mid-typing).
+- **Phone iPhone-16 redesign + camera crash guard.** The NUI phone now looks like an **iPhone 16** —
+  a titanium-bezel frame with a **Dynamic Island**, an iOS status bar (signal / Wi-Fi / battery),
+  a gradient wallpaper, **squircle app icons** with labels, a page dot and a **frosted dock**; chat
+  bubbles, buttons and back arrows use iOS blue. The camera no longer throws
+  `No such export requestScreenshot in resource screenshot-basic` — every `screenshot-basic` call is
+  now `pcall`-guarded (prefers `requestScreenshotUpload`, falls back safely, and always restores the UI).
+- **Phone crash + crisp home-screen icons.** The new phone config global collided with the legacy
+  scaleform phone's `Phone()` function (`attempt to index a function value (global 'Phone')`); the
+  config table is now `PhoneCfg`, so both coexist. The home-screen app icons are now proper **Lucide**
+  glyphs (imported per-icon so the build stays fast) instead of emoji.
 - **Air Unit overhaul.** Locking a target (Spacebar/L) then engaging orbit now **keeps flying after you
   leave the heli cam** — the lock persists so the auto-orbit keeps circling instead of dropping the
   target when the cam closes. A **compact status HUD** now shows even with the cam closed (orbit / lock
@@ -191,7 +279,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   placement coords drive the distance check, and the server broadcasts the netId so the owning
   client deletes it locally.
 
-### Security
+### Security & Robustness
 - **Reusable hardening helpers** (`modules/security/harden-sv.lua`): per-key rate limiting, input
   sanitising, and identifier validation, applied to the network-ban tooling so bad input can't reach
   the shared ban list.
@@ -203,23 +291,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   register as a unit and then pass every `IsLasdUnit` / `IsEmsUnit` gate — creating incidents,
   running **record queries**, changing status, etc.
 
-### Robustness
 - **Guarded `json.decode`.** The player-list KVP restore (server boot), the character KVP restore
   (`/character`), and the legacy phone screenshot-upload response are now wrapped in `pcall` with
   type checks, so a corrupt value can't throw during boot or at runtime.
-
-### Changed — branding of internal keys
-- **Server KVP keys renamed `PVP_CORE:*` → `LACORE:*`** (playerlist, world time, AOP). A one-shot
-  migration on boot copies any existing legacy values over and deletes the old keys, so no persisted
-  data is lost. (The client-side KVP migration for `PVP-CORE:*` player keys already existed.)
-
-### Changed — console hygiene
-- **Gated debug logging.** New shared `Debug(...)` / `IsDebug()` helper (off by default). Developer
-  trace `print()`s — most notably the client boot sequence in `world-cl.lua` (~25 lines that spammed
-  every player's F8 console) plus vehicle/plates/CCTV/weapons/events traces and a couple of server
-  score/AOP dumps — now route through `Debug()`. Enable with `setr lacore_debug 1`. **Intentional
-  output is kept as `print()`**: security/IP-lock alerts, DB & startup status, missing-dependency
-  warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### 🎙 Speech-to-Text — Radio Transcript (experimental — disabled by default)
 
