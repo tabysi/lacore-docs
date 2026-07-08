@@ -185,6 +185,11 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **Phone prop sits right in the hand + is tunable.** The in-hand phone prop used call-to-ear attach
+  values, so it lay flat/awkwardly while reading the phone. The hold offset/rotation/bone are now in
+  `configs/cfg-phone-sh.lua` (`PhoneCfg.hold`) with a clean default, and a live tuner —
+  `/phonehold <x> <y> <z> <rx> <ry> <rz>` (while the phone is open) — lets you dial it in and copy the
+  values into the config.
 - **Anticheat — false positives removed (God Mode + Anti-Dump) & localised messages.** Two detections
   were wrongly punishing legit players:
   - **God Mode** flagged `hp > GetEntityMaxHealth`, but full GTA health is **200** while
