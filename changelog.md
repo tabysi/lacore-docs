@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.2.0] – Global ban network protection
+## [3.2.0] – NativeLacoreUI, Air Unit, Corrections, framework support, config backup & more
 
 ### Added
 - **NativeLacoreUI — own standalone menu system, NativeUI dependency removed.** LACORE's in-world
@@ -74,6 +74,18 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   banned on the network is refused on connect, so known offenders can't just hop to another LACORE
   server. Only stable per-account identifiers are matched (never shared IPs), and the check is
   **fail-open** — if the network can't be reached, your players are let in rather than locked out.
+- **Branding config + full LACORE re-brand.** New `configs/cfg-branding-sh.lua` centralises the
+  visible community name (`Branding.label` / `Branding.community`). All remaining `Pacific Valley`
+  strings — the on-screen spawn welcome, the phone-booth panel, the weapon-wheel panel, and the
+  Discord connect title — are now LACORE-branded and driven by this config, so an operator can
+  re-brand every in-game label in one place. (Internal identifiers / KVP keys are deliberately left
+  untouched.)
+- **Config backup / restore across reinstalls.** New `/lacoreconfig backup | restore | status`
+  (console / staff) snapshots the hand-edited `configs/*.lua` files into the DB and can write them
+  back after a reinstall (which ships default configs). Backup is manual by design — no auto-backup
+  on start, which would clobber a good backup with fresh defaults right after a reinstall. `restore`
+  first snapshots the current on-disk configs (rollback), and a resource restart applies it.
+  (Runtime data in `data/*.json` is already DB-persisted and survives on its own with oxmysql.)
 
 ### Fixed
 - **Air Unit overhaul.** Locking a target (Spacebar/L) then engaging orbit now **keeps flying after you
@@ -136,29 +148,6 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   another department (or reopening on a new one) closes the previous CAD instead of leaving it
   stuck on screen — the old one could no longer be moved or closed. Handled both on the department
   change itself and whenever `/mdt` opens a CAD.
-
-### Security
-- **Reusable hardening helpers** (`modules/security/harden-sv.lua`): per-key rate limiting, input
-  sanitising, and identifier validation, applied to the network-ban tooling so bad input can't reach
-  the shared ban list.
-
-## [3.1.6] – Security hardening, fixes, config backup, branding & experimental STT
-
-### Added
-- **Branding config + full LACORE re-brand.** New `configs/cfg-branding-sh.lua` centralises the
-  visible community name (`Branding.label` / `Branding.community`). All remaining `Pacific Valley`
-  strings — the on-screen spawn welcome, the phone-booth panel, the weapon-wheel panel, and the
-  Discord connect title — are now LACORE-branded and driven by this config, so an operator can
-  re-brand every in-game label in one place. (Internal identifiers / KVP keys are deliberately left
-  untouched.)
-- **Config backup / restore across reinstalls.** New `/lacoreconfig backup | restore | status`
-  (console / staff) snapshots the hand-edited `configs/*.lua` files into the DB and can write them
-  back after a reinstall (which ships default configs). Backup is manual by design — no auto-backup
-  on start, which would clobber a good backup with fresh defaults right after a reinstall. `restore`
-  first snapshots the current on-disk configs (rollback), and a resource restart applies it.
-  (Runtime data in `data/*.json` is already DB-persisted and survives on its own with oxmysql.)
-
-### Fixed
 - **Characters lost on core restart.** After restarting the resource, connected players were
   prompted to re-create their character. `playerSpawned` (which restores the active character) does
   not fire on a resource restart, so the client now also re-requests it on `onClientResourceStart`
@@ -171,6 +160,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
   client deletes it locally.
 
 ### Security
+- **Reusable hardening helpers** (`modules/security/harden-sv.lua`): per-key rate limiting, input
+  sanitising, and identifier validation, applied to the network-ban tooling so bad input can't reach
+  the shared ban list.
 - **NADS: server-side staff gate.** `AddNADSStreet` now requires `HasPermission(src, "nads")`
   (staff / dev bypass) — the client-only `player.staff` check could be bypassed by a crafted event
   to inject addresses or spam the Discord webhook. The payload is also type-checked.
