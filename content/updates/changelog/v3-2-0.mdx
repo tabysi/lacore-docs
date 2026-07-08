@@ -77,8 +77,14 @@ and an experimental radio **speech-to-text**.
     (still logged). New exports `AcImmune` / `AcFlag` for your own resources.
   - **Evidence capture (optional).** On a serious detection the server can request a **screenshot** from
     the flagged client and attach the link to the Discord admin log (needs `screenshot-basic`; off by
-    default). All configurable in `configs/cfg-anticheat-sh.lua` (`Trust`, `ServerSweep`, `Whitelist`,
-    `Evidence`, `BlacklistedPeds`).
+    default).
+  - **Server-authoritative combat integrity.** New checks on the built-in weapon events (so they can't
+    be hidden by a patched-out client anticheat): **dealing damage with a blacklisted weapon** is
+    cancelled + punished server-side, an **aimbot / silent-aim heuristic** (too many distinct victims or
+    an impossible hit-rate → feeds the trust score, never insta-bans a hot gunfight), **projectile spam**
+    (grenade/RPG floods) and **particle-FX spam** (screen-crash exploits). The sweep also catches
+    **impossible armour**. All configurable in `configs/cfg-anticheat-sh.lua` (`Trust`, `ServerSweep`,
+    `Combat`, `Whitelist`, `Evidence`, `BlacklistedPeds`).
 - **NativeLacoreUI — own standalone menu system, NativeUI dependency removed.** LACORE's in-world
   menus (settings, phone booth, vehicle spawner, AOP vote, props, character) previously required the
   external `NativeUILua_Reloaded` resource. They now run on **NativeLacoreUI**, LACORE's own
