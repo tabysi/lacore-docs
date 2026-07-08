@@ -19,6 +19,29 @@ See the [`lacore_devmode` convar](/configuration/convars#dev-mode). When on, it 
 bypasses **all** connect checks, and grants every player full staff/dev permissions. Never on in
 production.
 
+## Access control (whitelist & Discord on/off)
+
+Framework servers (ESX / QBCore / QBox) usually handle identity and permissions themselves and don't
+need LACORE's Discord layer or its members-only whitelist. Switch either off here:
+
+```lua
+AccessControl = {
+    whitelist    = true,  -- members-only join gate (/wl). false = disabled entirely.
+    discordRoles = true,  -- require + read Discord roles and bridge them to ACE. false = off.
+}
+```
+
+| Toggle | `false` means |
+| --- | --- |
+| `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans and the global-ban network still apply.** |
+| `discordRoles` | LACORE no longer requires Discord at connect (no “join our Discord” rejection), doesn't read Discord roles, and doesn't bridge them to ACE. Duty-role gating (`DutyRoles`) is skipped, and Staff/Dev powers come from **ACE / txAdmin** only. |
+
+<Callout type="warning">
+  With `discordRoles = false`, admin powers no longer come from Discord — grant them through ACE
+  (e.g. `add_ace group.admin lacore allow` in `server.cfg`) or txAdmin, and duty authorisation comes
+  from the framework job (see the [Framework Bridge](/features/bridge)).
+</Callout>
+
 ## Discord role authentication (built-in)
 
 LACORE reads Discord roles directly via a bot token (no external `discordroles` resource). Roles are

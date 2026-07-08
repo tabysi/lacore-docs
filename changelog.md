@@ -13,6 +13,13 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **Access-control toggles for framework servers (`AccessControl` in `configs/cfg-server-sv.lua`).**
+  Two switches so ESX / QBCore / QBox servers don't have to run LACORE's own gatekeeping:
+  `AccessControl.whitelist` (default on) disables the members-only join gate entirely when off (`/wl`
+  becomes a no-op; bans still apply), and `AccessControl.discordRoles` (default on) turns off the whole
+  Discord layer when off — no Discord required at connect, no roles read, no Discord→ACE bridge. With
+  Discord off, duty-role gating is skipped (duty auth comes from the framework job) and Staff/Dev powers
+  come from ACE / txAdmin instead.
 - **CCTV camera groups by locality.** Runtime-placed field cameras (the CAM tool) are now auto-sorted
   into **groups by the in-game locality** they sit in — e.g. *Vinewood*, *Sandy Shores*, *Del Perro*.
   Each group is its own network in the CCTV viewer and its own section in the `/cameras` manager, so a
