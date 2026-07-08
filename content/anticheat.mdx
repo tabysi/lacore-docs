@@ -1,0 +1,62 @@
+---
+title: Anti-Cheat & Security
+---
+
+import { Callout } from 'nextra/components'
+
+# Anti-Cheat & Security
+
+LACORE ships with a **built-in, multi-layered anti-cheat** — protection is included with the resource.
+There is no separate product to buy and nothing extra to wire up: enable it, set your punishment
+levels, and your server is defended out of the box.
+
+<Callout type="info">
+  Protection is **on the house** — the anti-cheat is part of LACORE, not an add-on. It runs alongside
+  everything else and stays fully standalone.
+</Callout>
+
+## What you're protected against
+
+LACORE actively guards your server against the common ways cheaters ruin a roleplay experience:
+
+- 🛡️ **Invincibility & health/armour tampering** — god-mode and impossible-stat exploits
+- 🔫 **Illegal weapons & combat abuse** — banned weapons, aimbot-style behaviour and rapid-fire abuse
+- 💥 **Explosion, projectile & crash exploits** — including screen-crash and lag attacks
+- 🏃 **Movement cheats** — teleporting, speed and no-clip
+- 🧨 **Mod menus & script injection** — known menu markers and injected-event abuse
+- 📦 **Resource dumping** — headless "download-only" clients and dump bots
+- ♻️ **Event spam** — mass-action floods (e.g. mass-cuff / dispatch spam), even from a compromised account
+- 🕵️ **Anti-cheat tampering** — attempts to disable or strip out the protection itself
+
+## Why it's effective
+
+<Callout type="info">
+  For security reasons we **don't publish exactly how each check works** — that would only help
+  cheaters adapt. What matters for you is the design below.
+</Callout>
+
+- **Server-authoritative core.** The most important checks run **on the server**, so a cheater can't
+  simply switch off the protection on their own machine.
+- **Built for fair play.** A smart, self-balancing system means legitimate players going about normal
+  roleplay are **not** punished for false alarms — real offenders are caught, honest players aren't.
+- **Escalating, not trigger-happy.** Repeat offenders are handled decisively while one-off blips fade
+  away, so you avoid the "banned my whole community by accident" trap.
+- **Full control.** Every protection is **configurable** — choose log / kick / ban per detection, and
+  whitelist your staff so admins are never caught by their own tools.
+- **Evidence & logging.** Detections are logged to your Discord with the player's details (and can even
+  attach a screenshot), so your team has a clear audit trail.
+- **Constantly hardened.** The protection is maintained and expanded with every LACORE update.
+
+## Recommended server hardening
+
+The anti-cheat is strongest when paired with a few standard FiveM server settings (script-hook
+disabled, verified client files, an enforced game build, and OneSync enabled). LACORE checks these on
+start-up and reminds you in the console if any are missing — so you always know your server is locked
+down.
+
+<Callout type="warning">
+  No anti-cheat on any platform can promise to stop **100 %** of cheats — that's simply not how FiveM
+  works. LACORE's job is to make cheating **hard, risky and quickly caught**, and to keep your honest
+  players safe from false bans. Combined with the recommended server settings above, your community is
+  well protected.
+</Callout>
