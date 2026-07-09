@@ -1,0 +1,73 @@
+---
+title: LACORE MDT (Standalone)
+---
+
+import { Callout, Cards } from 'nextra/components'
+
+# LACORE MDT — Standalone LEO CAD Suite
+
+The **law-enforcement half of LACORE**, packaged as its own resource. Every police / fire CAD tool from
+the core — four department terminals, the live Dispatch console, CCTV, BOLOs, charges & records, jail,
+impound, K9 and air support — **without** the civilian layer, phone or web dispatcher. Standalone, or
+bridged to **ESX / QBCore / QBox**.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: '1rem 0 0.5rem' }}>
+  <a href="https://lacore.tebex.io/package/7549630" target="_blank" rel="noreferrer"
+     style={{ background: '#1f6feb', color: '#fff', padding: '10px 18px', borderRadius: 8, fontWeight: 700, textDecoration: 'none' }}>🛒 Lifetime — €180</a>
+  <a href="https://lacore.tebex.io/package/7549629" target="_blank" rel="noreferrer"
+     style={{ background: '#5865F2', color: '#fff', padding: '10px 18px', borderRadius: 8, fontWeight: 700, textDecoration: 'none' }}>🔁 Monthly — €35.70</a>
+</div>
+
+<Callout type="info">
+  Prefer the complete package (LEO **+** civilian layer, phone, admin toolkit and web dispatcher)? Get the
+  full [LACORE core](/). LACORE MDT is the LEO-only edition for servers that just need the CAD.
+</Callout>
+
+## What's included
+
+- **4 Mobile Data Terminals** on one shared backend — LAPD PremierOne, LASD PCMS, Agency/CHP, EMS/Fire.
+  The right terminal opens automatically by department; data is shared across all of them.
+- **Live Dispatch console** — real GTA tile map, editable zones & districts, click-to-assign, unit
+  management, CCTV markers.
+- **CCTV surveillance** — fixed cameras + placeable field cameras with a targeting scanner; auto-grouped
+  by locality.
+- **BOLOs, charges & citations** — a configurable penal code; fines & jail computed server-side.
+- **Evidence & reports** — structured reports and tagged evidence with visibility-gated records.
+- **Multi-character profiles** — a persistent person/vehicle "digital file" the MDT reads from (on ESX,
+  characters come straight from the framework).
+- **Corrections/Jail, Impound, K9 and an Air Unit heli-cam.**
+- **Big Brother logging, ACE permissions and a hardened security stack.**
+- Fully localised **EN / DE / RU**; all config files are escrow-open.
+
+## Requirements
+
+- **oxmysql**, **pma-voice**, **spawnmanager** (same as the core). oxmysql auto-creates its tables and
+  falls back to local JSON if unavailable.
+- Standalone, or an **ESX / QBCore / QBox** bridge — no framework required.
+
+## Install
+
+<Callout type="info">
+  Escrow-protected, IP-locked to one server (one purchase = one server).
+</Callout>
+
+1. Download the resource from your Tebex purchase and unzip it into `resources` as `lacore-mdt`.
+2. Ensure the dependencies **before** it, then the resource, in `server.cfg`:
+   ```cfg
+   ensure oxmysql
+   ensure pma-voice
+   ensure lacore-mdt
+   ```
+3. **Plug-and-play** — it starts and lets officers in with no Discord/whitelist setup. Grant access via
+   the `lacore_mdt.access` ACE (or map an ESX/QB job), then open with `/mdt`.
+
+## Configuration & docs
+
+LACORE MDT ships the same config files as the core, so the rest of this documentation applies directly:
+
+<Cards>
+  <Cards.Card title="Configuration" href="/configuration" arrow />
+  <Cards.Card title="Penal Code & Evidence" href="/configuration/law-enforcement" arrow />
+  <Cards.Card title="CCTV Surveillance" href="/features/cctv" arrow />
+  <Cards.Card title="Command Reference" href="/commands" arrow />
+</Cards>
