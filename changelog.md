@@ -13,6 +13,11 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **HUD toggles (`configs/cfg-hud-sh.lua`).** LACORE's on-screen HUD can now be turned off — a master
+  switch `HudCfg.enabled = false` disables the whole thing (run your own HUD, e.g. C7), or disable
+  individual elements: **PLD** (street/AOP/alert/compass/time), **vehicle HUD** (speed/fuel/gear/seatbelt),
+  the **player list** and **nameplates**. Default is fully on, so existing servers are unchanged. Also in
+  the [Config Editor](/configuration/editor).
 - **Configurable player-name length + Config Editor list editing.** The connect name-length limits are
   no longer hardcoded — `AccessControl.minNameLength` / `maxNameLength` (defaults 3 / 20, `0` disables a
   check) so long Steam names stop being rejected out of the box. The docs **Config Editor** now edits
