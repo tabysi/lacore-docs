@@ -13,6 +13,12 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **Configurable player-name length + Config Editor list editing.** The connect name-length limits are
+  no longer hardcoded — `AccessControl.minNameLength` / `maxNameLength` (defaults 3 / 20, `0` disables a
+  check) so long Steam names stop being rejected out of the box. The docs **Config Editor** now edits
+  **list** configs too: the **Penal Code** is a full row editor (add / edit / remove / reorder charges,
+  seeded with the defaults) that generates the complete `PenalCode = { … }` block to drop in. The editor
+  panel is also fixed-height now, so it no longer resizes between steps.
 - **Access-control toggles for framework servers (`AccessControl` in `configs/cfg-server-sv.lua`).**
   Two switches so ESX / QBCore / QBox servers don't have to run LACORE's own gatekeeping:
   `AccessControl.whitelist` (default on) disables the members-only join gate entirely when off (`/wl`

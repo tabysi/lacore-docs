@@ -24,9 +24,12 @@ inline — then **download the assembled config** and paste it into your files.
 ## How to apply the result
 
 1. Open the downloaded `lacore-config.txt`. It's split into labelled blocks, one per file.
-2. For each block, open the named file and **paste the block at the very end**. Because Lua runs
+2. **APPEND** blocks: open the named file and paste the block at the very end. Because Lua runs
    top-to-bottom, a re-assignment at the end cleanly overrides the default above it — you don't have to
    hunt for the original line.
+3. **REPLACE** blocks (e.g. the penal code `PenalCode = { … }`): swap out the existing block of the same
+   name in the file. These can't just be appended — the file rebuilds a lookup right after the block, so
+   the real block has to change.
 3. The `server.cfg` block holds secret placeholders (Discord token, webhooks). Fill in the real values
    **locally** and never commit them.
 4. **Restart the resource** (`ensure lacore` / `restart lacore`) so the changes load.

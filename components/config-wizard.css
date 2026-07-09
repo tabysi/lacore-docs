@@ -128,6 +128,27 @@
 }
 .cw-input:focus { outline: none; border-color: color-mix(in srgb, var(--cw) 55%, transparent); }
 
+/* List editor (table) */
+.cw-list { display: flex; flex-direction: column; gap: 10px; }
+.cw-list-scroll { overflow-x: auto; border: 1px solid var(--cw-line); border-radius: 10px; }
+.cw-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cw-table th {
+  text-align: left; padding: 8px 8px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--cw-dim); border-bottom: 1px solid var(--cw-line);
+  position: sticky; top: 0; background: color-mix(in srgb, currentColor 4%, transparent);
+}
+.cw-table td { padding: 4px 6px; border-bottom: 1px solid var(--cw-soft); vertical-align: middle; }
+.cw-table tr:last-child td { border-bottom: 0; }
+.cw-table .cw-input { min-width: 0; width: 100%; padding: 5px 7px; }
+.cw-th-act { width: 92px; }
+.cw-td-act { white-space: nowrap; text-align: right; }
+.cw-rowbtn {
+  border: 1px solid var(--cw-line); background: none; color: var(--cw-dim);
+  border-radius: 6px; padding: 3px 7px; font: inherit; font-size: 12px; cursor: pointer; margin-left: 3px;
+}
+.cw-rowbtn:hover { background: var(--cw-soft); color: currentColor; }
+.cw-rowbtn.del:hover { border-color: color-mix(in srgb, #ef4444 55%, transparent); color: #ef4444; }
+
 /* Review */
 .cw-check { display: inline-flex; align-items: center; gap: 8px; color: var(--cw-dim); font-size: 13px; margin-bottom: 12px; cursor: pointer; }
 .cw-actions { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
