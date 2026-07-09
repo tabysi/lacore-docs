@@ -13,10 +13,11 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
-- **MDT "only in a vehicle" option (`configs/cfg-mdt-sh.lua`).** For realism, `MdtConfig.requireVehicle
-  = true` makes the MDT (all four terminals, via `/mdt` / key O) only openable while inside a vehicle —
-  any seat. An already-open MDT still closes on foot so no one gets stuck, and devmode bypasses it.
-  Default off (unchanged). Also in the [Config Editor](/configuration/editor).
+- **MDT vehicle-realism options (`configs/cfg-mdt-sh.lua`).** For realism, `MdtConfig.requireVehicle =
+  true` makes the MDT (all four terminals, via `/mdt` / key O) only openable while inside a vehicle (any
+  seat), and `MdtConfig.closeOnExit = true` auto-closes an open MDT the moment the officer leaves the car.
+  An already-open MDT still closes on foot so no one gets stuck, and devmode bypasses both. Both default
+  off (unchanged). Also in the [Config Editor](/configuration/editor).
 - **HUD toggles (`configs/cfg-hud-sh.lua`).** LACORE's on-screen HUD can now be turned off — a master
   switch `HudCfg.enabled = false` disables the whole thing (run your own HUD, e.g. C7), or disable
   individual elements: **PLD** (street/AOP/alert/compass/time), **vehicle HUD** (speed/fuel/gear/seatbelt),
