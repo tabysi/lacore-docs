@@ -36,10 +36,17 @@ AccessControl = {
 | `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans and the global-ban network still apply.** |
 | `discordRoles` | LACORE no longer requires Discord at connect (no “join our Discord” rejection), doesn't read Discord roles, and doesn't bridge them to ACE. Duty-role gating (`DutyRoles`) is skipped, and Staff/Dev powers come from **ACE / txAdmin** only. |
 
+<Callout type="info">
+  **Plug-and-play:** even with `discordRoles = true`, Discord is only *enforced* once it's actually
+  configured (a bot token **and** guild id are set). On a fresh install with no token, Discord stays
+  **idle** — players connect without it and no roles are read — and the moment you set the convars, role
+  features light up. So you never have to touch this to get the core running.
+</Callout>
+
 <Callout type="warning">
-  With `discordRoles = false`, admin powers no longer come from Discord — grant them through ACE
-  (e.g. `add_ace group.admin lacore allow` in `server.cfg`) or txAdmin, and duty authorisation comes
-  from the framework job (see the [Framework Bridge](/features/bridge)).
+  With `discordRoles = false` (or while Discord is idle), admin powers don't come from Discord — grant
+  them through ACE (e.g. `add_ace group.admin lacore allow` in `server.cfg`) or txAdmin, and duty
+  authorisation comes from the framework job (see the [Framework Bridge](/features/bridge)).
 </Callout>
 
 ## Discord role authentication (built-in)

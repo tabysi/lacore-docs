@@ -217,6 +217,12 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **Plug-and-play: a fresh install no longer locks everyone out.** Previously, with no Discord token
+  configured, the connect check still *required* Discord and rejected every player (and `CanGoOnDuty`
+  blocked LE duty). Discord role auth is now **auto-idle when unconfigured**: the core runs immediately
+  without any Discord/whitelist setup, and role features (member gate, Staff/Dev, `DutyRoles`,
+  Discord→ACE bridge) switch on automatically the moment you set `lacore_discord_token` +
+  `lacore_discord_guild`. `AccessControl.discordRoles = false` still hard-disables it.
 - **Notification config name collision crashed `ShowNotification`.** The new notify config table shared
   the name of a legacy global `Notify()` function in the client, which overwrote it — so any notification
   (e.g. toggling the CCTV camera tool) threw `attempt to index a function value (local 'cfg')`. The config
