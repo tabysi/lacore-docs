@@ -13,6 +13,13 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **K9 overhaul — realistic behaviour, map blip, in-game help.** The police dog no longer reacts to
+  ambient gunfire / panic and wanders off — it now ignores non-temporary events and holds its assigned
+  task (`SetBlockingOfNonTemporaryEvents` + keep-task + no-flee), so it behaves like a trained working
+  dog. It **teleports back to heel** if left too far behind (`K9.maxDistance`), **shows on the map** with
+  a configurable blip (`K9.blip`), `search` now trots ahead and sniffs the area (with a sniff animation)
+  instead of sitting in place, and `engage` commits and charges the target. New `/k9 help` lists every
+  command in chat, and deploying hints at it. New config: `K9.maxDistance`, `K9.searchWalk`, `K9.blip`.
 - **MDT vehicle-realism options (`configs/cfg-mdt-sh.lua`).** For realism, `MdtConfig.requireVehicle =
   true` makes the MDT (all four terminals, via `/mdt` / key O) only openable while inside a vehicle (any
   seat), and `MdtConfig.closeOnExit = true` auto-closes an open MDT the moment the officer leaves the car.

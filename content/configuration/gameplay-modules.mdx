@@ -60,7 +60,9 @@ Impound.persist     = true    -- remember impounded vehicles across restarts
 
 ## K9 — `configs/cfg-k9-sh.lua`
 
-A police dog that follows its handler and searches for suspects / contraband.
+A trained police dog that heels, searches, engages and loads into the patrol car. It ignores ambient
+stimuli (gunfire, panic) and holds its task — so it behaves like a working K9, not a wandering animal —
+and it **shows on the map**.
 
 ```lua
 K9.enabled        = true
@@ -68,8 +70,15 @@ K9.jobs           = { "Law Enforcement" }
 K9.model          = "a_c_shepherd"   -- dog ped model
 K9.name           = "Rex"
 K9.followDistance = 1.6
-K9.searchRadius   = 12.0
+K9.maxDistance    = 40.0             -- teleport back to heel if left this far behind (0 = never)
+K9.searchRadius   = 12.0             -- radius the dog sweeps on /k9 search
+K9.searchWalk     = 6.0              -- how far ahead it trots to sniff
+K9.blip = { enabled = true, sprite = 442, color = 5, scale = 0.85 }  -- map blip
 ```
+
+**Commands** (also listed in-game via `/k9 help`): `/k9` deploy/recall · `heel` · `stay` · `search`
+(sniffs the area ahead, alerts on an armed subject) · `engage` (charges the aimed/nearest target) ·
+`car` (loads into the nearest vehicle).
 
 ## Global-ban network — `configs/cfg-globalban-sh.lua`
 
