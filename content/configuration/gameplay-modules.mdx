@@ -76,9 +76,13 @@ K9.searchWalk     = 6.0              -- how far ahead it trots to sniff
 K9.blip = { enabled = true, sprite = 442, color = 5, scale = 0.85 }  -- map blip
 ```
 
-**Commands** (also listed in-game via `/k9 help`): `/k9` deploy/recall · `heel` · `stay` · `search`
-(sniffs the area ahead, alerts on an armed subject) · `engage` (charges the aimed/nearest target) ·
-`car` (loads into the nearest vehicle).
+**Commands** (also listed in-game via `/k9 help`): `/k9` deploy/recall · `heel` (follow) · `stay` ·
+`sit` · `lay` (platz) · `bark` · `search` (sniffs the area ahead, alerts on an armed subject) · `engage`
+(charges the aimed/nearest target) · `car` (loads into the nearest vehicle).
+
+Every action is **also a keybindable command** — players can bind them in **FiveM Settings → Key
+Bindings → FiveM** (`lacore_k9`, `lacore_k9_heel`, `lacore_k9_sit`, `lacore_k9_bark`, … — all unbound by
+default).
 
 ## Global-ban network — `configs/cfg-globalban-sh.lua`
 
