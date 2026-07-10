@@ -265,6 +265,12 @@ and an experimental radio **speech-to-text**.
   work out of the box; `/time` now also **applies instantly** (broadcasts immediately instead of waiting
   for the next sync tick), validates the input (`/time <0-23> [0-59]`), persists, and replies with usage
   on bad input. Set `SyncGameTime = false` only if another resource (vMenu) should own the clock.
+- **vMenu time conflict — clock kept fighting even with `SyncGameTime = false`.** LACORE set the
+  day-length (`SetMillisecondsPerGameMinute`) in an **ungated** thread, so handing the clock to vMenu
+  (`SyncGameTime = false`) stopped the hour/minute overrides but *not* the time-speed — vMenu and LACORE
+  each forced their own speed and the clock jumped. The day-length call now also respects
+  `SyncGameTime`: with it `false`, LACORE no longer touches the time speed at all, so vMenu owns the
+  clock cleanly.
 - **RPEmotes / DPEmotes not detected (emote radial).** The emote-provider detection ran **once** ~1.5 s
   after LACORE started, so an emote resource that starts later (load order) was missed — the civilian
   radial then reported "no provider". Detection now **retries for ~20 s**, **re-checks when a resource
