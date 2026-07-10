@@ -86,14 +86,15 @@ CCTV.placeProps  = true              -- false = invisible cameras (coordinates o
 CCTV.defaultProp = "prop_cctv_cam_02a"
 CCTV.props = {                        -- the models you can cycle through (only these may be spawned)
   { model = "prop_cctv_cam_02a", label = "Dome cam" },
-  { model = "prop_cctv_pole_02", label = "Cam pole 2", camZ = 2.7 },  -- lens height above the base
+  { model = "prop_cctv_pole_02", label = "Cam pole 2", camZ = 2.7, camFwd = 0.6 },
   -- … add / remove freely
 }
 ```
 
-`camZ` is the height of the lens above the prop's base — wall / dome cams *are* the lens (0), while a
-**pole** puts the camera on top, so the live `/cctv` view is rendered from up there. Tune it per model if
-a camera's view sits too low or high.
+For **poles** the live `/cctv` view is rendered from the lens on top of the post: `camZ` is the lens
+height above the base, and `camFwd` pushes the viewpoint that far **in front** of the base (along the
+aimed direction) so it isn't stuck inside the pole shaft. Wall / dome cams *are* the lens, so both are 0.
+Tune `camZ` / `camFwd` per model if a view sits too low / high or clips the post.
 
 <Callout type="info">
   Only models listed in `CCTV.props` can be spawned — the server rejects anything else, so a client can't

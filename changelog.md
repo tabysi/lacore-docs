@@ -263,6 +263,11 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **Pole CCTV view came from inside the post.** A pole camera's live view was placed directly above the
+  base — i.e. inside the pole shaft, staring at the horizon. The viewpoint now sits a little **in front**
+  of the base (new per-model `CCTV.props.camFwd`, along the aimed direction) and tilts **gently down**, so
+  an elevated pole cam surveys the area instead. Re-place existing pole cameras to pick up the new
+  geometry. Tune `camZ` / `camFwd` per model in `configs/cfg-cctv-sh.lua`.
 - **CCTV manager didn't update live + couldn't place on objects.** Deleting a field camera in `/cameras`
   removed its world prop but left the row in the panel, because the camera-list refresh was pushed only
   through the duty-player loop (which didn't reliably reach the actor). The place / delete / rename /
