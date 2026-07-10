@@ -17,8 +17,10 @@ and an experimental radio **speech-to-text**.
   (mouse + WASD, Space/Ctrl up-down, Shift faster). A **translucent preview** of the selected model sticks
   to the surface you look at — **ground for poles, walls for cams** — so nothing floats or sinks any more.
   **Scroll** cycles the model, **←→** rotate, **↑↓** nudge height, **LMB** places it exactly where the
-  preview sits, **Backspace** exits. The placed **CCTV prop is visible to everyone** (not just operators)
-  and despawns when the camera is removed. For **poles**, a per-model `camZ` puts the live view up at the
+  preview sits, **Backspace** exits. A **crosshair** + ground marker show exactly where the camera lands
+  (red when you're aiming at nothing), and the freecam now has **collision** so it stops at walls instead
+  of clipping through them. The placed **CCTV prop is visible to everyone** (not just operators) and
+  despawns when the camera is removed. For **poles**, a per-model `camZ` puts the live view up at the
   lens instead of on the ground. Only models in `CCTV.props` can be spawned (the server rejects anything
   else); `CCTV.placeProps = false` keeps the old invisible cameras. New config: `CCTV.placeProps`,
   `CCTV.defaultProp`, `CCTV.props` (with `label` / `camZ`).
