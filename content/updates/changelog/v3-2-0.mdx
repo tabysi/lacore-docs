@@ -263,6 +263,13 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **CCTV manager didn't update live + couldn't place on objects.** Deleting a field camera in `/cameras`
+  removed its world prop but left the row in the panel, because the camera-list refresh was pushed only
+  through the duty-player loop (which didn't reliably reach the actor). The place / delete / rename /
+  re-group handlers now push the updated list **directly to the actor** as well, so the manager and
+  dispatch map update instantly. The placement freecam also raycast **world geometry only**, so you
+  couldn't mount a camera on a prop/object — it now hits any geometry (world, objects, vehicles) like the
+  old tool did, ignoring your own body.
 - **CCTV broke when opened from inside a vehicle.** The viewer hides the operator's body and teleports
   it to the camera to stream the area — which ejected a seated player, so you (and your networked decoy)
   ended up **standing in the car** while viewing and after closing. When you open CCTV from a vehicle the
