@@ -258,7 +258,9 @@ and an experimental radio **speech-to-text**.
   operator now simply **stays seated**: the car is frozen so it can't roll away, the body is never
   moved/hidden/cloned, and the camera area still streams via the focus. On exit the car is unfrozen and
   you're left in your seat (with a re-seat safety net if the engine ejected you). The on-foot behaviour
-  is unchanged.
+  is unchanged. **Multiplayer fairness:** a vehicle operator is **not** made invincible, and the viewer
+  **auto-closes the instant you're hurt, killed or pulled out of the car**, so the cameras can't be used
+  as a safe hideout during combat. (Firing was already blocked while operating.)
 - **Plug-and-play: a fresh install no longer locks everyone out.** Previously, with no Discord token
   configured, the connect check still *required* Discord and rejected every player (and `CanGoOnDuty`
   blocked LE duty). Discord role auth is now **auto-idle when unconfigured**: the core runs immediately
