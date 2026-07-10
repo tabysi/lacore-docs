@@ -252,10 +252,13 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
-- **CCTV left you standing next to your car.** Opening the CCTV viewer from inside a vehicle only saved
-  the ped's coordinates, so on exit you were dropped on the ground beside the car instead of back in the
-  driver's seat. The viewer now remembers the **vehicle + seat**, freezes the car while you're in the
-  camera so it stays parked, and **re-seats you** on exit.
+- **CCTV broke when opened from inside a vehicle.** The viewer hides the operator's body and teleports
+  it to the camera to stream the area — which ejected a seated player, so you (and your networked decoy)
+  ended up **standing in the car** while viewing and after closing. When you open CCTV from a vehicle the
+  operator now simply **stays seated**: the car is frozen so it can't roll away, the body is never
+  moved/hidden/cloned, and the camera area still streams via the focus. On exit the car is unfrozen and
+  you're left in your seat (with a re-seat safety net if the engine ejected you). The on-foot behaviour
+  is unchanged.
 - **Plug-and-play: a fresh install no longer locks everyone out.** Previously, with no Discord token
   configured, the connect check still *required* Discord and rejected every player (and `CanGoOnDuty`
   blocked LE duty). Discord role auth is now **auto-idle when unconfigured**: the core runs immediately
