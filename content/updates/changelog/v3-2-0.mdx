@@ -13,13 +13,15 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
-- **CCTV cameras now spawn a real prop.** Placing a field camera with the CAM tool (`/camtool`) drops an
-  actual **CCTV model** in the world at that spot, facing where you stood — visible to everyone, not just
-  operators. While the tool is out a **translucent preview** follows your aim and the **mouse wheel cycles
-  the model** (dome / wall / bullet / bank / pole cams — the list in `configs/cfg-cctv-sh.lua` →
-  `CCTV.props`). Only listed models can be spawned (the server rejects anything else), the prop despawns
-  when the camera is removed, and `CCTV.placeProps = false` keeps the old invisible-camera behaviour. New
-  config: `CCTV.placeProps`, `CCTV.defaultProp`, `CCTV.props`.
+- **CCTV cameras now spawn a real prop, placed with a freecam.** `/camtool` opens a **free-fly camera**
+  (mouse + WASD, Space/Ctrl up-down, Shift faster). A **translucent preview** of the selected model sticks
+  to the surface you look at — **ground for poles, walls for cams** — so nothing floats or sinks any more.
+  **Scroll** cycles the model, **←→** rotate, **↑↓** nudge height, **LMB** places it exactly where the
+  preview sits, **Backspace** exits. The placed **CCTV prop is visible to everyone** (not just operators)
+  and despawns when the camera is removed. For **poles**, a per-model `camZ` puts the live view up at the
+  lens instead of on the ground. Only models in `CCTV.props` can be spawned (the server rejects anything
+  else); `CCTV.placeProps = false` keeps the old invisible cameras. New config: `CCTV.placeProps`,
+  `CCTV.defaultProp`, `CCTV.props` (with `label` / `camZ`).
 - **Phone polish pass.** The NUI phone got several quality-of-life upgrades: **notification banners** —
   an incoming text now slides a frosted banner down from the top (sender + preview, tap it to jump
   straight into the conversation), suppressed while *Do Not Disturb* is on; a working **Spotlight

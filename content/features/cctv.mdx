@@ -63,8 +63,10 @@ The scanner locking onto a subject and revealing the MDT summary card:
 
 Place cameras anywhere at runtime:
 
-- `/camtool` — gives a camera-placement tool (damage neutralised). A **translucent preview** follows your
-  aim; **scroll** to change the camera model, **fire** to place one. `/camtool` again to put it away.
+- `/camtool` — opens a **placement freecam**: fly around with the mouse + **WASD** (Space / Ctrl up-down,
+  Shift = faster). A **translucent preview** of the selected model sticks to the surface you look at —
+  ground for poles, walls for cams. **Scroll** changes the model, **←→** rotate it, **↑↓** nudge its
+  height, **LMB** places it (exactly where the preview sits), **Backspace** exits.
 - `/cameras` — a manager panel to rename / delete placed cameras, jump the live view to one, and
   toggle the tool.
 
@@ -82,10 +84,14 @@ CCTV.placeProps  = true              -- false = invisible cameras (coordinates o
 CCTV.defaultProp = "prop_cctv_cam_02a"
 CCTV.props = {                        -- the models you can cycle through (only these may be spawned)
   { model = "prop_cctv_cam_02a", label = "Dome cam" },
-  { model = "prop_cctv_pole_02", label = "Cam pole 2" },
+  { model = "prop_cctv_pole_02", label = "Cam pole 2", camZ = 2.7 },  -- lens height above the base
   -- … add / remove freely
 }
 ```
+
+`camZ` is the height of the lens above the prop's base — wall / dome cams *are* the lens (0), while a
+**pole** puts the camera on top, so the live `/cctv` view is rendered from up there. Tune it per model if
+a camera's view sits too low or high.
 
 <Callout type="info">
   Only models listed in `CCTV.props` can be spawned — the server rejects anything else, so a client can't
