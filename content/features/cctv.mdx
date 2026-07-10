@@ -63,13 +63,34 @@ The scanner locking onto a subject and revealing the MDT summary card:
 
 Place cameras anywhere at runtime:
 
-- `/camtool` — gives a camera-placement tool (damage neutralised). Fire at a spot to place a camera
-  there. `/camtool` again to put it away.
+- `/camtool` — gives a camera-placement tool (damage neutralised). A **translucent preview** follows your
+  aim; **scroll** to change the camera model, **fire** to place one. `/camtool` again to put it away.
 - `/cameras` — a manager panel to rename / delete placed cameras, jump the live view to one, and
   toggle the tool.
 
 Placed cameras are persisted server-side (`data/cctv_cams.json`), gated to LEO / Security, and appear
 in `/cctv` under the **Field Cameras** networks.
+
+### Physical camera props
+
+Each placed field camera spawns a **real CCTV prop** in the world at that spot (facing where you stood),
+visible to **every** player — not just operators. Pick the model while placing (scroll through dome / wall
+/ bullet / bank / pole cams). The prop despawns when the camera is removed.
+
+```lua
+CCTV.placeProps  = true              -- false = invisible cameras (coordinates only, the old behaviour)
+CCTV.defaultProp = "prop_cctv_cam_02a"
+CCTV.props = {                        -- the models you can cycle through (only these may be spawned)
+  { model = "prop_cctv_cam_02a", label = "Dome cam" },
+  { model = "prop_cctv_pole_02", label = "Cam pole 2" },
+  -- … add / remove freely
+}
+```
+
+<Callout type="info">
+  Only models listed in `CCTV.props` can be spawned — the server rejects anything else, so a client can't
+  make everyone load an arbitrary model.
+</Callout>
 
 ### Camera groups (by locality)
 

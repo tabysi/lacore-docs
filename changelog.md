@@ -13,6 +13,13 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **CCTV cameras now spawn a real prop.** Placing a field camera with the CAM tool (`/camtool`) drops an
+  actual **CCTV model** in the world at that spot, facing where you stood — visible to everyone, not just
+  operators. While the tool is out a **translucent preview** follows your aim and the **mouse wheel cycles
+  the model** (dome / wall / bullet / bank / pole cams — the list in `configs/cfg-cctv-sh.lua` →
+  `CCTV.props`). Only listed models can be spawned (the server rejects anything else), the prop despawns
+  when the camera is removed, and `CCTV.placeProps = false` keeps the old invisible-camera behaviour. New
+  config: `CCTV.placeProps`, `CCTV.defaultProp`, `CCTV.props`.
 - **Phone polish pass.** The NUI phone got several quality-of-life upgrades: **notification banners** —
   an incoming text now slides a frosted banner down from the top (sender + preview, tap it to jump
   straight into the conversation), suppressed while *Do Not Disturb* is on; a working **Spotlight
