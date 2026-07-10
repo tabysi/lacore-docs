@@ -18,8 +18,11 @@ and an experimental radio **speech-to-text**.
   straight into the conversation), suppressed while *Do Not Disturb* is on; a working **Spotlight
   search** — the home-screen search pill now filters and launches any app; **colour-coded contact
   avatars** so people are distinct at a glance in Messages, Contacts and Bleeter (deterministic tint per
-  name); and **share a photo to Bleeter** straight from the camera roll. Also fixed a calculator `%`
-  quirk and removed some dead styling. All client-side — no config needed.
+  name); and **share a photo to Bleeter** straight from the camera roll. The **top of the screen** was
+  also reworked — the wallpaper / app header now runs edge-to-edge to the top with only the Dynamic
+  Island left in black (previously a tall black status-bar band made the rounded top corners look
+  uneven against the thin side bezels). Also fixed a calculator `%` quirk and removed some dead styling.
+  All client-side — no config needed.
 - **K9 overhaul — realistic behaviour, more commands, keybinds, map blip, in-game help.** The police dog
   no longer reacts to ambient gunfire / panic and wanders off — it ignores non-temporary events and holds
   its assigned task (`SetBlockingOfNonTemporaryEvents` + keep-task + no-flee), so it behaves like a
