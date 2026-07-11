@@ -13,6 +13,14 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **MDT person record redesigned as a PremierOne "RMS folder".** Running a person now shows a proper
+  records-management folder: a **From RMS** header, the name (with a mugshot slot), a tidy field grid —
+  **Sex · Height · Weight · DOB · Hair · Eyes · Address** (address in yellow) plus **Race · OLN · CSZ ·
+  Phone · Occupation** *when the identity provides them* — then the registered vehicles, and two labelled
+  sections: **CRIMINAL HISTORY** (citations / arrests, or *"No criminal history on file"*) and **FLAGS /
+  NOTES** (RP notes, reports & evidence, or *"No flags or notes on file"*), keeping the cite / report /
+  evidence actions. Fields LACORE doesn't store are simply omitted, so it stays honest on a stock install
+  and fills out fully on a framework identity. Applies to the LAPD and Agency MDTs.
 - **Darker LAPD CAD theme.** The PremierOne MDT was reworked to a **dark-navy** palette — the bright
   royal-blue panels, header, toolbar and shiny 3D bevels are toned down to a flat, near-black navy that's
   easier on the eyes at night, while the coloured accents (status buttons, warrant / BOLO banners, the
