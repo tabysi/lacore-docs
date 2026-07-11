@@ -13,6 +13,11 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **Registered vehicles now show in the MDT person record.** Running a person (LAPD / Agency MDT query,
+  or the Persons tab) lists every vehicle registered to them — plate, model, colour, type, year and an
+  **Insured / No-insurance** badge, newest registration first — so an officer sees a suspect's cars
+  straight from their file instead of having to run each plate. The data was already linked owner-side;
+  it just wasn't surfaced.
 - **CCTV cameras now spawn a real prop, placed with a freecam.** `/camtool` opens a **free-fly camera**
   (mouse + WASD, Space/Ctrl up-down, Shift faster). A **translucent preview** of the selected model sticks
   to the surface you look at — **ground for poles, walls for cams** — so nothing floats or sinks any more.
