@@ -13,6 +13,14 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **Mobile fingerprint ID scanner (LEO).** A new handheld biometric device — like LAPD MobileID / HID
+  Rapid ID. `/mobileid` (bindable) scans the nearest **restrained** suspect: the MobileID device runs a
+  capture animation, matches the print against the records database and returns the identity — name, DOB,
+  sex, description, address, DL, and **active warrant / BOLO** flags — even when the suspect carries no ID
+  and refuses to identify themselves. **Fair play:** you can only scan a cuffed suspect who's close by (no
+  remote ID of free players), and every scan is written to the Big Brother audit log. Config
+  `configs/cfg-fingerprint-sh.lua` (range, require-cuffed, fingers, keybind); feature toggle
+  `fingerprint`. New module `modules/fingerprint/`.
 - **MDT person record redesigned as a PremierOne "RMS folder".** Running a person now shows a proper
   records-management folder: a **From RMS** header, the name (with a mugshot slot), a tidy field grid —
   **Sex · Height · Weight · DOB · Hair · Eyes · Address** (address in yellow) plus **Race · OLN · CSZ ·

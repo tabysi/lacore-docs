@@ -84,6 +84,27 @@ Every action is **also a keybindable command** — players can bind them in **Fi
 Bindings → FiveM** (`lacore_k9`, `lacore_k9_heel`, `lacore_k9_sit`, `lacore_k9_bark`, … — all unbound by
 default).
 
+## Mobile Fingerprint ID — `configs/cfg-fingerprint-sh.lua`
+
+A handheld biometric scanner for LEO (like LAPD MobileID / HID Rapid ID). `/mobileid` (bindable in *FiveM
+Settings → Key Bindings*) scans the nearest **restrained** suspect and matches the print against the
+records database — returning their identity (name, DOB, description, address, DL, and **active warrant /
+BOLO** flags) even when they carry no ID and refuse to identify themselves.
+
+```lua
+Fingerprint.enabled       = true
+Fingerprint.requireCuffed = true    -- only a cuffed suspect can be scanned (false = anyone in range)
+Fingerprint.range         = 2.5     -- how close the suspect must be (metres)
+Fingerprint.scanSeconds   = 2.2     -- capture animation length in the UI
+Fingerprint.openKey       = ""      -- optional default key for /mobileid (players can bind it themselves)
+```
+
+<Callout type="info">
+  **Fair play** — you can only scan a **cuffed** suspect who's close by, so there's no remote ID of free /
+  running players; detain them first. Every scan is written to the [Big Brother](/features/big-brother)
+  audit log. Turn the whole feature off with the `fingerprint` [feature toggle](/configuration/features).
+</Callout>
+
 ## Global-ban network — `configs/cfg-globalban-sh.lua`
 
 Optional participation in a shared ban list across LACORE servers: a banned identifier on one
