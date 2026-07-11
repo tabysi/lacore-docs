@@ -289,6 +289,14 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **MDT call list was broadcast to every player, not just units.** `mdt:SyncCalls` (the ~2 KB active-call
+  list) was pushed to `-1` (all connected clients) on every call change — so **civilians**, who never open
+  a CAD, received it too. On a busy server that wasted bandwidth and let the payload pile up in a slow
+  client's reliable-command queue (visible as repeated pending `mdt:SyncCalls` in connection-timeout
+  logs). It now goes **only to on-duty units** (like the LASD/EMS sync already did); units still get a
+  fresh list directly via `mdt:RequestFullSync` when they open a CAD. (Doesn't cure a bad connection, but
+  removes LACORE's share of the load — the largest pending payloads in those logs came from other
+  resources.)
 - **Pole CCTV view came from inside the post.** A pole camera's live view was placed directly above the
   base — i.e. inside the pole shaft, staring at the horizon. The viewpoint now sits a little **in front**
   of the base (new per-model `CCTV.props.camFwd`, along the aimed direction) and tilts **gently down**, so
