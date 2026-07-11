@@ -13,6 +13,11 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **Darker LAPD CAD theme.** The PremierOne MDT was reworked to a **dark-navy** palette — the bright
+  royal-blue panels, header, toolbar and shiny 3D bevels are toned down to a flat, near-black navy that's
+  easier on the eyes at night, while the coloured accents (status buttons, warrant / BOLO banners, the
+  yellow address link, the green insured badge) stay for contrast. Scoped to the LAPD MDT only; the
+  Dispatch console and the other CADs are unchanged.
 - **Registered vehicles now show in the MDT person record.** Running a person (LAPD / Agency MDT query,
   or the Persons tab) lists every vehicle registered to them — plate, model, colour, type, year and an
   **Insured / No-insurance** badge, newest registration first — so an officer sees a suspect's cars
