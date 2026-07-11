@@ -529,7 +529,7 @@ Pre-release development history (multiple `Unreleased` blocks from the changelog
   selben Beat).
 
 ### Added (Drittes MDT — Agency-MDT für alle übrigen Exekutiven)
-- Neues **Agency-MDT** (`web/.../AgencyMdt.svelte`) im **CHP/PremierOne-IMPACT-Stil**
+- Neues **Agency-MDT** (`web/.../AgencyMdt.svelte`) im **dunkler CAD-Stil**
   (dunkelblau) für **jede Exekutive außer LAPD und LASD**. Nachgebaut aus den
   Referenzbildern in `preview/`: Funktionsleiste (FOLLOW/STOP/10-6·10-99/11-27/10-28/
   CALLS/UNITS/WATCH LIST/MAIL·RETURNS) + Status, **ACTIVE/PENDING CALLS**, Incident-
@@ -539,7 +539,7 @@ Pre-release development history (multiple `Unreleased` blocks from the changelog
 - **Re-Skin, kein eigenes Backend:** nutzt exakt dieselben geteilten Daten/Actions
   wie das LAPD-MDT (`S.calls`/`activeCall`/`units`, `selectCall`/`addComment`/
   `setStatus`/`selfAssign`/`setGps`/`requestBackup`).
-- **Routing (`mdt-nui-cl.lua`):** `/mdt` → LAPD = PremierOne-MDT · LASD/Sheriff/BCSO =
+- **Routing (`mdt-nui-cl.lua`):** `/mdt` → LAPD = LACORE Mobile Client · LASD/Sheriff/BCSO =
   CAD/PCMS · **alle anderen = Agency-MDT** (`OpenAgencyMdt`). Eigener Open/Close +
   Control-Block + Escape-Schutz; Dev-Launcher-Card „Agency MDT".
 
@@ -697,7 +697,7 @@ Pre-release development history (multiple `Unreleased` blocks from the changelog
   sonst `NONE`). Für `PD-`-Einsätze werden die Units aus `player.incident`
   abgeleitet (`AttachedUnitsFor`).
 - **Das LASD-CAD/PCMS-Terminal gilt jetzt für JEDE Agency außer LAPD** (LASD,
-  Fire/EMS, Coroner, BCSO, …). Nur das LAPD nutzt weiterhin das PremierOne-MDT
+  Fire/EMS, Coroner, BCSO, …). Nur das LAPD nutzt weiterhin das LACORE Mobile Client
   (Routing in `mdt-nui-cl.lua`).
 
 ### Added (Dispatch-Konsole — Unit-Rechtsklickmenü)
@@ -885,11 +885,11 @@ Beginn eines externen, browserbasierten Dispatcher-Portals (eigener VPS).
 
 
 Großer Ausbau und Redesign des **MDT-, Dispatch- und CAD-Systems** im Stil des
-„PremierOne Mobile Client" (echtes Police-CAD), inklusive Kommentaren und einem
+„LACORE Mobile Client" (Police-CAD-Look), inklusive Kommentaren und einem
 admin-only Audit-Log.
 
 ### Added
-- **MDT (Mobile Data Terminal)** komplett im PremierOne-CAD-Look (Hochformat,
+- **MDT (Mobile Data Terminal)** komplett im CAD-Look (Hochformat,
   In-Vehicle-Terminal, bottom-right): Icon-Toolbar (Home/Query/Traffic/C6/Calls/
   Units/Persons/Station/Dispo), Kommando-/Status-Strip (Dept · Callsign · Status ·
   GPS · Zeit), linke Tab-Spalte, **„Active Incident"-Feldmaske**, **Comments/
@@ -929,7 +929,7 @@ admin-only Audit-Log.
 - **Fahrzeug-Registrierung:** beim Einsteigen in ein nicht registriertes Fahrzeug
   erscheint eine Erinnerung (oben rechts); `/vreg` öffnet ein Popup zum Hinterlegen
   des Fahrzeugs (Kennzeichen → Profil). Keine harte Fahrsperre (nur Erinnerung).
-- **1:1-PremierOne-Layout** (max. spec): zweizeilige Command-Bar mit Dropdowns
+- **1:1-CAD-Layout** (max. spec): zweizeilige Command-Bar mit Dropdowns
   (Incident / Logged in / Unread / Night / In Vehicle / Status / GPS Online), volle
   CAD-Feldmaske (Mod Circum, Loc Name, Apt/Unit, Report #, City, Description, Cross
   Streets, Call Initiated, Beat), Icons in der linken Leiste, `< >`-Incident-
@@ -946,7 +946,7 @@ admin-only Audit-Log.
   Zeilen sind in der Calls-Liste markiert; Öffnen des Calls-Tabs (oder Klick auf den
   Chip) markiert sie als gelesen.
 - **White-/Normal-Mode:** Theme-Umschalter (Knopf in der Titelleiste, gespeichert in
-  `localStorage`) zwischen dem dunklen PremierOne-Look und einem hellen „White"-Mode
+  `localStorage`) zwischen dem dunklen CAD-Look und einem hellen „White"-Mode
   — inkl. der `/char`- und `/vreg`-Popups. Auch als Command `/mdttheme [white|normal]`.
 - **Disposition-Resolve:** Dispatch-RESOLVE mit Reason-Dropdown (ADV/ARR/ARM/CIT/
   GOA/FAL/CCB/CMP). Beim Auflösen wird `DISPO // <Uhrzeit> // <REASON> // <UNIT>` in

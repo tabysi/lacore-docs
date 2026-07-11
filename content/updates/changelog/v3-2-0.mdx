@@ -13,15 +13,15 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
-- **Mobile fingerprint ID scanner (LEO).** A new handheld biometric device — like LAPD MobileID / HID
-  Rapid ID. `/mobileid` (bindable) scans the nearest **restrained** suspect: the MobileID device runs a
+- **Mobile fingerprint ID scanner (LEO).** A new handheld biometric device — a rugged, in-the-field
+  mobile ID reader. `/mobileid` (bindable) scans the nearest **restrained** suspect: the LACORE ID device runs a
   capture animation, matches the print against the records database and returns the identity — name, DOB,
   sex, description, address, DL, and **active warrant / BOLO** flags — even when the suspect carries no ID
   and refuses to identify themselves. **Fair play:** you can only scan a cuffed suspect who's close by (no
   remote ID of free players), and every scan is written to the Big Brother audit log. Config
   `configs/cfg-fingerprint-sh.lua` (range, require-cuffed, fingers, keybind); feature toggle
   `fingerprint`. New module `modules/fingerprint/`.
-- **MDT person record redesigned as a PremierOne "RMS folder".** Running a person now shows a proper
+- **MDT person record redesigned as an RMS-style folder.** Running a person now shows a proper
   records-management folder: a **From RMS** header, the name (with a mugshot slot), a tidy field grid —
   **Sex · Height · Weight · DOB · Hair · Eyes · Address** (address in yellow) plus **Race · OLN · CSZ ·
   Phone · Occupation** *when the identity provides them* — then the registered vehicles, and two labelled
@@ -29,7 +29,7 @@ and an experimental radio **speech-to-text**.
   NOTES** (RP notes, reports & evidence, or *"No flags or notes on file"*), keeping the cite / report /
   evidence actions. Fields LACORE doesn't store are simply omitted, so it stays honest on a stock install
   and fills out fully on a framework identity. Applies to the LAPD and Agency MDTs.
-- **Darker LAPD CAD theme.** The PremierOne MDT was reworked to a **dark-navy** palette — the bright
+- **Darker LAPD CAD theme.** The LACORE Mobile Client was reworked to a **dark-navy** palette — the bright
   royal-blue panels, header, toolbar and shiny 3D bevels are toned down to a flat, near-black navy that's
   easier on the eyes at night, while the coloured accents (status buttons, warrant / BOLO banners, the
   yellow address link, the green insured badge) stay for contrast. Scoped to the LAPD MDT only; the
@@ -393,7 +393,7 @@ and an experimental radio **speech-to-text**.
   progress — instead of an instant press; **Spacebar** now reliably **unlocks** (it was read as a
   disabled control before, so it did nothing). The **number-plate read-out was removed** from the cam.
 - **No-agency players could open the LAPD MDT.** `/mdt` (and the `O` keybind) fell through to the LAPD
-  PremierOne MDT for anyone not matching another agency — including players with no department set
+  LACORE Mobile Client for anyone not matching another agency — including players with no department set
   (which in devmode bypasses the job gate). Now only actual LAPD members open it; with no agency
   assigned nothing opens and you get a notice.
 - **`/lacore` in the server console dumped a convar instead of running.** A server-browser info

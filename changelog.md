@@ -13,15 +13,15 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
-- **Mobile fingerprint ID scanner (LEO).** A new handheld biometric device — like LAPD MobileID / HID
-  Rapid ID. `/mobileid` (bindable) scans the nearest **restrained** suspect: the MobileID device runs a
+- **Mobile fingerprint ID scanner (LEO).** A new handheld biometric device — a rugged, in-the-field
+  mobile ID reader. `/mobileid` (bindable) scans the nearest **restrained** suspect: the LACORE ID device runs a
   capture animation, matches the print against the records database and returns the identity — name, DOB,
   sex, description, address, DL, and **active warrant / BOLO** flags — even when the suspect carries no ID
   and refuses to identify themselves. **Fair play:** you can only scan a cuffed suspect who's close by (no
   remote ID of free players), and every scan is written to the Big Brother audit log. Config
   `configs/cfg-fingerprint-sh.lua` (range, require-cuffed, fingers, keybind); feature toggle
   `fingerprint`. New module `modules/fingerprint/`.
-- **MDT person record redesigned as a PremierOne "RMS folder".** Running a person now shows a proper
+- **MDT person record redesigned as an RMS-style folder.** Running a person now shows a proper
   records-management folder: a **From RMS** header, the name (with a mugshot slot), a tidy field grid —
   **Sex · Height · Weight · DOB · Hair · Eyes · Address** (address in yellow) plus **Race · OLN · CSZ ·
   Phone · Occupation** *when the identity provides them* — then the registered vehicles, and two labelled
@@ -29,7 +29,7 @@ and an experimental radio **speech-to-text**.
   NOTES** (RP notes, reports & evidence, or *"No flags or notes on file"*), keeping the cite / report /
   evidence actions. Fields LACORE doesn't store are simply omitted, so it stays honest on a stock install
   and fills out fully on a framework identity. Applies to the LAPD and Agency MDTs.
-- **Darker LAPD CAD theme.** The PremierOne MDT was reworked to a **dark-navy** palette — the bright
+- **Darker LAPD CAD theme.** The LACORE Mobile Client was reworked to a **dark-navy** palette — the bright
   royal-blue panels, header, toolbar and shiny 3D bevels are toned down to a flat, near-black navy that's
   easier on the eyes at night, while the coloured accents (status buttons, warrant / BOLO banners, the
   yellow address link, the green insured badge) stay for contrast. Scoped to the LAPD MDT only; the
@@ -393,7 +393,7 @@ and an experimental radio **speech-to-text**.
   progress — instead of an instant press; **Spacebar** now reliably **unlocks** (it was read as a
   disabled control before, so it did nothing). The **number-plate read-out was removed** from the cam.
 - **No-agency players could open the LAPD MDT.** `/mdt` (and the `O` keybind) fell through to the LAPD
-  PremierOne MDT for anyone not matching another agency — including players with no department set
+  LACORE Mobile Client for anyone not matching another agency — including players with no department set
   (which in devmode bypasses the job gate). Now only actual LAPD members open it; with no agency
   assigned nothing opens and you get a notice.
 - **`/lacore` in the server console dumped a convar instead of running.** A server-browser info
@@ -1242,7 +1242,7 @@ notes under 3.1.3 below are superseded by it).
   selben Beat).
 
 ### Added (Drittes MDT — Agency-MDT für alle übrigen Exekutiven)
-- Neues **Agency-MDT** (`web/.../AgencyMdt.svelte`) im **CHP/PremierOne-IMPACT-Stil**
+- Neues **Agency-MDT** (`web/.../AgencyMdt.svelte`) im **dunkler CAD-Stil**
   (dunkelblau) für **jede Exekutive außer LAPD und LASD**. Nachgebaut aus den
   Referenzbildern in `preview/`: Funktionsleiste (FOLLOW/STOP/10-6·10-99/11-27/10-28/
   CALLS/UNITS/WATCH LIST/MAIL·RETURNS) + Status, **ACTIVE/PENDING CALLS**, Incident-
@@ -1252,7 +1252,7 @@ notes under 3.1.3 below are superseded by it).
 - **Re-Skin, kein eigenes Backend:** nutzt exakt dieselben geteilten Daten/Actions
   wie das LAPD-MDT (`S.calls`/`activeCall`/`units`, `selectCall`/`addComment`/
   `setStatus`/`selfAssign`/`setGps`/`requestBackup`).
-- **Routing (`mdt-nui-cl.lua`):** `/mdt` → LAPD = PremierOne-MDT · LASD/Sheriff/BCSO =
+- **Routing (`mdt-nui-cl.lua`):** `/mdt` → LAPD = LACORE Mobile Client · LASD/Sheriff/BCSO =
   CAD/PCMS · **alle anderen = Agency-MDT** (`OpenAgencyMdt`). Eigener Open/Close +
   Control-Block + Escape-Schutz; Dev-Launcher-Card „Agency MDT".
 
@@ -1410,7 +1410,7 @@ notes under 3.1.3 below are superseded by it).
   sonst `NONE`). Für `PD-`-Einsätze werden die Units aus `player.incident`
   abgeleitet (`AttachedUnitsFor`).
 - **Das LASD-CAD/PCMS-Terminal gilt jetzt für JEDE Agency außer LAPD** (LASD,
-  Fire/EMS, Coroner, BCSO, …). Nur das LAPD nutzt weiterhin das PremierOne-MDT
+  Fire/EMS, Coroner, BCSO, …). Nur das LAPD nutzt weiterhin das LACORE Mobile Client
   (Routing in `mdt-nui-cl.lua`).
 
 ### Added (Dispatch-Konsole — Unit-Rechtsklickmenü)
@@ -2300,7 +2300,7 @@ MDT / Dispatch / Query sowie ein lokales Obfuskations-/Escrow-Buildsystem.
 - **`/run <Name|Kennzeichen>`:** öffnet das MDT direkt auf dem Query-Tab und zeigt
   die Person sofort an. Jeder Run (per `/run` **oder** MDT-Suche) postet
   `<Callsign> ran "<Query>"` in den **Game-Chat** (für alle OnDuty-Units).
-- **Query im PremierOne-Stil:** linker Query-Typ-Rail (Person / Vehicle / Plate),
+- **Query im CAD-Stil:** linker Query-Typ-Rail (Person / Vehicle / Plate),
   strukturierte Formulare mit gelb hervorgehobenem „Key"-Feld.
 - **Live-Kennzeichen-Run + Diebstahl-Logik:** runt ein Beamter ein unbekanntes
   Kennzeichen, bekommt der **aktuelle Fahrer** ein VREG-Formular mit **15-Sekunden-
@@ -2367,11 +2367,11 @@ MDT / Dispatch / Query sowie ein lokales Obfuskations-/Escrow-Buildsystem.
 ## [Unreleased] – 2026-06-02 — MDT, Dispatch & CAD
 
 Großer Ausbau und Redesign des **MDT-, Dispatch- und CAD-Systems** im Stil des
-„PremierOne Mobile Client" (echtes Police-CAD), inklusive Kommentaren und einem
+„LACORE Mobile Client" (Police-CAD-Look), inklusive Kommentaren und einem
 admin-only Audit-Log.
 
 ### Added
-- **MDT (Mobile Data Terminal)** komplett im PremierOne-CAD-Look (Hochformat,
+- **MDT (Mobile Data Terminal)** komplett im CAD-Look (Hochformat,
   In-Vehicle-Terminal, bottom-right): Icon-Toolbar (Home/Query/Traffic/C6/Calls/
   Units/Persons/Station/Dispo), Kommando-/Status-Strip (Dept · Callsign · Status ·
   GPS · Zeit), linke Tab-Spalte, **„Active Incident"-Feldmaske**, **Comments/
@@ -2411,7 +2411,7 @@ admin-only Audit-Log.
 - **Fahrzeug-Registrierung:** beim Einsteigen in ein nicht registriertes Fahrzeug
   erscheint eine Erinnerung (oben rechts); `/vreg` öffnet ein Popup zum Hinterlegen
   des Fahrzeugs (Kennzeichen → Profil). Keine harte Fahrsperre (nur Erinnerung).
-- **1:1-PremierOne-Layout** (max. spec): zweizeilige Command-Bar mit Dropdowns
+- **1:1-CAD-Layout** (max. spec): zweizeilige Command-Bar mit Dropdowns
   (Incident / Logged in / Unread / Night / In Vehicle / Status / GPS Online), volle
   CAD-Feldmaske (Mod Circum, Loc Name, Apt/Unit, Report #, City, Description, Cross
   Streets, Call Initiated, Beat), Icons in der linken Leiste, `< >`-Incident-
@@ -2428,7 +2428,7 @@ admin-only Audit-Log.
   Zeilen sind in der Calls-Liste markiert; Öffnen des Calls-Tabs (oder Klick auf den
   Chip) markiert sie als gelesen.
 - **White-/Normal-Mode:** Theme-Umschalter (Knopf in der Titelleiste, gespeichert in
-  `localStorage`) zwischen dem dunklen PremierOne-Look und einem hellen „White"-Mode
+  `localStorage`) zwischen dem dunklen CAD-Look und einem hellen „White"-Mode
   — inkl. der `/char`- und `/vreg`-Popups. Auch als Command `/mdttheme [white|normal]`.
 - **Disposition-Resolve:** Dispatch-RESOLVE mit Reason-Dropdown (ADV/ARR/ARM/CIT/
   GOA/FAL/CCB/CMP). Beim Auflösen wird `DISPO // <Uhrzeit> // <REASON> // <UNIT>` in
