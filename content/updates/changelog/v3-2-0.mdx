@@ -13,6 +13,23 @@ and an experimental radio **speech-to-text**.
 
 ### Added
 
+- **9100-T retro Mobile Data Terminal (new MDT skin).** A fourth CAD terminal styled after a 1990s
+  in-car MDT — a green-phosphor CRT in a rugged chassis with a 12-key function panel (ACK / ENRT /
+  SCENE / AVAIL / OUTSVC / TRANSP / UNAVAIL / VEH / PERSON / PROP / T-STOP / ONVIEW), a red EMER
+  panic button and a **clickable on-screen keyboard** (works with the physical keys too). It is a
+  re-skin of the shared LAPD/dispatch backend (same calls, statuses, self-assign and person/vehicle
+  runs — no new server logic), routed automatically to any officer whose **department name contains
+  "90s"**. Running a wanted person or a stolen vehicle shows a blinking red
+  **"CODE 6 CHARLES – PROCEED WITH CAUTION"** banner with a compiled record summary. `ACK` attaches
+  the unit and goes en route, `AVAIL` clears/detaches, `INSERT` opens incident comments,
+  `SEND` runs a query, `BACKSPACE` goes back. New NUI component `web/src/components/RetroMdt.svelte`;
+  routing + open/close in `modules/mdt/mdt-nui-cl.lua`. Fully localised (`nine_*` keys, en/de/ru).
+- **Identity link for the LACORE Discord bot (optional).** A new server module
+  (`modules/identitylink/`, feature toggle `identitylink`) records each connecting player's stable
+  identifiers together with their Discord id in a central store, so the companion Discord bot can
+  ban **all** of a player's identifiers from just their Discord user (not only the discord id). It
+  only runs for players with a linked Discord, writes once per player per session, and is a no-op
+  unless the server-only convar `lacore_identity_token` is set. Config: `configs/cfg-identitylink-sh.lua`.
 - **Mobile fingerprint ID scanner (LEO).** A new handheld biometric device — a rugged, in-the-field
   mobile ID reader. `/mobileid` (bindable) scans the nearest **restrained** suspect: the LACORE ID device runs a
   capture animation, matches the print against the records database and returns the identity — name, DOB,

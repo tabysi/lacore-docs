@@ -10,8 +10,9 @@ Every `<arg>` is required, `[arg]` is optional. Many commands only work in a cer
 (Civilian / LEO / Fire-EMS / Coroner / Dispatcher / Staff).
 
 <Callout type="info">
-  Command availability and agency codes depend on your server's config — when in doubt, ask your
-  server team or check the [Support & FAQ](/support).
+  Command availability depends on your server's config: modules can be switched off in
+  `configs/cfg-features-sh.lua`, and agency codes come from your server team. When in doubt, ask
+  your team or check the [Support & FAQ](/support).
 </Callout>
 
 ## 🧍 Character & session
@@ -22,6 +23,7 @@ Every `<arg>` is required, `[arg]` is optional. Many commands only work in a cer
 | `/character` | Everyone | Alias of `/char`. |
 | `/vreg` | Everyone | Register the vehicle you're currently driving (plate, make, model, colour, owner…). |
 | `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config). |
+| `/phone` | Everyone | Open / close the LACORE phone (default key **F1**). |
 
 ## 👮 Duty & jobs
 
@@ -30,25 +32,35 @@ Every `<arg>` is required, `[arg]` is optional. Many commands only work in a cer
 | `/onduty <agency> <callsign>` | Member | Go on duty for an agency with a callsign (e.g. `/onduty LAPD 1A-12`). Sets dept, motto and loadout. |
 | `/offduty` | On-duty | Go off duty, clear weapons & callsign. |
 | `/job [name]` | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
+| `/jobmenu` | Everyone | Toggle the job / session menu. |
 
 ## 🚓 MDT & CAD
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → LACORE Mobile Client, others → LASD CAD, Fire/EMS → EMS CAD. |
-| `/lasd` | LEO / Fire-EMS / Coroner | Always opens the LASD CAD / PCMS. |
+| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → LACORE Mobile Client, other LE → Agency MDT, LASD/Sheriff/BCSO → LASD CAD, Fire/EMS → EMS CAD. |
+| `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
+| `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
 | `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
 | `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |
 | `/dispatch [on\|off\|open]` | LEO / Dispatcher | `on`/`off` = dispatcher duty; no arg or `open` = open the dispatch console. |
 
 See [Using the MDT](/user-guide/mdt) and [Dispatch Console](/user-guide/dispatch-console).
 
+## 📞 Emergency & non-emergency calls
+
+| Command | Who | What it does |
+|---------|-----|--------------|
+| `/911 [message]` | Everyone | Emergency call to dispatch — opens the caller form and creates a live incident. |
+| `/311 [message]` | Everyone | Non-emergency call to dispatch. |
+| `/hangup` | Everyone | End the current dispatch call. |
+
 ## 📹 CCTV (LEO / Security)
 
 | Command | What it does |
 |---------|--------------|
 | `/cctv` | Open the CCTV surveillance viewer (fixed cameras + placed field cameras). |
-| `/camtool` | Toggle the field-camera placement tool (fire at a spot to place a camera). |
+| `/camtool` | Toggle the field-camera placement freecam (aim + click to place a camera/pole). |
 | `/cameras` | Manage placed field cameras (rename / delete / view / toggle tool). |
 
 See [CCTV Surveillance](/features/cctv).
@@ -59,16 +71,55 @@ See [CCTV Surveillance](/features/cctv).
 |---------|-----|--------------|
 | `/p` | LEO / Fire-EMS | **Panic button** — broadcasts your callsign & location to all units. |
 | `/xmit <message>` | LEO / Fire-EMS | Transmit a dispatch radio message. |
-| `/radiolog` | LEO / Fire-EMS | Open the **radio transcript log** (offline speech-to-text). Bind "Radio: hold to transcribe" in Keybinds. See [Radio Transcript](/features/radio-stt). |
-| `/sttcheck` | Everyone | Diagnose whether offline speech-to-text works in your client. |
 | `/cb <message>` | LEO | Crime broadcast with your callsign & current street. |
 | `/leoreq <unit>` | On-duty | Request a unit to your scene (RP, unit "arrives" after a delay). |
+| `/release` · `/uncuff` | LEO | Put down a carried person / uncuff the nearest cuffed person (default key **X**). |
+| `/putin` | LEO | Put the person you're dragging into the nearest vehicle. |
+| `/mobileid` | LEO | Scan a restrained suspect's fingerprint and return their identity. See [Mobile Fingerprint ID](/configuration/gameplay-modules). |
+| `/breath [µg]` · `/breatha` | LEO | Breathalyzer test on the nearest person (`/breath` logs a reading, `/breatha` targets the nearest player). |
+| `/saliva [cannabis] [cocaine]` · `/druga` | LEO | Drug swab test on the nearest person. |
+| `/impound [reason]` | LEO | Impound the nearest vehicle. |
+| `/impounds` | LEO | Open the impound-lot panel (view / release impounded vehicles). |
+| `/inmates` | LEO | Open the jail / corrections inmate roster. |
+| `/lpr` | LEO (LASD) | Scan the plate of the vehicle in front of you (Licence-Plate Reader). |
+| `/grabstretcher` | Fire-EMS | Grab / deploy a stretcher. |
 | `/jail <id> <minutes> [reason]` | LEO | Jail a player. |
 | `/unjail <id> [reason]` | LEO | Release a jailed player. |
 | `/hospital <id> <minutes>` | LEO / Fire-EMS | Send a player to hospital. |
 | `/unhospital <id>` | LEO / Fire-EMS | Release from hospital. |
 | `/coroner <id> <minutes>` | Coroner / LEO / Fire-EMS | Mark a player deceased. |
 | `/uncoroner <id>` | Coroner / LEO / Fire-EMS | Revive. |
+
+## 🐕 K9 (LEO)
+
+| Command | What it does |
+|---------|--------------|
+| `/k9` | Deploy or recall your K9 unit. |
+| `/k9 <command>` | Command the dog: `heel` · `stay` · `sit` · `lay` · `bark` · `search` · `engage` · `car` · `help`. |
+
+Every K9 action (deploy, heel, stay, sit, lay, bark, search, engage, car) is also a **keybindable
+command** — bind it in *FiveM Settings → Key Bindings* (all unbound by default). See
+[K9 module](/configuration/gameplay-modules).
+
+## 🚁 Air Unit (LEO)
+
+Air-unit controls are **keybinds**, rebindable in *FiveM Settings → Key Bindings*:
+
+| Action | Default |
+|--------|---------|
+| Toggle heli cam | **F5** |
+| Toggle auto-orbit | **F6** |
+| Toggle spotlight | **F7** |
+
+## 🎙️ Radio (LEO / Fire-EMS)
+
+| Command | What it does |
+|---------|--------------|
+| `/radiolog` | Open the **radio transcript log** (offline speech-to-text). |
+| `/sttcheck` | Diagnose whether offline speech-to-text works in your client. |
+
+"Radio: hold to transcribe" is a keybind — set it in *FiveM Settings → Key Bindings*.
+See [Radio Transcript](/features/radio-stt).
 
 ## 🔫 Equipment (on-duty)
 
@@ -79,6 +130,7 @@ See [CCTV Surveillance](/features/cctv).
 | `/drop` | Drop your currently equipped weapon. |
 | `/firingmode` | Toggle your weapon's firing mode. |
 | `/headlightmode` | Toggle headlight mode. |
+| `/hup [texture]` | Put on / take off a helmet (optional texture index). |
 
 ## 🎭 Roleplay
 
@@ -88,7 +140,7 @@ See [CCTV Surveillance](/features/cctv).
 | `/gme <action>` | Global version of `/me`. |
 | `/do <text>` | Local scene description ("The door is locked"). |
 | `/gdo <text>` | Global version of `/do`. |
-| `/search <target>` | RP: "searches X, what do I find?" (local). `/gsearch` = global. |
+| `/search <target>` · `/gsearch <target>` | RP: "searches X, what do I find?" (local / global). |
 | `/give <item>` | RP: hand something over (local). |
 | `/report <id> <message>` | Report a player / issue to staff. |
 
@@ -96,6 +148,18 @@ See [CCTV Surveillance](/features/cctv).
 
 Emotes are provided by DPEmotes / RPEmotes (`/e <name>`, `/emotemenu`) — LACORE's civilian radial
 bridges to whichever is installed. See [Civilian Layer](/features/civilian).
+
+## 🧍‍♂️ Civilian layer
+
+| Command | What it does |
+|---------|--------------|
+| `/prop [id\|pickup]` | Place a prop by id, `/prop pickup` removes the nearest, no arg opens the prop menu. |
+| `/canceljob` | Cancel your current civilian activity. |
+| `/orgaccept` | Accept a pending organisation invite. |
+| `/turf` | Show turf / territory ownership and your organisation's influence. |
+
+The **civilian radial** ("Open civilian menu") is a hold-keybind — bind it in
+*FiveM Settings → Key Bindings*. See [Civilian Layer](/features/civilian).
 
 ## 🚗 Vehicle controls
 
@@ -118,7 +182,6 @@ bridges to whichever is installed. See [Civilian Layer](/features/civilian).
 | `/playtime` | Show your playtime. |
 | `/showid` | Show your server ID. |
 | `/dismiss` | Dismiss the nearest spawned ped/world prompt. |
-| `/prop` | Open the prop menu. |
 | `/hu` | Hands up (default **U**). |
 | `/hh` | Hand on holster (default **X**). |
 | `/settings` / `/vehicle` / `/session` | Open the matching in-game menus. |
@@ -131,22 +194,30 @@ Restricted to staff — listed for server owners. Many require ACE permissions.
 |---------|--------------|
 | `/admin` | Open the admin GUI menu (players / self / world). |
 | `/bblog` | Open the Big Brother admin-log panel. |
+| `/calllog` | Print the MDT call/audit log. |
 | `/aop <text>` | Set the Area of Play. |
 | `/aopvote A/B/C` | Start an AOP vote. |
 | `/alert <text>` | Server-wide alert banner. |
-| `/warn <id> <reason>` / `/advise <id> <text>` | Warn / advise a player. |
+| `/warn <id> <reason>` · `/advise <id> <text>` | Warn / advise a player. |
 | `/kick <id> <reason>` | Kick a player. |
 | `/ban <id> <reason>` · `/tempban <id> <time> <reason>` · `/unban <id>` | Ban management. |
 | `/dc <id>` | Force-disconnect a player. |
 | `/msg <id> <text>` · `/smsg <id> <text>` | Direct message / staff message. |
 | `/staff` | Toggle staff mode. |
 | `/wl ...` | Whitelist management. |
-| `/time <h> [m]` · `/freezetime` | World time control. |
-| `/ft` · `/rft` | Freeze / unfreeze time helpers. |
-| `/deleteentity` · `/dv` | Delete the entity / vehicle you're aiming at / in. |
+| `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
+| `/releaseinmate <id>` | Release an inmate (corrections). |
+| `/lacoreconfig` | Back up / restore LACORE configs across reinstalls. |
+| `/myperms` | Show your own ACE permissions. |
+| `/time <h> [m]` · `/freezetime` · `/ft` · `/rft` | World time control / freeze helpers. |
 | `/patrolhost` | Patrol host controls. |
-| `/calllog` | Print the MDT call/audit log (staff). |
-| `/rd` | Dismiss a player's report. |
+| `/deleteentity` · `/dv` | Delete the entity / vehicle you're aiming at / in. |
+
+### 🗺️ NADS — worldbuilding (staff)
+
+The New Address System lets staff record street-address points on the map:
+
+`/startnads <start-number> [street]` · `/finishnads` · `/cancelnads` · `/generatenadsblips`
 
 ## 🧰 Owner commands (`/lacore`)
 

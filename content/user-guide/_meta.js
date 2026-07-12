@@ -8,5 +8,6 @@ export default {
   'citations-charges': 'Citations & Charges',
   'dispatch-console': 'Dispatch Console',
   'lasd-cad': 'LASD CAD / PCMS',
+  'retro-mdt': '9100-T Retro Terminal',
   'civilian-vehicles': 'Civilian & Vehicles',
 }
