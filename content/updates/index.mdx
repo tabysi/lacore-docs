@@ -13,6 +13,25 @@ The latest LACORE release at a glance. Every version has its own page under the
   The authoritative, line-by-line changelog also ships with the resource in `changelog.md`.
 </Callout>
 
+## 3.2.1 — ESX / framework compatibility & fixes
+
+A compatibility pass for framework servers — LACORE no longer fights an ESX / QBCore / QBox
+server over spawning or vehicle plates.
+
+- **Framework owns spawning** — when ESX / QBCore / QBox is detected, LACORE no longer sets its
+  own auto-spawn or teleports the player, so garage vehicles (e.g. the police garage) spawn
+  correctly.
+- **Garage plates kept** — plate re-formatting is now `Vehicles.plateFormatting = "auto"`
+  (off automatically on a framework server), so external garages keep their own plate.
+- **ESX licence import** — a player's `user_licenses` show up in the MDT person record, mapped
+  onto the six licence slots via the new `configs/cfg-licenses-sh.lua`.
+- Fixes a vehicle-spawn `nil` error and moves the network endpoints out of the editable config.
+
+<Cards>
+  <Cards.Card title="Full 3.2.1 changelog" href="/updates/changelog/v3-2-1" arrow />
+  <Cards.Card title="All Releases" href="/updates/changelog" arrow />
+</Cards>
+
 ## 3.2.0 — New NUI Phone, Feature Toggles, Air Unit, Corrections & more
 
 Our biggest release yet — a brand-new phone, a fourth MDT skin, real framework

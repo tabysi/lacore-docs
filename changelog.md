@@ -3,13 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.2.0] – New NUI Phone, Feature Toggles, Air Unit, Corrections & more
+## [3.2.1] – ESX / framework compatibility & fixes
 
-**Highlights:** a brand-new **iPhone-style NUI phone** (calls, SMS, apps and more), a **feature-toggle
-config** so you can run only the parts of LACORE you want (e.g. just the MDT/CAD), real
-**ESX / QBCore / QBox** compatibility, new gameplay systems (**Corrections / Jail**, **Impound**,
-**Air Unit**, **K9**), premium notifications & dialogs, a full LACORE re-brand, config backup/restore,
-and an experimental radio **speech-to-text**.
+A compatibility pass for framework servers: LACORE no longer fights an ESX / QBCore / QBox server over
+player spawning or vehicle plates. Also adds an ESX licence import into the MDT and moves the central
+network endpoints out of the editable config.
 
 ### Added
 
@@ -20,6 +18,50 @@ and an experimental radio **speech-to-text**.
   six MDT slots (driver · commercial · boating · pilot · ccw · hunting), with a toggle and configurable
   table/column names for non-standard forks. Best-effort: a fork without a `user_licenses` table never
   breaks the character import (licences just stay untouched). Standalone / QB / QBox are unaffected.
+
+### Changed
+
+- **Ban-network & identity-link need no endpoint configuration.** The central service endpoint for the
+  global-ban network and the Discord identity link is now managed internally by LACORE and no longer
+  lives in the editable config — there was never anything to set there, and it removes a footgun. The
+  behaviour toggles (`enabled`, matched identifier types, refresh interval, fail-open, message) stay
+  configurable as before.
+
+### Fixed
+
+- **Framework servers: LACORE no longer controls player spawning.** LACORE set its own
+  `spawnmanager` auto-spawn (fixed coords + a placeholder ped) and re-teleported the player on every
+  `playerSpawned`. On an ESX / QBCore / QBox server the framework owns character spawning, so the two
+  fought each other — which could teleport the player mid-action and stop **garage vehicles (e.g. the
+  police garage) from spawning**. When a framework is detected (respecting a forced `Bridge.mode`),
+  LACORE now leaves spawning entirely to the framework and never sets an auto-spawn, forces a respawn
+  or teleports the player. Standalone servers are unchanged.
+- **External garages / framework plates were overwritten.** LACORE re-formats vehicle plates to the
+  server plate style and strips the yellow "EXEMPT" plate from civilian cars — but on an ESX/QBCore/QBox
+  server the framework's garage owns each vehicle's plate and looks the vehicle up by it, so rewriting it
+  made external garages report *"plate not found / shows a different plate."* Plate formatting is now
+  gated by a new escrow-editable toggle `Vehicles.plateFormatting` (`configs/cfg-vehicles-sh.lua`),
+  default `"auto"` → **on** standalone, **off** automatically when a framework is detected (the garage
+  keeps its plate). Force it with `true` / `false`. Both plate-rewrite paths (the on-drive
+  `CheckPlateValidity` and the EXEMPT-plate sweep) respect it.
+- **"attempt to perform arithmetic on a nil value" when spawning / entering a vehicle.** The seatbelt
+  ejection loop (`client/loops-cl.lua`) computed the vehicle's acceleration delta from a previous/current
+  speed global that could still be unset on the very first vehicle frame — e.g. spawning straight into a
+  garage vehicle — and divided by `GetFrameTime()`, which can momentarily be 0 mid-load. Both the speeds
+  and the frame time are now guarded (`or 0.0` / zero-check), so the delta can never throw. Note: LACORE
+  never writes vehicle plates (only reads them for CAD queries), so it does not change a spawned car's
+  plate — a garage plate mismatch is not caused by LACORE.
+
+## [3.2.0] – New NUI Phone, Feature Toggles, Air Unit, Corrections & more
+
+**Highlights:** a brand-new **iPhone-style NUI phone** (calls, SMS, apps and more), a **feature-toggle
+config** so you can run only the parts of LACORE you want (e.g. just the MDT/CAD), real
+**ESX / QBCore / QBox** compatibility, new gameplay systems (**Corrections / Jail**, **Impound**,
+**Air Unit**, **K9**), premium notifications & dialogs, a full LACORE re-brand, config backup/restore,
+and an experimental radio **speech-to-text**.
+
+### Added
+
 - **9100-T retro Mobile Data Terminal (new MDT skin).** A fourth CAD terminal styled after a 1990s
   in-car MDT — a green-phosphor CRT in a rugged chassis with a 12-key function panel (ACK / ENRT /
   SCENE / AVAIL / OUTSVC / TRANSP / UNAVAIL / VEH / PERSON / PROP / T-STOP / ONVIEW), a red EMER
@@ -300,11 +342,6 @@ and an experimental radio **speech-to-text**.
   Opening the tab clears it; messages you receive while already reading it don't badge.
 
 ### Changed
-- **Ban-network & identity-link need no endpoint configuration.** The central service endpoint for the
-  global-ban network and the Discord identity link is now managed internally by LACORE and no longer
-  lives in the editable config — there was never anything to set there, and it removes a footgun. The
-  behaviour toggles (`enabled`, matched identifier types, refresh interval, fail-open, message) stay
-  configurable as before.
 - **LAPD unit list — no more `(N)` callsign suffix.** Partners sharing a callsign were listed as
   e.g. `1A-12 (2)`. The unit row now shows just the callsign; the members still expand via the row.
 - **Internal KVP keys re-branded `PVP_CORE:*` → `LACORE:*`** (playerlist, world time, AOP). A one-shot
@@ -318,21 +355,6 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
-- **External garages / framework plates were overwritten.** LACORE re-formats vehicle plates to the
-  server plate style and strips the yellow "EXEMPT" plate from civilian cars — but on an ESX/QBCore/QBox
-  server the framework's garage owns each vehicle's plate and looks the vehicle up by it, so rewriting it
-  made external garages report *"plate not found / shows a different plate."* Plate formatting is now
-  gated by a new escrow-editable toggle `Vehicles.plateFormatting` (`configs/cfg-vehicles-sh.lua`),
-  default `"auto"` → **on** standalone, **off** automatically when a framework is detected (the garage
-  keeps its plate). Force it with `true` / `false`. Both plate-rewrite paths (the on-drive
-  `CheckPlateValidity` and the EXEMPT-plate sweep) respect it.
-- **"attempt to perform arithmetic on a nil value" when spawning / entering a vehicle.** The seatbelt
-  ejection loop (`client/loops-cl.lua`) computed the vehicle's acceleration delta from a previous/current
-  speed global that could still be unset on the very first vehicle frame — e.g. spawning straight into a
-  garage vehicle — and divided by `GetFrameTime()`, which can momentarily be 0 mid-load. Both the speeds
-  and the frame time are now guarded (`or 0.0` / zero-check), so the delta can never throw. Note: LACORE
-  never writes vehicle plates (only reads them for CAD queries), so it does not change a spawned car's
-  plate — a garage plate mismatch is not caused by LACORE.
 - **MDT call list was broadcast to every player, not just units.** `mdt:SyncCalls` (the ~2 KB active-call
   list) was pushed to `-1` (all connected clients) on every call change — so **civilians**, who never open
   a CAD, received it too. On a busy server that wasted bandwidth and let the payload pile up in a slow

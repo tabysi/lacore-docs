@@ -1,0 +1,53 @@
+---
+title: "3.2.1"
+---
+
+# [3.2.1] – ESX / framework compatibility & fixes
+
+
+A compatibility pass for framework servers: LACORE no longer fights an ESX / QBCore / QBox server over
+player spawning or vehicle plates. Also adds an ESX licence import into the MDT and moves the central
+network endpoints out of the editable config.
+
+### Added
+
+- **ESX licence import into the MDT (owner-configurable).** On an ESX server LACORE now reads each
+  player's `user_licenses` rows on load / character switch and shows their real licences in the CAD
+  person record — no manual `/profile` entry. A new escrow-editable config
+  (`configs/cfg-licenses-sh.lua`) lets server owners map their own ESX licence `type` strings onto the
+  six MDT slots (driver · commercial · boating · pilot · ccw · hunting), with a toggle and configurable
+  table/column names for non-standard forks. Best-effort: a fork without a `user_licenses` table never
+  breaks the character import (licences just stay untouched). Standalone / QB / QBox are unaffected.
+
+### Changed
+
+- **Ban-network & identity-link need no endpoint configuration.** The central service endpoint for the
+  global-ban network and the Discord identity link is now managed internally by LACORE and no longer
+  lives in the editable config — there was never anything to set there, and it removes a footgun. The
+  behaviour toggles (`enabled`, matched identifier types, refresh interval, fail-open, message) stay
+  configurable as before.
+
+### Fixed
+
+- **Framework servers: LACORE no longer controls player spawning.** LACORE set its own
+  `spawnmanager` auto-spawn (fixed coords + a placeholder ped) and re-teleported the player on every
+  `playerSpawned`. On an ESX / QBCore / QBox server the framework owns character spawning, so the two
+  fought each other — which could teleport the player mid-action and stop **garage vehicles (e.g. the
+  police garage) from spawning**. When a framework is detected (respecting a forced `Bridge.mode`),
+  LACORE now leaves spawning entirely to the framework and never sets an auto-spawn, forces a respawn
+  or teleports the player. Standalone servers are unchanged.
+- **External garages / framework plates were overwritten.** LACORE re-formats vehicle plates to the
+  server plate style and strips the yellow "EXEMPT" plate from civilian cars — but on an ESX/QBCore/QBox
+  server the framework's garage owns each vehicle's plate and looks the vehicle up by it, so rewriting it
+  made external garages report *"plate not found / shows a different plate."* Plate formatting is now
+  gated by a new escrow-editable toggle `Vehicles.plateFormatting` (`configs/cfg-vehicles-sh.lua`),
+  default `"auto"` → **on** standalone, **off** automatically when a framework is detected (the garage
+  keeps its plate). Force it with `true` / `false`. Both plate-rewrite paths (the on-drive
+  `CheckPlateValidity` and the EXEMPT-plate sweep) respect it.
+- **"attempt to perform arithmetic on a nil value" when spawning / entering a vehicle.** The seatbelt
+  ejection loop (`client/loops-cl.lua`) computed the vehicle's acceleration delta from a previous/current
+  speed global that could still be unset on the very first vehicle frame — e.g. spawning straight into a
+  garage vehicle — and divided by `GetFrameTime()`, which can momentarily be 0 mid-load. Both the speeds
+  and the frame time are now guarded (`or 0.0` / zero-check), so the delta can never throw. Note: LACORE
+  never writes vehicle plates (only reads them for CAD queries), so it does not change a spawned car's
+  plate — a garage plate mismatch is not caused by LACORE.
