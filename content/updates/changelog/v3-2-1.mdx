@@ -18,6 +18,11 @@ network endpoints out of the editable config.
   six MDT slots (driver · commercial · boating · pilot · ccw · hunting), with a toggle and configurable
   table/column names for non-standard forks. Best-effort: a fork without a `user_licenses` table never
   breaks the character import (licences just stay untouched). Standalone / QB / QBox are unaffected.
+- **MDT plate query now hits the framework vehicle DB.** On an ESX server, running a plate that isn't
+  in LACORE's own store is now looked up directly in `owned_vehicles` (matched normalised, so ESX's
+  padded plates still match) and returns the vehicle plus its registered owner (from `users`) — so a
+  car bought through the framework's own shop/garage shows up in the CAD even before it's mirrored into
+  LACORE. Async, gated by `Bridge.useFrameworkCharacters`.
 
 ### Changed
 
@@ -29,6 +34,19 @@ network endpoints out of the editable config.
 
 ### Fixed
 
+- **Entity-spam anti-cheat could delete server-spawned framework vehicles.** Garages / vehicle shops /
+  dealerships that spawn vehicles **server-side** (e.g. `jg-advancedgarages`) tripped LACORE's
+  entity-spam guard, which deleted the freshly spawned car — while client-side garages (e.g. esx_garage)
+  were unaffected. On a framework server the check now steps aside for the framework's own AC
+  (new `EntitySpam.skipOnFramework`, default `true`; set `false` to keep it on). Standalone unchanged.
+- **Framework garage vehicles were removed right after spawning.** LACORE's per-frame vehicle loops
+  (HUD dashboard, sunday-driver handling, tyre/nitro/plate tweaks) ran on the vehicle the ped was
+  reported to be in — but a server-spawned vehicle (e.g. an ESX garage car) is reported before the
+  client streams/owns the entity. Writing to it then (`SetVehicleHandlingFloat`, etc.) fought the
+  OneSync ownership handshake — flooding the console with `No such entity` / `no script guid` and
+  making the garage remove the freshly spawned car. LACORE now only tracks/writes a vehicle once it
+  **exists locally** (`DoesEntityExist`), so it never touches a mid-handshake server vehicle. Also
+  removed a stray `print(GetCurrentLocation())` debug line.
 - **Framework servers: LACORE no longer controls player spawning.** LACORE set its own
   `spawnmanager` auto-spawn (fixed coords + a placeholder ped) and re-teleported the player on every
   `playerSpawned`. On an ESX / QBCore / QBox server the framework owns character spawning, so the two
