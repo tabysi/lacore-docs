@@ -318,6 +318,14 @@ and an experimental radio **speech-to-text**.
   missing-dependency warnings, `/lacore` diagnostics and the already-gated `CDbg` call-center helper.
 
 ### Fixed
+- **External garages / framework plates were overwritten.** LACORE re-formats vehicle plates to the
+  server plate style and strips the yellow "EXEMPT" plate from civilian cars — but on an ESX/QBCore/QBox
+  server the framework's garage owns each vehicle's plate and looks the vehicle up by it, so rewriting it
+  made external garages report *"plate not found / shows a different plate."* Plate formatting is now
+  gated by a new escrow-editable toggle `Vehicles.plateFormatting` (`configs/cfg-vehicles-sh.lua`),
+  default `"auto"` → **on** standalone, **off** automatically when a framework is detected (the garage
+  keeps its plate). Force it with `true` / `false`. Both plate-rewrite paths (the on-drive
+  `CheckPlateValidity` and the EXEMPT-plate sweep) respect it.
 - **"attempt to perform arithmetic on a nil value" when spawning / entering a vehicle.** The seatbelt
   ejection loop (`client/loops-cl.lua`) computed the vehicle's acceleration delta from a previous/current
   speed global that could still be unset on the very first vehicle frame — e.g. spawning straight into a
