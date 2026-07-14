@@ -23,9 +23,33 @@ network endpoints out of the editable config.
   padded plates still match) and returns the vehicle plus its registered owner (from `users`) — so a
   car bought through the framework's own shop/garage shows up in the CAD even before it's mirrored into
   LACORE. Async, gated by `Bridge.useFrameworkCharacters`.
+- **Search OFFLINE players by name in the MDT.** On an ESX server the person query now also searches the
+  framework's `users` table (first / last / full name), merged with the local results and deduped by
+  name — so an officer can look up a player who is offline or was never mirrored into LACORE. Async,
+  gated by `Bridge.useFrameworkCharacters`.
+- **Automatic server registration (zero configuration).** Every server running LACORE now registers
+  itself with the LACORE service on start, sends a heartbeat every hour and reports on stop — so the
+  team can see which servers are live, on what version and with how many slots. It goes through the same
+  write-only relay as everything else (`lacore.netica.dev/ingest/server`): **server-level metadata only**
+  (hostname, IP, version, slot/player count, optional owner Discord) — **never any player data**, no
+  database credential, nothing for the owner to set up. Replaces the old start-up Discord webhook ping.
 
 ### Changed
 
+- **🔒 The database host no longer appears in the resource at all.** The IP-lock and global-ban
+  network used to read the licence/ban lists straight from the backing database URL (baked into the
+  build). They now go through LACORE's own relay (`lacore.netica.dev/list/*`), and ban propagation/lift
+  goes through token-gated relay endpoints — so the resource knows only `lacore.netica.dev` and holds no
+  database address or credential. The public read endpoints expose exactly the same non-secret lists as
+  before (blocked IPs, banned identifiers), which lets the database be locked down to superuser-only.
+- **🔒 The resource no longer holds any central credential (identity link reworked).** The identity
+  link used to require the server owner to put a database token in their `server.cfg`
+  (`lacore_identity_token`). That was wrong: the token could read and modify **every** LACORE server's
+  data. The core now posts to a narrow, **write-only ingest endpoint** on LACORE's own service instead —
+  it never talks to the database and holds no database credential. There is **nothing to configure**:
+  no convar, no token, no server.cfg line. The ingest endpoint accepts only identity records, rejects
+  reads outright, validates every field and is rate-limited. Console/command messages no longer name
+  any credential or backing store either.
 - **Ban-network & identity-link need no endpoint configuration.** The central service endpoint for the
   global-ban network and the Discord identity link is now managed internally by LACORE and no longer
   lives in the editable config — there was never anything to set there, and it removes a footgun. The
@@ -72,6 +96,4 @@ network endpoints out of the editable config.
   ejection loop (`client/loops-cl.lua`) computed the vehicle's acceleration delta from a previous/current
   speed global that could still be unset on the very first vehicle frame — e.g. spawning straight into a
   garage vehicle — and divided by `GetFrameTime()`, which can momentarily be 0 mid-load. Both the speeds
-  and the frame time are now guarded (`or 0.0` / zero-check), so the delta can never throw. Note: LACORE
-  never writes vehicle plates (only reads them for CAD queries), so it does not change a spawned car's
-  plate — a garage plate mismatch is not caused by LACORE.
+  and the frame time are now guarded (`or 0.0` / zero-check), so the delta can never throw.

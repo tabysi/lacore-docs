@@ -1,0 +1,20 @@
+---
+title: "3.2.2"
+---
+
+# [3.2.2] – Automatic server registration out of the box
+
+
+Fixes server auto-registration so it just works on every LACORE server with **zero configuration** —
+no token to set, anywhere.
+
+### Fixed
+
+- **Server auto-registration now works on every server without any setup.** The write-only relay/ingest
+  token is now a single fixed constant shipped inside the core (obfuscated in the escrow build) instead
+  of a blank the maintainer had to fill before each build. Previously the token was empty, so the core's
+  home-reporting (`/ingest/server`, identity link) short-circuited and **nothing** was ever sent — the
+  admin dashboard's "LACORE servers" list stayed empty. Every LACORE server now reports `start` /
+  heartbeat / `stop` automatically. The dashboard defaults to the same token, so it accepts those posts
+  even when `INGEST_TOKEN` is unset. Still write-only and never a database credential — the resource
+  continues to hold no DB host or credentials.
