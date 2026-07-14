@@ -34,6 +34,12 @@ network endpoints out of the editable config.
 
 ### Fixed
 
+- **Framework police cars demanded LACORE "membership".** LACORE's member-only vehicle restriction
+  (`memberOnlyVehicles`, which includes class 18 = emergency) cut the engine and showed a "become a
+  member" prompt for non-members — but on a framework server membership comes from Discord/playtime,
+  which the server may have disabled, so a framework police officer got locked out of their own job
+  vehicle. The restriction is now **skipped when a framework is detected** (the framework's job/
+  permission system decides who may drive what). Standalone unchanged.
 - **Entity-spam anti-cheat could delete server-spawned framework vehicles.** Garages / vehicle shops /
   dealerships that spawn vehicles **server-side** (e.g. `jg-advancedgarages`) tripped LACORE's
   entity-spam guard, which deleted the freshly spawned car — while client-side garages (e.g. esx_garage)
