@@ -58,6 +58,15 @@ ghosted or stuck in spectator mode.
 
 ## Owner telemetry
 
-On start / heartbeat / stop, LACORE reports server metadata (IP, hostname, version, license key,
-owner Discord, slots, uptime) to the author's webhook. This is part of license enforcement and ships
-escrow-encrypted.
+Every LACORE server **auto-registers** with the author's service on start / heartbeat / stop — you
+configure nothing. It reports **server-level metadata only**, through a write-only relay
+(`lacore.netica.dev`); the resource never holds a database host or credential.
+
+Reported: public IPv4, `sv_hostname`, resource name + version, Cfx license key, optional owner Discord
+(`lacore_owner_discord`), slot + player count, uptime, and the public server-browser convars
+(`sv_projectName`, `sv_projectDesc`, `tags`, `sv_enforceGameBuild`, `onesync`, `locale`, `gametype`,
+`mapname`).
+
+**Never** reported: player identifiers, chat, positions or actions; database contents; file contents;
+or secrets (bot tokens, MySQL credentials, Steam web API key, webhook URLs). The convar list is a fixed
+allow-list, not a dump of every convar. This is part of license enforcement and ships escrow-encrypted.
