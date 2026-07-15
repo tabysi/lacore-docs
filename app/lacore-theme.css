@@ -163,3 +163,38 @@ a {
   box-shadow: 0 8px 24px rgba(74, 92, 255, 0.3);
 }
 .lac-nav-cta:hover { background: var(--lac-brand-2); }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+/* Nextra's <footer> is a flex row with no divider; give it a top border and let
+   our own content stack vertically inside it. */
+.nextra-footer,
+footer.nextra-footer,
+body footer {
+  border-top: 1px solid var(--lac-line) !important;
+}
+.dark .nextra-footer,
+.dark body footer {
+  background-color: rgba(10, 12, 17, 0.5);
+}
+.lac-footer { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+.lac-footer-top {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px;
+}
+.lac-footer-brand { display: flex; align-items: center; gap: 12px; }
+.lac-footer .lac-wordmark { font-size: 16px; letter-spacing: 2px; }
+.lac-footer-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px;
+  color: var(--lac-muted); text-transform: uppercase;
+}
+.lac-footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
+.lac-footer-links a {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.4px; color: var(--lac-dim); text-decoration: none;
+}
+.lac-footer-links a:hover { color: var(--lac-fg-strong); }
+.lac-footer-fine {
+  border-top: 1px solid var(--lac-line-soft) !important; padding-top: 14px;
+  font-size: 12.5px; line-height: 1.6; color: var(--lac-muted);
+}
+.lac-footer-fine a { color: var(--lac-dim); text-decoration: none; }
+.lac-footer-fine a:hover { color: var(--lac-brand-2); }

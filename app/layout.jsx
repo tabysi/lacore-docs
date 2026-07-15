@@ -28,19 +28,26 @@ const navbar = (
   </Navbar>
 )
 
-const footerLink = { textDecoration: 'underline' }
 const footer = (
   <Footer>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', marginBottom: '.5rem' }}>
-      <a href="https://lacore.netica.dev/" target="_blank" rel="noreferrer" style={footerLink}>Website</a>
-      <a href="https://lacore.tebex.io/" target="_blank" rel="noreferrer" style={footerLink}>Tebex Store</a>
-      <a href="https://www.patreon.com/c/5mlacore/" target="_blank" rel="noreferrer" style={footerLink}>Patreon</a>
-      <a href="https://discord.gg/b6YbvVEvYp" target="_blank" rel="noreferrer" style={footerLink}>Discord</a>
-      <a href="https://github.com/tabysi" target="_blank" rel="noreferrer" style={footerLink}>GitHub</a>
+    <div className="lac-footer">
+      <div className="lac-footer-top">
+        <div className="lac-footer-brand">
+          <span className="lac-wordmark">LA<b>CORE</b></span>
+          <span className="lac-footer-tag">FIVEM CORE FRAMEWORK</span>
+        </div>
+        <div className="lac-footer-links">
+          <a href="https://lacore.netica.dev/" target="_blank" rel="noreferrer">Website</a>
+          <a href="https://lacore.tebex.io/" target="_blank" rel="noreferrer">Store</a>
+          <a href="https://www.patreon.com/c/5mlacore/" target="_blank" rel="noreferrer">Patreon</a>
+          <a href="https://discord.gg/b6YbvVEvYp" target="_blank" rel="noreferrer">Discord</a>
+          <a href="https://github.com/tabysi" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+      <div className="lac-footer-fine">
+        LACORE — created by <a href="https://github.com/tabysi" target="_blank" rel="noreferrer">@tabysi</a>. © {new Date().getFullYear()}. All rights reserved.
+      </div>
     </div>
-    LACORE — created by{' '}
-    <a href="https://github.com/tabysi" style={footerLink}>@tabysi</a>. © {new Date().getFullYear()}.
-    All rights reserved.
   </Footer>
 )
 
