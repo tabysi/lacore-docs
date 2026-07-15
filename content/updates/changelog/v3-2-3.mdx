@@ -1,0 +1,15 @@
+---
+title: "3.2.3"
+---
+
+# [3.2.3] – Richer server registration (public convars)
+
+
+### Added
+
+- **Server registration now includes the public server-browser convars.** On top of the existing
+  metadata, each LACORE server also reports `sv_projectName`, `sv_projectDesc`, `tags`,
+  `sv_enforceGameBuild`, `onesync`, `locale` / `sv_language`, `gametype` and `mapname`, shown in the
+  admin dashboard's server-detail view. These come from a **fixed allowlist** — the telemetry never
+  iterates or dumps all convars, so secrets like `mysql_connection_string`, `steam_webApiKey` and bot
+  tokens are never sent. Still server-level only, still no player data.

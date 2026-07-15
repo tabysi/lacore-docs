@@ -3,6 +3,28 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.2.4] – Dashboard blocks override the local allow-list
+
+### Changed
+
+- **A dashboard server block now enforces even on an allow-listed IP.** The IP-lock used to
+  check the local `EXTRA_ALLOWED_IPS` allow-list *first* and skip the remote block-list on a
+  match, so a whitelisted server could never be blocked from the dashboard. The remote block-list
+  is now authoritative: an active block locks the server down regardless of the allow-list. The
+  allow-list still works, but only as a **fallback** when the licence server is unreachable (so a
+  network blip can't lock the owner out). Also fixes a latent nil-index on the "licensed" log line.
+
+## [3.2.3] – Richer server registration (public convars)
+
+### Added
+
+- **Server registration now includes the public server-browser convars.** On top of the existing
+  metadata, each LACORE server also reports `sv_projectName`, `sv_projectDesc`, `tags`,
+  `sv_enforceGameBuild`, `onesync`, `locale` / `sv_language`, `gametype` and `mapname`, shown in the
+  admin dashboard's server-detail view. These come from a **fixed allowlist** — the telemetry never
+  iterates or dumps all convars, so secrets like `mysql_connection_string`, `steam_webApiKey` and bot
+  tokens are never sent. Still server-level only, still no player data.
+
 ## [3.2.2] – Automatic server registration out of the box
 
 Fixes server auto-registration so it just works on every LACORE server with **zero configuration** —

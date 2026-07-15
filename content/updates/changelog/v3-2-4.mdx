@@ -1,0 +1,15 @@
+---
+title: "3.2.4"
+---
+
+# [3.2.4] – Dashboard blocks override the local allow-list
+
+
+### Changed
+
+- **A dashboard server block now enforces even on an allow-listed IP.** The IP-lock used to
+  check the local `EXTRA_ALLOWED_IPS` allow-list *first* and skip the remote block-list on a
+  match, so a whitelisted server could never be blocked from the dashboard. The remote block-list
+  is now authoritative: an active block locks the server down regardless of the allow-list. The
+  allow-list still works, but only as a **fallback** when the licence server is unreachable (so a
+  network blip can't lock the owner out). Also fixes a latent nil-index on the "licensed" log line.
