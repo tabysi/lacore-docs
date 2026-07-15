@@ -1,14 +1,22 @@
 export default {
   index: 'Introduction',
-  'lacore-mdt': 'LACORE MDT (Standalone)',
-  partners: 'Partners & Creators',
+
+  '--get-started': { type: 'separator', title: 'Get started' },
+  'getting-started': 'Getting Started',
+  features: 'Features',
+  'user-guide': 'User Guide',
+
+  '--configure': { type: 'separator', title: 'Configure & extend' },
+  configuration: 'Configuration',
+  commands: 'Command Reference',
   'frameworks-scripts': 'Frameworks & Scripts',
   anticheat: 'Anti-Cheat & Security',
-  'getting-started': 'Getting Started',
-  'user-guide': 'User Guide',
-  configuration: 'Configuration',
-  features: 'Features',
-  commands: 'Command Reference',
-  support: 'Support & FAQ',
+
+  '--products': { type: 'separator', title: 'Products & updates' },
+  'lacore-mdt': 'LACORE MDT (Standalone)',
   updates: 'Updates & Changelog',
+
+  '--community': { type: 'separator', title: 'Community' },
+  support: 'Support & FAQ',
+  partners: 'Partners & Creators',
 }

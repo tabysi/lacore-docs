@@ -1,0 +1,165 @@
+/* ============================================================================
+   LACORE docs — reskin to match the marketing site (lacore.netica.dev).
+   Palette + fonts mirror landing/web/src/app.css so the docs feel like the same
+   product. Dark is the primary look; light stays clean.
+   ============================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* LACORE brand tokens (from the website @theme) */
+  --lac-ink: #08090c;
+  --lac-ink-2: #0a0c11;
+  --lac-panel: #0d1017;
+  --lac-panel-2: #11161e;
+  --lac-line: #1a2131;
+  --lac-line-2: #232c42;
+  --lac-fg: #d7deea;
+  --lac-fg-strong: #eef2f8;
+  --lac-dim: #98a6c0;
+  --lac-muted: #6b7689;
+  --lac-brand: #4a5cff;
+  --lac-brand-2: #6c8cff;
+  --lac-brand-3: #9fb0ff;
+
+  /* Nextra accent → brand blue #6c8cff ≈ hsl(226 100% 71%) */
+  --nextra-primary-hue: 226deg;
+  --nextra-primary-saturation: 100%;
+  --nextra-primary-lightness: 68%;
+}
+
+/* ── Fonts ────────────────────────────────────────────────────────────────── */
+html,
+body {
+  font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-feature-settings: 'ss01';
+}
+h1, h2, h3, h4, h5, h6,
+.nextra-navbar-blur ~ * h1 {
+  font-family: 'Chakra Petch', 'Archivo', sans-serif;
+  letter-spacing: -0.4px;
+}
+code, kbd, pre, samp, .nextra-code, tt {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-feature-settings: normal;
+}
+
+/* ── Dark palette (matches the website) ───────────────────────────────────── */
+.dark {
+  --nextra-bg: 8 9 12; /* #08090c as an "r g b" triple (Nextra background var) */
+}
+.dark body {
+  background-color: var(--lac-ink);
+  color: var(--lac-fg);
+  /* subtle grid backdrop like the marketing site */
+  background-image:
+    linear-gradient(rgba(74, 92, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 92, 255, 0.028) 1px, transparent 1px);
+  background-size: 52px 52px;
+  background-attachment: fixed;
+}
+
+/* Top nav + sidebar + toc surfaces → panel/ink with brand borders */
+.dark .nextra-navbar,
+.dark .nextra-navbar-blur {
+  background-color: rgba(8, 9, 12, 0.8) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--lac-line) !important;
+}
+.dark .nextra-sidebar,
+.dark aside.nextra-sidebar-container,
+.dark .nextra-toc {
+  background-color: transparent !important;
+}
+.dark .nextra-sidebar-container {
+  border-right: 1px solid var(--lac-line) !important;
+}
+
+/* Active / hovered sidebar links → brand-tinted pill (like the dashboard nav) */
+.dark .nextra-sidebar a[data-active='true'],
+.dark .nextra-sidebar .active > a {
+  background-color: rgba(74, 92, 255, 0.14) !important;
+  color: #fff !important;
+}
+.dark .nextra-sidebar a:hover {
+  background-color: #0e1118 !important;
+}
+
+/* Links + inline accents */
+a {
+  color: var(--lac-brand-2);
+  text-decoration-color: rgba(108, 140, 255, 0.35);
+}
+.dark .nextra-content a {
+  color: var(--lac-brand-2);
+}
+
+/* Headings pop a little brighter in dark */
+.dark h1, .dark h2, .dark h3 { color: var(--lac-fg-strong); }
+.dark h2 { border-bottom-color: var(--lac-line) !important; }
+
+/* Inline code + code blocks → panel look */
+.dark code:not(pre code) {
+  background-color: #12161f !important;
+  border: 1px solid var(--lac-line) !important;
+  color: var(--lac-brand-3) !important;
+  border-radius: 5px;
+}
+.dark pre,
+.dark .nextra-code pre,
+.dark figure.nextra-code pre {
+  background-color: #0a0c11 !important;
+  border: 1px solid var(--lac-line) !important;
+  border-radius: 10px;
+}
+
+/* Cards (Nextra <Cards>) → panels with a brand hover edge */
+.dark .nextra-card,
+.dark a.nextra-card {
+  background-color: var(--lac-panel) !important;
+  border: 1px solid var(--lac-line) !important;
+  border-radius: 12px;
+  transition: border-color .15s, transform .15s;
+}
+.dark .nextra-card:hover,
+.dark a.nextra-card:hover {
+  border-color: var(--lac-brand) !important;
+  transform: translateY(-2px);
+}
+
+/* Callouts → keep readable on the dark panel */
+.dark .nextra-callout {
+  border-radius: 10px;
+}
+
+/* Search box */
+.dark .nextra-search input {
+  background-color: #0d1017 !important;
+  border: 1px solid var(--lac-line) !important;
+}
+
+/* Brand wordmark in the navbar (rendered from layout.jsx) */
+.lac-wordmark {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 2.5px;
+  color: var(--lac-fg-strong);
+}
+.lac-wordmark b { color: var(--lac-brand-2); font-weight: 700; }
+:root:not(.dark) .lac-wordmark { color: #0a0c11; }
+
+/* Buttons/badges in navbar (Store / Patreon) */
+.lac-nav-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.lac-nav-cta {
+  background: var(--lac-brand);
+  color: #fff !important;
+  padding: 7px 15px;
+  border-radius: 7px;
+  box-shadow: 0 8px 24px rgba(74, 92, 255, 0.3);
+}
+.lac-nav-cta:hover { background: var(--lac-brand-2); }
