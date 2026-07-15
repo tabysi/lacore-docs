@@ -3,6 +3,78 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.2.5] – Security & fairness hardening pass
+
+Server-authoritative hardening, multiplayer-fairness fixes and small performance fixes across the
+civilian (RP), CCTV, impound, K9, Air Unit, corrections (jail), fingerprint and address (NADS)
+systems. No gameplay change for legitimate players.
+
+### Fixed
+
+**Civilian**
+
+- **Activity completion is now position-checked.** `civ:ActivityDone` verifies the player is actually
+  at the activity's final step before granting the XP/achievement, so a modified client can no longer
+  loop-report completions to farm rewards from off-map (mirrors the anti-spoof checks the turf system
+  already does).
+- **Showing your ID and placing a prop are now proximity-checked server-side.** Both require the
+  target / spot to be near you — blocking a modified client from popping an ID card on someone across
+  the map or dropping props remotely.
+- **Organisation events are rate-limited.** Every org action writes the store to disk; a per-source
+  rate limit now stops a modified client from looping create/disband or spamming MOTD/invites as a
+  cheap DoS or to harass nearby players.
+
+**CCTV**
+
+- **Field-camera placement is capped, proximity-checked and rate-limited.** `cctv:PlaceCamera` now
+  enforces a configurable maximum (`CCTV.maxCameras`, default 60), rejects placements far from the
+  operator and validates the coordinates — so a compromised authorised client can't spam cameras
+  across the map (each camera persists to disk and spawns a networked prop for every player).
+  Remove / rename / set-group are rate-limited too.
+- **On-foot CCTV is no longer a safe hideout.** The on-foot operator's desk standin was invincible,
+  so an attacker at the desk couldn't touch them while they watched cameras. The standin is now
+  damageable and the viewer bails out of CCTV the moment it's attacked — exposing the operator,
+  exactly like the in-vehicle viewer already did.
+
+**Impound**
+
+- **Impounding can no longer world-delete an arbitrary vehicle.** `impound:Add` removes the vehicle
+  for everyone, so it now verifies server-side (by netId) that the vehicle is real and near the
+  officer before broadcasting the delete — a modified authorised client can no longer grief-delete
+  cars anywhere on the map. Add / release are rate-limited too.
+
+**K9**
+
+- **A downed handler's dog now breaks off its attack.** The K9 kept biting its target after the
+  handler was killed or knocked down; it now leaves combat and holds the moment the handler goes
+  down, so a dead officer can't keep a working attack dog on someone.
+
+**Corrections**
+
+- **The inmate roster and release events are rate-limited.** Both are already LEO-gated and
+  server-authoritative; a per-source rate limit now also caps how fast a client can pull the roster
+  (which walks the inmate list) or fire releases (which write the store to disk).
+
+**Fingerprint**
+
+- **The mobile fingerprint scan is rate-limited.** It's already LEO-gated and proximity/cuff-checked;
+  a per-source rate limit now caps how fast it can be fired (each scan runs a records + BOLO lookup).
+
+**NADS (address system)**
+
+- **Address submissions are validated and bounded.** `AddNADSStreet` (staff-only) now sanitises the
+  street name and point list — capping the name length, limiting points per street and dropping
+  non-numeric coordinates — so a crafted event can't inject a huge or malformed blob into the saved
+  address store. Add / fetch are rate-limited too.
+
+### Changed
+
+- **The civilian activity loop no longer runs on the 0 ms hot path while travelling** — it only
+  tight-loops (to draw the objective marker) within ~60 m of the current step, polling slowly
+  otherwise.
+- **The Air Unit spotlight loop no longer touches the 0 ms path while the searchlight is off** — it
+  idles at 200 ms and only runs per-frame while actually drawing the beam.
+
 ## [3.2.4] – Dashboard blocks override the local allow-list
 
 ### Changed
