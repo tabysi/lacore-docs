@@ -1,0 +1,30 @@
+---
+title: Servers
+---
+
+import { Callout } from 'nextra/components'
+
+# Servers
+
+Every server linked to your account (via a [license key](/customer-portal/license-keys)) appears on
+**Dashboard → Servers**, with live status refreshed automatically.
+
+## What you see
+
+| Field | Meaning |
+|-------|---------|
+| **Status** | Online / offline — green when the server reported in recently |
+| **Players** | Current players / slots |
+| **Version** | The LACORE version the server is running |
+| **Last seen** | When the server last checked in |
+
+## Managing a server
+
+- **Rename** — give a server a friendly name (separate from its in-game hostname).
+- **Remove** — take a server off your list. If it's still running with a valid key it re-appears on its
+  next heartbeat, so this is mainly for clearing out old / offline entries.
+
+<Callout type="info">
+  A server only appears here once it's **verified** by a license key. If you don't see your server,
+  check that `setr lacore_license_key "…"` is set in its `server.cfg` and the key is active.
+</Callout>

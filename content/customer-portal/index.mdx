@@ -1,0 +1,49 @@
+---
+title: Customer Portal
+---
+
+import { Callout, Cards } from 'nextra/components'
+
+# Customer Portal
+
+Your LACORE account lives at **[lacore.netica.dev/dashboard](https://lacore.netica.dev/dashboard/)**.
+Sign in with the **Discord account that owns your licence** — no separate password, no new account to
+create. Your role in our Discord decides what you see.
+
+<Callout type="info">
+  **How access works.** The portal reads your roles in the LACORE Discord: a **customer** role opens
+  the customer dashboard, **staff / owner** roles open the admin console, and a **partner** role adds
+  the Partner page. Nothing to configure — just sign in.
+</Callout>
+
+## What you can do
+
+<Cards>
+  <Cards.Card title="License keys" href="/customer-portal/license-keys" arrow>
+    Create a key, paste it into server.cfg, link your server to your account.
+  </Cards.Card>
+  <Cards.Card title="Servers" href="/customer-portal/servers" arrow>
+    See your linked servers — live status, players, version.
+  </Cards.Card>
+  <Cards.Card title="Server config" href="/customer-portal/server-config" arrow>
+    Change LACORE settings online — no file edits, no re-upload.
+  </Cards.Card>
+  <Cards.Card title="Payments" href="/customer-portal/payments" arrow>
+    Your Tebex purchases and invoices.
+  </Cards.Card>
+  <Cards.Card title="Partner program" href="/customer-portal/partner" arrow>
+    Referral stats and payouts (partners only).
+  </Cards.Card>
+  <Cards.Card title="Team" href="/customer-portal/team" arrow>
+    Give teammates scoped access to your account.
+  </Cards.Card>
+</Cards>
+
+## Roles at a glance
+
+| Role | Sees |
+|------|------|
+| **Customer** | Servers · License keys · Server config · Payments · Downloads · Support |
+| **Partner** | The above **+** the Partner page (referral stats & earnings) |
+| **Team member** | Whatever the account owner grants — scoped to *their* account |
+| **Staff / Owner** | The admin console (servers, bans, tickets, bot control, settings) |

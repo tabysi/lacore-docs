@@ -1,0 +1,36 @@
+---
+title: Server config
+---
+
+import { Callout } from 'nextra/components'
+
+# Server config
+
+Change LACORE's settings from **Dashboard → Server config** — no file edits, no re-upload. Your servers
+pull the changes by [license key](/customer-portal/license-keys) and apply them automatically.
+
+## How it applies
+
+- **Live settings** (e.g. branding) apply within about **10 minutes**.
+- **Restart settings** (tagged **⟳ restart** — feature toggles, HUD, etc.) apply on the server's **next
+  restart**.
+
+The editor is organised into tabs (**General · Features · HUD & Phone · Modules**), every setting has a
+plain-English explanation, and a search box spans all tabs. Your server also reports its **current
+values** back, so you can see what's actually running and adopt it with one click.
+
+## Templates & revisions
+
+- **Templates** — one-click starting points (Full RP · Police-CAD-only · Lightweight).
+- **Revisions** — every save is snapshotted; restore any of the **last 5**.
+
+## Data lists
+
+Beyond single settings, **Data lists** (under Server config) let you edit LACORE's tables — like the
+**penal code** and **vehicle blacklists** — as simple editors.
+
+<Callout type="info">
+  **Security by design.** Only a vetted, typed set of settings can be changed remotely — never files or
+  code, never secrets. If the service is ever unreachable, your server falls back to its shipped local
+  config.
+</Callout>
