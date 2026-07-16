@@ -2,14 +2,14 @@
 title: Developer API
 ---
 
-import { Callout } from 'nextra/components'
+import { Callout, Cards } from 'nextra/components'
 
 # Developer API
 
 A small, stable **exports + events** surface so other resources can talk to LACORE / LACORE MDT.
 Every export wraps an existing internal function — no new backend logic, no schema of its own. Use it
-to feed dispatch calls in, read officer / duty state, react to CAD events, and open the MDT from your
-own scripts.
+to feed dispatch calls in, read officer / duty state, look records up, issue BOLOs, react to CAD
+events, and open the MDT from your own scripts.
 
 <Callout type="info">
   **Resource name.** Exports are called by the *running* resource's name — `exports['lacore']` for the
@@ -22,6 +22,15 @@ Check the shipped version at runtime:
 ```lua
 local version = exports['lacore']:GetApiVersion()   -- e.g. "1.0.0"
 ```
+
+<Cards>
+  <Cards.Card title="API Bridge (drop-in)" href="/developer-api/bridge" arrow>
+    A tiny adapter resource that auto-detects the prefix and no-ops safely when LACORE isn't running.
+  </Cards.Card>
+  <Cards.Card title="Build your own with AI" href="/developer-api/ai-prompt" arrow>
+    A copy-paste prompt that hands an AI the full API contract so it writes your integration.
+  </Cards.Card>
+</Cards>
 
 ## Server exports
 
@@ -84,11 +93,53 @@ local inc = exports['lacore']:CreateCall({
 exports['lacore']:ResolveCall(inc, 'GOA')   -- Gone On Arrival
 ```
 
+### Records lookup
+
+Read-only, in-memory lookup — the same matching the MDT query uses. Results are **sanitised**: the raw
+`records` (which may hold private entries) and `faction` fields are never returned; active BOLO hits
+are attached under `bolos`.
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `QueryPerson(query)` | `profile[]` | match by server id, name (substring) or plate |
+| `QueryPlate(plate)` | `profile` \| `nil` | registered owner profile (with `.vehicles`) |
+
+```lua
+-- Look someone up by name and print their registered plates.
+for _, p in ipairs(exports['lacore']:QueryPerson('John')) do
+    local plates = {}
+    for pl in pairs(p.vehicles or {}) do plates[#plates + 1] = pl end
+    print(('%s — %s'):format(p.name, table.concat(plates, ', ')))
+end
+
+-- Who owns this plate?
+local owner = exports['lacore']:QueryPlate('8XYZ123')
+if owner then print('Registered to ' .. owner.name) end
+```
+
+<Callout type="warning">
+  **Privacy.** The lookup never exposes the raw criminal `records` array — that stays server-side and
+  officer-permissioned inside the MDT. `QueryPerson` / `QueryPlate` are for identity, vehicles and
+  active BOLO flags, not for pulling someone's rap sheet into a third-party script.
+</Callout>
+
 ### BOLOs
 
-| Export | Returns |
-|--------|---------|
-| `GetBolos()` | `bolo[]` |
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetBolos()` | `bolo[]` | active (non-expired) BOLOs |
+| `CreateBolo(opts)` | `boloId` \| `nil` | issues a BOLO, syncs to on-duty units + webhook |
+
+```lua
+exports['lacore']:CreateBolo({
+    kind    = 'vehicle',                 -- 'person' | 'vehicle' | 'plate' (default 'person')
+    subject = 'Black Sultan RS',         -- name / vehicle description
+    plate   = '8XYZ123',                 -- for vehicle / plate BOLOs
+    reason  = 'Suspect vehicle, 211',
+    danger  = true,                      -- armed & dangerous
+    -- by = 'my-heist-script',           -- attribution (defaults to the calling resource)
+})
+```
 
 ## Client exports
 
@@ -105,8 +156,8 @@ exports['lacore']:OpenMDT()
 ```
 
 <Callout type="info">
-  Officer / duty / call data lives on the **server** (it owns the session). Query it with the server
-  exports above, not on the client.
+  Officer / duty / call / records data lives on the **server** (it owns the session). Query it with the
+  server exports above, not on the client.
 </Callout>
 
 ## Events (LACORE → your resource)
@@ -118,6 +169,7 @@ exports['lacore']:OpenMDT()
 | `lacore:api:callCreated` | `call` `{ incidentNumber, type, message, address, postal, agency, x, y, z }` | server |
 | `lacore:api:callResolved` | `incidentNumber, reason, by` | server |
 | `lacore:api:dutyChanged` | `src, job, dept, onDuty` | server |
+| `lacore:api:boloCreated` | `bolo` `{ id, kind, subject, plate, reason, danger, by }` | server |
 | `lacore:mdt:opened` / `lacore:mdt:closed` | — | client |
 
 ```lua
@@ -128,14 +180,18 @@ end)
 AddEventHandler('lacore:api:dutyChanged', function(src, job, dept, onDuty)
     if onDuty then TriggerClientEvent('myjob:gaveGear', src, dept) end
 end)
+
+AddEventHandler('lacore:api:boloCreated', function(bolo)
+    if bolo.danger then print(('[alert] armed BOLO %s — %s'):format(bolo.id, bolo.subject)) end
+end)
 ```
 
 ## Notes
 
 <Callout type="warning">
   **Trust model.** Server exports are meant to be called by other **server** resources (trusted).
-  Client exports only open / close the local UI and can't grant authority — call creation and
-  resolution stay server-authoritative.
+  Client exports only open / close the local UI and can't grant authority — call creation, resolution
+  and BOLO issuing stay server-authoritative.
 </Callout>
 
 - **Stability.** Export names and the payload shapes above are the contract. New fields may be added;
@@ -145,7 +201,6 @@ end)
   this API sits next to them.
 
 <Callout type="info">
-  Need an export that isn't here yet (person / plate lookups, BOLO creation, …)? Ask in our
-  [Discord](https://discord.gg/b6YbvVEvYp) — if it maps to an existing internal function it's usually a
-  quick add.
+  Need an export that isn't here yet? Ask in our [Discord](https://discord.gg/b6YbvVEvYp) — if it maps
+  to an existing internal function it's usually a quick add.
 </Callout>

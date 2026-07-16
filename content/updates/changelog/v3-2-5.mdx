@@ -17,12 +17,24 @@ systems. No gameplay change for legitimate players.
   export wraps an existing internal function (no new backend logic). Called by the running resource
   name — `exports['lacore']:…` (core) or `exports['lacore-mdt']:…` (standalone).
 - **Server exports:** `GetOfficer`, `IsOnDuty`, `GetCallsign`, `GetDepartment`, `GetOnDutyUnits`,
-  `HasPermission`, `CreateCall`, `ResolveCall`, `GetActiveCalls`, `GetCall`, `GetBolos`,
-  `GetApiVersion`. `CreateCall`/`ResolveCall` let e.g. an alarm or heist script feed real CAD calls
-  in and close them out; creation/resolution stays server-authoritative.
+  `HasPermission`, `CreateCall`, `ResolveCall`, `GetActiveCalls`, `GetCall`, `QueryPerson`,
+  `QueryPlate`, `GetBolos`, `CreateBolo`, `GetApiVersion`. `CreateCall`/`ResolveCall` let e.g. an
+  alarm or heist script feed real CAD calls in and close them out; creation/resolution stays
+  server-authoritative.
+- **Records lookup:** `QueryPerson(query)` (by server id / name / plate) and `QueryPlate(plate)`
+  reuse the MDT's own in-memory matching. Results are **sanitised** — the raw criminal `records` and
+  `faction` fields are never exposed; active BOLO hits are attached under `bolos`.
+- **BOLO creation:** `CreateBolo(opts)` issues a person / vehicle / plate BOLO and syncs it to
+  on-duty units + the dispatch webhook. Refactored the officer NUI path (`mdt:BoloCreate`) onto the
+  same shared `CreateBoloRecord` core (single source of truth).
 - **Client exports:** `OpenMDT`, `CloseMDT`, `IsMDTOpen`, `GetApiVersion`.
 - **Events emitted by LACORE:** `lacore:api:callCreated`, `lacore:api:callResolved`,
-  `lacore:api:dutyChanged` (plus `lacore:mdt:opened` / `lacore:mdt:closed` for MDT open-state).
+  `lacore:api:dutyChanged`, `lacore:api:boloCreated` (plus `lacore:mdt:opened` /
+  `lacore:mdt:closed` for MDT open-state).
+- **Docs:** the Developer API section is now a dropdown with an **API Bridge** (a drop-in adapter
+  resource that auto-detects the `lacore` / `lacore-mdt` prefix and no-ops safely when LACORE isn't
+  running) and an **AI Prompt** (a self-contained prompt that hands an AI the full contract to
+  generate a tailored integration).
 - Ships in both the full core and the `lacore-mdt` standalone product. Reference + examples in
   `modules/api/README.md`.
 

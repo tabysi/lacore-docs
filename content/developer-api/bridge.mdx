@@ -1,0 +1,187 @@
+---
+title: API Bridge
+---
+
+import { Callout, Steps, Tabs } from 'nextra/components'
+
+# API Bridge
+
+A tiny **drop-in adapter resource** that sits between your scripts and LACORE. It solves the three
+things every integration re-invents:
+
+- **Prefix.** It auto-detects whether the full core (`lacore`) or the standalone product
+  (`lacore-mdt`) is running — your code never hardcodes the name.
+- **Safety.** If LACORE isn't started (yet), every call returns a sensible default instead of throwing,
+  so a missing dependency never crashes your resource.
+- **One stable namespace.** You call `exports['lacore_bridge']:…` and listen to `lacore_bridge:…`
+  events, regardless of which LACORE edition the server runs.
+
+<Callout type="info">
+  This is different from the built-in **[Framework Bridge](/features/bridge)** (which connects LACORE
+  to ESX / QBCore *inside* the core). This one is a resource **you** ship to consume the Developer API.
+</Callout>
+
+<Callout type="warning">
+  Prefer to have an AI write a version tailored to your framework and needs? Use the
+  **[AI Prompt](/developer-api/ai-prompt)** — it hands the model this exact contract.
+</Callout>
+
+## Install
+
+<Steps>
+
+### Create the resource
+
+Make a folder `lacore_bridge` in your `resources/` and add the four files below.
+
+### Ensure it before your scripts
+
+In `server.cfg`, start it **after** LACORE but **before** any resource that uses it:
+
+```cfg
+ensure lacore          # or: ensure lacore-mdt
+ensure lacore_bridge
+ensure my-cool-script
+```
+
+### Call it from anywhere
+
+```lua
+if exports['lacore_bridge']:IsAvailable() then
+    exports['lacore_bridge']:CreateBolo({ kind = 'plate', plate = '8XYZ123', reason = 'BOLO test' })
+end
+```
+
+</Steps>
+
+## The resource
+
+<Tabs items={['fxmanifest.lua', 'shared.lua', 'server.lua', 'client.lua']}>
+
+<Tabs.Tab>
+```lua
+fx_version 'cerulean'
+game 'gta5'
+lua54 'yes'
+
+name 'lacore_bridge'
+description 'Drop-in adapter for the LACORE Developer API'
+version '1.0.0'
+
+shared_script 'shared.lua'
+server_script 'server.lua'
+client_script 'client.lua'
+```
+</Tabs.Tab>
+
+<Tabs.Tab>
+```lua
+-- shared.lua — resolve which LACORE edition is running (core or standalone).
+LACORE_CANDIDATES = { 'lacore', 'lacore-mdt' }
+
+-- Returns the exports proxy of the running edition, or nil if none is started.
+function LacoreCore()
+    for _, name in ipairs(LACORE_CANDIDATES) do
+        if GetResourceState(name) == 'started' then
+            return exports[name], name
+        end
+    end
+    return nil
+end
+```
+</Tabs.Tab>
+
+<Tabs.Tab>
+```lua
+-- server.lua — forwards every server export + re-broadcasts the API events.
+
+-- Wrapped exports. c[fn](c, ...) is exactly the colon call c:fn(...), so this
+-- forwards each call verbatim to whichever edition is live.
+local SERVER_EXPORTS = {
+    'GetApiVersion', 'GetOfficer', 'IsOnDuty', 'GetCallsign', 'GetDepartment',
+    'GetOnDutyUnits', 'HasPermission', 'CreateCall', 'ResolveCall',
+    'GetActiveCalls', 'GetCall', 'QueryPerson', 'QueryPlate', 'GetBolos', 'CreateBolo',
+}
+
+-- List-returning exports get an empty table when LACORE is absent (never nil),
+-- so `for _, x in ipairs(...)` stays safe.
+local LIST_DEFAULT = {
+    GetOnDutyUnits = true, GetActiveCalls = true, QueryPerson = true, GetBolos = true,
+}
+
+exports('IsAvailable', function() return (LacoreCore()) ~= nil end)
+
+for _, fn in ipairs(SERVER_EXPORTS) do
+    exports(fn, function(...)
+        local c = LacoreCore()
+        if not c then return LIST_DEFAULT[fn] and {} or nil end
+        return c[fn](c, ...)
+    end)
+end
+
+-- Re-broadcast the LACORE API events under a stable namespace, so consumers
+-- listen to `lacore_bridge:*` no matter which edition fired them.
+for _, ev in ipairs({ 'callCreated', 'callResolved', 'dutyChanged', 'boloCreated' }) do
+    AddEventHandler('lacore:api:' .. ev, function(...)
+        TriggerEvent('lacore_bridge:' .. ev, ...)
+    end)
+end
+```
+</Tabs.Tab>
+
+<Tabs.Tab>
+```lua
+-- client.lua — forwards the client (UI) exports.
+local CLIENT_EXPORTS = { 'GetApiVersion', 'OpenMDT', 'CloseMDT', 'IsMDTOpen' }
+
+exports('IsAvailable', function() return (LacoreCore()) ~= nil end)
+
+for _, fn in ipairs(CLIENT_EXPORTS) do
+    exports(fn, function(...)
+        local c = LacoreCore()
+        if not c then return nil end
+        return c[fn](c, ...)
+    end)
+end
+
+-- Re-broadcast the client open/close events.
+for _, ev in ipairs({ 'opened', 'closed' }) do
+    AddEventHandler('lacore:mdt:' .. ev, function(...)
+        TriggerEvent('lacore_bridge:mdt:' .. ev, ...)
+    end)
+end
+```
+</Tabs.Tab>
+
+</Tabs>
+
+## Using it
+
+Once ensured, your scripts talk to `lacore_bridge` and forget LACORE's internals:
+
+```lua
+-- server side — feed a call in and react when any BOLO is issued.
+local inc = exports['lacore_bridge']:CreateCall({
+    type = 'Shots Fired', message = 'Multiple reports — Legion Sq', postal = '2043',
+})
+
+AddEventHandler('lacore_bridge:boloCreated', function(bolo)
+    if bolo.danger then
+        print(('[dispatch] ARMED BOLO %s — %s'):format(bolo.id, bolo.subject))
+    end
+end)
+```
+
+```lua
+-- client side — open the MDT from your own keybind / interaction.
+RegisterCommand('mycad', function()
+    if exports['lacore_bridge']:IsAvailable() then
+        exports['lacore_bridge']:OpenMDT()
+    end
+end, false)
+```
+
+<Callout type="info">
+  **Version pinning.** `exports['lacore_bridge']:GetApiVersion()` returns the LACORE API version
+  (currently `1.0.0`). Gate features on it if you rely on a newer field.
+</Callout>

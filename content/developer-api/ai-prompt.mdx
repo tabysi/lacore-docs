@@ -1,0 +1,124 @@
+---
+title: AI Prompt
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Build your integration with AI
+
+Don't want to hand-write a bridge? Hand the whole API contract to an AI assistant (Claude, ChatGPT,
+Copilot, …) and let it write the resource for you. The prompt below is **self-contained** — it embeds
+every export, event and option, so the model needs nothing else.
+
+<Steps>
+
+### Copy the prompt
+
+Grab the full block below.
+
+### Fill the two placeholders
+
+Replace `<<YOUR FRAMEWORK>>` and `<<WHAT YOU WANT>>` with your setup and goal (examples underneath).
+
+### Paste it into your AI, then review
+
+Drop it in, read what it generates, and test on a dev server before shipping. Treat AI output as a
+first draft — verify the exports match this page.
+
+</Steps>
+
+<Callout type="warning">
+  An AI can hallucinate export names or invent fields. This page is the source of truth — if generated
+  code uses something not listed here, it's wrong. When in doubt, start from the hand-written
+  **[API Bridge](/developer-api/bridge)** instead.
+</Callout>
+
+## The prompt
+
+````text
+You are a senior FiveM (CFX/FXServer) Lua developer. Write a clean, production-ready
+resource that integrates with LACORE, a police/CAD core, through its Developer API.
+
+MY SETUP
+- Framework: <<YOUR FRAMEWORK>>            (e.g. "standalone", "ESX", "QBCore")
+- What I want to build: <<WHAT YOU WANT>>  (describe the feature in one or two sentences)
+
+HARD RULES
+- Only use the exports and events listed in "LACORE API CONTRACT" below. Do NOT invent
+  export names, fields, or events. If something you need isn't in the contract, add a
+  clearly-marked TODO comment instead of guessing.
+- LACORE runs as EITHER 'lacore' (full core) OR 'lacore-mdt' (standalone product). The
+  exports are identical; only the resource name differs. Auto-detect which one is started
+  with GetResourceState and never hardcode a single name.
+- If neither edition is started, every wrapper must return a safe default (nil, or {} for
+  list-returning calls) — never error.
+- Server exports are server-authoritative and meant to be called from server scripts.
+  Client exports only open/close the local MDT UI. Put each call on the correct side.
+- Never try to read a player's raw criminal records — the API does not expose them by design.
+- Output complete files with filenames (fxmanifest.lua + the Lua files). Add a short
+  server.cfg 'ensure' order and a 2-line usage example at the end.
+
+LACORE API CONTRACT
+Call style: exports['lacore']:ExportName(args)  (or exports['lacore-mdt']:...)
+
+Server exports:
+- GetApiVersion() -> string
+- GetOfficer(src) -> table|nil  { source, name, callsign, job, dept, onDuty, incident, status }
+- IsOnDuty(src) -> bool          (on duty = non-civilian job)
+- GetCallsign(src) -> string|nil
+- GetDepartment(src) -> string|nil   ("LAPD" | "LASD" | "AMR" | ...)
+- GetOnDutyUnits() -> officer[]
+- HasPermission(src, perm) -> bool
+- CreateCall(opts) -> incidentNumber|nil
+    opts = { type, message, address, postal, city,
+             agency = "LAPD"|"LASD" (default "LAPD"),
+             coords = { x, y, z }  (or x, y, z directly),
+             callsign, src, status,      -- optional: attach a creating unit
+             notifyCreator = bool, actor = { name, label } }
+- ResolveCall(incidentNumber, reason [, src]) -> bool   (src optional; external if omitted)
+- GetActiveCalls() -> call[]     (non-resolved)
+- GetCall(incidentNumber) -> call|nil
+    call = { incidentNumber, type, message, address, postal, state, agency, notes, x, y, z, createdAtUnix }
+- QueryPerson(query) -> profile[]    (match by server id, name substring, or plate)
+- QueryPlate(plate) -> profile|nil   (registered owner profile, includes .vehicles)
+    profile is sanitised: it NEVER contains raw `records` or `faction`; active BOLO hits
+    are attached under `bolos`. Useful fields: name, dob, gender, vehicles (map by plate), bolos.
+- GetBolos() -> bolo[]           (active, non-expired)
+- CreateBolo(opts) -> boloId|nil
+    opts = { kind = "person"|"vehicle"|"plate" (default "person"),
+             subject,       -- person name / vehicle description
+             plate,         -- for vehicle/plate BOLOs
+             description, reason,
+             danger = bool, -- armed & dangerous
+             by = string }  -- attribution (defaults to the calling resource)
+
+Client exports:
+- GetApiVersion() -> string
+- OpenMDT() -> bool          (opens the LAPD MDT for the local player)
+- CloseMDT() -> bool         (closes whichever LACORE terminal is open)
+- IsMDTOpen() -> bool
+
+Events LACORE fires (AddEventHandler on the consumer side):
+- 'lacore:api:callCreated'  (call)                        [server]
+- 'lacore:api:callResolved' (incidentNumber, reason, by)  [server]
+- 'lacore:api:dutyChanged'  (src, job, dept, onDuty)      [server]
+- 'lacore:api:boloCreated'  (bolo)                        [server]
+    bolo = { id, kind, subject, plate, reason, danger, by }
+- 'lacore:mdt:opened' / 'lacore:mdt:closed'  ()           [client]
+
+Now write the resource for MY SETUP above.
+````
+
+## Example fills
+
+Swap the two placeholders for something concrete, for example:
+
+| Placeholder | Example |
+|-------------|---------|
+| `<<YOUR FRAMEWORK>>` | `ESX (es_extended, latest)` |
+| `<<WHAT YOU WANT>>` | `When a bank robbery starts in my heist script, create a LAPD "211 in Progress" call at the vault and issue a vehicle BOLO for the getaway car.` |
+
+<Callout type="info">
+  The contract in this prompt is generated from the shipped API. When LACORE adds exports, this page
+  updates — re-copy the prompt to get the newest contract. Check `GetApiVersion()` at runtime to be sure.
+</Callout>
