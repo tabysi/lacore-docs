@@ -73,7 +73,12 @@ systems. No gameplay change for legitimate players.
   maps to a resource global the core replaces wholesale by license key (`RemoteListTargets` +
   `ApplyRemoteLists` in `modules/remoteconfig/`; `POST /ingest/config` now also carries the lists). Pure
   typed DATA only — validated per field, never code. Extensible: add a `LIST_SCHEMAS` entry + the same id
-  in the resource to expose more tables (vehicles, blips, …). Now also ships two flat vehicle lists — **blacklisted vehicles** and **member-only vehicles** — edited as a simple one-per-line textarea (spawn names or class numbers, deduped).
+  in the resource to expose more tables. Now also ships two flat vehicle lists — **blacklisted vehicles** and **member-only vehicles** — edited as a simple one-per-line textarea (spawn names or class numbers, deduped) — and the **phone directory** (`PhoneCfg.directory`: name / number / category), so the businesses players look up in the phone's Directory app can be maintained without touching Lua. A list target may now be **nested** (e.g. `PhoneCfg.directory`), not just a top-level global; it is only written if every parent already exists, so a target whose module isn't loaded is skipped rather than created.
+- **`configs/cfg-blips-cl.lua` now documents what it actually does.** The file described map blips —
+  sprite `id`, `x`/`y`, a hover `image`, a `location` — but **no code in the resource reads those fields**;
+  the table is only consumed by the phone's Directory app (`name` / `phone` / `category`). Following the
+  old comment therefore put nothing on the map. The config is untouched (the phone still reads it), but the
+  comment no longer promises a feature that isn't there and points at `PhoneCfg.directory` instead.
 - **Diagnostics — license & version checks** (`/lacore doctor`): the boot report now shows whether a
   **license key is activated** (and whether it's recognised / inactive), and compares the running
   version against the latest — with a **big console banner** (and a red report line) when a server is
