@@ -38,6 +38,59 @@ systems. No gameplay change for legitimate players.
 - Ships in both the full core and the `lacore-mdt` standalone product. Reference + examples in
   `modules/api/README.md`.
 
+**Customer portal — license keys & server management**
+
+- **License keys link a server to your dashboard account.** Generate a key in the customer portal,
+  paste `setr lacore_license_key "…"` into `server.cfg`, and the server's telemetry now carries it
+  (`modules/security/telemetry-sv.lua`). The web service verifies the key and stamps a **trusted**
+  account link on the server record — replacing the old, unverified `lacore_owner_discord` self-claim.
+  A bad / missing / revoked key never blocks registration; the server just stays "unlicensed".
+- **New portal pages** (`landing/`): `/dashboard/keys` (create keys, copy the cfg line, revoke) and
+  `/dashboard/servers` (your linked servers with live online status, players and version; rename +
+  remove). Discord-login based — no new accounts, no passwords.
+- **Payments** (`/dashboard/payments`): customers see their Tebex purchases (package, amount, status).
+  The Discord bot's Tebex webhook now records each money event to PocketBase (`lacore_payments`),
+  matched to the account by the Discord ID entered at checkout.
+- **Online resource config** (`/dashboard/config`): tune a vetted, **allowlisted** set of settings
+  across modules — branding, feature toggles (CAD, phone, CCTV, K9, …), HUD, notifications, MDT and
+  Discord presence — from the dashboard, organised into sections with typed controls (toggle / number /
+  text / dropdown). Each server pulls its config by license key (`modules/remoteconfig/` +
+  `LacoreRelayFetch` + read-only, token-gated `POST /ingest/config`). **Live** settings (branding)
+  apply at runtime; **load-time** settings are cached to `data/remote-config.json` and re-applied early
+  on the next restart (before the feature modules load). The core also **reports its current values
+  up** (`POST /ingest/config-report`) so the dashboard shows what's really running and can adopt it.
+  Security by design: only known typed keys ever cross — **never code, never secrets, never raw config
+  files** — so even a full site/DB compromise can't run anything on a server; any error falls back to
+  the shipped local `configs/*.lua`.
+- **Diagnostics — license & version checks** (`/lacore doctor`): the boot report now shows whether a
+  **license key is activated** (and whether it's recognised / inactive), and compares the running
+  version against the latest — with a **big console banner** (and a red report line) when a server is
+  **2+ releases behind**. The relay `/ingest/server` + `/ingest/config` responses now carry the license
+  state + latest version. Also fixed the misleading `remote config applied — 0 setting(s)` log for an
+  unrecognised/inactive key (it now says the key isn't recognised and only logs real changes).
+- **Downloads & versions** (`/dashboard/downloads`): current version, a Keymaster/store get-&-update
+  CTA (delivery stays via Tebex & Keymaster, tied to the purchase), and the full parsed version history.
+- **Portal support tickets** (`/dashboard/tickets`): customers can open a support ticket from the web —
+  it creates a real private Discord ticket channel for them (via the bot's control API, their own
+  Discord id only) so it flows through the existing claim / close / transcript pipeline. They also see
+  their ticket history and read closed-ticket transcripts in the portal.
+- **Team / sub-users** (`/dashboard/team`): an owner can grant trusted teammates (by Discord id)
+  **scoped** access — `servers`, `config` and/or `billing`. Members sign in with their own Discord and
+  switch into the owner's account from a sidebar switcher; the portal shows only the areas their scopes
+  cover and every `/api/*` request re-checks membership + scope server-side (the client header alone
+  grants nothing). Self view is unchanged.
+- **Partner program** (`/dashboard/partner`): partners see their referral stats — referred sales,
+  revenue and payout earnings — attributed by their referral code on each Tebex order (the bot's
+  webhook records the referral on the payment; admins assign partners + codes in the dashboard).
+- **Admin role settings** (`/admin/settings`): staff can set the dashboard role IDs (owner / staff /
+  customer / supporter / partner) online — a PocketBase override over the `.env` defaults, applied on
+  each user's next login. Fail-safe: if the override store is unreachable, the `.env` values still apply.
+- **Portal logging** (`landing/`): a small structured logger (`lib/log.mjs`) with a `LOG_LEVEL` env
+  (debug/info/warn/error). Wide coverage — request completions, logins, ingest (server registration,
+  config pull, rejects), PocketBase errors, and every state-changing action (key / config / team /
+  partner / role-settings / ticket) is logged with actor + target, greppable in `journalctl`. Secrets
+  are never logged.
+
 ### Fixed
 
 **Civilian**
