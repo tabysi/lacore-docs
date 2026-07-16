@@ -17,37 +17,84 @@ const SRC = path.join(ROOT, 'changelog.md')
 const OUT = path.join(ROOT, 'content', 'updates', 'changelog')
 const THUMBS = path.join(ROOT, 'public', 'changelog')
 
-// Brand palette (mirrors app/lacore-theme.css).
-const BRAND = { ink: '#08090c', ink2: '#0a0c11', panel: '#11161e', line: '#1a2131', brand: '#4a5cff', brand2: '#6c8cff', brand3: '#9fb0ff', fg: '#eef2f8', dim: '#98a6c0', muted: '#6b7689' }
-
 const xml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
 const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s)
 
-// A branded 1200×630 thumbnail per release — dark gradient, brand glow, big version.
-function thumbnailSVG(version, title) {
-  const desc = clip(title, 52)
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="Segoe UI, system-ui, -apple-system, Arial, sans-serif">
+// Split a changelog header line into its title and (optional) date.
+//   "[3.2.5] – Security & fairness hardening pass"        → { title, date: '' }
+//   "[3.0.5h] – 2026-06-14 — Profilsystem: … "            → { title, date: '2026-06-14' }
+function parseHeader(headerLine) {
+  let rest = headerLine.replace(/^\[[^\]]+\]\s*[–—-]?\s*/, '')
+  let date = ''
+  const m = rest.match(/^(\d{4}-\d{2}-\d{2})\s*[–—-]?\s*/)
+  if (m) { date = m[1]; rest = rest.slice(m[0].length) }
+  return { title: rest.trim(), date }
+}
+
+// A branded 1200×630 release card per release (lacore-release-card-template.svg).
+function thumbnailSVG({ version, title, date }) {
+  const ver = xml('v' + version)
+  const t = xml(clip(title, 44))
+  const d = xml(date || '')
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${BRAND.ink2}"/>
-      <stop offset="1" stop-color="${BRAND.panel}"/>
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.82" cy="0.12" r="0.7">
-      <stop offset="0" stop-color="${BRAND.brand}" stop-opacity="0.34"/>
-      <stop offset="1" stop-color="${BRAND.brand}" stop-opacity="0"/>
+    <radialGradient id="glow" cx="0.8" cy="0.16" r="0.72">
+      <stop offset="0" stop-color="#4a5cff" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#4a5cff" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#9fb0ff"/>
+      <stop offset="0.45" stop-color="#4a5cff"/>
+      <stop offset="1" stop-color="#2a35b0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
-  <g stroke="${BRAND.line}" stroke-width="1" opacity="0.55">
-    <line x1="0" y1="157" x2="1200" y2="157"/>
-    <line x1="0" y1="472" x2="1200" y2="472"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M40 74 V40 H74"/>
+    <path d="M1160 556 V590 H1126"/>
   </g>
-  <rect x="0" y="0" width="12" height="630" fill="${BRAND.brand}"/>
-  <text x="84" y="118" fill="${BRAND.dim}" font-size="30" font-weight="700" letter-spacing="8">LACORE</text>
-  <text x="80" y="352" fill="${BRAND.fg}" font-size="150" font-weight="800" letter-spacing="-2">v${xml(version)}</text>
-  <text x="84" y="438" fill="${BRAND.brand3}" font-size="42" font-weight="600">${xml(desc)}</text>
-  <text x="84" y="556" fill="${BRAND.muted}" font-size="26" font-weight="500" letter-spacing="1">lacore.netica.dev  ·  Changelog</text>
+  <g stroke="#2c3650" stroke-width="3" fill="none">
+    <path d="M1160 74 V40 H1126"/>
+    <path d="M40 556 V590 H74"/>
+  </g>
+  <rect x="40" y="40" width="6" height="550" fill="#4a5cff"/>
+  <g transform="translate(1006 150)">
+    <g transform="translate(-90 -90)">
+      <polygon points="90,10 156,48 156,124 90,162 24,124 24,48" fill="#0e1220" stroke="#2c3650" stroke-width="4" stroke-linejoin="round"/>
+      <polygon points="90,10 156,48 156,124 90,162 24,124 24,48" fill="none" stroke="#4a5cff" stroke-width="1.5" stroke-linejoin="round" opacity="0.4"/>
+      <circle cx="90" cy="86" r="44" fill="none" stroke="#4a5cff" stroke-width="1.6" stroke-dasharray="5 9" opacity="0.55"/>
+      <circle cx="90" cy="86" r="29" fill="none" stroke="#6c8cff" stroke-width="3.4"/>
+      <circle cx="90" cy="86" r="10.5" fill="url(#core)"/>
+      <g stroke="#9fb0ff" stroke-width="3.4" stroke-linecap="round">
+        <line x1="90" y1="43" x2="90" y2="54"/>
+        <line x1="90" y1="118" x2="90" y2="129"/>
+        <line x1="47" y1="86" x2="58" y2="86"/>
+        <line x1="122" y1="86" x2="133" y2="86"/>
+      </g>
+    </g>
+  </g>
+  <g stroke="#1a2131" stroke-width="1" opacity="0.7">
+    <line x1="84" y1="392" x2="1116" y2="392"/>
+    <line x1="84" y1="496" x2="1116" y2="496"/>
+  </g>
+  <text x="84" y="112" fill="#e7ecf5" font-size="30" font-weight="700" letter-spacing="7">LA<tspan fill="#6c8cff">CORE</tspan></text>
+  <g>
+    <rect x="84" y="150" width="150" height="30" rx="5" fill="none" stroke="#2c3650"/>
+    <text x="100" y="171" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="3">RELEASE</text>
+  </g>
+  <text x="80" y="342" fill="#eef2f8" font-size="168" font-weight="700" letter-spacing="-4">${ver}</text>
+  <text x="84" y="452" fill="#9fb0ff" font-size="40" font-weight="600">${t}</text>
+  <text x="84" y="548" fill="#6b7689" font-size="24" font-weight="500" letter-spacing="1">lacore.netica.dev</text>
+  <text x="1116" y="548" fill="#4d5872" font-size="22" font-weight="500" letter-spacing="2" text-anchor="end">${d}</text>
 </svg>
 `
 }
@@ -103,8 +150,8 @@ for (const sec of sections) {
   }
   const slug = slugFor(sec.bracket)
   meta[slug] = "'" + sec.bracket + "'"
-  const secTitle = sec.headerLine.replace(/^\[[^\]]+\]\s*[–-]?\s*/, '').trim()
-  fs.writeFileSync(path.join(THUMBS, slug + '.svg'), thumbnailSVG(sec.bracket, secTitle || sec.bracket))
+  const { title: secTitle, date: secDate } = parseHeader(sec.headerLine)
+  fs.writeFileSync(path.join(THUMBS, slug + '.svg'), thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate }))
   const banner = `![LACORE ${sanitize(sec.bracket)}](/changelog/${slug}.svg)\n\n`
   const page = `---\ntitle: ${yaml(sec.bracket)}\n---\n\n${banner}# ${sanitize(sec.headerLine)}\n\n${sanitize(sec.body)}\n`
   fs.writeFileSync(path.join(OUT, slug + '.mdx'), page)
@@ -124,7 +171,7 @@ fs.writeFileSync(path.join(OUT, '_meta.js'), metaBody)
 // index.mdx — card grid with a thumbnail per version.
 const cards = sections.filter((s) => !/^unreleased$/i.test(s.bracket)).map((s) => {
   const slug = slugFor(s.bracket)
-  const desc = xml(s.headerLine.replace(/^\[[^\]]+\]\s*[–-]?\s*/, '').trim())
+  const desc = xml(parseHeader(s.headerLine).title)
   return `  <a href="/updates/changelog/${slug}" style={{ display: 'block', border: '1px solid var(--lac-line, #1a2131)', borderRadius: '12px', overflow: 'hidden', textDecoration: 'none', background: 'var(--lac-panel, #0d1017)' }}>
     <img src="/changelog/${slug}.svg" alt="LACORE ${xml(s.bracket)}" style={{ display: 'block', width: '100%', height: 'auto' }} />
     <span style={{ display: 'block', padding: '12px 16px', color: 'var(--lac-fg, #d7deea)', fontWeight: 600 }}>${desc}</span>
