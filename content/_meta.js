@@ -10,6 +10,7 @@ export default {
   configuration: 'Configuration',
   commands: 'Command Reference',
   'frameworks-scripts': 'Frameworks & Scripts',
+  'developer-api': 'Developer API',
   anticheat: 'Anti-Cheat & Security',
 
   '--products': { type: 'separator', title: 'Products & updates' },

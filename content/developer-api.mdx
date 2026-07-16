@@ -1,0 +1,151 @@
+---
+title: Developer API
+---
+
+import { Callout } from 'nextra/components'
+
+# Developer API
+
+A small, stable **exports + events** surface so other resources can talk to LACORE / LACORE MDT.
+Every export wraps an existing internal function — no new backend logic, no schema of its own. Use it
+to feed dispatch calls in, read officer / duty state, react to CAD events, and open the MDT from your
+own scripts.
+
+<Callout type="info">
+  **Resource name.** Exports are called by the *running* resource's name — `exports['lacore']` for the
+  full core, or `exports['lacore-mdt']` for the standalone MDT product. The code is identical; only the
+  prefix differs. Examples below use `lacore`.
+</Callout>
+
+Check the shipped version at runtime:
+
+```lua
+local version = exports['lacore']:GetApiVersion()   -- e.g. "1.0.0"
+```
+
+## Server exports
+
+### Officers & duty
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetOfficer(src)` | `officer` \| `nil` | `{ source, name, callsign, job, dept, onDuty, incident, status }` |
+| `IsOnDuty(src)` | `bool` | on duty = non-civilian job |
+| `GetCallsign(src)` | `string` \| `nil` | |
+| `GetDepartment(src)` | `string` \| `nil` | e.g. `"LAPD"`, `"LASD"`, `"AMR"` |
+| `GetOnDutyUnits()` | `officer[]` | every on-duty player |
+
+```lua
+-- Is this player an on-duty cop?
+if exports['lacore']:IsOnDuty(src) then
+    local o = exports['lacore']:GetOfficer(src)
+    print(('%s is on duty as %s (%s)'):format(o.name, o.callsign, o.dept))
+end
+```
+
+### Permissions
+
+| Export | Returns |
+|--------|---------|
+| `HasPermission(src, perm)` | `bool` |
+
+### Dispatch calls & incidents
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `CreateCall(opts)` | `incidentNumber` \| `nil` | creates a CAD call and broadcasts it to terminals |
+| `ResolveCall(incidentNumber, reason [, src])` | `bool` | `src` optional — external actor if omitted |
+| `GetActiveCalls()` | `call[]` | non-resolved only |
+| `GetCall(incidentNumber)` | `call` \| `nil` | |
+
+`CreateCall` options:
+
+```lua
+exports['lacore']:CreateCall({
+    type    = 'Robbery in Progress',   -- short call type / title
+    message = 'Silent alarm — Fleeca Bank, Vinewood',
+    address = 'Vinewood Blvd',
+    postal  = '4021',
+    city    = 'Los Angeles',
+    agency  = 'LAPD',                  -- 'LAPD' | 'LASD'  (default 'LAPD')
+    coords  = { x = 250.0, y = 220.0, z = 100.0 },  -- or pass x, y, z directly
+    -- optional: attach a creating unit + set its status
+    -- callsign = '6A13-W3', src = officerSrc, status = 'CODE SIX',
+})
+```
+
+```lua
+-- Alarm script: auto-create a 911 when a bank alarm trips, then close it later.
+local inc = exports['lacore']:CreateCall({
+    type = '211 - Bank Alarm', message = 'Fleeca Bank silent alarm',
+    address = 'Vinewood Blvd', postal = '4021', coords = GetEntityCoords(alarmProp),
+})
+
+exports['lacore']:ResolveCall(inc, 'GOA')   -- Gone On Arrival
+```
+
+### BOLOs
+
+| Export | Returns |
+|--------|---------|
+| `GetBolos()` | `bolo[]` |
+
+## Client exports
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetApiVersion()` | `string` | |
+| `OpenMDT()` | `bool` | opens the LAPD MDT for the local player |
+| `CloseMDT()` | `bool` | closes whichever LACORE terminal is open |
+| `IsMDTOpen()` | `bool` | LAPD MDT open state |
+
+```lua
+-- Open the MDT when the player sits in a police cruiser's driver seat.
+exports['lacore']:OpenMDT()
+```
+
+<Callout type="info">
+  Officer / duty / call data lives on the **server** (it owns the session). Query it with the server
+  exports above, not on the client.
+</Callout>
+
+## Events (LACORE → your resource)
+
+`AddEventHandler` on the consumer side:
+
+| Event | Args | Side |
+|-------|------|------|
+| `lacore:api:callCreated` | `call` `{ incidentNumber, type, message, address, postal, agency, x, y, z }` | server |
+| `lacore:api:callResolved` | `incidentNumber, reason, by` | server |
+| `lacore:api:dutyChanged` | `src, job, dept, onDuty` | server |
+| `lacore:mdt:opened` / `lacore:mdt:closed` | — | client |
+
+```lua
+AddEventHandler('lacore:api:callCreated', function(call)
+    print(('[cad-logger] #%s %s @ %s'):format(call.incidentNumber, call.type, call.address))
+end)
+
+AddEventHandler('lacore:api:dutyChanged', function(src, job, dept, onDuty)
+    if onDuty then TriggerClientEvent('myjob:gaveGear', src, dept) end
+end)
+```
+
+## Notes
+
+<Callout type="warning">
+  **Trust model.** Server exports are meant to be called by other **server** resources (trusted).
+  Client exports only open / close the local UI and can't grant authority — call creation and
+  resolution stay server-authoritative.
+</Callout>
+
+- **Stability.** Export names and the payload shapes above are the contract. New fields may be added;
+  existing ones won't be renamed within a major version (`GetApiVersion`).
+- **Alongside the old exports.** The existing standalone exports (`isRolePresent`, `getUserRoles`,
+  `getUserData`, `IsClientVerified`, `IsGloballyBanned`, `GetFramework`, …) keep working unchanged —
+  this API sits next to them.
+
+<Callout type="info">
+  Need an export that isn't here yet (person / plate lookups, BOLO creation, …)? Ask in our
+  [Discord](https://discord.gg/b6YbvVEvYp) — if it maps to an existing internal function it's usually a
+  quick add.
+</Callout>

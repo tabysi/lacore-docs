@@ -9,6 +9,23 @@ Server-authoritative hardening, multiplayer-fairness fixes and small performance
 civilian (RP), CCTV, impound, K9, Air Unit, corrections (jail), fingerprint and address (NADS)
 systems. No gameplay change for legitimate players.
 
+### Added
+
+**Public developer API (`modules/api/`)**
+
+- **A stable exports + events surface so other resources can talk to LACORE / LACORE MDT.** Every
+  export wraps an existing internal function (no new backend logic). Called by the running resource
+  name — `exports['lacore']:…` (core) or `exports['lacore-mdt']:…` (standalone).
+- **Server exports:** `GetOfficer`, `IsOnDuty`, `GetCallsign`, `GetDepartment`, `GetOnDutyUnits`,
+  `HasPermission`, `CreateCall`, `ResolveCall`, `GetActiveCalls`, `GetCall`, `GetBolos`,
+  `GetApiVersion`. `CreateCall`/`ResolveCall` let e.g. an alarm or heist script feed real CAD calls
+  in and close them out; creation/resolution stays server-authoritative.
+- **Client exports:** `OpenMDT`, `CloseMDT`, `IsMDTOpen`, `GetApiVersion`.
+- **Events emitted by LACORE:** `lacore:api:callCreated`, `lacore:api:callResolved`,
+  `lacore:api:dutyChanged` (plus `lacore:mdt:opened` / `lacore:mdt:closed` for MDT open-state).
+- Ships in both the full core and the `lacore-mdt` standalone product. Reference + examples in
+  `modules/api/README.md`.
+
 ### Fixed
 
 **Civilian**
