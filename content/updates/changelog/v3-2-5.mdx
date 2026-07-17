@@ -110,6 +110,16 @@ systems. No gameplay change for legitimate players.
 
 ### Fixed
 
+**Access control**
+
+- **Member-only perks no longer lock up when the Discord layer is off.** The `member` flag (used to gate
+  `/onduty`, member vehicles and board voting) was derived *only* from the Discord "Member" role, so with
+  `AccessControl.discordRoles = false` (ESX / QBCore / plug-and-play) it was `false` for everyone and the
+  client blocked `/onduty` — even though the server-side duty auth already allowed it. Added
+  `AccessControl.membership` (`"auto"` | `"open"` | `"role"`, default `"auto"`): in `"auto"` a player is a
+  member when the Discord "Member" role is held **or** — when Discord auth is off — automatically, so the
+  perks just work without Discord. Documented in [Discord & Access Control](/configuration/discord).
+
 **Civilian**
 
 - **Activity completion is now position-checked.** `civ:ActivityDone` verifies the player is actually

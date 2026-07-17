@@ -26,8 +26,9 @@ need LACORE's Discord layer or its members-only whitelist. Switch either off her
 
 ```lua
 AccessControl = {
-    whitelist    = true,  -- members-only join gate (/wl). false = disabled entirely.
-    discordRoles = true,  -- require + read Discord roles and bridge them to ACE. false = off.
+    whitelist    = true,    -- members-only join gate (/wl). false = disabled entirely.
+    discordRoles = true,    -- require + read Discord roles and bridge them to ACE. false = off.
+    membership   = "auto",  -- who counts as a "member" for member-only perks. See below.
 }
 ```
 
@@ -35,6 +36,25 @@ AccessControl = {
 | --- | --- |
 | `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans and the global-ban network still apply.** |
 | `discordRoles` | LACORE no longer requires Discord at connect (no “join our Discord” rejection), doesn't read Discord roles, and doesn't bridge them to ACE. Duty-role gating (`DutyRoles`) is skipped, and Staff/Dev powers come from **ACE / txAdmin** only. |
+
+### Membership (member-only perks)
+
+`membership` decides who counts as a **member** for member-only perks — going on agency duty (`/onduty`),
+spawning member vehicles, and voting on the community board. This is separate from the join whitelist;
+membership normally rides on the Discord **“Member”** role.
+
+| Value | Behaviour |
+| --- | --- |
+| `"auto"` *(default)* | With Discord role auth **on**, a member is anyone holding the Discord “Member” role. With Discord auth **off** there is no role to read, so **everyone is a member**. |
+| `"open"` | Everyone is always a member, even with Discord auth on. |
+| `"role"` | Always require the Discord “Member” role — locks the perks for everyone when Discord auth is off, so only use it with Discord on. |
+
+<Callout type="info">
+  On an ESX / QBCore / plug-and-play server (`discordRoles = false`), `"auto"` is what makes `/onduty`
+  and the other member-only perks **just work** — otherwise, with no “Member” role to read, they would be
+  silently locked for everyone. Duty is still authorised by the framework job (see the
+  [Framework Bridge](/features/bridge)); `membership` only governs LACORE's own member gate.
+</Callout>
 
 <Callout type="info">
   **Plug-and-play:** even with `discordRoles = true`, Discord is only *enforced* once it's actually
