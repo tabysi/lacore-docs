@@ -3,14 +3,20 @@ import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 import './lacore-theme.css'
+import { SITE, BASE, SITE_NAME, DEFAULT_DESCRIPTION, share } from '../lib/seo'
 
 export const metadata = {
+  // Resolves any relative metadata URL and canonical links against the deployed
+  // origin + base path (empty locally). Trailing slash matters for base-path sites.
+  metadataBase: new URL(`${SITE}${BASE}/`),
   title: {
-    default: 'LACORE Documentation',
+    default: SITE_NAME,
     template: '%s — LACORE',
   },
-  description:
-    'Official documentation for LACORE — the all-in-one configurable roleplay core for FiveM, by @tabysi.',
+  description: DEFAULT_DESCRIPTION,
+  // Site-wide share preview. Individual pages override the image (see
+  // app/[[...mdxPath]]/page.jsx — changelog pages use their release card).
+  ...share(),
 }
 
 // Website-matching text wordmark: LA + CORE (accent), Chakra Petch.

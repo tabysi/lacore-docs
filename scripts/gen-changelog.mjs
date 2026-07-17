@@ -10,12 +10,25 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import sharp from 'sharp'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const SRC = path.join(ROOT, 'changelog.md')
 const OUT = path.join(ROOT, 'content', 'updates', 'changelog')
 const THUMBS = path.join(ROOT, 'public', 'changelog')
+const OGDIR = path.join(ROOT, 'public', 'og')
+
+// Rasterise a card SVG → 1200×630 PNG. Social scrapers (Discord, WhatsApp, X, …)
+// don't render SVG, so every share image ships as PNG. Rendered at 2× then
+// downscaled for crisp text. Fonts fall back to the SVG's system stack (Chakra
+// Petch isn't installed at build time) — visually clean, verified.
+async function renderPNG(svg, outFile) {
+  await sharp(Buffer.from(svg), { density: 144 })
+    .resize(1200, 630)
+    .png({ compressionLevel: 9 })
+    .toFile(outFile)
+}
 
 const xml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
 const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s)
@@ -99,6 +112,69 @@ function thumbnailSVG({ version, title, date }) {
 `
 }
 
+// The site-wide default card — same frame/hexagon as the release cards, but the
+// LACORE wordmark instead of a version. Shown when a shared page has no card of
+// its own (every page except a specific changelog version).
+function defaultCardSVG() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.16" r="0.72">
+      <stop offset="0" stop-color="#4a5cff" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#4a5cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#9fb0ff"/>
+      <stop offset="0.45" stop-color="#4a5cff"/>
+      <stop offset="1" stop-color="#2a35b0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M40 74 V40 H74"/>
+    <path d="M1160 556 V590 H1126"/>
+  </g>
+  <g stroke="#2c3650" stroke-width="3" fill="none">
+    <path d="M1160 74 V40 H1126"/>
+    <path d="M40 556 V590 H74"/>
+  </g>
+  <rect x="40" y="40" width="6" height="550" fill="#4a5cff"/>
+  <g transform="translate(1006 200)">
+    <g transform="translate(-90 -90)">
+      <polygon points="90,10 156,48 156,124 90,162 24,124 24,48" fill="#0e1220" stroke="#2c3650" stroke-width="4" stroke-linejoin="round"/>
+      <polygon points="90,10 156,48 156,124 90,162 24,124 24,48" fill="none" stroke="#4a5cff" stroke-width="1.5" stroke-linejoin="round" opacity="0.4"/>
+      <circle cx="90" cy="86" r="44" fill="none" stroke="#4a5cff" stroke-width="1.6" stroke-dasharray="5 9" opacity="0.55"/>
+      <circle cx="90" cy="86" r="29" fill="none" stroke="#6c8cff" stroke-width="3.4"/>
+      <circle cx="90" cy="86" r="10.5" fill="url(#core)"/>
+      <g stroke="#9fb0ff" stroke-width="3.4" stroke-linecap="round">
+        <line x1="90" y1="43" x2="90" y2="54"/>
+        <line x1="90" y1="118" x2="90" y2="129"/>
+        <line x1="47" y1="86" x2="58" y2="86"/>
+        <line x1="122" y1="86" x2="133" y2="86"/>
+      </g>
+    </g>
+  </g>
+  <g>
+    <rect x="84" y="150" width="200" height="30" rx="5" fill="none" stroke="#2c3650"/>
+    <text x="100" y="171" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="3">DOCUMENTATION</text>
+  </g>
+  <text x="80" y="352" fill="#eef2f8" font-size="132" font-weight="700" letter-spacing="-2">LA<tspan fill="#6c8cff">CORE</tspan></text>
+  <text x="84" y="440" fill="#9fb0ff" font-size="36" font-weight="600">The all-in-one FiveM roleplay core</text>
+  <line x1="84" y1="492" x2="1116" y2="492" stroke="#1a2131" stroke-width="1" opacity="0.7"/>
+  <text x="84" y="548" fill="#6b7689" font-size="24" font-weight="500" letter-spacing="1">lacore.netica.dev</text>
+  <text x="1116" y="548" fill="#4d5872" font-size="22" font-weight="500" letter-spacing="2" text-anchor="end">DOCS</text>
+</svg>
+`
+}
+
 const raw = fs.readFileSync(SRC, 'utf8').replace(/\r\n/g, '\n')
 const lines = raw.split('\n')
 
@@ -134,9 +210,10 @@ for (let s = 0; s < starts.length; s++) {
 // Clean any old generated pages (keep nothing but what we regenerate).
 for (const f of fs.readdirSync(OUT)) fs.rmSync(path.join(OUT, f))
 
-// Fresh thumbnails dir.
+// Fresh thumbnails dir (SVG banners + PNG share cards).
 fs.rmSync(THUMBS, { recursive: true, force: true })
 fs.mkdirSync(THUMBS, { recursive: true })
+fs.mkdirSync(OGDIR, { recursive: true })
 
 const meta = { index: "'All Releases'" }
 const unreleased = []
@@ -151,7 +228,9 @@ for (const sec of sections) {
   const slug = slugFor(sec.bracket)
   meta[slug] = "'" + sec.bracket + "'"
   const { title: secTitle, date: secDate } = parseHeader(sec.headerLine)
-  fs.writeFileSync(path.join(THUMBS, slug + '.svg'), thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate }))
+  const cardSVG = thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate })
+  fs.writeFileSync(path.join(THUMBS, slug + '.svg'), cardSVG)   // crisp in-page banner
+  await renderPNG(cardSVG, path.join(THUMBS, slug + '.png'))    // PNG share card for OG
   const banner = `![LACORE ${sanitize(sec.bracket)}](/changelog/${slug}.svg)\n\n`
   const page = `---\ntitle: ${yaml(sec.bracket)}\n---\n\n${banner}# ${sanitize(sec.headerLine)}\n\n${sanitize(sec.body)}\n`
   fs.writeFileSync(path.join(OUT, slug + '.mdx'), page)
@@ -193,4 +272,7 @@ Development history lives on the [Unreleased / Dev](/updates/changelog/unrelease
 `
 fs.writeFileSync(path.join(OUT, 'index.mdx'), idx)
 
-console.log(`Generated ${Object.keys(meta).length - 1} pages from changelog.md`)
+// Site-wide default share card (shown for every non-version page).
+await renderPNG(defaultCardSVG(), path.join(OGDIR, 'default.png'))
+
+console.log(`Generated ${Object.keys(meta).length - 1} pages + ${sections.length - (unreleased.length ? 1 : 0)} PNG cards + default OG from changelog.md`)
