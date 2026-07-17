@@ -118,6 +118,10 @@ systems. No gameplay change for legitimate players.
   member when the Discord "Member" role is held **or** — when Discord auth is off — automatically, so the
   perks just work without Discord. Documented in [Discord & Access Control](/configuration/discord).
 
+> ⚠️ **Config change (`configs/cfg-server-sv.lua`):** new `AccessControl.membership` key. It defaults to
+> `"auto"` when absent, so nothing breaks if you don't touch your config — but add
+> `membership = "auto"` to your `AccessControl` block to keep it aligned with the shipped default.
+
 **Civilian**
 
 - **Activity completion is now position-checked.** `civ:ActivityDone` verifies the player is actually
