@@ -1,5 +1,7 @@
 export default {
   index: 'Introduction',
+  partners: 'Partners & Creators',
+  support: 'Support & FAQ',
 
   '--get-started': { type: 'separator', title: 'Get started' },
   'getting-started': 'Getting Started',
@@ -22,6 +24,4 @@ export default {
   'customer-portal': 'Customer Portal',
 
   '--community': { type: 'separator', title: 'Community' },
-  support: 'Support & FAQ',
-  partners: 'Partners & Creators',
 }
