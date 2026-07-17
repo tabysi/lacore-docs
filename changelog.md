@@ -9,6 +9,11 @@ Server-authoritative hardening, multiplayer-fairness fixes and small performance
 civilian (RP), CCTV, impound, K9, Air Unit, corrections (jail), fingerprint and address (NADS)
 systems. No gameplay change for legitimate players.
 
+> [!WARNING]
+> **Config change (`configs/cfg-server-sv.lua`):** new `AccessControl.membership` key. It defaults to
+> `"auto"` when absent, so nothing breaks if you don't touch your config — but add
+> `membership = "auto"` to your `AccessControl` block to keep it aligned with the shipped default.
+
 ### Added
 
 **Public developer API (`modules/api/`)**
@@ -117,10 +122,6 @@ systems. No gameplay change for legitimate players.
   `AccessControl.membership` (`"auto"` | `"open"` | `"role"`, default `"auto"`): in `"auto"` a player is a
   member when the Discord "Member" role is held **or** — when Discord auth is off — automatically, so the
   perks just work without Discord. Documented in [Discord & Access Control](/configuration/discord).
-
-> ⚠️ **Config change (`configs/cfg-server-sv.lua`):** new `AccessControl.membership` key. It defaults to
-> `"auto"` when absent, so nothing breaks if you don't touch your config — but add
-> `membership = "auto"` to your `AccessControl` block to keep it aligned with the shipped default.
 
 **Civilian**
 

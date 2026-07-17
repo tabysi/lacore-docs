@@ -194,6 +194,31 @@ function sanitize(md) {
   }).join('\n')
 }
 
+// Pull warning blockquotes out of a section body so they can be promoted to an
+// alert banner at the very top of the page (under the title + description). Matches
+// GitHub-style `> [!WARNING]`, a bare `> ⚠️ …`, or a `> **Config change …` note —
+// the convention for flagging that a config file changed. Returns the extracted
+// texts (marker stripped) and the body with those blocks removed.
+function splitWarnings(body) {
+  const lines = body.split('\n')
+  const warnings = []
+  const kept = []
+  const isWarnStart = (l) => /^>\s*(\[!WARNING\]|⚠️|\*\*Config change)/i.test(l)
+  let i = 0
+  while (i < lines.length) {
+    if (isWarnStart(lines[i])) {
+      const block = []
+      while (i < lines.length && /^>/.test(lines[i])) { block.push(lines[i].replace(/^>\s?/, '')); i++ }
+      const text = block.join('\n').trim().replace(/^\[!WARNING\]\s*/i, '').replace(/^⚠️\s*/, '').trim()
+      if (text) warnings.push(text)
+      if (i < lines.length && lines[i].trim() === '') i++ // consume one trailing blank
+      continue
+    }
+    kept.push(lines[i]); i++
+  }
+  return { warnings, body: kept.join('\n').replace(/\n{3,}/g, '\n\n').trim() }
+}
+
 const yaml = (s) => '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
 const slugFor = (ver) => 'v' + ver.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
@@ -231,9 +256,22 @@ for (const sec of sections) {
   const cardSVG = thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate })
   fs.writeFileSync(path.join(THUMBS, slug + '.svg'), cardSVG)   // crisp in-page banner
   await renderPNG(cardSVG, path.join(THUMBS, slug + '.png'))    // PNG share card for OG
-  const banner = `![LACORE ${sanitize(sec.bracket)}](/changelog/${slug}.svg)\n\n`
-  const page = `---\ntitle: ${yaml(sec.bracket)}\n---\n\n${banner}# ${sanitize(sec.headerLine)}\n\n${sanitize(sec.body)}\n`
-  fs.writeFileSync(path.join(OUT, slug + '.mdx'), page)
+  // Warnings (e.g. config changes) become a <Callout> alert banner at the top,
+  // right under the title + description; the rest of the body follows.
+  const { warnings, body: cleanBody } = splitWarnings(sec.body)
+  const nl2 = cleanBody.indexOf('\n\n')
+  const intro = nl2 >= 0 ? cleanBody.slice(0, nl2) : cleanBody
+  const rest = nl2 >= 0 ? cleanBody.slice(nl2 + 2) : ''
+  const callouts = warnings.map((w) => `<Callout type="warning">\n${sanitize(w)}\n</Callout>`).join('\n\n')
+
+  const parts = [`---\ntitle: ${yaml(sec.bracket)}\n---`]
+  if (warnings.length) parts.push(`import { Callout } from 'nextra/components'`)
+  parts.push(`![LACORE ${sanitize(sec.bracket)}](/changelog/${slug}.svg)`)
+  parts.push(`# ${sanitize(sec.headerLine)}`)
+  if (intro.trim()) parts.push(sanitize(intro))
+  if (callouts) parts.push(callouts)
+  if (rest.trim()) parts.push(sanitize(rest))
+  fs.writeFileSync(path.join(OUT, slug + '.mdx'), parts.join('\n\n') + '\n')
 }
 
 if (unreleased.length) {

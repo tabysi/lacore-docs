@@ -2,14 +2,21 @@
 title: "3.2.5"
 ---
 
+import { Callout } from 'nextra/components'
+
 ![LACORE 3.2.5](/changelog/v3-2-5.svg)
 
 # [3.2.5] – Security & fairness hardening pass
 
-
 Server-authoritative hardening, multiplayer-fairness fixes and small performance fixes across the
 civilian (RP), CCTV, impound, K9, Air Unit, corrections (jail), fingerprint and address (NADS)
 systems. No gameplay change for legitimate players.
+
+<Callout type="warning">
+**Config change (`configs/cfg-server-sv.lua`):** new `AccessControl.membership` key. It defaults to
+`"auto"` when absent, so nothing breaks if you don't touch your config — but add
+`membership = "auto"` to your `AccessControl` block to keep it aligned with the shipped default.
+</Callout>
 
 ### Added
 
@@ -119,10 +126,6 @@ systems. No gameplay change for legitimate players.
   `AccessControl.membership` (`"auto"` | `"open"` | `"role"`, default `"auto"`): in `"auto"` a player is a
   member when the Discord "Member" role is held **or** — when Discord auth is off — automatically, so the
   perks just work without Discord. Documented in [Discord & Access Control](/configuration/discord).
-
-> ⚠️ **Config change (`configs/cfg-server-sv.lua`):** new `AccessControl.membership` key. It defaults to
-> `"auto"` when absent, so nothing breaks if you don't touch your config — but add
-> `membership = "auto"` to your `AccessControl` block to keep it aligned with the shipped default.
 
 **Civilian**
 

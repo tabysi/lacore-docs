@@ -2,16 +2,24 @@
 title: "3.2.0"
 ---
 
+import { Callout } from 'nextra/components'
+
 ![LACORE 3.2.0](/changelog/v3-2-0.svg)
 
 # [3.2.0] – New NUI Phone, Feature Toggles, Air Unit, Corrections & more
-
 
 **Highlights:** a brand-new **iPhone-style NUI phone** (calls, SMS, apps and more), a **feature-toggle
 config** so you can run only the parts of LACORE you want (e.g. just the MDT/CAD), real
 **ESX / QBCore / QBox** compatibility, new gameplay systems (**Corrections / Jail**, **Impound**,
 **Air Unit**, **K9**), premium notifications & dialogs, a full LACORE re-brand, config backup/restore,
 and an experimental radio **speech-to-text**.
+
+<Callout type="warning">
+**This feature ships DISABLED (`STT.enabled = false`).** It is experimental and does not yet
+work reliably enough for production (offline recognition accuracy varies by client). The full
+implementation is included and can be enabled in `configs/cfg-stt-sh.lua` to try it — see the
+[Radio Transcript docs](https://tabysi.github.io/lacore-docs/features/radio-stt/).
+</Callout>
 
 ### Added
 
@@ -488,11 +496,6 @@ and an experimental radio **speech-to-text**.
   type checks, so a corrupt value can't throw during boot or at runtime.
 
 ### 🎙 Speech-to-Text — Radio Transcript (experimental — disabled by default)
-
-> ⚠️ **This feature ships DISABLED (`STT.enabled = false`).** It is experimental and does not yet
-> work reliably enough for production (offline recognition accuracy varies by client). The full
-> implementation is included and can be enabled in `configs/cfg-stt-sh.lua` to try it — see the
-> [Radio Transcript docs](https://tabysi.github.io/lacore-docs/features/radio-stt/).
 
 ### Added — push-to-talk radio dictation + transcript log
 - **Offline speech recognition (Vosk / WebAssembly).** On-duty units hold a bindable **radio key**
