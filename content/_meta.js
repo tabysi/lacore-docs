@@ -1,7 +1,10 @@
 export default {
   index: 'Introduction',
+  '--community': { type: 'separator', title: 'Community' },
   partners: 'Partners & Creators',
   support: 'Support & FAQ',
+  'frameworks-scripts': 'Frameworks & Scripts',
+  'developer-api': 'Developer API',
 
   '--get-started': { type: 'separator', title: 'Get started' },
   'getting-started': 'Getting Started',
@@ -11,8 +14,6 @@ export default {
   '--configure': { type: 'separator', title: 'Configure & extend' },
   configuration: 'Configuration',
   commands: 'Command Reference',
-  'frameworks-scripts': 'Frameworks & Scripts',
-  'developer-api': 'Developer API',
   anticheat: 'Anti-Cheat & Security',
 
   '--products': { type: 'separator', title: 'Products & updates' },
@@ -22,6 +23,4 @@ export default {
 
   '--portal': { type: 'separator', title: 'Customer Portal' },
   'customer-portal': 'Customer Portal',
-
-  '--community': { type: 'separator', title: 'Community' },
 }
