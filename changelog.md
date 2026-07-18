@@ -32,6 +32,19 @@ add more).
 - **ps-dispatch** uses a tiny client relay (its `CustomAlert` is a client export); the others fire their
   server event/export directly. All gated + pcall-wrapped — a no-op when no dispatch is running.
 
+**Notifications — first-class adapters**
+
+- **Route LACORE notices to ox_lib / okokNotify / mythic_notify with one setting.** `NotifyCfg.mode`
+  now accepts `"ox_lib"`, `"okok"` and `"mythic"` directly (built-in, resource-gated, falling back to the
+  LACORE toast if that resource isn't running) — no more writing a `customHandler` for the common ones.
+
+**Bridge event & export surface — rounded out**
+
+- **New events:** `lacore:api:incidentAttached` (a unit self-assigned), `lacore:api:evidenceLogged`,
+  `lacore:api:recordAdded`.
+- **New exports:** `AttachUnit(src, incidentNumber)` (attach a unit to a call, ENROUTE + Assigned) and
+  `GetCallByUnit(src)` (the call a unit is on).
+
 ## [3.2.5] – Security & fairness hardening pass
 
 Server-authoritative hardening, multiplayer-fairness fixes and small performance fixes across the

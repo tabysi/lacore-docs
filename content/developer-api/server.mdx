@@ -77,6 +77,8 @@ Drive LACORE units from an integration.
 |--------|---------|-------|
 | `SetUnitStatus(src, status)` | `bool` | sets the unit's server-side status; emits `unitStatusChanged` (`"CLEAR"` detaches its incident) |
 | `SetUnitCallsign(src, callsign)` | `bool` | sets the unit's callsign; emits `unitCallsignChanged` |
+| `AttachUnit(src, incidentNumber)` | `bool` | attach a unit to a call (ENROUTE, raises it to Assigned); emits `incidentAttached` |
+| `GetCallByUnit(src)` | `call` \| `nil` | the call the unit is currently attached to |
 
 ## Records lookup
 

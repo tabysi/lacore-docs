@@ -18,8 +18,11 @@ what happens in LACORE from your own resource. `AddEventHandler` on the consumer
 | `lacore:api:dutyChanged` | `src, job, dept, onDuty` | server |
 | `lacore:api:unitStatusChanged` | `src, status, incident` | server |
 | `lacore:api:unitCallsignChanged` | `src, callsign` | server |
+| `lacore:api:incidentAttached` | `src, incidentNumber` | server |
 | `lacore:api:reportFiled` | `report` `{ src, target, rtype, location, involved, incident, officer }` | server |
 | `lacore:api:chargesIssued` | `data` `{ src, target, ctype, charges, fine, jailMonths, officer }` | server |
+| `lacore:api:evidenceLogged` | `data` `{ src, target, tag, etype, location, incident, officer }` | server |
+| `lacore:api:recordAdded` | `data` `{ src, target, body, officer }` | server |
 | `lacore:api:boloCreated` | `bolo` `{ id, kind, subject, plate, reason, danger, by }` | server |
 | `lacore:api:boloCancelled` | `id` | server |
 | `lacore:mdt:opened` / `lacore:mdt:closed` | — | client |
