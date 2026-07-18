@@ -163,12 +163,14 @@ systems. No gameplay change for legitimate players.
   `QueryPerson`, …). Any integration is now a plain external resource that *subscribes* to the events and
   *calls* the exports — no core edits, no escrow touch. A ready-to-run
   `examples/lacore_integration_example` and the full reference (docs → Developer API) ship with it.
-- **TK_Dispatch (tk_scripts) — automatic 911 calls, now event-driven.** LACORE's dispatch calls (911 / 311
+- **TK_Dispatch (tk_scripts) — full `exports` support, event-driven.** LACORE's dispatch calls (911 / 311
   / Panic / Crime Broadcast / Shot Spotter / Requesting LEO/Fire-EMS/Coroner / Tow / Created Incident) mirror
-  into `tk_dispatch`'s call list via `exports.tk_dispatch:addCall`. It's a bridge adapter
-  (`modules/bridge/integrations-sv.lua`) that simply subscribes to `lacore:api:callCreated` — gated on the
-  resource + an `"auto"`/`false` toggle and pcall-wrapped, a no-op without tk_dispatch. Per-type mapping
-  (recipient jobs, code, priority, blip) lives in `configs/cfg-integrations-sh.lua`.
+  into `tk_dispatch`'s call list via `exports.tk_dispatch:addCall`, **and** a unit's callsign is pushed via
+  `exports.tk_dispatch:setCallsign` on every duty change (cleared when going off duty). It's a bridge adapter
+  (`modules/bridge/integrations-sv.lua`) that simply subscribes to `lacore:api:callCreated` /
+  `unitCallsignChanged` — gated on the resource + an `"auto"`/`false` toggle and pcall-wrapped, a no-op
+  without tk_dispatch. Per-type mapping (recipient jobs, code, priority, blip) + `syncCallsigns` live in
+  `configs/cfg-integrations-sh.lua`.
 
 **Access control**
 
