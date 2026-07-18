@@ -19,9 +19,25 @@ systems. No gameplay change for legitimate players.
 </Callout>
 
 <Callout type="warning">
-**Config change (`configs/cfg-weapons-cl.lua`):** new `HolsterAnim` table (the reaching / hand-on-holster
-animation used by `/hh`, bound to X). If you keep a customised `cfg-weapons-cl.lua`, add the `HolsterAnim`
-block from the shipped file — otherwise `/hh` errors. Swap its `dict`/`name` to change the reach animation.
+**Config change (`configs/cfg-weapons-cl.lua`) — holster section rewritten.** The holster config is now a
+single, simplified `HolsterConfig` (vx-holster style): one `weapons` whitelist, an `animation` toggle, an
+`eup` toggle and position-paired `on` / `off` EUP component lists. The old per-ped `HolsterConfig.Peds` /
+`.Weapons` maps and the standalone `holsterWeapons` list were **removed**, and the `HolsterAnim` table (the
+`/hh` reaching animation, bound to X) was added. **If you keep a customised `cfg-weapons-cl.lua`, replace its
+holster section with the new shipped one and set the `on` / `off` drawable numbers to your EUP pack** —
+otherwise the holster (and `/hh`) will error.
+</Callout>
+
+<Callout type="warning">
+**Config change (`configs/cfg-server-sv.lua`):** new `ExternalChat` key. It defaults to `false`
+(LACORE's OOC chat behaves exactly as before), so nothing changes if you don't touch it. Set it `true`
+only when you run a third-party chat resource (cc-chat / cc-rpchat) to stop double messages.
+</Callout>
+
+<Callout type="warning">
+**Config change (`configs/cfg-server-sv.lua`):** new `EntityLockdown` key. It defaults to `"strict"`
+(exactly the previous behaviour), so nothing changes if you don't touch it. Set it `"inactive"` to bring
+ambient NPC traffic / peds back (at the cost of the client entity-spawn protection).
 </Callout>
 
 ### Added
@@ -207,6 +223,33 @@ block from the shipped file — otherwise `/hh` errors. Swap its `dict`/`name` t
 
 ### Changed
 
+- **Config backup/restore now MERGES instead of overwriting — updates no longer strip your new keys.**
+  `/lacoreconfig restore` used to write whole files back, so restoring a backup taken on an older version
+  removed any config keys a later update had added (and could re-introduce an old, restructured block).
+  Each backup now also stores the pristine default it was edited from (shipped in `configs/.defaults/`), and
+  restore does a 3-way merge: only *your* changes are re-applied onto the current files, so keys/blocks added
+  by an update survive. Where an update changed the exact spot you did, the new default is kept (a feature
+  never breaks) and the conflict count is reported. Legacy (pre-merge) backups still restore whole-file — re-run
+  `/lacoreconfig backup` once to upgrade them.
+- **NPC traffic can be turned back on (entity-lockdown is now configurable).** The default routing bucket
+  was hard-locked to `"strict"` entity lockdown (an anti-cheat measure that blocks clients from spawning
+  arbitrary networked entities) — but that also blocks the game's ambient NPC vehicles + peds, so streets
+  were empty. New `EntityLockdown` key (`configs/cfg-server-sv.lua`, default `"strict"` = unchanged): set it
+  `"inactive"` to restore NPC traffic (trading away that entity-spawn protection), or `"relaxed"` to test a
+  middle ground.
+- **Compatibility with third-party chat resources (cc-chat / cc-rpchat).** LACORE's OOC chat took over
+  the stock `chatMessage` (re-posting it as `OOC | Name` and running a name anti-spoof kick). External chat
+  resources don't honour LACORE's `CancelEvent()`, so every line showed **twice** and their RP names tripped
+  the anti-spoof kick. New `ExternalChat` toggle (`configs/cfg-server-sv.lua`, default `false`): when `true`
+  LACORE no longer re-posts/cancels and skips the name anti-spoof, so the external chat owns display — no
+  double messages, no false kicks. The Discord OOC log and the slur filter stay active.
+- **The holster system config is now simple (vx-holster style).** The old setup needed a per-ped drawable
+  map (`HolsterConfig.Peds`) plus two separate weapon lists; it is replaced by one `HolsterConfig` with a
+  single `weapons` whitelist, an `animation` toggle, an `eup` toggle and two position-paired `on` / `off`
+  EUP lists (`{component, drawable, texture}` — `on[i]` = gun in holster ↔ `off[i]` = empty). Drawing a
+  listed weapon swaps every EUP holster to its empty look **ped-agnostically** (a row only fires if the ped
+  actually wears it), so it works for any uniform without listing ped models. Set the `on` / `off` numbers
+  to your EUP pack.
 - **The reaching / hand-on-holster animation (`/hh`, bound to X) is now configurable.** The animation
   dict/name was hardcoded; it now reads `HolsterAnim` from `configs/cfg-weapons-cl.lua`, so a server can
   swap the reach animation (`rest` = hand at the holster, `up` = hand raised) without touching code.
