@@ -1,0 +1,73 @@
+---
+title: Examples
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Examples
+
+A **standalone** example resource, `lacore_integration_example`, ships with LACORE (in `examples/`). It
+shows the whole integration pattern in one place — **consume** LACORE events and **drive** LACORE via
+exports, all from a plain external resource that never touches the core.
+
+<Steps>
+
+### Drop it in
+
+Copy the `lacore_integration_example` folder into your `resources/`.
+
+### Ensure it after LACORE
+
+```cfg
+ensure lacore
+ensure lacore_integration_example
+```
+
+### Watch it work
+
+Every LACORE event is logged to the server console (`Config.debug`), and `/lacore_example_call` creates
+a LACORE dispatch call from outside the core.
+
+</Steps>
+
+## What it does
+
+```lua
+-- CONSUME — react to LACORE events
+AddEventHandler('lacore:api:callCreated', function(call)
+    -- forward to another dispatch resource, a Discord webhook, a map blip, …
+    -- exports['your_dispatch']:addCall({
+    --     title = call.type, message = call.message,
+    --     coords = vector3(call.x + 0.0, call.y + 0.0, call.z + 0.0),
+    --     location = (call.postal or '') .. ' ' .. (call.address or ''),
+    --     jobs = { 'police' },
+    -- })
+end)
+
+AddEventHandler('lacore:api:dutyChanged', function(src, job, dept, onDuty)
+    -- e.g. mirror the callsign into another dispatch UI on duty
+    -- if onDuty then exports['your_dispatch']:setCallsign(src, exports['lacore']:GetCallsign(src)) end
+end)
+
+-- DRIVE — push data INTO LACORE
+RegisterCommand('lacore_example_call', function(src)
+    local pos = (src and src > 0) and GetEntityCoords(GetPlayerPed(src)) or vector3(0.0, 0.0, 0.0)
+    local inc = exports['lacore']:CreateCall({
+        type = 'Crime Broadcast', message = 'Example call',
+        agency = 'LAPD', coords = { x = pos.x, y = pos.y, z = pos.z },
+    })
+    print('created incident', inc)
+end, true)
+```
+
+## Make your own integration
+
+Copy the example's `server.lua`, keep the [events](/developer-api/events) you need, and replace the
+commented `exports['your_dispatch']:…` blocks with real calls to your target resource. That's the whole
+pattern — no LACORE files are ever touched.
+
+<Callout type="info">
+  Prefer a prefix-safe wrapper (auto-detect `lacore` vs `lacore-mdt`, no-op when LACORE isn't running)?
+  Use the [API Bridge](/developer-api/bridge), or have an AI write one from the
+  [AI Prompt](/developer-api/ai-prompt).
+</Callout>

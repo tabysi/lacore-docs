@@ -7,14 +7,14 @@ import { Callout, Cards } from 'nextra/components'
 # Developer API
 
 A small, stable **exports + events** surface so other resources can talk to LACORE / LACORE MDT.
-Every export wraps an existing internal function — no new backend logic, no schema of its own. Use it
-to feed dispatch calls in, read officer / duty state, look records up, issue BOLOs, react to CAD
-events, and open the MDT from your own scripts.
+Every export wraps an existing internal function — no new backend logic, no schema of its own. Feed
+dispatch calls in, read officer / duty state, look records up, issue BOLOs, react to CAD events, and
+open the MDT from your own scripts — **without ever editing the (encrypted) core**.
 
 <Callout type="info">
   **Resource name.** Exports are called by the *running* resource's name — `exports['lacore']` for the
   full core, or `exports['lacore-mdt']` for the standalone MDT product. The code is identical; only the
-  prefix differs. Examples below use `lacore`.
+  prefix differs. Examples use `lacore`.
 </Callout>
 
 Check the shipped version at runtime:
@@ -23,193 +23,40 @@ Check the shipped version at runtime:
 local version = exports['lacore']:GetApiVersion()   -- e.g. "1.0.0"
 ```
 
+## Sections
+
 <Cards>
+  <Cards.Card title="Server" href="/developer-api/server" arrow>
+    Officers & duty, dispatch calls, units, records lookup, permissions, BOLOs.
+  </Cards.Card>
+  <Cards.Card title="Client" href="/developer-api/client" arrow>
+    Open / close the MDT and read the local player's duty snapshot.
+  </Cards.Card>
+  <Cards.Card title="Events" href="/developer-api/events" arrow>
+    Subscribe to `lacore:api:*` — calls, duty, status, reports, charges, BOLOs.
+  </Cards.Card>
+  <Cards.Card title="Config" href="/developer-api/config" arrow>
+    Wire third-party scripts (e.g. TK_Dispatch) via the integrations config.
+  </Cards.Card>
+  <Cards.Card title="Examples" href="/developer-api/examples" arrow>
+    A drop-in resource that integrates with LACORE with zero core edits.
+  </Cards.Card>
   <Cards.Card title="API Bridge (drop-in)" href="/developer-api/bridge" arrow>
-    A tiny adapter resource that auto-detects the prefix and no-ops safely when LACORE isn't running.
+    A tiny adapter that auto-detects the prefix and no-ops safely when LACORE isn't running.
   </Cards.Card>
   <Cards.Card title="Build your own with AI" href="/developer-api/ai-prompt" arrow>
-    A copy-paste prompt that hands an AI the full API contract so it writes your integration.
+    A copy-paste prompt that hands an AI the full API contract.
   </Cards.Card>
 </Cards>
 
-## Server exports
+## The pattern
 
-### Officers & duty
+Two ways to integrate — both from your **own** resource, never touching LACORE's files:
 
-| Export | Returns | Notes |
-|--------|---------|-------|
-| `GetOfficer(src)` | `officer` \| `nil` | `{ source, name, callsign, job, dept, onDuty, incident, status }` |
-| `IsOnDuty(src)` | `bool` | on duty = non-civilian job |
-| `GetCallsign(src)` | `string` \| `nil` | |
-| `GetDepartment(src)` | `string` \| `nil` | e.g. `"LAPD"`, `"LASD"`, `"AMR"` |
-| `GetOnDutyUnits()` | `officer[]` | every on-duty player |
-
-```lua
--- Is this player an on-duty cop?
-if exports['lacore']:IsOnDuty(src) then
-    local o = exports['lacore']:GetOfficer(src)
-    print(('%s is on duty as %s (%s)'):format(o.name, o.callsign, o.dept))
-end
-```
-
-### Permissions
-
-| Export | Returns |
-|--------|---------|
-| `HasPermission(src, perm)` | `bool` |
-
-### Dispatch calls & incidents
-
-| Export | Returns | Notes |
-|--------|---------|-------|
-| `CreateCall(opts)` | `incidentNumber` \| `nil` | creates a CAD call and broadcasts it to terminals |
-| `ResolveCall(incidentNumber, reason [, src])` | `bool` | `src` optional — external actor if omitted |
-| `AddCallNote(incidentNumber, note)` | `bool` | set/replace a call's notes; emits `callUpdated` |
-| `GetActiveCalls()` | `call[]` | non-resolved only |
-| `GetCall(incidentNumber)` | `call` \| `nil` | |
-
-### Units
-
-| Export | Returns | Notes |
-|--------|---------|-------|
-| `SetUnitStatus(src, status)` | `bool` | sets the unit's server-side status; emits `unitStatusChanged` (`"CLEAR"` detaches its incident) |
-| `SetUnitCallsign(src, callsign)` | `bool` | sets the unit's callsign; emits `unitCallsignChanged` |
-
-`CreateCall` options:
-
-```lua
-exports['lacore']:CreateCall({
-    type    = 'Robbery in Progress',   -- short call type / title
-    message = 'Silent alarm — Fleeca Bank, Vinewood',
-    address = 'Vinewood Blvd',
-    postal  = '4021',
-    city    = 'Los Angeles',
-    agency  = 'LAPD',                  -- 'LAPD' | 'LASD'  (default 'LAPD')
-    coords  = { x = 250.0, y = 220.0, z = 100.0 },  -- or pass x, y, z directly
-    -- optional: attach a creating unit + set its status
-    -- callsign = '6A13-W3', src = officerSrc, status = 'CODE SIX',
-})
-```
-
-```lua
--- Alarm script: auto-create a 911 when a bank alarm trips, then close it later.
-local inc = exports['lacore']:CreateCall({
-    type = '211 - Bank Alarm', message = 'Fleeca Bank silent alarm',
-    address = 'Vinewood Blvd', postal = '4021', coords = GetEntityCoords(alarmProp),
-})
-
-exports['lacore']:ResolveCall(inc, 'GOA')   -- Gone On Arrival
-```
-
-### Records lookup
-
-Read-only, in-memory lookup — the same matching the MDT query uses. Results are **sanitised**: the raw
-`records` (which may hold private entries) and `faction` fields are never returned; active BOLO hits
-are attached under `bolos`.
-
-| Export | Returns | Notes |
-|--------|---------|-------|
-| `QueryPerson(query)` | `profile[]` | match by server id, name (substring) or plate |
-| `QueryPlate(plate)` | `profile` \| `nil` | registered owner profile (with `.vehicles`) |
-
-```lua
--- Look someone up by name and print their registered plates.
-for _, p in ipairs(exports['lacore']:QueryPerson('John')) do
-    local plates = {}
-    for pl in pairs(p.vehicles or {}) do plates[#plates + 1] = pl end
-    print(('%s — %s'):format(p.name, table.concat(plates, ', ')))
-end
-
--- Who owns this plate?
-local owner = exports['lacore']:QueryPlate('8XYZ123')
-if owner then print('Registered to ' .. owner.name) end
-```
-
-<Callout type="warning">
-  **Privacy.** The lookup never exposes the raw criminal `records` array — that stays server-side and
-  officer-permissioned inside the MDT. `QueryPerson` / `QueryPlate` are for identity, vehicles and
-  active BOLO flags, not for pulling someone's rap sheet into a third-party script.
-</Callout>
-
-### BOLOs
-
-| Export | Returns | Notes |
-|--------|---------|-------|
-| `GetBolos()` | `bolo[]` | active (non-expired) BOLOs |
-| `CreateBolo(opts)` | `boloId` \| `nil` | issues a BOLO, syncs to on-duty units + webhook |
-
-```lua
-exports['lacore']:CreateBolo({
-    kind    = 'vehicle',                 -- 'person' | 'vehicle' | 'plate' (default 'person')
-    subject = 'Black Sultan RS',         -- name / vehicle description
-    plate   = '8XYZ123',                 -- for vehicle / plate BOLOs
-    reason  = 'Suspect vehicle, 211',
-    danger  = true,                      -- armed & dangerous
-    -- by = 'my-heist-script',           -- attribution (defaults to the calling resource)
-})
-```
-
-## Client exports
-
-| Export | Returns | Notes |
-|--------|---------|-------|
-| `GetApiVersion()` | `string` | |
-| `OpenMDT()` | `bool` | opens the LAPD MDT for the local player |
-| `CloseMDT()` | `bool` | closes whichever LACORE terminal is open |
-| `IsMDTOpen()` | `bool` | LAPD MDT open state |
-| `GetDutyInfo()` | `{ job, dept, callsign, status, incident, onDuty }` | local player's duty snapshot |
-
-```lua
--- Open the MDT when the player sits in a police cruiser's driver seat.
-exports['lacore']:OpenMDT()
-```
-
-<Callout type="info">
-  Officer / duty / call / records data lives on the **server** (it owns the session). Query it with the
-  server exports above, not on the client.
-</Callout>
-
-## Events (LACORE → your resource)
-
-`AddEventHandler` on the consumer side:
-
-| Event | Args | Side |
-|-------|------|------|
-| `lacore:api:callCreated` | `call` `{ incidentNumber, type, message, address, postal, agency, code, city, playerName, source, x, y, z }` | server |
-| `lacore:api:callUpdated` | `incidentNumber, fields` `{ notes }` | server |
-| `lacore:api:callResolved` | `incidentNumber, reason, by` | server |
-| `lacore:api:panic` | `src, coords` `{ x, y, z }`, `name` | server |
-| `lacore:api:dutyChanged` | `src, job, dept, onDuty` | server |
-| `lacore:api:unitStatusChanged` | `src, status, incident` | server |
-| `lacore:api:unitCallsignChanged` | `src, callsign` | server |
-| `lacore:api:reportFiled` | `report` `{ src, target, rtype, location, involved, incident, officer }` | server |
-| `lacore:api:chargesIssued` | `data` `{ src, target, ctype, charges, fine, jailMonths, officer }` | server |
-| `lacore:api:boloCreated` | `bolo` `{ id, kind, subject, plate, reason, danger, by }` | server |
-| `lacore:api:boloCancelled` | `id` | server |
-| `lacore:mdt:opened` / `lacore:mdt:closed` | — | client |
-
-<Callout type="info">
-  **The 911 path fires `callCreated` too.** Every automatic LACORE call — 911 / 311 / Panic / Crime
-  Broadcast / Shot Spotter / Requesting LEO/Fire-EMS/Coroner / Tow — *and* every MDT-created call raises
-  `lacore:api:callCreated`. So a dispatch integration only needs to subscribe to this one event; it never
-  touches the (encrypted) core. A ready-to-run example ships in `examples/lacore_integration_example`.
-</Callout>
-
-```lua
-AddEventHandler('lacore:api:callCreated', function(call)
-    print(('[cad-logger] #%s %s @ %s'):format(call.incidentNumber, call.type, call.address))
-end)
-
-AddEventHandler('lacore:api:dutyChanged', function(src, job, dept, onDuty)
-    if onDuty then TriggerClientEvent('myjob:gaveGear', src, dept) end
-end)
-
-AddEventHandler('lacore:api:boloCreated', function(bolo)
-    if bolo.danger then print(('[alert] armed BOLO %s — %s'):format(bolo.id, bolo.subject)) end
-end)
-```
-
-## Notes
+- **Consume** — `AddEventHandler('lacore:api:*')` to react to dispatch calls, duty / status changes,
+  reports, charges and BOLOs. See [Events](/developer-api/events).
+- **Drive** — `exports['lacore']:CreateCall{…}` / `ResolveCall(…)` / `QueryPerson(…)` … to push data
+  into LACORE. See [Server](/developer-api/server).
 
 <Callout type="warning">
   **Trust model.** Server exports are meant to be called by other **server** resources (trusted).
@@ -217,13 +64,8 @@ end)
   and BOLO issuing stay server-authoritative.
 </Callout>
 
-- **Stability.** Export names and the payload shapes above are the contract. New fields may be added;
-  existing ones won't be renamed within a major version (`GetApiVersion`).
+- **Stability.** Export names and payload shapes are the contract. New fields may be added; existing
+  ones won't be renamed within a major version (`GetApiVersion`).
 - **Alongside the old exports.** The existing standalone exports (`isRolePresent`, `getUserRoles`,
   `getUserData`, `IsClientVerified`, `IsGloballyBanned`, `GetFramework`, …) keep working unchanged —
   this API sits next to them.
-
-<Callout type="info">
-  Need an export that isn't here yet? Ask in our [Discord](https://discord.gg/b6YbvVEvYp) — if it maps
-  to an existing internal function it's usually a quick add.
-</Callout>

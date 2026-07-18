@@ -1,0 +1,33 @@
+---
+title: Client
+---
+
+import { Callout } from 'nextra/components'
+
+# Client exports
+
+Called on the client by the running prefix — `exports['lacore']` (core) or `exports['lacore-mdt']`
+(product).
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetApiVersion()` | `string` | |
+| `OpenMDT()` | `bool` | opens the LAPD MDT for the local player |
+| `CloseMDT()` | `bool` | closes whichever LACORE terminal is open |
+| `IsMDTOpen()` | `bool` | LAPD MDT open state |
+| `GetDutyInfo()` | `{ job, dept, callsign, status, incident, onDuty }` | local player's duty snapshot |
+
+```lua
+-- Open the MDT when the player sits in a police cruiser's driver seat.
+exports['lacore']:OpenMDT()
+
+-- Read the local player's duty state.
+local duty = exports['lacore']:GetDutyInfo()
+if duty.onDuty then print(('On duty: %s / %s'):format(duty.dept, duty.callsign)) end
+```
+
+<Callout type="info">
+  Officer / duty / call / records data lives on the **server** (it owns the session). Query it with the
+  [server exports](/developer-api/server), not on the client. The client exports only open / close the
+  local UI and read the local player's own snapshot.
+</Callout>

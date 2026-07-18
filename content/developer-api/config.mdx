@@ -1,0 +1,53 @@
+---
+title: Config
+---
+
+import { Callout } from 'nextra/components'
+
+# Config — built-in integrations
+
+Some third-party integrations ship with LACORE and are wired up purely through config — no code, no
+core edits. They live in `configs/cfg-integrations-sh.lua`, each gated by an `"auto"` / `false` toggle
+(`"auto"` = active only when the target resource is running).
+
+## TK_Dispatch (tk_scripts)
+
+Mirrors LACORE's automatic dispatch calls into [tk_dispatch](https://tk-scripts.gitbook.io/docs)'s call
+list. Under the hood it just subscribes to [`lacore:api:callCreated`](/developer-api/events) and calls
+`exports.tk_dispatch:addCall` — the reference "no core edit" adapter.
+
+```lua
+-- configs/cfg-integrations-sh.lua
+Integrations.tk_dispatch = "auto"        -- "auto" | false
+
+Integrations.tkDispatch = {
+    resource    = "tk_dispatch",         -- rename only if you forked it
+    defaultJobs = { "police" },          -- your FRAMEWORK job names (ESX/QB), not LACORE depts
+    forwardUnmapped = false,             -- forward types not listed below?
+
+    -- Per LACORE call type → how it appears in tk_dispatch.
+    -- Set `jobs` to the framework jobs that should receive each.
+    calls = {
+        ["911 Emergency"]       = { code = "911",   priority = "high",   jobs = { "police", "ambulance" }, blip = { sprite = 280, color = 1 } },
+        ["Panic Button"]        = { code = "10-99", priority = "high",   jobs = { "police" }, flash = true },
+        ["Shot Spotter"]        = { code = "shots", priority = "high",   jobs = { "police" }, flash = true },
+        ["Crime Broadcast"]     = { code = "crime", priority = "high",   jobs = { "police" } },
+        ["Requesting Fire/EMS"] = { code = "10-52", priority = "high",   jobs = { "ambulance" } },
+        -- … 311 / Requesting LEO / Coroner / Tow / Created Incident
+    },
+}
+```
+
+The fields under each call type (`code`, `priority`, `jobs`, `blip`, `flash`) are passed straight to
+`tk_dispatch:addCall`; the coords, message and location come from the LACORE call.
+
+<Callout type="warning">
+  **Set `jobs` to your framework's job names** (`police`, `ambulance`, …) — these are ESX/QB jobs, not
+  LACORE departments. With the wrong names, tk_dispatch simply shows the call to nobody.
+</Callout>
+
+<Callout type="info">
+  Want to wire up a **different** dispatch / notification resource? You don't edit LACORE — you write a
+  tiny external resource that subscribes to `lacore:api:callCreated`. Copy the
+  [example resource](/developer-api/examples) and point it at your target.
+</Callout>

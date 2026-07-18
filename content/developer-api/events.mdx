@@ -1,0 +1,49 @@
+---
+title: Events
+---
+
+import { Callout } from 'nextra/components'
+
+# Events
+
+Subscribing to these is how you integrate **without ever editing the (encrypted) core** — react to
+what happens in LACORE from your own resource. `AddEventHandler` on the consumer side.
+
+| Event | Args | Side |
+|-------|------|------|
+| `lacore:api:callCreated` | `call` `{ incidentNumber, type, message, address, postal, agency, code, city, playerName, source, x, y, z }` | server |
+| `lacore:api:callUpdated` | `incidentNumber, fields` `{ notes }` | server |
+| `lacore:api:callResolved` | `incidentNumber, reason, by` | server |
+| `lacore:api:panic` | `src, coords` `{ x, y, z }`, `name` | server |
+| `lacore:api:dutyChanged` | `src, job, dept, onDuty` | server |
+| `lacore:api:unitStatusChanged` | `src, status, incident` | server |
+| `lacore:api:unitCallsignChanged` | `src, callsign` | server |
+| `lacore:api:reportFiled` | `report` `{ src, target, rtype, location, involved, incident, officer }` | server |
+| `lacore:api:chargesIssued` | `data` `{ src, target, ctype, charges, fine, jailMonths, officer }` | server |
+| `lacore:api:boloCreated` | `bolo` `{ id, kind, subject, plate, reason, danger, by }` | server |
+| `lacore:api:boloCancelled` | `id` | server |
+| `lacore:mdt:opened` / `lacore:mdt:closed` | — | client |
+
+<Callout type="info">
+  **The 911 path fires `callCreated` too.** Every automatic LACORE call — 911 / 311 / Panic / Crime
+  Broadcast / Shot Spotter / Requesting LEO/Fire-EMS/Coroner / Tow — *and* every MDT-created call raises
+  `lacore:api:callCreated`. So a dispatch integration only needs to subscribe to this one event; it never
+  touches the core. A ready-to-run example ships in the [Examples](/developer-api/examples).
+</Callout>
+
+```lua
+AddEventHandler('lacore:api:callCreated', function(call)
+    print(('[cad-logger] #%s %s @ %s'):format(call.incidentNumber, call.type, call.address))
+    -- e.g. forward to another dispatch resource:
+    -- exports['your_dispatch']:addCall({ title = call.type, message = call.message,
+    --     coords = vector3(call.x + 0.0, call.y + 0.0, call.z + 0.0), jobs = { 'police' } })
+end)
+
+AddEventHandler('lacore:api:dutyChanged', function(src, job, dept, onDuty)
+    if onDuty then TriggerClientEvent('myjob:gaveGear', src, dept) end
+end)
+
+AddEventHandler('lacore:api:boloCreated', function(bolo)
+    if bolo.danger then print(('[alert] armed BOLO %s — %s'):format(bolo.id, bolo.subject)) end
+end)
+```
