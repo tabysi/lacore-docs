@@ -64,8 +64,16 @@ end
 |--------|---------|-------|
 | `CreateCall(opts)` | `incidentNumber` \| `nil` | creates a CAD call and broadcasts it to terminals |
 | `ResolveCall(incidentNumber, reason [, src])` | `bool` | `src` optional — external actor if omitted |
+| `AddCallNote(incidentNumber, note)` | `bool` | set/replace a call's notes; emits `callUpdated` |
 | `GetActiveCalls()` | `call[]` | non-resolved only |
 | `GetCall(incidentNumber)` | `call` \| `nil` | |
+
+### Units
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `SetUnitStatus(src, status)` | `bool` | sets the unit's server-side status; emits `unitStatusChanged` (`"CLEAR"` detaches its incident) |
+| `SetUnitCallsign(src, callsign)` | `bool` | sets the unit's callsign; emits `unitCallsignChanged` |
 
 `CreateCall` options:
 
@@ -149,6 +157,7 @@ exports['lacore']:CreateBolo({
 | `OpenMDT()` | `bool` | opens the LAPD MDT for the local player |
 | `CloseMDT()` | `bool` | closes whichever LACORE terminal is open |
 | `IsMDTOpen()` | `bool` | LAPD MDT open state |
+| `GetDutyInfo()` | `{ job, dept, callsign, status, incident, onDuty }` | local player's duty snapshot |
 
 ```lua
 -- Open the MDT when the player sits in a police cruiser's driver seat.
@@ -166,11 +175,25 @@ exports['lacore']:OpenMDT()
 
 | Event | Args | Side |
 |-------|------|------|
-| `lacore:api:callCreated` | `call` `{ incidentNumber, type, message, address, postal, agency, x, y, z }` | server |
+| `lacore:api:callCreated` | `call` `{ incidentNumber, type, message, address, postal, agency, code, city, playerName, source, x, y, z }` | server |
+| `lacore:api:callUpdated` | `incidentNumber, fields` `{ notes }` | server |
 | `lacore:api:callResolved` | `incidentNumber, reason, by` | server |
+| `lacore:api:panic` | `src, coords` `{ x, y, z }`, `name` | server |
 | `lacore:api:dutyChanged` | `src, job, dept, onDuty` | server |
+| `lacore:api:unitStatusChanged` | `src, status, incident` | server |
+| `lacore:api:unitCallsignChanged` | `src, callsign` | server |
+| `lacore:api:reportFiled` | `report` `{ src, target, rtype, location, involved, incident, officer }` | server |
+| `lacore:api:chargesIssued` | `data` `{ src, target, ctype, charges, fine, jailMonths, officer }` | server |
 | `lacore:api:boloCreated` | `bolo` `{ id, kind, subject, plate, reason, danger, by }` | server |
+| `lacore:api:boloCancelled` | `id` | server |
 | `lacore:mdt:opened` / `lacore:mdt:closed` | — | client |
+
+<Callout type="info">
+  **The 911 path fires `callCreated` too.** Every automatic LACORE call — 911 / 311 / Panic / Crime
+  Broadcast / Shot Spotter / Requesting LEO/Fire-EMS/Coroner / Tow — *and* every MDT-created call raises
+  `lacore:api:callCreated`. So a dispatch integration only needs to subscribe to this one event; it never
+  touches the (encrypted) core. A ready-to-run example ships in `examples/lacore_integration_example`.
+</Callout>
 
 ```lua
 AddEventHandler('lacore:api:callCreated', function(call)

@@ -33,6 +33,11 @@ systems. No gameplay change for legitimate players.
 > (exactly the previous behaviour), so nothing changes if you don't touch it. Set it `"inactive"` to bring
 > ambient NPC traffic / peds back (at the cost of the client entity-spawn protection).
 
+> [!WARNING]
+> **Config change (`configs/cfg-integrations-sh.lua`):** new `Integrations.tk_dispatch` toggle +
+> `Integrations.tkDispatch` map. Defaults to `"auto"` (only forwards when `tk_dispatch` is actually running,
+> so it's a no-op otherwise). If you use tk_dispatch, set the per-type `jobs` to YOUR framework job names.
+
 ### Added
 
 **Public developer API (`modules/api/`)**
@@ -147,6 +152,23 @@ systems. No gameplay change for legitimate players.
   `OpenNineMdt` now also sends the report types (it already sent the penal code). No server logic changed —
   the citation / report events (`char:IssueCharges`, `char:FileReport`) are the exact same ones the LAPD and
   Agency MDTs use.
+
+**Integrations**
+
+- **Public integration bridge — add third-party scripts without touching the (encrypted) core.** LACORE
+  now emits a full set of `lacore:api:*` events covering every dispatch/officer moment — `callCreated`
+  (both the 911 path *and* MDT-created calls), `callUpdated`, `callResolved`, `panic`, `dutyChanged`,
+  `unitStatusChanged`, `unitCallsignChanged`, `reportFiled`, `chargesIssued`, `boloCreated`, `boloCancelled`
+  — plus drive-in exports (`CreateCall`, `ResolveCall`, `AddCallNote`, `SetUnitStatus`, `SetUnitCallsign`,
+  `QueryPerson`, …). Any integration is now a plain external resource that *subscribes* to the events and
+  *calls* the exports — no core edits, no escrow touch. A ready-to-run
+  `examples/lacore_integration_example` and the full reference (docs → Developer API) ship with it.
+- **TK_Dispatch (tk_scripts) — automatic 911 calls, now event-driven.** LACORE's dispatch calls (911 / 311
+  / Panic / Crime Broadcast / Shot Spotter / Requesting LEO/Fire-EMS/Coroner / Tow / Created Incident) mirror
+  into `tk_dispatch`'s call list via `exports.tk_dispatch:addCall`. It's a bridge adapter
+  (`modules/bridge/integrations-sv.lua`) that simply subscribes to `lacore:api:callCreated` — gated on the
+  resource + an `"auto"`/`false` toggle and pcall-wrapped, a no-op without tk_dispatch. Per-type mapping
+  (recipient jobs, code, priority, blip) lives in `configs/cfg-integrations-sh.lua`.
 
 **Access control**
 
