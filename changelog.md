@@ -14,6 +14,11 @@ systems. No gameplay change for legitimate players.
 > `"auto"` when absent, so nothing breaks if you don't touch your config — but add
 > `membership = "auto"` to your `AccessControl` block to keep it aligned with the shipped default.
 
+> [!WARNING]
+> **Config change (`configs/cfg-weapons-cl.lua`):** new `HolsterAnim` table (the reaching / hand-on-holster
+> animation used by `/hh`, bound to X). If you keep a customised `cfg-weapons-cl.lua`, add the `HolsterAnim`
+> block from the shipped file — otherwise `/hh` errors. Swap its `dict`/`name` to change the reach animation.
+
 ### Added
 
 **Public developer API (`modules/api/`)**
@@ -113,6 +118,22 @@ systems. No gameplay change for legitimate players.
 
 ### Fixed
 
+**LEO / CAD — reports & citations everywhere**
+
+- **The LASD PCMS terminal can now file reports and issue citations / charges.** After a person query
+  (DEX), two actions appear under the record: **Cite / Charge** (multi-select over the shared penal code,
+  citation/arrest toggle, running fine + jail total) and **File Report** (report type, narrative, location,
+  involved, incident #). Both are styled in the PCMS amber/teal skin and drive the same shared backend as
+  the LAPD MDT — the server already gated this on *being an on-duty unit*, not on the department, so LASD
+  deputies simply had no UI for it before.
+- **The 9100-T retro CAD can now file reports and issue citations / charges too.** From a PERSON result the
+  terminal offers **Cite / Charge** (type to filter the penal code, click charges to add, ENTER to issue)
+  and **File Report** (pick a report type, type the narrative, ENTER to file) — all in the green CRT look.
+- **Behind the scenes:** `OpenLasdMdt` now sends the penal code + report types to the LASD UI, and
+  `OpenNineMdt` now also sends the report types (it already sent the penal code). No server logic changed —
+  the citation / report events (`char:IssueCharges`, `char:FileReport`) are the exact same ones the LAPD and
+  Agency MDTs use.
+
 **Access control**
 
 - **Member-only perks no longer lock up when the Discord layer is off.** The `member` flag (used to gate
@@ -181,6 +202,9 @@ systems. No gameplay change for legitimate players.
 
 ### Changed
 
+- **The reaching / hand-on-holster animation (`/hh`, bound to X) is now configurable.** The animation
+  dict/name was hardcoded; it now reads `HolsterAnim` from `configs/cfg-weapons-cl.lua`, so a server can
+  swap the reach animation (`rest` = hand at the holster, `up` = hand raised) without touching code.
 - **The civilian activity loop no longer runs on the 0 ms hot path while travelling** — it only
   tight-loops (to draw the objective marker) within ~60 m of the current step, polling slowly
   otherwise.
