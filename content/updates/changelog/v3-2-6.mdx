@@ -1,0 +1,37 @@
+---
+title: "3.2.6"
+---
+
+import { Callout } from 'nextra/components'
+
+![LACORE 3.2.6](/changelog/v3-2-6.svg)
+
+# [3.2.6] – Dispatch bridge ecosystem
+
+Builds on the 3.2.5 integration bridge: LACORE's automatic calls now forward into the popular
+third-party **dispatch** scripts out of the box, through a pluggable adapter registry (no core edits to
+add more).
+
+<Callout type="warning">
+**Config change (`configs/cfg-integrations-sh.lua`):** the dispatch config was generalised. Pick your
+dispatch with the new `Integrations.dispatch` (`"auto"` by default) and set the per-type mapping in the
+neutral `Integrations.dispatchCalls`. The old `Integrations.tk_dispatch` / `Integrations.tkDispatch`
+keys still work as a fallback, but if you customised `tkDispatch.calls`, move your job mappings into
+`dispatchCalls`.
+</Callout>
+
+### Added
+
+**Dispatch bridge — works with your dispatch out of the box**
+
+- **Forward LACORE calls into any supported dispatch script.** A pluggable adapter registry
+  (`modules/bridge/integrations-sv.lua`) subscribes to `lacore:api:callCreated` and routes each call to
+  the active dispatch. Supported: **tk_dispatch**, **ps-dispatch**, **cd_dispatch**, **core_dispatch**,
+  **rcore_dispatch**, **linden_outlawalert** — each built against its real export/event API. Select with
+  `Integrations.dispatch = "auto"` (uses the first one running) or force a specific one.
+- **One neutral call map for all of them.** `Integrations.dispatchCalls` maps each LACORE call type to a
+  neutral `{ code, priority, jobs, blip, flash }`; every adapter translates it to its own fields (10-code,
+  recipient jobs, blip sprite/colour, priority/flash), so you configure it once regardless of which
+  dispatch you run.
+- **ps-dispatch** uses a tiny client relay (its `CustomAlert` is a client export); the others fire their
+  server event/export directly. All gated + pcall-wrapped — a no-op when no dispatch is running.
