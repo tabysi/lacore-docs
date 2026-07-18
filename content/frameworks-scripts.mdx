@@ -11,7 +11,13 @@ import { frameworks, scripts } from '../lib/frameworks-scripts.js'
 LACORE is **standalone-first** — it ships with its own identity, jobs and duty system and needs no
 framework. But when you already run one, or use popular paid resources, LACORE **integrates with them
 automatically**: if the resource is running, the integration turns on; if not, LACORE carries on
-standalone. Nothing here is ever required.
+standalone. None of the *integrations* below are ever required.
+
+<Callout type="warning">
+  **Required dependencies.** LACORE itself only hard-depends on three standard resources — `ensure`
+  them before `lacore`: **oxmysql** (database), **pma-voice** (voice) and **spawnmanager**. Everything
+  else on this page is optional and auto-detected.
+</Callout>
 
 ## Supported frameworks
 
