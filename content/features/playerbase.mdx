@@ -1,0 +1,95 @@
+---
+title: Enhanced Playerbase
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Enhanced Playerbase <span style={{fontSize:'0.6em',verticalAlign:'middle',opacity:0.7}}>BETA</span>
+
+The **Enhanced Playerbase** turns your local bans and warns into a shared, cross-community reputation
+layer. Upload your records to the LACORE playerbase, share them with partner communities by a key, and
+— if you choose — **enforce** partner bans automatically when a player connects.
+
+<Callout type="info">
+  The playerbase is **advisory by default**. Nothing auto-bans anyone until you deliberately turn on
+  enforcement on *both* sides. Uploading and sharing only ever expose **hashed** identifiers.
+</Callout>
+
+## How it works
+
+- **Records** — every ban and warn keeps its provenance (which community, which server, who issued it).
+- **Players** — records attach to a shared *player*, matched across servers by **hashed identifiers**
+  (SHA-256, no per-server salt) so the same person lines up everywhere without exposing raw identifiers.
+- **Ghosts** — if you ban someone the playerbase has never seen, a **ghost** player is minted to hold
+  the record. The next time that person connects to a participating server, the ghost is **claimed**
+  (their real identifiers attach, the ghost flag drops).
+
+## 1 · Upload your records
+
+Local bans and warns live in `data/banlist.json` (warns carry `type="Warning"`). Share them from the
+server console:
+
+```
+/lacore bans list     # count your local bans + warns
+/lacore bans upload    # push them to the LACORE playerbase
+```
+
+Upload rides the write-only relay and your **license key** — no key, nothing is sent. Server-side the
+records are hashed, deduped and attached to a shared player (a ghost if unknown).
+
+<Callout type="info">
+  Requires a [license key](/customer-portal/license-keys) (`setr lacore_license_key "…"`). Duplicate
+  records (same local id from the same community, or same player + reason) are skipped automatically.
+</Callout>
+
+## 2 · Share with partner communities
+
+In the dashboard under **Community → Players → Bans/Warns Database** you generate a **share key**
+(`PBSHARE-XXXXX-XXXXX-XXXXX`). Hand it to a partner and they paste it to pull your records into their
+list, tagged with your name. See [Players & sharing](/customer-portal/players) for the dashboard flow.
+
+Sharing is **directional** (giving a partner your key lets *them* read *you*, not the reverse) and
+**revocable** (revoke the key to cut every subscriber at once).
+
+## 3 · Enforcement (opt-in, two-sided)
+
+Enforcement makes a server actually **reject** a connecting player who carries an active ban in its
+playerbase. It requires agreement from **both** sides:
+
+<Steps>
+
+### Owner marks the key "Enforce"
+
+On the sharing side, flip your key's scope from **Read only** to **Enforce**. This permits partners to
+auto-reject players *you* banned. Plain read grants stay advisory.
+
+### Consuming server enables the convar
+
+The server that wants to enforce sets:
+
+```cfg
+setr lacore_playerbase_enforce true
+```
+
+</Steps>
+
+Only when the owner grants **Enforce** *and* the consuming server enables the convar does a shared ban
+block a connect. A server always enforces **its own** bans when the convar is on; partner bans are
+enforced only for partners who granted the Enforce scope.
+
+<Callout type="warning">
+  **Fail-safe by design.** The connect check never holds the deferral — it runs asynchronously and only
+  drops a player on a *confirmed* ban. No license key, relay down, or any API error simply lets the
+  connect proceed. A slow or offline playerbase can never stall your server's join flow.
+</Callout>
+
+## Privacy
+
+Raw identifiers never appear in shared reads — matching is done entirely on SHA-256 hashes. Your own
+raw identifiers are kept only so *you* can lift your *own* records. Communities you share with see the
+player's name and ban reason, never their identifiers.
+
+## Roadmap
+
+Uploading, sharing and opt-in enforcement are live (Beta). Warn-point thresholds and richer revocation
+propagation are planned. Feedback welcome via [Support](/support).

@@ -1,0 +1,67 @@
+---
+title: Players & sharing
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Players & sharing <span style={{fontSize:'0.6em',verticalAlign:'middle',opacity:0.7}}>BETA</span>
+
+**Dashboard → Community → Players** shows your community's shared **bans & warns** and the
+**Bans/Warns Database** panel for cross-community sharing. This is the dashboard side of the
+[Enhanced Playerbase](/features/playerbase) — for the server commands and the privacy model, see that
+page.
+
+## The records table
+
+Every record you [uploaded](/features/playerbase#1--upload-your-records) from a server appears here,
+attached to a shared player:
+
+- A <strong>GHOST</strong> badge marks a player the playerbase minted from a record but hasn't met yet
+  — it's claimed automatically when they next connect to a participating server.
+- Records pulled from a partner's database carry that partner's name as a **source badge** and are
+  **read-only** (you can't lift someone else's ban).
+- For your **own** records you can **Lift** a ban (keeps it in history, stops counting it active) or
+  **Remove** a warn.
+
+Filter by All / Bans / Warns and search by name, identifier or reason.
+
+## Bans/Warns Database (sharing)
+
+The **🔑 Bans/Warns Database** panel at the top of the page is where cross-community sharing lives.
+
+<Steps>
+
+### Share your database
+
+Click **Generate key** to mint your share key (`PBSHARE-XXXXX-XXXXX-XXXXX`). Anyone you hand it to can
+**read** your bans & warns. Use **Copy** to grab it, **Revoke** to cut every subscriber at once.
+
+### Choose the scope
+
+Under **Partners may**, pick:
+
+- **Read only** *(default)* — partners see your records, nothing auto-bans.
+- **Enforce** — partners running enforcement may auto-reject players you banned.
+
+### Subscribe to a partner
+
+Paste a partner's key under **Subscribe to a database** and click **Add**. Their records flow into your
+table, tagged with their name. Remove a subscription any time.
+
+</Steps>
+
+<Callout type="info">
+  **To actually auto-reject** subscribed bans on connect, the *consuming* server also sets
+  `setr lacore_playerbase_enforce true`. It's off by default — enforcement always needs both the owner's
+  **Enforce** scope and the server convar. See [Enforcement](/features/playerbase#3--enforcement-opt-in-two-sided).
+</Callout>
+
+<Callout type="warning">
+  Sharing is directional and revocable, and only ever exposes **hashed** identifiers — never raw ones.
+  Treat a share key like a password; revoke it if it leaks.
+</Callout>
+
+## Access
+
+The Players page is gated by the **players** [team scope](/customer-portal/team), so you can let a
+trusted staff member manage the shared playerbase without giving them the rest of your account.

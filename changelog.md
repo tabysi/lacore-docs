@@ -45,6 +45,37 @@ add more).
 - **New exports:** `AttachUnit(src, incidentNumber)` (attach a unit to a call, ENROUTE + Assigned) and
   `GetCallByUnit(src)` (the call a unit is on).
 
+**Enhanced Playerbase — shared bans &amp; warns (Beta)**
+
+- **Share your bans and warns across LACORE servers.** New owner commands `/lacore bans list` and
+  `/lacore bans upload` push your local bans + warns (from `data/banlist.json`) to the LACORE API, keyed to
+  your community by the license key. Server-side they're hashed, deduped and attached to a shared player
+  history — a **ghost identifier** is created for a player you haven't met yet, and claimed when they turn
+  up. Requires the online playerbase collections + a license key.
+- **Cross-community sharing (share keys).** Under **Community → Players → Bans/Warns Database** in the
+  dashboard you can generate a share key and hand it to a partner community; whoever holds it can **read**
+  your bans &amp; warns, tagged with your name. Paste a partner's key to pull their records into your list.
+  Sharing is directional and revocable. By default it is **advisory only** — shared records never auto-ban.
+- **Opt-in enforcement + ghost claim on connect.** A server can set `setr lacore_playerbase_enforce true`
+  to actually reject a connecting player who carries an active ban in its playerbase (its own bans + any
+  partner database shared under the **Enforce** scope — plain read grants stay advisory). Enforcement needs
+  **both** sides: the owner flips their key to Enforce, and the consuming server enables the convar. On
+  connect a matching **ghost identifier** is also claimed (real identifiers attached, ghost flag dropped).
+  Fail-safe: no key / relay down / any API error never blocks a connect.
+
+### Fixed
+
+- **Phone / 911 calls now push to on-duty CADs instantly.** A call made through the phone path
+  (`relaySpecialContact` — 911 / 311 / Panic / …) broadcast its alert but never called
+  `SyncCallsToUnits()`, so the new call only showed up when an officer *re-opened* their CAD. It now
+  syncs to every on-duty terminal immediately.
+- **Connecting can no longer get stuck on "Checking permissions…".** The optional Discord connect card
+  (`RichPresence.connectCard`) is now presented inside a `pcall` with a guaranteed `deferrals.done()`
+  fallback, so a card that fails to render can never leave a player hanging on the deferral.
+- **Diagnostics false positives** (`/lacore doctor`): `sv_scriptHookAllowed = false` is no longer flagged
+  (`false` and `0` both mean disabled), and the standalone `lacore-mdt` product no longer warns about its
+  resource name.
+
 ## [3.2.5] – Security & fairness hardening pass
 
 Server-authoritative hardening, multiplayer-fairness fixes and small performance fixes across the

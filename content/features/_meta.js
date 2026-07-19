@@ -7,6 +7,7 @@ export default {
   profiles: 'Profiles & Characters',
   civilian: 'Civilian Layer',
   security: 'Security & Admin',
+  playerbase: 'Enhanced Playerbase',
   bridge: 'Framework Bridge',
   webdispatch: 'Web Dispatcher',
 }
