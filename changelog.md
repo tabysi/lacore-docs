@@ -88,6 +88,22 @@ Three things LACORE used to own unconditionally can now be handed to your own sc
 
 All six new keys are also exposed in the dashboard's online config (**Server config**).
 
+**Spawn selector — pick where you start on the map**
+
+- **New `configs/cfg-spawns-sh.lua` + `Features.spawnselect`.** Instead of one fixed spawn point, the
+  player gets the city map with a pin per location. **Law enforcement and Fire/EMS start in front of
+  their own station**, and civilian points can be marked `aopOnly = true` so they are only offered
+  while inside the current Area of Play — no more driving or teleporting across the map to reach the
+  roleplay. Shows on first join and after a respawn (both switchable).
+- **Server-authoritative by design.** The client only ever sends a point **ID**; the server re-checks
+  the player's job and the AOP before it returns any coordinates, and the offered list carries no
+  z/heading at all. A modified client gains nothing — a point it may not use resolves to the fallback.
+- **Cannot strand a player.** Selector off, no points the player may use, no choice made within
+  `timeout`, or a rejected pick — every path ends at the configured `fallback`, and the player is held
+  frozen until the world has loaded around them so they cannot fall through the map.
+- Reuses the existing `lacore-maps` tiles and the shared projection (`lib/mapproj.js`), so pins land
+  exactly where the dispatch and Big Brother maps put the same coordinates — one calibration, not three.
+
 **Whitelabel — rename anything the MDT / CAD shows**
 
 - **New `configs/cfg-mdt-labels-sh.lua`.** Put a key in `MdtLabels` and that text replaces the
@@ -139,6 +155,16 @@ All six new keys are also exposed in the dashboard's online config (**Server con
   `configs/*.lua` keeps deciding it. Untouched fields also seed from what the server *reports* as
   running instead of `false`. **RELEASE ALL TO LOCAL** hands every setting back in one click — the fix
   for an account that already stored values it never meant to manage.
+
+- **An unreachable database no longer hangs the server (players stuck on "Checking bans…").** When MySQL
+  is down, oxmysql's promise rejects inside Node — that is the `AggregateError [ECONNREFUSED]` in the
+  console — and its `.await` **never returns**. Every `DBLoadStore()` caller then waited forever. That
+  includes the `playerConnecting` ban check, so an unreachable database left joining players stuck on
+  the deferral, and console commands that read a store simply produced no output at all. Database calls
+  now run behind a **5-second deadline**: the first timeout logs a clear message naming the cause, marks
+  the database unavailable and falls back to the local `data/*.json` mirror — and stops issuing queries,
+  so the next call is instant instead of waiting again. The code always claimed "DB unreachable → local
+  file only"; only the *disabled* case actually did that.
 
 - **Dragging a suspect into a vehicle no longer uncuffs them or leaves the officer stuck.** Cuffing and
   dragging were pure **toggles** on both the client and the server — every event just flipped whatever
