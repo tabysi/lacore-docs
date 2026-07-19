@@ -6,7 +6,7 @@ import { Callout } from 'nextra/components'
 
 ![LACORE 3.2.6](/changelog/v3-2-6.svg)
 
-# [3.2.6] – Dispatch bridge ecosystem
+# [3.2.6] – Dispatch bridge, whitelabel & opt-out toggles
 
 Builds on the 3.2.5 integration bridge: LACORE's automatic calls now forward into the popular
 third-party **dispatch** scripts out of the box, through a pluggable adapter registry (no core edits to
@@ -20,8 +20,17 @@ keys still work as a fallback, but if you customised `tkDispatch.calls`, move yo
 `dispatchCalls`.
 </Callout>
 
-### Added
+<Callout type="warning">
+**Config change (`configs/cfg-features-sh.lua`, `configs/cfg-hud-sh.lua`):** two new feature groups
+(`Features.chat`, `Features.aop`) and two new HUD keys (`HudCfg.mdtstatus`, `HudCfg.mdtalerts`).
+All default to ON, so an untouched config behaves exactly as before. If you keep your own copies of
+these files, add the new keys (or restore from the shipped defaults) to see them in the dashboard.
+</Callout>
 
+Three things LACORE used to own unconditionally can now be handed to your own scripts. Every toggle is
+**fail-open** — leave the configs alone and nothing changes.
+
+### Added
 **Dispatch bridge — works with your dispatch out of the box**
 
 - **Forward LACORE calls into any supported dispatch script.** A pluggable adapter registry
@@ -67,8 +76,55 @@ keys still work as a fallback, but if you customised `tkDispatch.calls`, move yo
   connect a matching **ghost identifier** is also claimed (real identifiers attached, ghost flag dropped).
   Fail-safe: no key / relay down / any API error never blocks a connect.
 
-### Fixed
+- **Hand the RP chat commands to your own chat resource.** `Features.chat` gates LACORE's built-in RP
+  commands, split so you only give up what collides: `chat.rp` (`/me` `/do` `/gme` `/gdo`),
+  `chat.actions` (`/run` `/grun` `/search` `/gsearch` `/give`), `chat.leoreq` and `chat.report`. With a
+  group off LACORE neither registers the command nor advertises it as a chat suggestion, so a server
+  running **cc-chat / cc-rpchat** no longer gets every line posted twice by two handlers.
+  (For the plain OOC chat line this pairs with `ExternalChat` in `cfg-server-sv.lua`.)
+- **Hand the AOP to your own script.** `Features.aop` switches off the whole Area-of-Play system —
+  `/aop`, `/aopvote`, the vote menu and countdown, the AOP line on the PLD, the scoreboard entry and
+  the entered/left toasts. A finer `Features.aop.commands` frees **only** the two commands while
+  LACORE keeps drawing the AOP, so your script can own the commands and still feed the display.
+- **Turn off the MDT status badge.** `HudCfg.mdtstatus` hides the colored duty-status plate drawn
+  bottom-right for Law Enforcement and Fire/EMS. It was previously impossible to disable and drew even
+  while the MDT was closed. The panic-button / crime-broadcast / unread-call flashes sit behind a
+  **separate** `HudCfg.mdtalerts` on purpose, so hiding the status plate never hides a panic alert.
 
+All six new keys are also exposed in the dashboard's online config (**Server config**).
+
+**Whitelabel — rename anything the MDT / CAD shows**
+
+- **New `configs/cfg-mdt-labels-sh.lua`.** Put a key in `MdtLabels` and that text replaces the
+  translated one everywhere it appears — window title, section headers, buttons, empty states,
+  input placeholders. A community can rebrand the generic MDT (`Mobile Digital Terminal` →
+  `Pacific Valley MDT`, `CALLS` → `JOBS`, …) without touching locale files or the encrypted core.
+  Leave a key out and the normal translation for the player's language is used, so an empty table
+  behaves exactly as before.
+- The override lives inside the NUI's `t()` helper, so it applies to **every** translated string in
+  the UI, not just a fixed list — and it re-renders live, no reload.
+- The generic MDT's remaining hardcoded English was moved onto locale keys as part of this
+  (63 new keys in `lang/en.json` / `de.json` / `ru.json`), which is what makes it overridable at all.
+  ⚠ An `MdtLabels` entry applies to **all** languages — it is a label, not a translation. On a
+  multi-language server, translate in `lang/*.json` and use this file only for names that stay the
+  same everywhere.
+
+**Customer portal**
+
+- **Server developers can be given dashboard access.** A new Discord role bucket (**Server developer
+  roles**, set under Admin → Settings) lets a customer's external developer sign in. The role grants
+  **login only** — a developer's own account carries no licence, no keys and no downloads. They reach a
+  customer's data the normal way: that customer adds them under **Team** with scopes. A user who is
+  both a customer and a developer keeps their customer role. Takes effect on the developer's next login.
+- **Ban appeals (Entbannungsantrag).** A player banned on your server can appeal at **`/appeal`** using
+  the Ban ID from their kick message — no account needed, since a banned player is not a LACORE
+  customer and cannot sign in. The appeal is routed to the community that issued the ban and shows up
+  under **Players → Ban appeals**, where staff can **Approve & lift** (a soft lift, history preserved)
+  or **Deny** with a note. Gated by the existing `players` team scope.
+  The public endpoint is rate-limited and answers **identically whether or not the Ban ID exists**, so
+  it can't be used to probe which bans exist; each ban allows one open appeal at a time.
+
+### Fixed
 - **Phone / 911 calls now push to on-duty CADs instantly.** A call made through the phone path
   (`relaySpecialContact` — 911 / 311 / Panic / …) broadcast its alert but never called
   `SyncCallsToUnits()`, so the new call only showed up when an officer *re-opened* their CAD. It now
@@ -79,3 +135,36 @@ keys still work as a fallback, but if you customised `tkDispatch.calls`, move yo
 - **Diagnostics false positives** (`/lacore doctor`): `sv_scriptHookAllowed = false` is no longer flagged
   (`false` and `0` both mean disabled), and the standalone `lacore-mdt` product no longer warns about its
   resource name.
+
+- **The dashboard config no longer forces itself onto your server.** Saving on **Server config** used to
+  send **every** setting on the page, not just the ones you touched — and unset booleans were seeded to
+  `false`. One Save could therefore write `features.* = false` for all 63 toggles and switch off most of
+  the resource on the next pull. The page is now an explicit **override layer**: a setting is only sent
+  once you edit it (shown as **DASHBOARD**); everything else stays **LOCAL FILE** and your server's own
+  `configs/*.lua` keeps deciding it. Untouched fields also seed from what the server *reports* as
+  running instead of `false`. **RELEASE ALL TO LOCAL** hands every setting back in one click — the fix
+  for an account that already stored values it never meant to manage.
+
+- **Dragging a suspect into a vehicle no longer uncuffs them or leaves the officer stuck.** Cuffing and
+  dragging were pure **toggles** on both the client and the server — every event just flipped whatever
+  state that side happened to hold. One stray, duplicated or out-of-order event (which is what the
+  put-in-vehicle / take-out-of-vehicle sequence produced) desynced the two sides permanently: the
+  suspect detached and un-cuffed while the officer stayed locked in "dragging", and only a relog cleared
+  it. The server now owns the drag, decides the RESULTING state and tells both sides what it **is**
+  rather than "flip it" — including releasing a previous target when an officer switches, and clearing
+  the drag when either player disconnects. `getCuffed` / `getDragged` take an explicit state (a missing
+  one still behaves like the old toggle, so nothing else breaks).
+
+- **The whole HUD could vanish at once, permanently, with nothing in the server console.**
+  `GetUserSettings()` returned **nil** for a setting that wasn't present yet — and `userSettings`
+  starts empty, filled only during init. `drawPld()` used that result directly as a table index, so
+  `pldSettingsNew[nil]` → `ipairs(nil)` → a runtime error. Because the PLD, player list, nameplates and
+  vehicle HUD all render inside **one** `CreateThread`, that single error killed the thread for good:
+  every one of those elements disappeared together and never came back until the resource restarted.
+  It looked silent because a *client* error only reaches the player's F8 log, never the server console.
+  `GetUserSettings(name, default)` now takes a default, the PLD resolves an unknown or out-of-range
+  theme/colour to the first valid one, and each renderer is wrapped so a failure is **reported once**
+  and disables only that element — the rest of the HUD keeps running.
+
+- **`/aop` with no argument no longer wipes the AOP.** It used to set the Area of Play to an empty
+  string and persist that to KVP *and* the FiveM server browser; it is now ignored.

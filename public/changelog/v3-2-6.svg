@@ -54,7 +54,7 @@
     <text x="100" y="171" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="3">RELEASE</text>
   </g>
   <text x="80" y="342" fill="#eef2f8" font-size="168" font-weight="700" letter-spacing="-4">v3.2.6</text>
-  <text x="84" y="452" fill="#9fb0ff" font-size="40" font-weight="600">Dispatch bridge ecosystem</text>
+  <text x="84" y="452" fill="#9fb0ff" font-size="40" font-weight="600">Dispatch bridge, whitelabel &amp; opt-out toggl…</text>
   <text x="84" y="548" fill="#6b7689" font-size="24" font-weight="500" letter-spacing="1">lacore.netica.dev</text>
   <text x="1116" y="548" fill="#4d5872" font-size="22" font-weight="500" letter-spacing="2" text-anchor="end"></text>
 </svg>
