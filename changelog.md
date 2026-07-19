@@ -101,6 +101,12 @@ All six new keys are also exposed in the dashboard's online config (**Server con
 - **Cannot strand a player.** Selector off, no points the player may use, no choice made within
   `timeout`, or a rejected pick — every path ends at the configured `fallback`, and the player is held
   frozen until the world has loaded around them so they cannot fall through the map.
+- **`/spawnpoint <id> <label>` captures a point where you stand.** Spawn coordinates have to sit on the
+  actual ground and face something sensible, which cannot be read off a map — stand there, look the
+  right way, and the command prints a ready-to-paste config line using the **ground** Z beneath you and
+  your current heading. The shipped list is deliberately short and only contains positions the resource
+  already uses elsewhere: station and hospital entrances differ on every map and MLO, so guessed
+  coordinates would drop players into walls.
 - Reuses the existing `lacore-maps` tiles and the shared projection (`lib/mapproj.js`), so pins land
   exactly where the dispatch and Big Brother maps put the same coordinates — one calibration, not three.
 
@@ -155,6 +161,14 @@ All six new keys are also exposed in the dashboard's online config (**Server con
   `configs/*.lua` keeps deciding it. Untouched fields also seed from what the server *reports* as
   running instead of `false`. **RELEASE ALL TO LOCAL** hands every setting back in one click — the fix
   for an account that already stored values it never meant to manage.
+
+- **Map markers sit where they belong again.** The tile projection used a single scale factor for both
+  axes. The pyramid is not isotropic to world units, so one shared factor cannot fit both — the error
+  grew with distance from the centre: roughly 56&nbsp;px off downtown, 142&nbsp;px at Paleto Bay and up to
+  205&nbsp;px at the map corners, on an 8192&nbsp;px map. Recalibrated with separate X and Y scales, taken
+  from [gta-v-map-leaflet](https://github.com/RiceaRaul/gta-v-map-leaflet) (MIT), which drives the same
+  tile pyramid. Affects the dispatch map, Big Brother and the spawn picker at once — they all read the
+  one projection.
 
 - **An unreachable database no longer hangs the server (players stuck on "Checking bans…").** When MySQL
   is down, oxmysql's promise rejects inside Node — that is the `AggregateError [ECONNREFUSED]` in the

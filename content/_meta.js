@@ -3,6 +3,7 @@ export default {
   '--community': { type: 'separator', title: 'Community' },
   partners: 'Partners & Creators',
   support: 'Support & FAQ',
+  'whats-included': "What's Included",
   'frameworks-scripts': 'Frameworks & Scripts',
   'developer-api': 'Developer API',
 

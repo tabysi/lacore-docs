@@ -1,0 +1,149 @@
+---
+title: What's Included
+---
+
+import { Callout } from 'nextra/components'
+
+# What's included — and what you can switch off
+
+LACORE bundles a lot of systems that servers usually glue together from separate
+scripts. This page is the full inventory, written for one decision: **which parts do you
+hand over to LACORE, and which do you keep as they are?**
+
+<Callout type="info">
+  **Default is ON, and every gate fails open.** A missing or unset key counts as enabled,
+  so an untouched config behaves exactly as shipped. Turn something off and the module
+  doesn't load at all — no commands, no loops, no events, ~0&nbsp;ms.
+</Callout>
+
+Toggles live in [`configs/cfg-features-sh.lua`](/configuration/features). A group can be a
+plain boolean (`phone = false`) or a table with sub-toggles (`cad = { enabled = true, lasd = false }`);
+switching a group off switches its sub-features off with it.
+
+## Police / CAD suite
+
+The LEO stack. `cad.enabled = false` removes all of it.
+
+| System | Replaces | Toggle |
+| --- | --- | --- |
+| **LAPD MDT** | Your MDT / mobile data terminal | `cad.lapd` |
+| **LASD CAD / PCMS** | A second-agency MDT re-skin | `cad.lasd` |
+| **EMS / Fire CAD** | Your EMS computer | `cad.ems` |
+| **Dispatch console** | ps-dispatch / cd_dispatch / a dispatcher script | `cad.dispatch` |
+| **BOLO system** | A standalone BOLO resource | `cad.bolo` |
+| **Charges & citations** | Penal-code / ticket scripts | part of `cad` |
+| **Evidence & reports** | Evidence lockers, report writers | part of `cad` |
+
+<Callout type="info">
+  Already running a dispatch you like? Keep it — leave `cad.dispatch = false` and LACORE
+  will **forward its calls into yours** instead. See [Frameworks &amp; Scripts](/frameworks-scripts).
+</Callout>
+
+## LEO field tools
+
+| System | Replaces | Toggle |
+| --- | --- | --- |
+| **K9 unit** | A K9 script | `k9` |
+| **Air Unit** | Heli-cam / spotter scripts | `airunit` |
+| **CCTV surveillance** | A camera / surveillance resource | `cctv` |
+| **Fingerprint scanner** | Mobile ID scanners | `fingerprint` |
+| **Field essentials** | Breathalyser, drug-test scripts | `field` |
+| **Corrections / jail** | A jail script | `corrections` |
+| **Impound lot** | An impound resource | `impound` |
+| **Radio speech-to-text** | Radio transcription add-ons | `stt` |
+
+## Player-facing systems
+
+| System | Replaces | Toggle |
+| --- | --- | --- |
+| **NUI phone** | lb-phone / gksphone / qs-phone | `phone` |
+| **Spawn selector** | A spawn-picker resource | `spawnselect` |
+| **Civilian layer** | Emote / ID-card scripts | `civilian` |
+| **Organisations & gangs** | A gang script | `civilian.org` |
+| **Turf / gang war** | A turf resource | `civilian.turf` |
+| **New Address System** | Postal / address scripts | `nads` |
+| **Placeable props** | Prop-spawner scripts | `extras.props` |
+| **EMS stretcher** | A stretcher script | `extras.stretcher` |
+| **Rideable trains** | Train scripts | `extras.trains` |
+| **Death / respawn sync** | Death-state sync add-ons | `extras.deathsync` |
+
+## Chat, HUD and world
+
+These are the ones people most often already have — each can be handed back.
+
+| System | Replaces | Toggle |
+| --- | --- | --- |
+| **RP chat commands** `/me` `/do` `/gme` | cc-chat, cc-rpchat, RP chat scripts | `chat.rp` |
+| **RP actions** `/run` `/search` `/give` | — | `chat.actions` |
+| **`/leoreq`**, **`/report`** | Report scripts | `chat.leoreq`, `chat.report` |
+| **Area of Play + `/aop`** | An AOP script | `aop`, `aop.commands` |
+| **HUD (PLD, player list, vehicle)** | A HUD resource | `HudCfg.*` |
+| **MDT status badge** | — | `HudCfg.mdtstatus` |
+| **Notifications** | ox_lib / okok / mythic notify | `NotifyCfg.mode` |
+
+<Callout type="warning">
+  If another resource provides the same chat command, **both** answer it and every line is
+  posted twice. That is what `chat.rp` is for. The plain OOC line has its own switch,
+  `ExternalChat` in `cfg-server-sv.lua`.
+</Callout>
+
+## Staff & security
+
+| System | Replaces | Toggle |
+| --- | --- | --- |
+| **Admin menu** | vMenu-style staff tools | `admin` |
+| **Big Brother log** | Admin logging scripts | `admin` |
+| **Web dispatcher bridge** | — | `webdispatch` |
+| **Discord ⇄ identifier link** | Identity-link scripts | `identitylink` |
+
+## Always on
+
+Infrastructure the rest depends on. These have no toggle by design — switching them off
+would break everything above.
+
+| System | What it does |
+| --- | --- |
+| **Database layer** | MySQL with a local JSON mirror; falls back to files when unreachable |
+| **Framework bridge** | ESX / QBCore / QBox detection and adaptation |
+| **Discord integration** | Roles, webhooks, the ACE bridge |
+| **Anti-cheat** | Event honeypot, heartbeat, server-side sweep |
+| **Player profile / multi-character** | Characters, records, vehicles |
+| **Developer API** | `exports` + `lacore:api:*` events for your own scripts |
+| **Remote config** | Pulls dashboard settings by licence key |
+| **Security** | Licence / IP-lock, telemetry, global ban network |
+
+## Configuring without switching off
+
+Plenty of systems have no on/off switch because they are *content*, not features — you tune
+them instead:
+
+| Config | Controls |
+| --- | --- |
+| `cfg-branding-sh.lua` | Your community name everywhere in the UI |
+| `cfg-mdt-labels-sh.lua` | [Whitelabel](/features/mdt-and-dispatch) — rename any MDT label |
+| `cfg-charges-sh.lua` | Penal code, fines, sentences |
+| `cfg-vehicles-sh.lua` | Blacklisted / member-only vehicles |
+| `cfg-weapons-cl.lua` | Holster behaviour and weapon rules |
+| `cfg-spawns-sh.lua` | Spawn points (capture them in-game with `/spawnpoint`) |
+| `cfg-licenses-sh.lua` | Driver / firearm licence types |
+| `cfg-globalban-sh.lua` | The cross-server ban network |
+| `cfg-presence-sh.lua` | Discord Rich Presence |
+
+Most of these are also editable from the [customer portal](/customer-portal/server-config)
+without touching a file.
+
+## Deciding what to swap
+
+A practical order:
+
+1. **Start with everything on.** Play a session and note what duplicates something you already run.
+2. **Switch off the duplicates** — not LACORE's version necessarily; whichever you like less.
+3. **Watch for the chat commands.** Duplicate commands are the one case that is actively
+   broken rather than merely redundant, because both resources answer.
+4. **Keep your dispatch if you like it.** LACORE forwards into it, which is usually better
+   than replacing a workflow your staff already knows.
+
+<Callout type="info">
+  `/lacore modules` on the server console prints which sub-modules actually loaded — the
+  quickest way to confirm a toggle did what you expected.
+</Callout>
