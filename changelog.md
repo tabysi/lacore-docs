@@ -152,7 +152,37 @@ All six new keys are also exposed in the dashboard's online config (**Server con
 - **Diagnostics false positives** (`/lacore doctor`): `sv_scriptHookAllowed = false` is no longer flagged
   (`false` and `0` both mean disabled), and the standalone `lacore-mdt` product no longer warns about its
   resource name.
-
+- **Spawn selector: the map no longer covers the "Spawn here" panel and the location list.** Leaflet's own
+  marker/popup panes (z-index 600+) were painting over both overlays. The map layer now sits in its own
+  stacking context so those panes stay trapped inside it, and the two panels render above it. The picker
+  also always uses the **satellite** map now instead of the flat atlas tiles — it reads as a real place
+  you're about to spawn into, not a menu graphic.
+- **Phone: no more black blocks poking past the rounded top corners.** The titanium bezel was drawn with
+  large-spread `box-shadow` rings, which FiveM's CEF renders with *square* corners on a rounded element
+  (a normal browser rounds them, so it only ever showed up in game — worst at the top, where the soft drop
+  shadow doesn't mask it). The bezel is now a rounded background on the phone's frame instead of spread
+  shadows, so every corner stays cleanly rounded. The screen, notch and app grid are unchanged.
+- **Phone: the Search (Spotlight) sheet no longer spills over the frame, and its scrollbar is tidy.** The
+  overlay was positioned against the phone body instead of the screen, so it bled ~5px past the rounded
+  glass onto the bezel and showed a raw browser scrollbar. It now fills the screen exactly, is clipped to
+  the rounded corners, and uses a slim translucent scrollbar.
+- **Fire/EMS CAD: comments on 911/PD-bridged incidents now show up.** When an EMS unit added a comment to a
+  shared 911/PD incident it was saved server-side but never sent back to the EMS terminal — the bridged
+  call entry omitted its `comments`, so the message tab stayed empty. The bridge now carries the incident's
+  comments, so EMS-authored notes appear in the thread. (Comments on EMS-native incidents already worked.)
+- **Fire/EMS CAD: 911 calls now reach the terminal.** The EMS call list only surfaced explicit *Requesting
+  Fire/EMS* / *Requesting Coroner* requests (or calls an EMS unit was already attached to), so a plain 911
+  call never appeared. Generic `911 Emergency` calls are now shown too (tagged **PD**, since they aren't
+  necessarily EMS requests); dedicated Fire/EMS and Coroner requests still show first with the **EMS REQ**
+  flag.
+- **Fire/EMS CAD: the "Unread MDT Calls" HUD alert now clears when you open the terminal.** The new-call
+  popup/sound cue (drawn for Fire/EMS while there's an unread call) was only reset by the LAPD/Agency/LASD
+  terminals — opening the EMS CAD didn't clear it, so it stuck on screen even after the unit had looked at
+  the incidents. Opening the EMS CAD now clears it like the other terminals do.
+- **Fire/EMS running as the "AMR" job now gets the same dispatch cues as "Fire/EMS".** Three checks only
+  matched the literal `Fire/EMS` job string, so servers whose medics use the `AMR` job were silently left
+  out of: the new-call alert sound (incl. the *Requesting Fire/EMS* cue), the on-screen "Unread MDT Calls"
+  alert, and the incident blips on the minimap. All three now recognise `AMR` alongside `Fire/EMS`.
 - **The dashboard config no longer forces itself onto your server.** Saving on **Server config** used to
   send **every** setting on the page, not just the ones you touched — and unset booleans were seeded to
   `false`. One Save could therefore write `features.* = false` for all 63 toggles and switch off most of
@@ -190,6 +220,38 @@ All six new keys are also exposed in the dashboard's online config (**Server con
   the drag when either player disconnects. `getCuffed` / `getDragged` take an explicit state (a missing
   one still behaves like the old toggle, so nothing else breaks).
 
+- **The retro phone now holds a retro prop.** The in-hand prop stayed a modern handset, which looked
+  wrong next to a 90s brick screen. When `PhoneCfg.retro` is on it uses `PhoneCfg.retroPropModel`
+  (default a chunky handheld — base GTA has no true brick phone) with its own `retroHold` offset. Point
+  it at a custom brick-phone model if you stream one.
+- **Retro brick-phone skin for retro-themed servers.** A 90s NT-3100-style phone — green LCD, keypad,
+  T9 texting, softkeys and a signal/battery bar — over the **same** phone backend: real contacts,
+  threads, call log and call state, real calls and SMS. Turn it on with `PhoneCfg.retro = true` in
+  `cfg-phone-sh.lua`; everything else about the phone is unchanged. (Includes a Serpent mini-game,
+  because of course it does.)
+- **Priors at a glance on a person query.** Running an 11-27 in the Agency MDT (and the LAPD MDT — both
+  use the same record card) now shows a **priors strip** above the criminal history: arrests, citations,
+  reports and flags, plus total fines and jail months. The strip turns red when the person has a prior
+  arrest, and reads "No record" when they're clean. Computed from the records already returned by the
+  query — no extra lookup.
+- **Priors on the retro CAD person query too.** The retro terminal read out name, warrant and licences
+  but never a person's history. A person run now ends with a `PRIORS n ARR / n CIT / n REP` line (or
+  `NO PRIORS`), in the CRT style, from the same records — so all three CADs surface priors.
+- **The `/settings` command can be renamed.** Another HUD (jgscripts and the like) commonly owns
+  `/settings` too, and two resources can't share a command — ours was silently shadowing theirs. Set
+  `HudCfg.settingsCommand` in `cfg-hud-sh.lua` to a different name (or `false` for none). The settings
+  menu is also key-bindable now — **FiveM → Settings → Key Bindings → "LACORE: Open settings menu"** —
+  so it stays reachable whatever you name it.
+- **Phone ringtone no longer sticks after a call ends.** The ring played on sound id `-1` (engine-chosen,
+  so unreferenceable), which meant a looping ringtone asset kept playing once the call ended — stopping
+  the loop only stopped the *next* ring, not the one already sounding. It now plays on a tracked sound id
+  and is stopped explicitly on answer / decline / end.
+- **Broken or duplicated penal-code entries are now reported instead of silently breaking the CAD.** The
+  charge picker and the server-side fine calc both key everything on `code`, so a duplicated `code`
+  (easy to do when bulk-adding charges of one class) hid an earlier charge and mis-toggled in the picker,
+  and a malformed `cfg-charges-sh.lua` made the picker come up empty with no hint. A start-up check now
+  logs duplicate codes, malformed entries and the loaded count — so "charges won't show" is one console
+  line to read.
 - **The whole HUD could vanish at once, permanently, with nothing in the server console.**
   `GetUserSettings()` returned **nil** for a setting that wasn't present yet — and `userSettings`
   starts empty, filled only during init. `drawPld()` used that result directly as a table index, so
@@ -203,6 +265,11 @@ All six new keys are also exposed in the dashboard's online config (**Server con
 
 - **`/aop` with no argument no longer wipes the AOP.** It used to set the Area of Play to an empty
   string and persist that to KVP *and* the FiveM server browser; it is now ignored.
+
+### Changed
+- ⚠️ **Config default:** the phone now ships with the **retro brick-phone skin off** (`PhoneCfg.retro = false`)
+  — the modern app phone is the default, and the 90s brick skin is opt-in for retro-themed servers. Set
+  `PhoneCfg.retro = true` in `configs/cfg-phone-sh.lua` to bring the brick phone back.
 
 ## [3.2.5] – Security & fairness hardening pass
 
