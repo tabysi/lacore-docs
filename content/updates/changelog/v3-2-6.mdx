@@ -184,6 +184,17 @@ All six new keys are also exposed in the dashboard's online config (**Server con
   popup/sound cue (drawn for Fire/EMS while there's an unread call) was only reset by the LAPD/Agency/LASD
   terminals — opening the EMS CAD didn't clear it, so it stuck on screen even after the unit had looked at
   the incidents. Opening the EMS CAD now clears it like the other terminals do.
+- **You can add contacts on the retro phone again.** The brick phone could only *view*
+  contacts — there was no way to create one, so the address book stayed whatever the
+  server handed you. **Contacts → Add contact** now runs a proper two-step entry: the
+  name via multi-tap T9, then the number on the keypad, saved through the same
+  `phoneSaveContact` backend the modern phone uses. Softkeys read *Next* / *Save*, and
+  *Del* backspaces (or steps back to the name).
+- **The engine keybind (`G`) no longer throws a script error on foot.** `/engine` compared
+  `vehicle.hp` before it was ever set, so pressing the key outside a vehicle spammed
+  `attempt to compare number with nil`. The command now bails out when there's no tracked
+  vehicle, and only refuses to start a wrecked engine when the health is actually known.
+  The engine-warning-light check got the same nil guard.
 - **Fire/EMS running as the "AMR" job now gets the same dispatch cues as "Fire/EMS".** Three checks only
   matched the literal `Fire/EMS` job string, so servers whose medics use the `AMR` job were silently left
   out of: the new-call alert sound (incl. the *Requesting Fire/EMS* cue), the on-screen "Unread MDT Calls"
