@@ -185,6 +185,25 @@ German and Russian MDT stopped being half English.
   The logic moved into `web/src/lib/charges.svelte.js`; every skin keeps its own markup and now shares
   the state. Net 69 lines lighter, and a fix to the picker no longer has to be made five times.
 
+- **The bot panel says whether the bot is actually current.** It showed the version the bot *reports*,
+  with no way to tell that from the version that *should* be running — and "↻ Restart bot" does not
+  help, because it reloads whatever is on disk rather than pulling. The status card now carries the
+  commit the bot process was started from, and compares its LACORE version against the changelog (the
+  single source of truth the portal already uses). Matching: nothing to see. Behind: an amber tile and
+  one line explaining that it self-syncs within a changelog interval, and what it means if it does not.
+  An unreachable changelog raises no warning at all rather than a false one.
+
+- **Support can be answered from the dashboard.** The admin ticket archive could open a ticket but not
+  actually read or answer one: it reused the customer viewer, which calls endpoints that filter on
+  "tickets you opened yourself" — so every ticket someone else opened came back as *not found*. Support
+  therefore always meant switching to Discord. Staff now get their own pair of endpoints without that
+  filter, and the existing viewer takes an `admin` flag to use them.
+
+  A staff answer is posted as **support** (own colour and author line, so the opener can tell it apart)
+  and marks the ticket as *staff replied* rather than *the opener wrote* — the wrong flag there would
+  have left the SLA sweeper pinging staff about a ticket that had just been answered. Unlike the
+  customer reply, it is audit-logged: an answer sent from outside Discord should still be traceable.
+
 ### Fixed
 - **The customer portal scrolled sideways on a phone — for staff.** The dashboard header could not shrink
   below 547px while the CUSTOMER/ADMIN switch was in it, so every one of the 21 pages scrolled sideways on
