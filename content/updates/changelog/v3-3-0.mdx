@@ -204,7 +204,27 @@ German and Russian MDT stopped being half English.
   have left the SLA sweeper pinging staff about a ticket that had just been answered. Unlike the
   customer reply, it is audit-logged: an answer sent from outside Discord should still be traceable.
 
+- **The landing page has a way to buy.** It had 22 links and not one went to the store: both primary
+  buttons pointed at the documentation, so a visitor who had read all fourteen sections and was
+  convinced ended up in the docs. The shop is now the primary call to action in the header, the hero and
+  the closing section, with the docs kept as the secondary button next to it, plus a STORE link in the
+  footer.
+- **The seatbelt and limiter toggles are documented.** They shipped in this release and are the answer
+  to "I already run JG's HUD", but the Feature Toggles page never mentioned them — including the part
+  that matters, that `HudCfg.vehicle` only hides the display while the mechanic keeps running.
+
 ### Fixed
+- **The landing page advertised 3.2.5.** The hero badge and the "what's new" card read their version
+  from a hand-written block in `marketing.js` — under a comment saying *keep in sync with changelog.md*.
+  It had drifted two releases behind on the page customers see first. A Vite plugin now reads the real
+  `CHANGELOG.md` at build time and inlines only the newest entry, so a release has to land in one file
+  and nowhere else. An unreadable or version-less changelog falls back to a literal rather than breaking
+  the build.
+- **Small print on the landing page failed WCAG AA.** The muted token sat at 2.7–3.2:1 against the
+  panels across 54 places, the 9px section labels used the brand blue at 3.5:1, and the legal disclaimer
+  was the worst on the page at 2.44:1. The muted token now clears 4.75:1 on the lightest panel, the
+  labels moved to the existing lighter brand token (5.6:1) and the disclaimer joined the muted token.
+  74 failing elements → 0. Purely decorative "+" list markers were left alone.
 - **The customer portal scrolled sideways on a phone — for staff.** The dashboard header could not shrink
   below 547px while the CUSTOMER/ADMIN switch was in it, so every one of the 21 pages scrolled sideways on
   a phone for anyone with staff access. Customers were never affected. The switch now drops to icons on

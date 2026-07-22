@@ -48,10 +48,34 @@ Features = {
 
   civilian = { enabled = true, org = true, turf = true },        -- emotes / props / orgs / turf
 
+  seatbelt     = true, -- /seatbelt, the K bind, the warning icon, windscreen ejection
+  speedlimiter = true, -- hold the limiter key in a vehicle to cap its speed
+
   extras = { enabled = true, props = true, stretcher = true,     -- misc gameplay
              trains = true, deathsync = true },
 }
 ```
+
+## Running another HUD that brings its own seatbelt
+
+If a HUD like **JG** — or a standalone seatbelt resource — already provides one, two running at once
+means two icons and two sets of rules. Switch LACORE's off:
+
+```lua
+Features = {
+  seatbelt     = false,   -- /seatbelt is never registered, K stays free for the other script
+  speedlimiter = false,   -- only if your HUD also owns cruise control
+}
+```
+
+With `seatbelt = false` the command is not registered at all, so the other resource can claim it, the
+**K** bind is left alone, the warning icon is gone and you are no longer thrown through the windscreen.
+
+<Callout type="info">
+  `HudCfg.vehicle` is **not** enough for this — it only hides the display while the mechanic keeps
+  running underneath. The limiter is a separate key on purpose, so a HUD that owns cruise control but
+  not the seatbelt can take just that one.
+</Callout>
 
 ## Example: MDT/CAD only
 
