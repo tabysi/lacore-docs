@@ -3,6 +3,246 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.3.0] – Model library, config editor & a rebuilt player list
+
+The config editor grows up. A setting can be a slider, a colour, a keybind, a spawn name or a map
+position instead of a text box, and 29 more settings became tunable from the dashboard — each one
+curated from the real config files rather than exposed wholesale.
+
+Around it sits a model library: your server inventories what it actually has (`/modelscan`),
+photographs it (`/modelcapture`), draws it to scale, and `/preview` lets you look at any model in 3D
+in the game that owns it — which is also the only honest way to answer "is this add-on installed?".
+
+In the resource itself, the player list behind **I** stopped being native rectangles and became a
+real interface, charges can now be issued straight from the LAPD and Agency terminals, and the
+German and Russian MDT stopped being half English.
+
+### Added
+- **New remote-config field types.** `range` (slider + exact value), `color` (swatch + hex),
+  `keybind`, `vehicleModel` / `pedModel` / `weapon` (searchable spawn-name picker) and `coords`
+  (X/Y/Z + heading, with a paste box that reads `vector3(…)`, `vec3(…)`, `{x = …}` or plain numbers).
+  Validated by shape on **both** sides — `landing/lib/configschema.mjs` and the resource's
+  `modules/remoteconfig/remoteconfig-sh.lua` — so an unknown or malformed value is still ignored by
+  each side independently.
+- **Model pickers accept add-on models.** The catalogue (`landing/lib/gamedata.mjs`) is a suggestion
+  list, never a whitelist: any well-formed spawn name is accepted and flagged as "custom", because
+  every server runs models that appear in no public list.
+- **Seven more settings are now tunable from the dashboard:** K9 model + heel distance, impound reach,
+  the phone's open key, the member-badge colour, and the jail cell / release positions.
+- **Phase C2 — 22 more settings**, curated one by one from the config files: air unit on/off, the whole
+  CCTV camera feel (prop, look speed, zoom limits, scan time, field grouping), jail sentence clamps and
+  persistence, the phone's modern/retro switch and in-hand props, and a new **Integrations** tab
+  (dispatch forwarding + target script, property addresses, framework identity fallback).
+- **Two more field types the real configs needed:** `tristate` (`auto` / on / off — LACORE's own
+  three-way integration switch, where the boolean has to *stay* a boolean or every `== false` check on
+  the resource side silently fails) and `propModel`.
+
+- **`/preview <model>` — look at any model in 3D, in the game that owns it.** Vehicles, peds, props and
+  weapons, orbit camera, mouse or A/D to turn, scroll to zoom. Every model picker in the dashboard has a
+  **VIEW IN GAME** button that copies the matching command.
+  It also answers "does this model actually exist on my server?" — an add-on that isn't installed says so
+  instead of silently spawning nothing.
+
+  > A 3D viewer in the browser is not possible and won't be built: GTA's models are Rockstar's property,
+  > so nobody may ship, host or convert them. The game already has every model — including the add-ons
+  > that appear in no online list — so the preview happens where the models actually live.
+
+  Fair by design: your ped stays put, stays visible and still takes damage; any damage closes the
+  preview. The previewed entity is **local only** — no other player sees it, and it can't be entered or
+  driven. Staff tool (`Features.admin`).
+
+- **`/modelscan` — the model library's foundation.** An admin runs it once and the game inventories
+  what this server actually has: every vehicle (add-ons included, because `GetAllVehicleModels` sees
+  them and no external catalogue does), plus the peds and props the config references. Each model is
+  measured — length, width, height, seat count, class, the game's own display label — and the result
+  goes to the dashboard.
+
+  Measurements and names only: no assets, nothing about players. The client does the measuring because
+  only the running game knows what loaded, but the server re-validates every row before it leaves, and
+  the ingest endpoint validates it again — an ingest route must not trust its caller even with a valid
+  licence key.
+
+- **Model library in the dashboard** (`/dashboard/library/`, linked from Manage LACORE). Browse every
+  vehicle, ped, prop and weapon by spawn name or model name, filter vehicles by class, sort by size or
+  seats, and tick **On my servers only** to hide anything your scan didn't find.
+
+  Two sources, labelled so you can tell them apart: what `/modelscan` reported, and our curated
+  suggestion list so the page is useful before you ever scan. A model the scan found but the catalogue
+  doesn't know is tagged **ADD-ON**; one only the catalogue knows is dimmed and tagged **NOT FOUND**.
+  That difference is the point — it is the only place that tells you what your server actually has.
+
+  No pictures, and that is deliberate: GTA's models and screenshots are Rockstar's, so LACORE may not
+  ship, host or hotlink them. Every entry instead carries **VIEW IN GAME**, which copies the `/preview`
+  command for the real model in the engine that owns it.
+
+- **`/modelcapture` — pictures for the library, taken on your server.** Each model is spawned in the
+  preview scene, framed so it fills the shot whatever its size, photographed via `screenshot-basic` and
+  uploaded. The URLs come back and attach to the matching model in the library.
+
+  **LACORE hosts the pictures for you** — there is nothing to set up. Your server asks for a
+  short-lived upload session with its licence key and the screenshots go to LACORE's image host. Prefer
+  your own storage? Set `Library.uploadUrl` in the new `configs/cfg-library-sh.lua` and yours wins
+  (a Discord webhook, or any uploader answering with JSON containing a URL).
+
+  > ⚠️ **New config file (`configs/cfg-library-sh.lua`).** All defaults work as shipped. The upload
+  > target is deliberately **not** remotely editable — where your data goes must never be something the
+  > dashboard can change, the same rule that keeps `PhoneCfg.cameraUpload` out of the allowlist.
+
+  The image host takes the narrow view of its job: a capture authenticates over the existing relay and
+  gets back an **expiring token**, so the licence key never travels in an upload URL. Uploads must be a
+  real PNG or JPEG — checked by magic bytes, not by the type the client claims, so an executable or a
+  script-bearing SVG named `.png` is refused. Filenames come from the content hash, so nothing a client
+  sends becomes a path, and the account is a one-way hash so no Discord id appears in a public URL.
+  Per-account quotas on files and bytes.
+
+  A run is capped by `Library.maxPerRun` (default 150) and resumes with an offset, so a full sweep of a
+  few thousand vehicles is several deliberate runs rather than one endless one. Do it on an empty
+  server: you stand still for the duration, and — as with `/preview` — any damage cancels it. Everything
+  already shot is kept.
+
+  Image URLs are the least trustworthy input in the feature: they come from an outside host, through a
+  game client, and end up as an `<img src>`. The resource only accepts URLs whose host matches your
+  configured endpoint, and the ingest endpoint re-checks the shape (http(s) only, no `data:`, no
+  `javascript:`, no protocol-relative, no embedded credentials).
+
+- **Scale drawings in the library — real 3D, in the browser.** Hit **📐 SIZE** on any scanned model and
+  a rotatable shape appears at its measured size, with a 1.8 m figure beside it for scale and a
+  **compare with** picker to put two models side by side. Drag to turn it.
+
+  > It is a scale drawing, **not the model**. GTA's models may not be shipped, hosted or converted — no
+  > web viewer can legitimately render one, whether or not the site charges for access. So the
+  > proportions are real (measured on your server) and the shape is one of our own low-poly stand-ins,
+  > picked from the vehicle class and refined by the measurements: a 6.5 m long, 2.6 m tall "Emergency"
+  > vehicle is drawn as a van, not a saloon, whatever the class says.
+
+  It answers "how big is this and will it fit", which no photo does. For what a model looks like there
+  is the captured photo and `/preview` in game. Rendered as plain SVG — no 3D library, no WebGL, no
+  dependency added.
+
+- **`/streambudget` — what your add-on vehicles cost every player.** FiveM servers rarely die of
+  scripts; they die of streaming. Every add-on vehicle's geometry and textures are pushed to *every*
+  connecting client, and one careless 4K-texture car can outweigh fifty stock ones — which nobody can
+  see from inside the game.
+
+  The scan walks your started resources, keeps the ones declaring vehicle metadata, reads the model
+  names out of their `vehicles.meta` and measures the matching stream files. The library then shows the
+  total per client and a table sorted by weight, flagging **HEAVY**, **TEXTURES** (textures dominate —
+  usually oversized source art) and **NO LOD** (no `_hi` variant, so the game has no cheaper version to
+  draw at distance).
+
+  It reads file **sizes** — never contents. A byte count is taken and the file is dropped, the same
+  line the rest of the library holds. Stock vehicles aren't counted: they ship with the game and you
+  couldn't change their cost anyway. The judgement (what counts as heavy) is made on the dashboard, not
+  in the resource, so it stays consistent across builds.
+
+- **Seatbelt and speed limiter can be switched off** (`Features.seatbelt`, `Features.speedlimiter`).
+  Both also appear in the dashboard under Features.
+
+  > ⚠️ **Config change (`configs/cfg-features-sh.lua`):** two new keys, both default **ON**, so an
+  > untouched config behaves exactly as before. If you keep your own copy of that file, add them (or
+  > restore from the shipped defaults) to see them.
+
+  Requested by a customer running JG's HUD, which brings its own seatbelt: two of them means two icons
+  and two sets of rules. `Features.seatbelt = false` removes the whole mechanic — the `/seatbelt`
+  command is never registered (so it is free for the other script), the **K** bind is not taken, the
+  warning icon is gone and you are no longer thrown through the windscreen. `HudCfg.vehicle` was not
+  enough: it only hides the display while the mechanic keeps running underneath.
+
+  The limiter is a separate toggle on purpose, so a HUD that owns cruise control but not the seatbelt
+  can take just that one.
+
+- **Charge picker in the LAPD MDT and the Agency MDT.** Until now charges could only be issued from a
+  person's record card after a query, or from the LASD terminal. Both MDTs now have their own tab —
+  **Charges** in the LAPD toolbar, **CITE / CHARGE** in the Agency function bar (LEO only) — that lists
+  the shared penal code (`S.penalCode`) with a search box, citation/arrest switch, running fine and jail
+  totals, and a notes line.
+
+  The target is an exact character name, exactly as the server matches it; if you queried someone just
+  before, one click fills their name in. Each MDT is skinned in its own look — the LAPD picker in the
+  PremierOne grey/white grid (white mode included), the Agency one native on its `--a-*` theme variables
+  so all seven colour presets follow. No Lua change: the picker sends the same `issueCharges` payload
+  the record card already sent, so the server still computes fines and jail time from the config.
+
+- **The playerlist ("I") is a real UI now.** It was drawn with native rectangles and text: a 6×4 grid of
+  24 tiles showing an ID, a name and a nick, with a thin coloured line for the player's role. It is now a
+  proper NUI board (`web/src/components/Playerlist.svelte`), and it finally shows what the server has been
+  sending all along — every player's **department and callsign**, their **duty status** in the same colours
+  the MDT uses, their **role as a readable badge** instead of a coloured line, and their **ping**.
+
+  Ping is read on the server, not on the client: with OneSync a client only sees players in its own scope,
+  so a client-side reading would be blank for everyone across the map.
+
+  The server column (AOP, server status, dispatcher, unit counts, clock) moved over with it and is grouped
+  into panels instead of two blocks of loose text. Behaviour is unchanged on purpose: **I** still toggles,
+  the arrow keys still page, and the board takes **no** NUI focus — the mouse stays in the game, so it can
+  never trap your cursor. It closes itself if the resource stops or if it ever errors.
+
+### Changed
+- **The charge picker lives in one place now.** Five terminals can issue charges — the LAPD MDT, the
+  Agency MDT, the LASD PCMS, the 9100-T and the person record card — and each carried its own copy of the
+  same search filter, the same picked-code map, the same fine/jail totals and the same submit payload.
+  The logic moved into `web/src/lib/charges.svelte.js`; every skin keeps its own markup and now shares
+  the state. Net 69 lines lighter, and a fix to the picker no longer has to be made five times.
+
+### Fixed
+- **The customer portal scrolled sideways on a phone — for staff.** The dashboard header could not shrink
+  below 547px while the CUSTOMER/ADMIN switch was in it, so every one of the 21 pages scrolled sideways on
+  a phone for anyone with staff access. Customers were never affected. The switch now drops to icons on
+  narrow screens (keeping `title`/`aria-label`), and the wordmark steps aside below 640px.
+
+  This also revived a breakpoint that had never worked: the rule hiding the "DOCS" label since 1180px
+  targeted a `<span>` that did not exist in the markup, so the label had always stayed at full width.
+- **Muted text in the portal failed WCAG AA.** Two greys — one of them a hardcoded duplicate of the
+  `--dim-2` token, the other a third grey that was never a token at all — sat at 3.48:1 and 4.29:1 against
+  the panels, under the 4.5:1 floor for small text. Both are now a single value at 4.73:1 or better across
+  every panel shade, across 38 places. The small accent caption moved to the existing lighter `--accent-2`
+  (6.27:1) so the brand accent itself is untouched where it fills buttons and borders.
+- **The German and Russian MDT was half English.** The LAPD MDT hardcoded its field mask, its action bar
+  and its empty states in English although the translations were already sitting in `lang/de.json` and
+  `lang/ru.json` — the component simply never asked for them. Wired up, plus nine field labels that had
+  no key at all. The dispatch console's disposition list (Advised / Arrest / Gone on Arrival / …) had the
+  same problem and is translated now too.
+- **…and the rest of the LAPD MDT followed:** table headers, the unit filters and sort box, the comment
+  and chat entry, the status-times panel and every empty state. 31 more keys, so the terminal no longer
+  has a single hardcoded string in it.
+- **The Agency MDT was entirely English in German and Russian.** This one was the opposite problem: the
+  component asked for translations correctly, but the whole `mdt_*` block in `de.json` and `ru.json` still
+  held the English text verbatim — 63 keys covering every header, button, column and empty state it has.
+  Translated. The nine that stayed identical (`Code`, `STATUS`, `BACKUP`, `ZOOM`, …) are the same word in
+  German by design.
+- **Comment fix in `configs/cfg-hud-sh.lua`.** `playerlist` was described as "shown while holding the
+  player-list key" — the key toggles the board, it is not held. Comment only: no default changed and
+  nothing to do if you keep your own copy of the file.
+- **The radio log showed `[radio_log]` instead of its text.** All four of its strings were written as
+  `t('radio_log') || 'Radio Log'` — but `t()` never returns a falsy value: a missing key comes back as
+  `[key]`, so the fallback could never run and the panel rendered the raw key names. The four keys now
+  exist in all three locales and the dead fallbacks are gone. Worth remembering project-wide: `t()` is
+  not nullable, so `t(…) || 'default'` is always dead code.
+- **The legacy phone's Bleeter app no longer costs a frame slot while closed.** Its render thread starts
+  with the resource and used to run at frame rate for the entire session, even for players who never open
+  the app — only to re-check one flag. It now idles at ~7 checks a second and goes back to full frame rate
+  the moment the app is on screen.
+- **The legacy phone's Notes and Radio apps now close with the phone.** Both ran a frame-rate loop whose
+  only exit was the BACK key. That normally lines up with closing the phone (same key), but any teardown
+  that skipped it would leave the loop polling — still switching radio stations and paging notes on a
+  phone that is no longer on screen. Both now leave as soon as the phone is gone.
+
+- **The Chat and AOP settings were unreachable.** Both groups existed in the schema but belonged to no
+  tab, so the seven `/me`-style and AOP toggles only appeared if you happened to search for them.
+- An untouched dropdown rendered blank instead of showing its default option.
+
+### Notes
+- No config file changed — these are additional *remotely tunable* keys. A server that never touches
+  them in the dashboard keeps running exactly on its own `configs/*.lua`.
+- Not tested in-game: the allowlist is covered by a Lua test (apply + reject + read-back), the portal
+  side by a Node test, but the actual pull-and-apply on a live server still needs a real run.
+- Two settings were reviewed and **deliberately left out**: `PhoneCfg.cameraUpload` and
+  `PhoneCfg.eyefindUrl`. Both name a destination for data, and where a customer's uploads go must
+  never be something the portal can change. The schema generator now refuses them by policy.
+- Tests live in `tests/` — `node tests/configschema.test.mjs` and `lua54 tests/remoteconfig.test.lua`.
+  They also assert the two allowlists hold identical keys *and* types, which is the invariant the
+  whole design rests on.
+
 ## [3.2.6] – Dispatch bridge, whitelabel & opt-out toggles
 
 Builds on the 3.2.5 integration bridge: LACORE's automatic calls now forward into the popular

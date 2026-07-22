@@ -1,0 +1,85 @@
+---
+title: "Player List"
+---
+
+# Player List
+
+Press **I** to open the board: who is online, what they are doing, and how the server itself is doing. It is a read-only overlay — the game keeps running underneath and your mouse stays in the world, so you can open it mid-scene without losing control of your character.
+
+> 📑 **Related:** [Keybinds](/getting-started/keybinds) · [Using the MDT](/user-guide/mdt) · [Dispatch Console](/user-guide/dispatch-console)
+
+---
+
+## 👥 The roster
+
+One row per player, 24 to a page.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ ONLINE PLAYERS  58                        Page 2 of 3  ← → to page│
+│ ──────────────────────────────────────────────────────────────── │
+│ │ 101  Tabysi          YOU     LAPD · 1A-12   CLEAR      22 ms   │
+│ │ 102  SomeDevGuy      DEV     AMR · M-7      ON SCENE   64 ms   │
+│ │ 103  Randomer                                         141 ms   │
+│ │      Spawn session                                             │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+| Column | What it means |
+|--------|---------------|
+| **ID** | The server ID. This is what staff commands and `/report` refer to. |
+| **Name** | The player's account name. |
+| Second line | Their **character name**, or which session they are in if they have not joined RP yet. |
+| **Badge** | `YOU` for yourself, otherwise their role — Staff, Dev, Supporter, Donator, Member. |
+| **Unit** | Department and callsign, e.g. `LAPD · 1A-12`. Only for players on duty. |
+| **Status** | Their duty status, in the same colours the MDT uses — CLEAR, ENROUTE, ON SCENE, BUSY, … |
+| **Ping** | Green under 60 ms, amber under 120 ms, red above. `—` means it is not known yet. |
+
+The coloured edge on the left of each row repeats the role, so a screen full of names is still scannable at a glance. Players in a **different session** than you are dimmed.
+
+> ℹ️ **Why some players have no character name.** Someone still in the spawn or freeroam session has not picked a character yet, so the board shows the session instead of a name. That is not an error.
+
+---
+
+## 🖥 Server panel
+
+The column on the right is the state of the server itself:
+
+- **Area of Play** — the current AOP and how long ago it changed. Hidden entirely when the AOP feature is switched off.
+- **Server status** — whether the server is members-only, open to everyone, or currently running **without emergency services** (nobody on duty).
+- **Dispatcher** — whether a 911 dispatcher is on, and how many.
+- **Units on duty** — LEO and Fire/EMS, each as *on duty · available*.
+- The in-game **clock**.
+
+---
+
+## ⌨️ Controls
+
+| Key | Action |
+|-----|--------|
+| **I** | Open / close the board |
+| **←** / **→** | Previous / next page (only when there is more than one) |
+
+There is nothing to click: the board takes no cursor, so it can never trap your mouse in the UI. Names above heads are shown while it is open, as before.
+
+> 📸 **Screenshot pending** — this page still needs a capture of the board. Drop it in `content/user-guide/images/` and link it here.
+
+---
+
+## 🛠 For server owners
+
+The board is part of the HUD and follows the HUD config (`configs/cfg-hud-sh.lua`):
+
+```lua
+HudCfg = {
+    enabled    = true,   -- master switch for the whole HUD
+    playerlist = true,   -- the "I" board
+    nameplates = true,   -- names above heads while the board is open
+}
+```
+
+Turning `playerlist` off leaves the key registered but the board never opens.
+
+**Ping is read on the server**, not on each client — with OneSync a client only sees players inside its own scope, so a client-side reading would be blank for everyone across the map.
+
+Roles come from the Discord role mapping (see [Discord configuration](/configuration/discord)); a player with no role simply has no badge.

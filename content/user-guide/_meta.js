@@ -10,4 +10,5 @@ export default {
   'lasd-cad': 'LASD CAD / PCMS',
   'retro-mdt': '9100-T Retro Terminal',
   'civilian-vehicles': 'Civilian & Vehicles',
+  playerlist: 'Player List',
 }

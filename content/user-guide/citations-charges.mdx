@@ -4,16 +4,33 @@ title: "Citations & Charges"
 
 # Citations & Charges
 
-Write a **citation** (ticket) or an **arrest report** against a person straight from their record in the MDT. Pick charges from the server's **penal code**, and the system adds up the **fine** and **jail time** for you and files it to the subject's record.
+Write a **citation** (ticket) or an **arrest report** against a person. Pick charges from the server's **penal code**, and the system adds up the **fine** and **jail time** for you and files it to the subject's record.
 
 > 📑 **Related:** [Query: People & Plates](/user-guide/mdt-query) · [Using the MDT](/user-guide/mdt) · [LASD CAD](/user-guide/lasd-cad)
 
 ---
 
+## 🚪 Two ways in
+
+Every terminal reaches the same picker and files the same record — pick whichever fits what you are doing.
+
+| Where | How to open it | The subject is… |
+|-------|----------------|-----------------|
+| **Person record card** (LAPD MDT, Agency MDT) | Run the person, then **⚖ Cite / Charge** on their card | …the person on the card — nothing to type |
+| **Charges tab** (LAPD MDT) | **⚖ Charges** in the toolbar | …typed into the **Target** field |
+| **CITE / CHARGE** (Agency MDT) | The button in the function bar | …typed into the **Target** field |
+| **CITE / CHARGE** (LASD PCMS, 9100-T) | From an open person record | …the person you last ran |
+
+The record-card route is the quickest during a stop you already ran. The **Charges tab** exists for the other case — you know the name and do not need the whole record, e.g. writing up a citation after the fact.
+
+> ℹ️ **The Target must be the character's exact name.** The server matches on it and refuses anything ambiguous, so `John` will not find *John Fitzgerald*. If you queried the person just before, hit **From last query** to fill it in with one click.
+
+---
+
 ## ⚖ Issuing charges
 
-1. **Pull up the person** — run them in the [Query](/user-guide/mdt-query) tab, or open them from the **Persons** rail tab.
-2. On their record card, click **⚖ Cite / Charge**.
+1. **Pick your subject** — either open their record card, or open the **Charges** tab and fill in **Target**.
+2. On a record card, click **⚖ Cite / Charge**. In the Charges tab you are already there.
 3. Choose the report type: **Citation** (ticket / fine) or **Arrest** (booking + jail time).
 4. **Search and pick charges** from the penal code list. Each charge shows its class:
 
@@ -40,6 +57,27 @@ Write a **citation** (ticket) or an **arrest report** against a person straight 
 ```
 
 ![The charge picker on a person record](./images/mdt-charge-picker.png)
+
+The **Charges tab** is the same list on a full-width sheet, with the Target field and the type switch in the bar above it:
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│ CITE / CHARGE                                                  │
+│ Target [ John Fitzgerald ] [From last query] [Citation][Arrest] │
+│                                          [ Search charges…   ] │
+│ ── CL ── Code ── Charge ─────────────────── Fine / Jail ────── │
+│    🟥 F   101   Murder 1st Degree           $50000 · 240 mo  ✓ │
+│    🟨 M   311   Petty Theft                 $800 · 4 mo        │
+│    🟦 I   415   Disturbing the Peace        $250               │
+│ ────────────────────────────────────────────────────────────── │
+│ [ Notes (optional) ]        Selected: 1 · $50000 · 240 mo      │
+│                                                     [ Issue ]  │
+└────────────────────────────────────────────────────────────────┘
+```
+
+> 📸 **Screenshot pending** — this page still needs a capture of the Charges tab (LAPD) and of CITE / CHARGE (Agency). Drop them in `content/user-guide/images/` and link them here.
+
+> 💡 A search only filters what you *see* — charges you already ticked stay selected and stay in the total, even while the search hides them. Clear the search box to see the full selection again.
 
 ---
 
