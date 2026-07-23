@@ -9,6 +9,72 @@ title: "3.3.1"
 Small follow-up from a bug report — running a plate showed every vehicle as uninsured.
 
 ### Added
+- **The admin dashboard tells you what needs doing.** The overview showed four backward-looking totals
+  and five lists — nothing said "act on this now". A new attention bar sits across the top with the
+  genuine to-dos, each zero when nothing is pending: **open tickets** waiting on a reply, **servers**
+  offline or not seen in three days, **closed-but-unrated** tickets, and active **server blocks**. On a
+  quiet day it collapses to a green "✓ All clear". Every count — and every stat card — is clickable and
+  jumps to (and briefly flashes) the relevant table. Open-ticket counts are computed server-side, since
+  the on-page list is capped at fifteen.
+
+- **The partner dashboard shows more of what it already knows.** The referral page had earnings, a
+  six-month chart and recent orders; it now leads with a six-tile KPI strip — lifetime commission, this
+  month, **month-over-month growth**, **average commission per order**, referred sales and revenue — and
+  adds two panels built from the same attributed orders: **product performance** (revenue and order count
+  per package, as ranked bars) and **customers** (new vs. returning, average spend, and top spenders).
+  Buyer identifiers in the top-spenders list are **masked** — a Discord id shows only its last four
+  digits, an email only its first two characters and domain; the plain values never leave the server.
+
+- **A payout ledger for partners — bookkeeping, not money movement.** Partners now see a **Payouts**
+  panel: **available** (lifetime commission minus what's already been paid and what's pending), **paid
+  out**, **pending**, and a history table they can **export as CSV**. Staff record payouts under
+  *Settings → Partner payouts*, where a balance table shows what each partner is owed before a transfer.
+  Recording a payout only **logs** that a transfer happened — nothing here sends money; the actual
+  transfer stays manual (PayPal, bank, …). Tebex-paid partners settle in their own Tebex wallet, so for
+  them the panel points to Tebex rather than showing a LACORE balance. Backed by a new
+  `lacore_payouts` PocketBase collection; if it isn't imported yet the ledger simply shows empty.
+
+- **Partner-program analytics and a leaderboard for staff.** *Settings → Partner program* now opens with
+  the whole program at a glance: **referred revenue** and total sales across all partners, **commission**
+  earned, **LACORE owed** (unpaid balance for LACORE-paid partners only), partner count, a six-month
+  revenue trend, and a **leaderboard** ranking partners by referred revenue (sales, revenue, commission
+  per partner). It's computed in the same pass that builds the payout balances, so it costs no extra work.
+
+- **Achievements for partners.** The referral page gained an **Achievements** strip — tiered milestones
+  built only from the partner's *own* numbers (referred sales, commission earned, link clicks, unique
+  customers, renewals), each showing the level reached and progress to the next tier. No other partner's
+  figures are ever exposed here; the cross-partner leaderboard stays staff-only.
+
+- **Monthly goal for partners.** Partners can set a personal monthly commission target on the referral
+  page and watch this month's earnings fill the bar toward it — with a "goal reached" flourish at 100%.
+  Stored on their own partner record (a new `goal` field on `lacore_partners`); self-service, no admin
+  step. Paired with an optional Discord DM (bot side) the moment a sale is attributed to their code.
+
+- **QR code for the referral link.** A QR code button on the referral page renders the partner's link as
+  a scannable code (generated client-side, no external service) with a one-click SVG download — for
+  streams, overlays, print and business cards.
+
+- **The unregistered-plate → stolen flow is now a config toggle.** When an officer runs a plate that
+  isn't on file, LACORE asks the driver to `/vreg` and, if they don't in time, flags the **plate** as
+  stolen. A new `Vehicles.vreg` block turns the whole flow on/off (`enabled`) and tunes the window
+  (`seconds`, previously hard-coded to 15). Also editable from the dashboard. Clarified across the docs
+  that **LACORE never deletes the vehicle** here — it only writes a stolen flag on the plate; a car that
+  vanishes the instant it spawns is a *different* resource (a vehicle whitelist, an anticheat, a garage
+  script), which this toggle will not affect.
+
+  > ⚠️ **Config note (`configs/cfg-vehicles-sh.lua`):** one new block, `Vehicles.vreg = &#123; enabled = true,
+  > seconds = 15 &#125;`, defaulting to the previous behaviour. Set `enabled = false` to remove the `/vreg`
+  > prompt and the stolen flag entirely.
+
+- **Gapless ticket documentation — embeds and every message.** Ticket transcripts silently dropped every
+  embed as "(embed/attachment)" — and since staff dashboard replies, web-portal replies and the AI
+  assistant *all* post as embeds, the entire support side of each conversation was missing from the
+  history. Now every message is rendered in full (embeds, attachment names), read past Discord's
+  100-message cap, and the conversation view tags each line by source (opener / staff / AI / portal).
+  A new `lacore_ticket_messages` collection records each message the instant it is posted, so the
+  documentation is immediate and complete even for long or long-since-closed tickets. Degrades safely:
+  until the collection is imported, the bot falls back to a full paginated read of the channel.
+
 - **The built-in hands-up / holster binds can be switched off.** LACORE registers hands up (`/hu`, **U**)
   and hand-on-holster (`/hh`, **X**). Set **`Features.rpemotes = false`** and neither command is
   registered and both keys are left free — for anyone running a dedicated emote / roleplay script that

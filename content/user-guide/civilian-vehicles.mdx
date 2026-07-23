@@ -38,7 +38,15 @@ the plate.
    - The `/vreg` form opens automatically.
    - The officer's MDT shows a **request-running timer** while you fill it in.
    - **Submit within 15 seconds** → the plate registers normally.
-   - **Time out / close it** → the vehicle is **flagged stolen** in the CAD.
+   - **Time out / close it** → the **plate** is **flagged stolen** in the CAD.
+
+> **LACORE never deletes the vehicle here.** The `/vreg`-or-stolen flow only writes a
+> *stolen flag* on the **plate** so officers see it when they run it — the car itself
+> is untouched. If a vehicle disappears the moment it spawns, that is a **different
+> resource** (a vehicle whitelist, an anticheat, or a garage/framework script), not
+> this system. You can turn the whole flow off with `Vehicles.vreg.enabled = false`
+> in `configs/cfg-vehicles-sh.lua` (or from the dashboard), and change the window with
+> `Vehicles.vreg.seconds` — but that will not stop another resource from deleting cars.
 
 
 ![Driver's VREG form (auto-popup when plate was run)](./images/mdt-vreg-driver-form.png)
