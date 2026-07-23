@@ -3,6 +3,46 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.3.1] – Vehicle insurance: default & API
+
+Small follow-up from a bug report — running a plate showed every vehicle as uninsured.
+
+### Added
+- **The built-in hands-up / holster binds can be switched off.** LACORE registers hands up (`/hu`, **U**)
+  and hand-on-holster (`/hh`, **X**). Set **`Features.rpemotes = false`** and neither command is
+  registered and both keys are left free — for anyone running a dedicated emote / roleplay script that
+  owns U and X. Same pattern as the seatbelt toggle; cuffing forces hands up on its own and is not
+  affected. Also toggleable from the dashboard (Features).
+
+- **One config for the 90s theme.** The retro phone's settings used to be scattered across
+  `cfg-phone-sh.lua`, and the year and handset name were hardcoded in the UI. The new
+  `configs/cfg-retro-sh.lua` gathers it in one place: turn the retro phone on, set the **year** it shows,
+  the **phone model name**, the **in-hand prop** and the **carrier**. All cosmetic — the year never
+  touches the in-game clock. Also tunable from the dashboard (Retro / 90s tab).
+
+  Backward compatible: a server still setting `PhoneCfg.retro = true` keeps working, and an old config
+  with no retro block falls back to the shipped `NT-3100` / brand name.
+
+- **Vehicles start insured by default.** Insurance is the flag officers see when they run a plate, and
+  the owner can flip it from their profile. Until now a freshly-registered vehicle started **uninsured**
+  and stayed that way until the owner opted in, so running plates showed uninsured across the board. New
+  registrations are now insured out of the box. A new switch, **`Vehicles.insuredByDefault`** in
+  `cfg-vehicles-sh.lua` (also tunable from the dashboard), turns it back to opt-in.
+
+  Only the **first** registration is affected: a vehicle an owner has deliberately un-insured stays
+  un-insured, and re-registering never overrides their choice. (That distinction was also a latent bug —
+  the old `existingVeh.insured or false` would have re-insured an un-insured car under the new default; it
+  is now handled explicitly.)
+
+- **Insurance developer API** (API v1.1.0). `exports['lacore']:GetInsurance(plate)` returns `true` /
+  `false` / `nil` (unknown plate), and `SetInsurance(plate, insured)` writes it — so a mechanic job, an
+  insurance shop or a payment webhook can drive insurance without touching the core. A new event
+  `lacore:api:insuranceChanged (plate, insured, by)` fires on every change. Docs in `modules/api/README.md`.
+
+  > ⚠️ **Config note (`configs/cfg-vehicles-sh.lua`):** one new key, `insuredByDefault`, defaulting to
+  > **true**. On update, vehicles registered from now on start insured; existing records are untouched. Set
+  > it to `false` to keep the old opt-in behaviour.
+
 ## [3.3.0] – Model library, config editor & a rebuilt player list
 
 The config editor grows up. A setting can be a slider, a colour, a keybind, a spawn name or a map
@@ -203,6 +243,56 @@ German and Russian MDT stopped being half English.
   have left the SLA sweeper pinging staff about a ticket that had just been answered. Unlike the
   customer reply, it is audit-logged: an answer sent from outside Discord should still be traceable.
 
+- **The settings that used to be off-limits are now editable too — behind a switch only you can flip.**
+  Upload targets, webhook URLs and anti-cheat thresholds were refused outright, because a compromise of
+  the website could otherwise redirect every customer's data or disarm their protection. Refusing them
+  forever was the easy answer, not the right one.
+
+  They are now in the editor, and the consent lives on the server: the new `configs/cfg-remoteconfig-sh.lua`
+  has a master switch plus one flag per category (`destinations`, `anticheat`, `roles`), all **off by
+  default**. The website cannot change that file — it needs access to your disk — so an attacker who owns
+  the site still cannot reach a server that has not opted in. Turning the master switch on is not enough
+  on its own; each category is its own decision.
+
+  Destinations get a second belt even once unlocked: a URL must be **https** and its host must appear in
+  your own `RemoteConfig.allowedHosts` (empty means any https host, never plain http). And a destination
+  may only ever be typed as a URL, never as free text — the test suite asserts that, so a future field
+  cannot quietly slip past both gates.
+
+  **The editor shows which of them your server actually accepts.** Every server reports its consent along
+  with its running values, so a sensitive field carries a green *unlocked* or a red *locked* badge, and a
+  locked one spells out the two lines to add on the server. A server that has not reported yet says so
+  instead of pretending everything is closed. Better a visible lock than an edit that saves and is then
+  quietly ignored.
+
+- **The rest of the configs followed: 248 keys in the editor now** (from 121). The anti-cheat is fully
+  represented — every detector's on/off, action and threshold — along with the Discord role IDs, the K9,
+  evidence and fingerprint modules, and the anti-cheat evidence upload. Sensitive ones sit behind the
+  consent gate: 58 anti-cheat, 15 role IDs, 4 destinations.
+
+  Three things stayed out for reasons worth writing down. `AntiDump.challengeSalt` is a **secret**, and a
+  secret never travels. The **licence table and column names** are SQL identifiers, not settings. And the
+  consent gate itself is not in the allowlist — a gate that can unlock itself is not a gate. All three are
+  now guarded by tests rather than by memory.
+
+  What is left unexposed is list data, not settings: the emoji map, the department definitions, prop
+  categories. Those are rows, and rows have their own editor.
+
+- **32 more settings are tunable from the dashboard** — the heli-cam feel (zoom limits and speed, pan
+  speed, lock-on time, street-name overlay, spotlight range/brightness/radius) with its three keybinds,
+  the whole turf-war balance, the framework-bridge switches, plate formatting, the radio-log limits, and
+  the Big Brother buffer plus its nine category switches. 121 → 153 keys, added on both sides in
+  lock-step, which the test suite asserts in both directions and by type.
+
+  Deliberately still out, and this is the line rather than an oversight: **where data goes** (upload
+  targets, webhook URLs), **anything carrying code**, **anti-cheat thresholds and actions** — a
+  compromised dashboard must not be able to disarm every customer's protection — and **the Discord role
+  IDs** that decide who counts as staff. What is left over is mostly not settings at all but list rows
+  (departments, props, penal code, spawns), which the Data lists editor already covers.
+
+- **The dashboard's main nav points at Config instead of License.** The config editor is what a customer
+  comes back to; the licence key is a one-off on setup day. The key page keeps its own route and the nav
+  item stays lit while you are on it.
 - **The landing page has a way to buy.** It had 22 links and not one went to the store: both primary
   buttons pointed at the documentation, so a visitor who had read all fourteen sections and was
   convinced ended up in the docs. The shop is now the primary call to action in the header, the hero and

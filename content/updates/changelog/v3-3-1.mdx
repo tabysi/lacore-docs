@@ -1,0 +1,45 @@
+---
+title: "3.3.1"
+---
+
+![LACORE 3.3.1](/changelog/v3-3-1.svg)
+
+# [3.3.1] – Vehicle insurance: default & API
+
+Small follow-up from a bug report — running a plate showed every vehicle as uninsured.
+
+### Added
+- **The built-in hands-up / holster binds can be switched off.** LACORE registers hands up (`/hu`, **U**)
+  and hand-on-holster (`/hh`, **X**). Set **`Features.rpemotes = false`** and neither command is
+  registered and both keys are left free — for anyone running a dedicated emote / roleplay script that
+  owns U and X. Same pattern as the seatbelt toggle; cuffing forces hands up on its own and is not
+  affected. Also toggleable from the dashboard (Features).
+
+- **One config for the 90s theme.** The retro phone's settings used to be scattered across
+  `cfg-phone-sh.lua`, and the year and handset name were hardcoded in the UI. The new
+  `configs/cfg-retro-sh.lua` gathers it in one place: turn the retro phone on, set the **year** it shows,
+  the **phone model name**, the **in-hand prop** and the **carrier**. All cosmetic — the year never
+  touches the in-game clock. Also tunable from the dashboard (Retro / 90s tab).
+
+  Backward compatible: a server still setting `PhoneCfg.retro = true` keeps working, and an old config
+  with no retro block falls back to the shipped `NT-3100` / brand name.
+
+- **Vehicles start insured by default.** Insurance is the flag officers see when they run a plate, and
+  the owner can flip it from their profile. Until now a freshly-registered vehicle started **uninsured**
+  and stayed that way until the owner opted in, so running plates showed uninsured across the board. New
+  registrations are now insured out of the box. A new switch, **`Vehicles.insuredByDefault`** in
+  `cfg-vehicles-sh.lua` (also tunable from the dashboard), turns it back to opt-in.
+
+  Only the **first** registration is affected: a vehicle an owner has deliberately un-insured stays
+  un-insured, and re-registering never overrides their choice. (That distinction was also a latent bug —
+  the old `existingVeh.insured or false` would have re-insured an un-insured car under the new default; it
+  is now handled explicitly.)
+
+- **Insurance developer API** (API v1.1.0). `exports['lacore']:GetInsurance(plate)` returns `true` /
+  `false` / `nil` (unknown plate), and `SetInsurance(plate, insured)` writes it — so a mechanic job, an
+  insurance shop or a payment webhook can drive insurance without touching the core. A new event
+  `lacore:api:insuranceChanged (plate, insured, by)` fires on every change. Docs in `modules/api/README.md`.
+
+  > ⚠️ **Config note (`configs/cfg-vehicles-sh.lua`):** one new key, `insuredByDefault`, defaulting to
+  > **true**. On update, vehicles registered from now on start insured; existing records are untouched. Set
+  > it to `false` to keep the old opt-in behaviour.
