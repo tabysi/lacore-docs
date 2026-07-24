@@ -18,6 +18,10 @@ Small follow-up from a bug report — running a plate showed every vehicle as un
   stored but dropped by the API, so the detail modal previously showed "—".
 - **Customer dashboard: more KPIs.** The overview adds **Servers** (online / total), **Players now**
   (across your servers) and **License keys** (active) alongside the existing tiles.
+- **Customer dashboard: a full player roster.** `/dashboard/players` now leads with **All players** — every
+  player the Enhanced Playerbase has seen on your community (recorded on connect, not just the banned
+  ones), with names, identifier counts and first/last seen; players from partner communities you subscribe
+  to are tagged. The existing bans & warns records move behind a toggle.
 
 - **Paid add-on entitlements — unlock features per account from the dashboard.** A customer buys an
   add-on (e.g. an extra CAD), and staff tick it on for their account under *Settings → Add-on
