@@ -9,6 +9,17 @@ title: "3.3.1"
 Small follow-up from a bug report — running a plate showed every vehicle as uninsured.
 
 ### Added
+- **Admin dashboard: Products, Player database and Customer database pages.** Three new staff pages.
+  **Products** shows sales, buyers and revenue per Tebex package (from attributed orders) plus the add-on
+  catalogue with how many accounts hold each. **Player database** lists every player the network has seen
+  (`lacore_players`) — names, identifiers, communities, first/last seen. **Customer database** is a joined
+  per-account view — license keys, lifetime spend, orders and add-ons, keyed by Discord account. The
+  **server lookup** now surfaces everything the heartbeat reports (licensed / verified owner, project name
+  and description, tags, game build, OneSync, locale, gametype, map, uptime, first seen) — these were
+  stored but dropped by the API, so the detail modal previously showed "—".
+- **Customer dashboard: more KPIs.** The overview adds **Servers** (online / total), **Players now**
+  (across your servers) and **License keys** (active) alongside the existing tiles.
+
 - **Paid add-on entitlements — unlock features per account from the dashboard.** A customer buys an
   add-on (e.g. an extra CAD), and staff tick it on for their account under *Settings → Add-on
   entitlements*. The unlock is **backend-decided per license key** and delivered through the existing
@@ -125,6 +136,14 @@ Small follow-up from a bug report — running a plate showed every vehicle as un
   > it to `false` to keep the old opt-in behaviour.
 
 ### Fixed
+- **Admin "open tickets" count was inflated.** The overview counted PocketBase ticket rows with no
+  `closedAt`, which included synced rows for channels that were deleted without a proper close (e.g. it
+  read 22 when only 9 were open). It now uses the bot's **live** count (open channels under the tickets
+  category), falling back to the old heuristic only if the bot is unreachable.
+- **Customer dashboard version was stuck at 3.2.1.** The version came from the `LACORE_VERSION` env pin,
+  which short-circuited the changelog-derived lookup (exactly the drift the design was meant to avoid). The
+  changelog is now the source of truth; `LACORE_VERSION` is only an emergency fallback for the first read
+  before the changelog is reachable — so the version self-heals to the latest without touching the server.
 - **The retro 9100-T CAD now shows a stolen flag on an unregistered plate.** Running a plate that was
   flagged stolen but never registered showed **"NO RECORD"** on the retro terminal (the LAPD and Agency
   CADs showed it correctly). The retro CAD only read the stolen flag from inside the code path that
