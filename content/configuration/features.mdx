@@ -109,3 +109,12 @@ Features = {
   A resource **restart** is required for changes to apply (the config is read when modules load). The
   file is escrow-open and covered by config backup.
 </Callout>
+
+## Paid add-ons (entitlement-gated)
+
+The end of the `Features` table holds **paid add-on flags** (e.g. `extracad`), shipped **off**. Unlike the
+toggles above, you don't switch these on locally — they're **unlocked per account from the LACORE
+dashboard** and delivered to your server by its license key. The unlock is **fail-closed**: an add-on your
+account isn't entitled to is forced off at load even if the config says `true`, so a licensed server can't
+enable a paid feature by editing the file. When you buy an add-on it appears after your **next restart**
+(once the server has pulled its entitlements). Requires `lacore_license_key` set in `server.cfg`.

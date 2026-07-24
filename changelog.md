@@ -8,6 +8,20 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 Small follow-up from a bug report — running a plate showed every vehicle as uninsured.
 
 ### Added
+- **Paid add-on entitlements — unlock features per account from the dashboard.** A customer buys an
+  add-on (e.g. an extra CAD), and staff tick it on for their account under *Settings → Add-on
+  entitlements*. The unlock is **backend-decided per license key** and delivered through the existing
+  `/ingest/config` channel: the account's server receives its entitled add-on list and turns the matching
+  `Feature('…')` flags on. **Fail-closed** — an add-on the account isn't entitled to is forced off at
+  load even if someone edited `cfg-features-sh.lua`, so a licensed server can't switch a paid feature on
+  locally. Add your own add-ons by adding a row to the registry (`modules/entitlements/entitlements-sh.lua`
+  + `landing/lib/addons.mjs`) and gating the module with `Feature('<id>')`. Takes effect on the customer's
+  next restart; new `lacore_entitlements` PocketBase collection; ships with one example add-on, `extracad`.
+
+  > ⚠️ **Config note (`configs/cfg-features-sh.lua`):** a new **Add-ons** block at the end of `Features`,
+  > holding paid-add-on flags (default **false**). These are entitlement-gated — the dashboard/backend
+  > decides them; the local value is only the fail-closed default.
+
 - **The admin dashboard tells you what needs doing.** The overview showed four backward-looking totals
   and five lists — nothing said "act on this now". A new attention bar sits across the top with the
   genuine to-dos, each zero when nothing is pending: **open tickets** waiting on a reply, **servers**
