@@ -34,7 +34,7 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, webhooks |
 | `configs/cfg-branding-sh.lua` | shared | [Branding & Backup](/configuration/branding) — your community/server name everywhere |
 | `configs/cfg-notify-sh.lua` | shared | [Notifications](/configuration/notifications) — LACORE / native GTA / custom notify resource |
-| `configs/cfg-hud-sh.lua` | shared | *(in-file)* — HUD master switch + per-element toggles (PLD, vehicle, player list, nameplates) |
+| `configs/cfg-hud-sh.lua` | shared | *(in-file)* — HUD master switch + per-element toggles (PLD, vehicle, player list, nameplates, MDT status/alerts) + `settingsCommand` |
 | `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) — map blips |
 | `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) — area labels / zones |
 | `configs/cfg-spawns-sh.lua` | shared | *(in-file)* — map-based spawn picker points (capture with `/spawnpoint`) |
@@ -78,10 +78,10 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-anticheat-sh.lua` | shared | [Anti-Cheat & Security](/anticheat) — detections, trust score, whitelist, server sweep |
 | `configs/cfg-blacklist-sh.lua` | shared | [Anticheat & security](/configuration/security) — member-only vehicles |
 | `configs/cfg-globalban-sh.lua` | shared | [Global-ban network](/configuration/gameplay-modules) — read the shared LACORE ban list |
-| `configs/cfg-identitylink-sh.lua` | shared | *(in-file)* — link Discord ⇄ identifiers for the ban network (no setup) |
+| `configs/cfg-identitylink-sh.lua` | shared | [Anticheat & security](/configuration/security) — link Discord ⇄ identifiers for the ban network (no setup) |
 | `configs/cfg-remoteconfig-sh.lua` | server | [Anticheat & security](/configuration/security) — dashboard remote-config consent gate |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
-| `configs/cfg-presence-sh.lua` | shared | [Anticheat & security](/configuration/security) — Discord Rich Presence |
+| `configs/cfg-presence-sh.lua` | shared | [Discord & Duty](/configuration/discord) — Discord Rich Presence |
 
 ## Start here
 

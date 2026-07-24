@@ -137,3 +137,26 @@ Webhooks = {
 ```
 
 Set the matching convars in `server.cfg` — see [Server Convars](/configuration/convars#discord-webhooks).
+
+## Discord Rich Presence — `configs/cfg-presence-sh.lua`
+
+Shows a live status on each player's Discord profile with clickable buttons, so their friends can see the
+server and join. Set the fields directly in the config — a plain `set` convar is server-only and can't
+reach the client, so presence is **not** driven by convars.
+
+```lua
+RichPresence = {
+    enabled    = true,
+    appId      = 0,              -- Discord Application ID (number); 0 = disabled
+    largeAsset = "icon",         -- art asset key uploaded in the Dev Portal
+    smallAsset = "",
+    discordInvite = "discord.gg/YOURINVITE",   -- "Discord" button
+    website       = "",                        -- "Website" button (blank = hidden)
+    lines = {                    -- status text; {players} / {aop} / {discord} are filled live
+        "{players} Players | AOP: {aop}",
+        "{players} Players | {discord}",
+    },
+    rotateSeconds = 4,           -- seconds between rotating through the lines above
+    connectCard   = false,       -- true = a "Join Discord" card on the connect screen; false = instant connect
+}
+```

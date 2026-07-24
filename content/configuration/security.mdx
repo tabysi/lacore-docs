@@ -101,6 +101,20 @@ RemoteConfig.allowedHosts = { "discord.com", "discordapp.com" }   -- empty = any
   hosts.
 </Callout>
 
+## Identity link — `configs/cfg-identitylink-sh.lua`
+
+Posts a player's stable identifiers + Discord ID to LACORE's write-only ingest service (once per player
+per session), so the [global-ban network](/configuration/gameplay-modules) can match them. No token, keys
+or extra `server.cfg` lines — it just works when players are Discord-linked.
+
+```lua
+IdentityLink.enabled = true            -- false = nothing is ever sent
+IdentityLink.types   = {               -- which identifier types to store (mirrors the ban-match types)
+    license = true, license2 = true, discord = true, steam = true, live = true, xbl = true, fivem = true,
+}
+IdentityLink.requireDiscord = true     -- only store players with a linked Discord (the key the bot looks up by)
+```
+
 ## Big Brother (admin logging) — `configs/cfg-bigbrother-sv.lua`
 
 Server-only. Every important event flows through `BBLog()` into a searchable DB table and optionally

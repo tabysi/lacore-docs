@@ -116,6 +116,15 @@ Small follow-up from a bug report — running a plate showed every vehicle as un
   needs a matching record, so an empty result dropped it. It now raises the caution and prints
   **`<plate> — STOLEN VEHICLE`** even with no record on file, matching the other CADs.
 
+- **Docs reconciled with the actual configs.** A careful audit of the documentation against every
+  `configs/*.lua` fixed a batch of stale or wrong reference entries (notify modes, the phone eyefind URL,
+  evidence types, air-unit/impound/global-ban wording, member-vehicle gating, the penal-code mockup, and
+  more), and documented recently-added configs that were missing (retro phone, `Features.rpemotes`, the
+  Turf capture keys, the remote-config consent gate, Rich Presence, identity link). A few stale config
+  **comments** were also corrected to match the code — the STT engine is Vosk (not browser
+  SpeechRecognition), the K9 command list includes `sit`/`lay`/`bark`, and Rich Presence isn't
+  convar-driven. Comment/doc only — no behaviour changed.
+
 ## [3.3.0] – Model library, config editor & a rebuilt player list
 
 The config editor grows up. A setting can be a slider, a colour, a keybind, a spawn name or a map
