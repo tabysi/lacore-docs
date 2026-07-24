@@ -10,8 +10,9 @@ Small follow-up from a bug report — running a plate showed every vehicle as un
 ### Added
 - **Admin dashboard: Products, Player database and Customer database pages.** Three new staff pages.
   **Products** shows sales, buyers and revenue per Tebex package (from attributed orders) plus the add-on
-  catalogue with how many accounts hold each. **Player database** lists every player the network has seen
-  (`lacore_players`) — names, identifiers, communities, first/last seen. **Customer database** is a joined
+  catalogue with how many accounts hold each. **Player database** lists everyone the network has seen — the Discord ↔ identifier log
+  (`lacore_identities`, written on every connect) combined with the Enhanced Playerbase history
+  (`lacore_players`, where enabled), tagged by source. **Customer database** is a joined
   per-account view — license keys, lifetime spend, orders and add-ons, keyed by Discord account. The
   **server lookup** now surfaces everything the heartbeat reports (licensed / verified owner, project name
   and description, tags, game build, OneSync, locale, gametype, map, uptime, first seen) — these were
