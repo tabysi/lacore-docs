@@ -16,7 +16,10 @@ Small follow-up from a bug report — running a plate showed every vehicle as un
   (`lacore_players`) into one row per person (someone under several linked identifiers, or in both sources,
   collapses into a single player). Server-side **search/lookup** (name, Discord ID or any identifier),
   **source filter** (Discord-linked / identity / playerbase / ghosts), **pagination**, and a per-player
-  **detail modal** with every identifier and name seen, each copyable. **Customer database** is a joined
+  **detail modal** with every identifier and name seen, each copyable. From the modal, staff can also
+  **ban or warn a player via the Playerbase** and lift a ban — issued under the acting staff account as
+  the community (advisory unless a server enforce-subscribes; not a network-wide `/gban`), reusing the
+  same find-or-create-player + ingest path as a server-console upload. **Customer database** is a joined
   per-account view — license keys, lifetime spend, orders and add-ons, keyed by Discord account. The
   **server lookup** now surfaces everything the heartbeat reports (licensed / verified owner, project name
   and description, tags, game build, OneSync, locale, gametype, map, uptime, first seen) — these were
