@@ -49,10 +49,18 @@ LACORE actively guards your server against the common ways cheaters ruin a rolep
 
 ## Recommended server hardening
 
-The anti-cheat is strongest when paired with a few standard FiveM server settings (script-hook
-disabled, verified client files, an enforced game build, and OneSync enabled). LACORE checks these on
+The anti-cheat is strongest when paired with a few standard FiveM server settings. LACORE checks these on
 start-up and reminds you in the console if any are missing — so you always know your server is locked
-down.
+down. Add these to your `server.cfg`:
+
+```ini
+sv_scriptHookAllowed 0      # block ScriptHookV trainers (Menyoo, Simple Trainer, …)
+sv_pureLevel 2              # accept only original client files (2 = strictest)
+sv_enforceGameBuild 3258    # pin one game build so old-build exploits can't connect
+sv_filterRequestControl 4   # filter entity-control requests (stops foreign-entity manipulation)
+```
+
+(Plus OneSync enabled, which the server-authoritative checks rely on.)
 
 <Callout type="warning">
   No anti-cheat on any platform can promise to stop **100 %** of cheats — that's simply not how FiveM

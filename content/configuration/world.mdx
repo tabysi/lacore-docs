@@ -68,7 +68,38 @@ weaponOnBackSettings = {
 }
 ```
 
+## Spawn selector — `configs/cfg-spawns-sh.lua`
+
+A map-based spawn picker: the player sees the city map with pins and chooses where to start, instead of
+one fixed spawn. Gated by `Features.spawnselect` (off = the classic single `fallback` spawn).
+
+```lua
+SpawnCfg = {
+    enabled     = true,
+    onFirstJoin = true,   -- show the picker after connecting
+    onRespawn   = true,   -- show it again after death, once released
+    timeout     = 60,     -- seconds before the fallback is used anyway (0 = wait forever)
+    fallback    = { x = 2728.5073, y = 1373.4258, z = 24.5227, heading = 0.0 },  -- skipped / timed-out / error
+
+    points = {
+        { id = "hospital", label = "Pillbox Hill Medical", info = "Hospital entrance",
+          x = 298.50, y = -584.70, z = 43.26, heading = 70.0 },
+        { id = "coroner", label = "Coroner's Office", info = "County services",
+          x = 240.40, y = -1379.90, z = 33.80, heading = 320.0, jobs = { "Coroner" } },  -- job-gated
+        { id = "paleto_jail", label = "Bolingbroke Release", info = "Blaine County",
+          x = 1855.81, y = 2601.95, z = 45.32, heading = 270.0, aopOnly = true },  -- only inside the AOP
+    },
+}
+```
+
+Each point takes `id` (the client sends **this**, never coordinates — the server re-checks the job + AOP
+before it hands back a position), `label`, optional `info`, an optional `jobs` list (omit = everyone), and
+`aopOnly` (only offered while the point is inside the current Area of Play). Capture your own points in-game:
+stand where players should appear, face the right way, then run `/spawnpoint <id> <label>` — it prints a
+ready-to-paste line. It is always **fail-safe**: anything unexpected falls back to `fallback`, so no one
+gets stuck on a black screen.
+
 <Callout type="info">
-  These are cosmetic/world lists. None are required to run LACORE — leave them empty to disable the
-  feature, or populate them for your map.
+  Map blips, areas and weapon-on-back are cosmetic/world lists — none are required to run LACORE. Leave
+  them empty to disable the feature, or populate them for your map.
 </Callout>

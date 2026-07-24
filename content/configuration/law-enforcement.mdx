@@ -91,3 +91,28 @@ Evidence.maxDescription = 600     -- evidence item description max length
 ```
 
 See the [Evidence & Reports](/features/evidence-reports) feature page for how these appear in-game.
+
+## MDT licences (framework import) — `configs/cfg-licenses-sh.lua`
+
+The MDT person record shows six licence slots — **driver · commercial · boating · pilot · ccw · hunting**.
+On an **ESX** server, LACORE can read each player's `user_licenses` rows and mark the matching slots
+automatically, so an officer running a plate sees their real licences without any manual `/profile` entry.
+
+```lua
+Licenses.import       = "auto"    -- "auto" = on when ESX is active; false = never import (MDT uses /profile)
+Licenses.presentValue = "Valid"   -- what a held licence reads as
+Licenses.absentValue  = "None"    -- what an unheld slot reads as
+
+-- Map YOUR user_licenses.type strings → one of the six slots (case-insensitive)
+Licenses.map = {
+    ["drive"] = "driver", ["drive_truck"] = "commercial", ["boat"] = "boating",
+    ["fly"] = "pilot", ["weapon"] = "ccw", ["hunting"] = "hunting",
+    -- … add / rename rows to match your server; unmapped types are ignored
+}
+```
+
+<Callout type="info">
+  Standalone / QBCore / QBox servers leave the import off (nothing to read) — the MDT licences stay
+  whatever the player sets in `/profile`. Only change `Licenses.esx` (table / column names) if your ESX
+  fork stores licences differently.
+</Callout>

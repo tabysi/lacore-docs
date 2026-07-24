@@ -100,3 +100,29 @@ Add a category with a `categoryName`, `description`, and a `components` list of 
 
 Each player may place up to **`CivConfig.propLimit`** props at once (default `10`, in `cfg-civilian-sh.lua`);
 placing more removes their oldest.
+
+## Civilian activities — `CivConfig.activities`
+
+RP-only "jobs": a chain of ordered waypoints a civilian can run for an **achievement + a progress count**
+(no money — LACORE has no economy). The first step is the clock-in hub (a blip + marker shows there);
+reaching the last step completes the run and grants the reward. Fully data-driven — add your own.
+
+```lua
+CivConfig.activities = {
+    {
+        id    = "garbage",
+        label = "Garbage Run",
+        blip  = { sprite = 318, color = 2, scale = 0.8 },
+        achievement = nil,   -- optional: an id from your achievements config to unlock on completion
+        steps = {
+            { x = -322.6, y = -1545.4, z = 27.5, r = 3.5, label = "Depot — start your route" },
+            { x = -245.0, y = -1469.0, z = 30.5, r = 3.5, label = "Pickup 1" },
+            -- … the last step completes the run
+        },
+    },
+}
+```
+
+<Callout type="warning">
+  The shipped coordinates are **placeholders** — set them to spots on your own map.
+</Callout>

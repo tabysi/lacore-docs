@@ -37,7 +37,7 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-hud-sh.lua` | shared | *(in-file)* — HUD master switch + per-element toggles (PLD, vehicle, player list, nameplates, MDT status/alerts) + `settingsCommand` |
 | `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) — map blips |
 | `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) — area labels / zones |
-| `configs/cfg-spawns-sh.lua` | shared | *(in-file)* — map-based spawn picker points (capture with `/spawnpoint`) |
+| `configs/cfg-spawns-sh.lua` | shared | [World, blips & props](/configuration/world) — map-based spawn picker (capture points with `/spawnpoint`) |
 | `configs/cfg-emojis-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat |
 | `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
 
@@ -46,6 +46,9 @@ self-documented by the comment header at the top of the file.
 | File | Scope | Controls |
 | --- | --- | --- |
 | `configs/cfg-mdt-sh.lua` | shared | *(in-file)* — MDT options (e.g. only open the MDT while in a vehicle) |
+| `configs/cfg-mdt-labels-sh.lua` | shared | [MDT & Dispatch](/features/mdt-and-dispatch) — whitelabel: rename any MDT/CAD label |
+| `configs/cfg-licenses-sh.lua` | shared | [Penal code & evidence](/configuration/law-enforcement) — import ESX licences into the MDT slots |
+| `configs/cfg-fingerprint-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — mobile fingerprint ID scanner |
 | `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
 | `configs/cfg-evidence-sh.lua` | shared | [Evidence & reports](/configuration/law-enforcement) — item + report types |
 | `configs/cfg-cctv-sh.lua` | shared | [CCTV Surveillance](/features/cctv) — camera networks |

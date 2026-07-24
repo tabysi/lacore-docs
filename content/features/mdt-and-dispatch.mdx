@@ -99,3 +99,25 @@ Coroner, Tow Truck, Crime Broadcast, Shot Spotter, and Created Incident.
 
 Prefer an out-of-game dispatcher on a second screen? LACORE has an optional
 [Web Dispatcher](/features/webdispatch) portal that mirrors the console in the browser.
+
+## Whitelabel — `configs/cfg-mdt-labels-sh.lua`
+
+Rename anything the MDT / CAD shows without touching locale files or the encrypted core. Put a key in
+`MdtLabels` and that text replaces the translated one everywhere it appears; leave a key out (or empty)
+and the normal translation is used.
+
+```lua
+MdtLabels = {
+    mdt_title    = "Pacific Valley MDT",
+    mdt_subtitle = "Mobile Data Terminal",
+    mdt_calls    = "JOBS",
+    mdt_units    = "CREWS",
+    mdt_unit     = "CREW",
+}
+```
+
+<Callout type="warning">
+  These are **labels, not translations** — an override applies to *every* language. On a multi-language
+  server, translate in `lang/*.json` instead, and use this file only for names that stay the same in every
+  language (your community / department names).
+</Callout>
