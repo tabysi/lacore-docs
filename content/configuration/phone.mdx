@@ -20,7 +20,7 @@ RP-only — there is deliberately no banking / money app.
 PhoneCfg.useNui     = true            -- true = the new NUI phone; false = the legacy scaleform phone
 PhoneCfg.openKey    = "F1"            -- open/close key (players can rebind in FiveM keybind settings)
 PhoneCfg.requireNick = true           -- require a set RP nick before the phone opens (devmode bypasses)
-PhoneCfg.eyefindUrl = "https://lacore.gg"  -- the in-phone browser home page (your community, never a foreign site)
+PhoneCfg.eyefindUrl = "https://lacore.tebex.io/"  -- the in-phone browser home page (point it at your community, never a foreign site)
 PhoneCfg.numberPrefix = "555"         -- phone-number prefix (e.g. 555-0142)
 ```
 
@@ -38,6 +38,26 @@ PhoneCfg.apps = {
   calc = true, directory = true, torch = true, settings = true,
 }
 ```
+
+## Retro / 90s phone — `configs/cfg-retro-sh.lua`
+
+Turning retro on swaps the modern NUI phone for a **1990s brick-phone skin** (green LCD, keypad, T9) and
+puts a matching brick prop in the player's hand. Same calls, SMS and contacts underneath — only the look
+changes. Everything here is **cosmetic**: the year is a label, never the in-game clock.
+
+```lua
+Retro.enabled    = false                   -- master switch. false = the modern NUI phone
+Retro.year       = 1998                    -- year shown on the date line (e.g. "FRI 24 JUL '98") — cosmetic only
+Retro.phoneModel = "NT-3100"               -- handset name on the earpiece + About screen
+Retro.phoneProp  = "prop_v_m_phone_o1s"    -- in-hand prop others see (point at a custom brick model if you stream one)
+Retro.carrier    = ""                      -- carrier in the status bar; blank = your Branding.label
+```
+
+<Callout type="info">
+  **Backward compatible.** A server that still sets `PhoneCfg.retro = true` in `cfg-phone-sh.lua` keeps
+  working — either switch turns the retro phone on. The in-hand prop and its offset can also be tuned with
+  `PhoneCfg.retroPropModel` / `PhoneCfg.retroHold`.
+</Callout>
 
 ## Everyday use
 

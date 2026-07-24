@@ -13,7 +13,7 @@ Every LACORE notice (there are hundreds of `ShowNotification` calls) obeys this 
 
 ```lua
 NotifyCfg = {
-  mode = "lacore",   -- "lacore" | "gta" | "custom"
+  mode = "lacore",   -- "lacore" | "gta" | "ox_lib" | "okok" | "mythic" | "custom"
 }
 ```
 
@@ -26,7 +26,12 @@ NotifyCfg = {
 | --- | --- |
 | `"lacore"` | The built-in **premium NUI toasts** (info / success / warning / error), the default. |
 | `"gta"` | The native, **lore-friendly GTA-V** top-left feed. |
-| `"custom"` | Your own handler — route to **any notify resource** (ox_lib, okokNotify, mythic_notify, ESX, …). |
+| `"ox_lib"` | Route to **ox_lib** (`exports.ox_lib:notify`) — adapter is built in, just set the mode. |
+| `"okok"` | Route to **okokNotify** (`exports.okokNotify:Alert`) — built-in adapter. |
+| `"mythic"` | Route to **mythic_notify** (`exports.mythic_notify:SendAlert`) — built-in adapter. |
+| `"custom"` | Any **other** notify resource — wire it up in `NotifyCfg.customHandler` below. |
+
+The `ox_lib` / `okok` / `mythic` adapters are built in — just set the mode; if that resource isn't running, LACORE falls back to its own toast. Use `"custom"` only for a resource not in that list.
 
 ## Custom handler
 

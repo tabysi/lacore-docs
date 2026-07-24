@@ -49,6 +49,13 @@ Kill-based territory capture for civilian orgs. **Off by default.**
 Turf.enabled     = false   -- master switch (false = nothing runs)
 Turf.drawMarkers = false   -- in-world zone cylinder (off — heavy; blips show ownership)
 
+-- Capture tuning
+Turf.killsToCapture     = 5    -- qualifying kills in a zone to flip it
+Turf.decaySeconds       = 90   -- no kills for this long → capture progress drops by 1
+Turf.cooldownMin        = 15   -- minutes a zone is locked after being captured
+Turf.influenceOnCapture = 100  -- org influence awarded for taking a zone
+Turf.influencePerKill   = 5    -- org influence per qualifying kill
+
 Turf.zones = {
     { id = "grove", label = "Grove Street",
       center = vector3(-100.0, -1620.0, 30.0), radius = 90.0, color = "#2ecc71" },

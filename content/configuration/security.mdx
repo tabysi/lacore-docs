@@ -21,8 +21,8 @@ Per-detection action:
 | `"kick"` | Webhook + kick. |
 | `"ban"` | Webhook + permanent ban (via `BanPlayer`). |
 
-Bypass: `lacore_devmode = true` disables it entirely; players with the `Staff` / `Dev` Discord role
-are never punished (only logged).
+Bypass: `lacore_devmode = true` disables it entirely; players with the `Staff` / `Dev` Discord role, or
+the `lacore.ac.bypass` ACE permission (`Anticheat.Whitelist`), are never punished (only logged).
 
 ```lua
 Anticheat = {
@@ -48,13 +48,16 @@ Anticheat = {
         action       = "kick",
         maxPerMinute = 20,   -- max client-spawned entities per minute
     },
-    -- … more checks
+    -- … excerpt only — the file also carries GodMode, SpeedHack, Teleport, NoClip, Invisible, SuperJump,
+    -- BlacklistedWeapons, BlacklistedVehicles (delete = true), AntiDump, Honeypots, EventRateLimit, a Trust
+    -- escalation model (kickAt 8 / banAt 20), the server-authoritative ServerSweep + Combat checks, and a
+    -- recommended FXServer convar block (sv_scriptHookAllowed 0, sv_pureLevel 2, sv_enforceGameBuild, …).
 }
 ```
 
 ## Member-only vehicles — `configs/cfg-blacklist-sh.lua`
 
-Vehicle **classes** and specific **models** only "members" (playtime threshold) may drive:
+Vehicle **classes** and specific **models** only "members" may drive:
 
 ```lua
 memberOnlyVehicles = {
@@ -67,8 +70,36 @@ memberOnlyVehicles = {
 }
 ```
 
-Add class **numbers** or model **name strings**. The member threshold is `ProfileConfig.membershipHours`
-(see [Profile & Achievements](/configuration/profile)).
+Add class **numbers** or model **name strings**. Who counts as a "member" is set by
+`AccessControl.membership` in [`cfg-server-sv.lua`](/configuration/discord) — `"auto"` / `"open"` / `"role"`,
+driven by the Discord **Member** role, not by playtime. (`ProfileConfig.membershipHours` only decides when
+the "you've played enough to apply for membership" notice fires — it does **not** unlock these vehicles.)
+
+## Dashboard remote-config gate — `configs/cfg-remoteconfig-sh.lua`
+
+The customer dashboard can push config changes to your server. This **server-side** file is the consent
+gate for the sensitive ones — it lives on your box, so the dashboard can never flip it for you. By default
+the dashboard may change everything **except** three categories.
+
+```lua
+RemoteConfig.allowSensitive = false   -- master switch for the sensitive categories below (safe default)
+
+RemoteConfig.sensitive = {
+    destinations = false,   -- upload targets / webhook URLs (phone camera, model library, log hooks)
+    anticheat    = false,   -- anti-cheat thresholds + actions (off = dashboard can READ but not change them)
+    roles        = false,   -- the Discord role IDs in cfg-server-sv.lua that grant staff/dev access
+}
+
+-- Extra belt for `destinations`: even when enabled, a pushed URL must be https AND its host must be here.
+RemoteConfig.allowedHosts = { "discord.com", "discordapp.com" }   -- empty = any https host (never http)
+```
+
+<Callout type="warning">
+  Leave `allowSensitive = false` unless you specifically want the dashboard to manage upload destinations,
+  anti-cheat, or your staff role IDs — and even then, open only the one category you need. `allowedHosts`
+  keeps the blast radius small: a pushed URL must be `https` and, unless the list is empty, on one of these
+  hosts.
+</Callout>
 
 ## Big Brother (admin logging) — `configs/cfg-bigbrother-sv.lua`
 

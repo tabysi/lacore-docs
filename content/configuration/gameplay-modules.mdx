@@ -30,8 +30,9 @@ AirUnit.spotlight = { range = 300.0, brightness = 25.0, radius = 12.0 }
 ```
 
 <Callout type="info">
-  The overlay can show live **street names / directions** under the crosshair (`AirUnit.overlay`),
-  sampled on a grid around the aim point.
+  The overlay can show live **street names / directions** under the crosshair
+  (`AirUnit.cam.streetNames` / `AirUnit.cam.streetDirections`, tuned with `AirUnit.cam.overlayGrid` and
+  `AirUnit.cam.overlaySpacing`), sampled on a grid around the aim point.
 </Callout>
 
 ## Corrections / Jail — `configs/cfg-corrections-sh.lua`
@@ -41,6 +42,7 @@ code), and the sentence persists across reconnects.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
+| `Corrections.enabled` | `true` | Master switch for the jail / corrections system. |
 | `Corrections.secondsPerMonth` | `30` | Real seconds served per sentenced "month". |
 | `Corrections.minSeconds` / `maxSeconds` | `30` / `1200` | Clamp on any single sentence. |
 | `Corrections.autoBookArrests` | `true` | An arrest report with jail time books the suspect automatically. |
@@ -49,11 +51,11 @@ code), and the sentence persists across reconnects.
 
 ## Impound — `configs/cfg-impound-sh.lua`
 
-Officers impound a nearby vehicle; owners retrieve it for a fee.
+Officers impound a nearby vehicle; owners see an informational retrieval fee in the impound lot.
 
 ```lua
 Impound.enabled     = true
-Impound.fee         = 500     -- retrieval fee
+Impound.fee         = 500     -- retrieval fee shown in the lot (USD) — informational/RP only, LACORE has no economy so nothing is charged automatically
 Impound.maxDistance = 8.0     -- how close an officer must be to impound
 Impound.persist     = true    -- remember impounded vehicles across restarts
 ```
@@ -107,8 +109,8 @@ Fingerprint.openKey       = ""      -- optional default key for /mobileid (playe
 
 ## Global-ban network — `configs/cfg-globalban-sh.lua`
 
-Optional participation in a shared ban list across LACORE servers: a banned identifier on one
-participating server is refused on the others.
+A shared ban list, **managed centrally by the LACORE team**: your server **reads** the network list and
+refuses any identifier banned on it. There is nothing to obtain or configure to participate in reads.
 
 | Setting | Default | Meaning |
 | --- | --- | --- |
@@ -116,7 +118,7 @@ participating server is refused on the others.
 | `GlobalBan.refreshMinutes` | `15` | How often the list is refreshed. |
 | `GlobalBan.checkTypes` | license/discord/… | Which identifier types are matched. |
 | `GlobalBan.failOpen` | `true` | If the list can't be reached, **let players in** (never lock out your server on a network hiccup). |
-| `GlobalBan.propagate` | `false` | Whether **your** bans are pushed to the network (off by default). |
+| `GlobalBan.propagate` | `false` | Inert for normal servers — **writing** to the network is reserved for the LACORE team (needs a central credential you can't obtain). Leave it off; your server only reads. |
 
 <Callout type="warning">
   `failOpen = true` is the safe default — a network outage should never stop legitimate players from

@@ -29,6 +29,7 @@ ProfileConfig = {
         { role = "Dev",    label = "Developer",       color = "#b9c6ff", icon = "🛠" },
         { role = "Staff",  label = "Staff",           color = "#ffb38a", icon = "🛡" },
         { role = "LE",     label = "Law Enforcement", color = "#84e7b6", icon = "🚔" },
+        { role = "LOA",    label = "LOA",             color = "#ffd27a", icon = "💤" },
         { role = "Member", label = "Member",          color = "#ff9a9a", icon = "★" },
     },
 
@@ -38,15 +39,25 @@ ProfileConfig = {
         ["ON SCENE"] = "#84e7b6",
         -- …
     },
+
+    -- Thresholds for the calculated stat-achievements (also sent to the UI)
+    achievements = {
+        veteranHours   = 25,   -- "Veteran"
+        legendHours    = 100,  -- "Legend"
+        garageVehicles = 3,    -- "Garage"
+        collectorChars = 3,    -- "Collector"
+        licensesValid  = 6,    -- "Fully Licensed"
+    },
 }
 ```
 
 | Field | Meaning |
 | --- | --- |
-| `membershipHours` | Playtime (hours) to become a "Member". Changing it here changes it everywhere. |
+| `membershipHours` | Playtime (hours) that unlocks the **"apply for membership" notice** (it does not by itself make a player a Member — that's the Discord role, see [Discord](/configuration/discord)). |
 | `minutesPerLevel` | Minutes of playtime per profile level (60 = 1 level/hour). |
 | `roles` | Which Discord roles show as badges, and their label/colour/icon. Only present roles appear. |
 | `statusColors` | Colour per HUD status. |
+| `achievements` | Thresholds for the calculated stat-achievements (Veteran / Legend / Garage / Collector / Fully Licensed). |
 
 <Callout type="info">
   `roles[].role` must match a key in `DiscordAuth.roles`

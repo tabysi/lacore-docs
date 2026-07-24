@@ -41,20 +41,33 @@ Features = {
   impound     = true,  -- impound lot
   k9          = true,  -- K9 unit
   field       = true,  -- field essentials (breathalyser)
+  fingerprint = true,  -- mobile fingerprint ID scanner
+  identitylink = true, -- link Discord ⇄ identifiers so the ban network works (no setup)
   nads        = true,  -- New Address System
   stt         = true,  -- push-to-talk radio speech-to-text
   admin       = true,  -- staff tools (Big Brother log + admin menu)
   webdispatch = true,  -- external web dispatcher bridge
+  spawnselect = true,  -- map-based spawn picker (false = one fixed spawn)
 
   civilian = { enabled = true, org = true, turf = true },        -- emotes / props / orgs / turf
 
   seatbelt     = true, -- /seatbelt, the K bind, the warning icon, windscreen ejection
   speedlimiter = true, -- hold the limiter key in a vehicle to cap its speed
+  rpemotes     = true, -- built-in hands-up (/hu, U) + hand-on-holster (/hh, X); off frees U/X for another emote script
+
+  chat = { enabled = true, rp = true, actions = true, leoreq = true, report = true },  -- /me /do /run /leoreq /report …
+  aop  = { enabled = true, commands = true },                    -- /aop + /aopvote (commands = false keeps the AOP display only)
 
   extras = { enabled = true, props = true, stretcher = true,     -- misc gameplay
              trains = true, deathsync = true },
 }
 ```
+
+<Callout type="info">
+  Everything defaults to **on**. `rpemotes` gates the built-in `/hu` (U) and `/hh` (X) binds — turn it off
+  when another emote / roleplay script owns those keys. `chat` gates the built-in RP chat commands (turn off
+  if you run cc-chat / cc-rpchat), and `aop` the Area-of-Play commands.
+</Callout>
 
 ## Running another HUD that brings its own seatbelt
 
@@ -83,9 +96,11 @@ With `seatbelt = false` the command is not registered at all, so the other resou
 Features = {
   cad = { enabled = true },   -- keep the police CAD suite …
   phone = false, airunit = false, cctv = false, corrections = false,
-  impound = false, k9 = false, field = false, nads = false, stt = false,
-  admin = false, webdispatch = false,
+  impound = false, k9 = false, field = false, fingerprint = false, nads = false, stt = false,
+  admin = false, webdispatch = false, spawnselect = false, rpemotes = false, identitylink = false,
   civilian = { enabled = false },
+  chat     = { enabled = false },
+  aop      = { enabled = false },
   extras   = { enabled = false },
 }
 ```

@@ -45,8 +45,11 @@ Map your framework jobs to agencies in `configs/cfg-bridge-sh.lua` — full API 
 
 ## Supported scripts
 
-Third-party resources LACORE plugs into when installed — configured in
-`configs/cfg-integrations-sh.lua` (each toggle `"auto"` = on when present, or `false` to disable).
+Third-party resources LACORE plugs into when installed. Most are **auto-detected** — no setup. The
+housing (`vms_*`) and dispatch bridges are toggled in `configs/cfg-integrations-sh.lua` (each toggle
+`"auto"` = on when present, or `false` to disable); the others live in the config their own card names
+(e.g. notify → `cfg-notify-sh.lua`, Third-Eye → `config.lua`, OOC chat → `ExternalChat` in
+`cfg-server-sv.lua`).
 
 <ScriptGrid items={scripts} />
 

@@ -109,6 +109,13 @@ Small follow-up from a bug report — running a plate showed every vehicle as un
   > **true**. On update, vehicles registered from now on start insured; existing records are untouched. Set
   > it to `false` to keep the old opt-in behaviour.
 
+### Fixed
+- **The retro 9100-T CAD now shows a stolen flag on an unregistered plate.** Running a plate that was
+  flagged stolen but never registered showed **"NO RECORD"** on the retro terminal (the LAPD and Agency
+  CADs showed it correctly). The retro CAD only read the stolen flag from inside the code path that
+  needs a matching record, so an empty result dropped it. It now raises the caution and prints
+  **`<plate> — STOLEN VEHICLE`** even with no record on file, matching the other CADs.
+
 ## [3.3.0] – Model library, config editor & a rebuilt player list
 
 The config editor grows up. A setting can be a slider, a colour, a keybind, a spawn name or a map

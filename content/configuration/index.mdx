@@ -37,6 +37,7 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-hud-sh.lua` | shared | *(in-file)* — HUD master switch + per-element toggles (PLD, vehicle, player list, nameplates) |
 | `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) — map blips |
 | `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) — area labels / zones |
+| `configs/cfg-spawns-sh.lua` | shared | *(in-file)* — map-based spawn picker points (capture with `/spawnpoint`) |
 | `configs/cfg-emojis-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat |
 | `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
 
@@ -59,6 +60,8 @@ self-documented by the comment header at the top of the file.
 | File | Scope | Controls |
 | --- | --- | --- |
 | `configs/cfg-phone-sh.lua` | shared | [Phone](/configuration/phone) — NUI phone: apps, ringtones, directory, prop hold |
+| `configs/cfg-retro-sh.lua` | shared | [Phone](/configuration/phone) — retro / 90s phone skin (year, model, prop, carrier) |
+| `configs/cfg-vehicles-sh.lua` | shared | [Registering a vehicle](/user-guide/civilian-vehicles) — plate formatting, insured-by-default, `/vreg`-or-stolen window |
 | `configs/cfg-profile-sh.lua` | shared | [Profile & achievements](/configuration/profile) — the `/profile` UI |
 | `configs/cfg-achievements-sh.lua` | shared | [Profile & achievements](/configuration/profile) — XP / easter eggs |
 | `configs/cfg-civilian-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — radial, emote catalogue |
@@ -74,7 +77,9 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-integrations-sh.lua` | shared | [Frameworks & Scripts](/frameworks-scripts) — third-party resources |
 | `configs/cfg-anticheat-sh.lua` | shared | [Anti-Cheat & Security](/anticheat) — detections, trust score, whitelist, server sweep |
 | `configs/cfg-blacklist-sh.lua` | shared | [Anticheat & security](/configuration/security) — member-only vehicles |
-| `configs/cfg-globalban-sh.lua` | shared | *(in-file)* — global-ban network participation |
+| `configs/cfg-globalban-sh.lua` | shared | [Global-ban network](/configuration/gameplay-modules) — read the shared LACORE ban list |
+| `configs/cfg-identitylink-sh.lua` | shared | *(in-file)* — link Discord ⇄ identifiers for the ban network (no setup) |
+| `configs/cfg-remoteconfig-sh.lua` | server | [Anticheat & security](/configuration/security) — dashboard remote-config consent gate |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
 | `configs/cfg-presence-sh.lua` | shared | [Anticheat & security](/configuration/security) — Discord Rich Presence |
 

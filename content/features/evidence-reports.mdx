@@ -38,9 +38,21 @@ person's record alongside reports, charges and citations.
 Evidence types are configured in `cfg-evidence-sh.lua`:
 
 ```lua
--- cfg-evidence-sh.lua
-Evidence.reportTypes = { 'Incident Report', 'Arrest Report', 'Use of Force', 'Witness Statement' }
-Evidence.types       = { 'Physical', 'Digital', 'Photograph', 'Firearm', 'Narcotics' }
+-- cfg-evidence-sh.lua — each entry is a table with an id + label (types also carry an icon)
+Evidence.reportTypes = {
+  { id = "arrest",   label = "Arrest Report" },
+  { id = "incident", label = "Incident Report" },
+  { id = "uof",      label = "Use of Force Report" },
+  { id = "fi",       label = "Field Interview" },
+  { id = "supp",     label = "Supplemental Report" },
+  { id = "traffic",  label = "Traffic Collision" },
+}
+Evidence.types = {
+  { id = "weapon", label = "Weapon", icon = "🔫" }, { id = "substance", label = "Substance", icon = "💊" },
+  { id = "fingerprint", label = "Fingerprint", icon = "🖐" }, { id = "dna", label = "DNA Sample", icon = "🧬" },
+  { id = "photo", label = "Photograph", icon = "📷" }, { id = "digital", label = "Digital Media", icon = "💾" },
+  -- … firearm, document, currency, vehicle, other
+}
 ```
 
 ## Record visibility
