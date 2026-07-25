@@ -1,0 +1,132 @@
+---
+title: Supervisor Panel
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Supervisor Panel
+
+A rank-gated oversight tablet for **shift supervisors and watch commanders**. It bundles what LACORE
+already knows — units, incidents, BOLOs, warrants, the map — into one screen, and adds the few command
+actions a supervisor actually needs during a shift.
+
+Open it with **`/supervisor`** (configurable). **Escape** closes it.
+
+<Callout type="info">
+  A supervisor no longer has to be registered as a **dispatcher** to direct their shift. The panel
+  reuses the dispatch backend, and the server authorises a verified supervisor for those actions while
+  the panel is open.
+</Callout>
+
+## Who can open it
+
+Access is **decided by the server**, never by the client. A unit qualifies if **either** check passes:
+
+<Steps>
+
+### Framework job grade
+
+On an ESX / QBCore / QBox server the unit's **job grade** is compared against a minimum
+(`minGrade`, with an optional per-department override). This is the natural path if your ranks already
+live in the framework.
+
+### Config allowlist
+
+The unit's **license identifier** or **exact callsign** is listed in `allow`. This is the standalone
+path — it works with no framework at all, and it's also how you grant the panel to specific people
+regardless of their grade.
+
+</Steps>
+
+<Callout type="warning">
+  On a **standalone** server there is no job grade, so every grade is `0` and the grade check never
+  passes. You must fill the `allow` list — otherwise nobody can open the panel.
+</Callout>
+
+## Configuration
+
+Everything lives in `configs/cfg-supervisor-sh.lua`.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `command` | `"supervisor"` | The chat command that opens the panel. |
+| `minGrade` | `3` | Minimum framework job grade that counts as a supervisor. |
+| `minGradeByDept` | *(empty)* | Per-department override, e.g. `["LSPD"] = 4`. Falls back to `minGrade`. |
+| `allow` | *(empty)* | Allowlist keyed by **license identifier** (`license:…`) **or exact callsign** (`"1-L-30"`), value `true`. |
+| `leoOnly` | `true` | Only on-duty LEO units are ever eligible. Set `false` to allow any job that clears the checks. |
+
+```lua filename="configs/cfg-supervisor-sh.lua"
+SupervisorConfig = {
+    command = "supervisor",
+
+    minGrade = 3,
+    minGradeByDept = {
+        ["LSPD"] = 4,
+    },
+
+    allow = {
+        ["license:0000000000000000000000000000000000000000"] = true,
+        ["1-L-30"] = true,
+    },
+
+    leoOnly = true,
+}
+```
+
+## The five views
+
+### Roster
+
+Every on-duty unit, live: **status** (colour-coded), **callsign**, **rank**, **name + department**,
+the **incident** they're attached to, and their **location**. Sort by callsign or status, and search by
+callsign, name or department. Units flagged as supervisors carry a **★**; the framework grade shows as
+`G<n>`. Partners sharing a callsign are merged into one row.
+
+### Map
+
+Every unit and every active incident on the LACORE map — the same projection and tiles as the
+[dispatch console](/user-guide/dispatch-console). Unit markers are outlined in their status colour;
+incidents show their number.
+
+### Dispatch
+
+Pick a **unit** and an **incident** to **assign** (the unit is set to *enroute* and attached), or set a
+picked unit's **status** directly: `CLEAR`, `ENROUTE`, `ON SCENE`, `CODE SIX`, `BUSY`,
+`OUT TO STATION`, `UNAVAILABLE`.
+
+### Broadcast
+
+Send a **division-wide message** to all units, and trigger the **attention tone**. Recent radio traffic
+is listed underneath so you can see what you're talking into.
+
+### BOLO / Warrants
+
+Oversight of both at once: **active BOLOs** with one-click cancel, and **every character currently
+carrying a warrant** (read-only, name + reason). Warrants themselves are set and cleared from a
+person's record in any CAD — see [BOLOs & Charges](/features/bolos-charges).
+
+## Server authority & audit
+
+- The client only **asks** to open; the server verifies the rank and grants it.
+- The panel's actions are authorised server-side for a verified supervisor **with the panel open** — so
+  closing the panel ends the elevated access.
+- The warrant list is a **supervisor-only** lookup and returns names and reasons only.
+- Warrant changes made from a CAD are written to the **BigBrother audit**, and fire
+  `lacore:api:warrantChanged` for integrations.
+
+<Callout type="info">
+  LACORE had no rank field before this panel. On-duty units now carry a `grade` (read from the
+  framework bridge where available), and it is included in the unit roster — which is what the ★ and
+  `G<n>` in the roster come from.
+</Callout>
+
+## Troubleshooting
+
+| Symptom | Cause |
+| --- | --- |
+| `/supervisor` says you're not a supervisor | Grade below `minGrade` **and** not in `allow`. On standalone servers the grade is always `0` — use `allow`. |
+| You want to test it without setting ranks up | Enable **devmode** (`setr lacore_devmode "true"`) — it opens the gate for everyone, exactly like the dispatch and officer checks. Never leave it on in production. |
+| Nobody can open it | Standalone server with an empty `allow` list. |
+| A supervisor can't assign or set status | They opened the panel, then it was closed — the elevated access only lasts while it is open. |
+| The map is blank | Same tile setup as the dispatch console; check your map tiles resource. |
+| The roster is empty | Nobody is on duty with a callsign — the roster is built from on-duty units. |
