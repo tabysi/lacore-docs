@@ -181,17 +181,23 @@ const lines = raw.split('\n')
 const starts = []
 lines.forEach((l, i) => { if (/^## \[/.test(l)) starts.push(i) })
 
-// Escape MDX-breaking chars outside fenced code blocks + inline code.
+// Escape MDX-breaking chars outside fenced code blocks + inline code. Inline
+// `code` spans are kept verbatim — INCLUDING ones that wrap across source lines
+// (a hard-wrapped config snippet in a blockquote), which the old line-by-line
+// pass missed, so their braces got escaped and rendered as literal "&#123;".
+// So: split off fenced blocks first, then split the rest on inline code spans
+// (`[^`]` matches newlines, so multi-line spans match), and escape only prose.
+// Braces in prose use the MDX escape `\{` — NOT `&#123;`, whose `&` gets
+// re-escaped downstream to `&amp;#123;` and shows as literal "&#123;".
 function sanitize(md) {
-  let inFence = false
-  return md.split('\n').map((line) => {
-    if (/^\s*```/.test(line)) { inFence = !inFence; return line }
-    if (inFence) return line
-    return line.split(/(`[^`]*`)/g).map((p) => {
-      if (p.startsWith('`') && p.endsWith('`')) return p
-      return p.replace(/</g, '&lt;').replace(/\{/g, '&#123;').replace(/\}/g, '&#125;')
-    }).join('')
-  }).join('\n')
+  return md.split(/(```[\s\S]*?```)/g).map((seg, i) => {
+    if (i % 2 === 1) return seg // fenced code block — verbatim
+    return seg.split(/(`[^`]*`)/g).map((p, j) =>
+      j % 2 === 1
+        ? p // inline code span — verbatim
+        : p.replace(/</g, '&lt;').replace(/\{/g, '\\{').replace(/\}/g, '\\}'),
+    ).join('')
+  }).join('')
 }
 
 // Pull warning blockquotes out of a section body so they can be promoted to an
