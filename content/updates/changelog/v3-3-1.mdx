@@ -65,6 +65,60 @@ insured by default now, with a matching developer API.
   licence-block tables used to live on the overview, which made the landing page of the staff area mostly
   input fields. The overview now only *reads* the queue and links across; "Block this server" in the server
   lookup hands the target over and opens the form pre-filled.
+- **A "NETWORK LIVE" chip for the staff header.** A licence state means nothing to someone looking at the
+  whole network, so in the staff area the chip reports the fleet instead — `NETWORK LIVE · 6/9`, or
+  `NO SERVERS ONLINE`. It counts servers exactly the way the overview's status wall does (a heartbeat
+  inside 90 minutes, no active licence block on the IP), so the header and the page below it can never
+  disagree about the word "online".
+
+### Fixed
+
+#### Admin dashboard
+- **The page-head controls had no styling at all.** The Refresh button and the "synced" chip rendered with
+  no border, square corners and the wrong typeface. The whole colour and radius token set was declared on
+  `.dash`, but the shell's page head sits outside that wrapper — and an unresolvable `var()` invalidates
+  the entire declaration, so `border: 1px solid var(--border)` became no border rather than a wrong one.
+  The tokens now live on `:root` alongside the type scale, which also inoculates anything else rendered
+  outside a `.dash` wrapper. (No effect on the marketing page: its palette is the separate `--color-*` set.)
+- **The staff sidebar stopped mid-page** and the BUILD block floated directly under the nav instead of
+  sitting at the foot of the column — the sticky aside was shrink-wrapping to its contents.
+- **The whole panel was rendering in the wrong typeface.** `.dash` never set a family, so everything
+  inherited Archivo from the site's base stylesheet while the design specifies Space Grotesk.
+- **Stat-tile labels were the one micro-label that never got the uppercase mono treatment**, so every KPI
+  caption in the portal read in sentence case while the table headers and panel headings around it did not.
+  Identifiers inside a label (the bot's commit hash) opt out and keep their case.
+- **Confirmations pushed the page down.** The admin toast reused the in-flow notice banner, so showing one
+  shifted everything below it and popped it back four seconds later. It is a floating toast now.
+- **The staff area rebuilt itself on every click.** Each `/admin` page rendered its own copy of the shell
+  and fetched its own session, so moving between sections tore the chrome down and put it back: for about
+  150ms the sidebar disappeared, the header fell back to the **customer** navigation, and the live chip,
+  the section counters and the BUILD block went blank — on top of four chrome requests per navigation
+  (`/api/me`, `/api/accounts`, `/api/admin/stats`, `/api/admin/bot/status`). The customer dashboard solved
+  this with a shared layout a while ago; the staff area now has the same one, so the chrome mounts once
+  and stays. Measured after: zero DOM changes to the shell across three section changes, and the only
+  request left is the page's own data. Three places also did a **full document load** where a client-side
+  navigation was meant — the command palette, the triage tiles and "Block this server".
+  Which chrome you get is now decided by the route itself, so even the first paint of a cold load is the
+  staff shell rather than the customer one.
+- **Design-fidelity pass over the admin area.** Audited region by region against the source design and
+  closed what was off: the ticket chart is one stacked column per day over a track (it was two half-width
+  bars, and used green for closed where the design uses a single accent hue), server tiles state-colour
+  their load bar, border tint and dot glow instead of painting every bar indigo, triage tiles take a pale
+  tone across tag, number and label rather than a saturated number, tables get the design's two-weight row
+  rules and tighter cell padding, form fields align with the button beside them, panel headings no longer
+  sit 14px off-centre from the control sharing their row, and the palette's kind column is bare coloured
+  text rather than a filled pill. The STAFF chip beside the wordmark and the modal entrance animations are
+  back.
+- **The type scale is now the design's own.** The scale introduced earlier in this release was floored at
+  11.5px for readability; the source design runs smaller — 13.5px body and table text, 11px micro-labels
+  and pills, 10.5px legends and captions, 10px count badges, with 34px / 28px / 26px for the three sizes
+  of number. Those are the sizes now, floor removed, so the panel is denser and matches the mockup.
+- **The ticket modal was the last component on the old palette.** It still used the previous blue-black
+  surfaces and the Chakra Petch face, so opening a ticket looked like leaving the product. It is on the
+  shared tokens now — and since it is shared, the customer support page gets the same correction.
+- **Per-page wording on the staff sign-in wall.** Centralising the staff check into the admin layout had
+  flattened every message to one generic line; the wording is per-page again ("The ticket archive is staff
+  only.") while the check itself still lives in exactly one place.
 
 #### Customer dashboard
 - **More KPIs.** The overview adds **Servers** (online / total), **Players now** (across your servers) and
