@@ -37,12 +37,34 @@ insured by default now, with a matching developer API.
   owner, project name and description, tags, game build, OneSync, locale, gametype, map, uptime, first
   seen) — these were stored but dropped by the API, so the detail modal previously showed "—".
 - **An attention bar that tells you what needs doing.** The overview showed four backward-looking totals
-  and five lists — nothing said "act on this now". A new attention bar sits across the top with the genuine
-  to-dos, each zero when nothing is pending: **open tickets** waiting on a reply, **servers** offline or not
-  seen in three days, **closed-but-unrated** tickets, and active **server blocks**. On a quiet day it
-  collapses to a green "✓ All clear". Every count — and every stat card — is clickable and jumps to (and
-  briefly flashes) the relevant table. Open-ticket counts are computed server-side, since the on-page list
-  is capped at fifteen.
+  and five lists — nothing said "act on this now". The genuine to-dos now sit across the top as four triage
+  tiles, each green when nothing is pending: **open tickets** waiting on a reply, **servers** offline or
+  missing a heartbeat, **closed-but-unrated** tickets, and active **server blocks**. Every tile is clickable
+  and jumps to (and briefly flashes) the relevant table or page. Open-ticket counts are computed
+  server-side, since the on-page list is capped at fifteen.
+- **The staff area became a section of its own.** Nine staff pages were competing for space in the customer
+  header row, so they moved into a **sidebar** ("// STAFF AREA") that shows a live count next to the
+  sections that have work waiting — open tickets, active bans — and ends in a **BUILD** block with the
+  current LACORE version, the bot version and whether the bridge is answering. A **⌘K command palette** in
+  the header searches every registered server, network ban, archived ticket and known identity, plus the
+  staff pages themselves; its index is fetched once, on first open, and only for staff. Which chrome you
+  get is now decided by the URL rather than by the page's section key — a staff member on the *customer*
+  player page used to be flipped into admin chrome, because both pages call themselves "players".
+- **A rebuilt overview.** After the triage tiles: **players in game / servers online / ticket satisfaction**,
+  a **14-day opened-vs-closed ticket chart** drawn from the tickets' own timestamps, and a **server status
+  wall** — one tile per registered server with its load bar and one of four states. *Online* and *offline*
+  come from the API; *stale* is a server that is still counted as online but has missed its hourly
+  heartbeat by 90 minutes, and *blocked* is one whose IP carries an active licence block. Underneath, the
+  **enforcement queue** (active network bans, newest first) and a **staff activity** feed. There is no audit
+  collection, so that feed is not a new log: it merges the records that already exist — bans issued, blocks
+  placed, tickets closed, servers registered — and sorts them by their own timestamps.
+  > The KPI tiles carry a supporting figure ("across 6 online servers · 596 slots") rather than a
+  > week-over-week trend. Nothing stores the history a trend line would need, and an invented one would
+  > look exactly like a real one.
+- **Bans and blocks moved to their own page** (`/admin/bans/`). Both enforcement forms plus the ban and
+  licence-block tables used to live on the overview, which made the landing page of the staff area mostly
+  input fields. The overview now only *reads* the queue and links across; "Block this server" in the server
+  lookup hands the target over and opens the form pre-filled.
 
 #### Customer dashboard
 - **More KPIs.** The overview adds **Servers** (online / total), **Players now** (across your servers) and
