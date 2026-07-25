@@ -124,6 +124,30 @@ insured by default now, with a matching developer API.
   > holding paid-add-on flags (default **false**). These are entitlement-gated — the dashboard/backend
   > decides them; the local value is only the fail-closed default.
 
+#### CAD & MDT
+- **A Supervisor Panel — a rank-gated oversight tablet.** `/supervisor` opens a tablet for shift
+  supervisors and watch commanders with five views: a **live unit roster** (status, rank, incident and
+  location, sortable and searchable), a **live map** of every unit and active incident, **dispatch
+  controls** (assign a unit to an incident, set its status), a **division broadcast** (message to all
+  units + the attention tone), and **BOLO / warrant oversight** (active BOLOs with one-click cancel, and
+  every character currently carrying a warrant). Who counts as a supervisor is **server-decided**: the
+  unit's **job grade** on a framework server (per-department minimum), or a **config allowlist** of
+  license identifiers / callsigns for standalone servers. Gating is enforced server-side for the panel
+  *and* its actions — the client only asks — and it reuses the existing dispatch backend, so a supervisor
+  no longer has to be registered as a dispatcher to direct their shift.
+
+  > ⚠️ **New config file (`configs/cfg-supervisor-sh.lua`):** who may open the panel — `minGrade` /
+  > `minGradeByDept` for framework servers, an `allow` list (license identifier or exact callsign) for
+  > standalone ones, plus `command` and `leoOnly`. Ships closed to everyone but grade ≥ 3 / listed units.
+- **Officers can add & clear warrants from any CAD — plus a BOLO board on the 9100-T.** A warrant used to be
+  something only the person could set on their *own* profile; now any **on-duty unit** can flag or clear a
+  warrant on a queried person straight from the record, in **all four terminals** (LAPD PremierOne, LASD
+  PCMS, Agency MDT and the 9100-T retro CAD). It's **server-authoritative and on-duty-gated** — the client
+  only asks; the server sets it, mirrors it onto the person's record and writes it to the **BigBrother
+  audit** — and fires `lacore:api:warrantChanged` for integrations. The **9100-T retro terminal** also gains
+  a **BOLO board**: list active BOLOs, create one (person / vehicle / plate, with a 10-32 danger flag) and
+  cancel them — the other terminals already had this; the retro CAD was BOLO-blind until now.
+
 #### Vehicles & insurance
 - **Vehicles start insured by default.** Insurance is the flag officers see when they run a plate, and the
   owner can flip it from their profile. Until now a freshly-registered vehicle started **uninsured** and
