@@ -3,171 +3,199 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.3.1] – Vehicle insurance: default & API
+## [3.3.1] – Dashboards grow up: admin, customer & partner tooling
 
-Small follow-up from a bug report — running a plate showed every vehicle as uninsured.
+This release is mostly about the three dashboards. On the **admin** side there are new Products,
+Player-database and Customer-database pages, an attention bar that surfaces what actually needs doing, and
+a server lookup that finally shows everything the heartbeat already reported. The **partner** dashboard
+turns its referral data into a full toolkit — KPIs, a payout ledger, program analytics with a leaderboard,
+achievements and a monthly goal. The **customer** dashboard gains KPIs and a complete player roster.
+
+Around them: the Discord + portal **support tickets** got a big overhaul — eight categories, smarter
+handling and gapless, embed-aware documentation — a **paid add-on** system unlocks features per licence
+key, and a batch of new **config toggles** hand server owners control over run announcements, the
+unregistered-plate stolen flow, the built-in emote binds and the 90s phone theme. Vehicles also start
+insured by default now, with a matching developer API.
 
 ### Added
-- **Admin dashboard: Products, Player database and Customer database pages.** Three new staff pages.
-  **Products** shows sales, buyers and revenue per Tebex package (from attributed orders) plus the add-on
-  catalogue with how many accounts hold each. **Player database** lists everyone the network has seen, **deduped by shared identifier** — the Discord ↔
-  identifier log (`lacore_identities`, written on every connect) merged with the Enhanced Playerbase history
-  (`lacore_players`) into one row per person (someone under several linked identifiers, or in both sources,
-  collapses into a single player). Server-side **search/lookup** (name, Discord ID or any identifier),
-  **source filter** (Discord-linked / identity / playerbase / ghosts), **pagination**, and a per-player
-  **detail modal** with every identifier and name seen, each copyable. From the modal, staff can also
-  **ban or warn a player via the Playerbase** and lift a ban — issued under the acting staff account as
-  the community (advisory unless a server enforce-subscribes; not a network-wide `/gban`), reusing the
-  same find-or-create-player + ingest path as a server-console upload. **Customer database** is a joined
-  per-account view — license keys, lifetime spend, orders and add-ons, keyed by Discord account. The
-  **server lookup** now surfaces everything the heartbeat reports (licensed / verified owner, project name
-  and description, tags, game build, OneSync, locale, gametype, map, uptime, first seen) — these were
-  stored but dropped by the API, so the detail modal previously showed "—".
-- **Customer dashboard: more KPIs.** The overview adds **Servers** (online / total), **Players now**
-  (across your servers) and **License keys** (active) alongside the existing tiles.
-- **Customer dashboard: a full player roster.** `/dashboard/players` now leads with **All players** — every
-  player the Enhanced Playerbase has seen on your community (recorded on connect, not just the banned
-  ones), with names, identifier counts and first/last seen; players from partner communities you subscribe
-  to are tagged. The existing bans & warns records move behind a toggle.
 
-- **Paid add-on entitlements — unlock features per account from the dashboard.** A customer buys an
-  add-on (e.g. an extra CAD), and staff tick it on for their account under *Settings → Add-on
-  entitlements*. The unlock is **backend-decided per license key** and delivered through the existing
-  `/ingest/config` channel: the account's server receives its entitled add-on list and turns the matching
-  `Feature('…')` flags on. **Fail-closed** — an add-on the account isn't entitled to is forced off at
-  load even if someone edited `cfg-features-sh.lua`, so a licensed server can't switch a paid feature on
-  locally. Add your own add-ons by adding a row to the registry (`modules/entitlements/entitlements-sh.lua`
-  + `landing/lib/addons.mjs`) and gating the module with `Feature('<id>')`. Takes effect on the customer's
-  next restart; new `lacore_entitlements` PocketBase collection; ships with one example add-on, `extracad`.
+#### Admin dashboard
+- **Products, Player database and Customer database pages.** Three new staff pages. **Products** shows
+  sales, buyers and revenue per Tebex package (from attributed orders) plus the add-on catalogue with how
+  many accounts hold each. **Player database** lists everyone the network has seen, **deduped by shared
+  identifier** — the Discord ↔ identifier log (`lacore_identities`, written on every connect) merged with
+  the Enhanced Playerbase history (`lacore_players`) into one row per person (someone under several linked
+  identifiers, or in both sources, collapses into a single player). Server-side **search/lookup** (name,
+  Discord ID or any identifier), **source filter** (Discord-linked / identity / playerbase / ghosts),
+  **pagination**, and a per-player **detail modal** with every identifier and name seen, each copyable. From
+  the modal, staff can also **ban or warn a player via the Playerbase** and lift a ban — issued under the
+  acting staff account as the community (advisory unless a server enforce-subscribes; not a network-wide
+  `/gban`), reusing the same find-or-create-player + ingest path as a server-console upload. **Customer
+  database** is a joined per-account view — license keys, lifetime spend, orders and add-ons, keyed by
+  Discord account. The **server lookup** now surfaces everything the heartbeat reports (licensed / verified
+  owner, project name and description, tags, game build, OneSync, locale, gametype, map, uptime, first
+  seen) — these were stored but dropped by the API, so the detail modal previously showed "—".
+- **An attention bar that tells you what needs doing.** The overview showed four backward-looking totals
+  and five lists — nothing said "act on this now". A new attention bar sits across the top with the genuine
+  to-dos, each zero when nothing is pending: **open tickets** waiting on a reply, **servers** offline or not
+  seen in three days, **closed-but-unrated** tickets, and active **server blocks**. On a quiet day it
+  collapses to a green "✓ All clear". Every count — and every stat card — is clickable and jumps to (and
+  briefly flashes) the relevant table. Open-ticket counts are computed server-side, since the on-page list
+  is capped at fifteen.
+
+#### Customer dashboard
+- **More KPIs.** The overview adds **Servers** (online / total), **Players now** (across your servers) and
+  **License keys** (active) alongside the existing tiles.
+- **A full player roster.** `/dashboard/players` now leads with **All players** — every player the Enhanced
+  Playerbase has seen on your community (recorded on connect, not just the banned ones), with names,
+  identifier counts and first/last seen; players from partner communities you subscribe to are tagged. The
+  existing bans & warns records move behind a toggle.
+
+#### Partner dashboard
+- **More of what it already knows.** The referral page had earnings, a six-month chart and recent orders; it
+  now leads with a six-tile KPI strip — lifetime commission, this month, **month-over-month growth**,
+  **average commission per order**, referred sales and revenue — and adds two panels built from the same
+  attributed orders: **product performance** (revenue and order count per package, as ranked bars) and
+  **customers** (new vs. returning, average spend, and top spenders). Buyer identifiers in the top-spenders
+  list are **masked** — a Discord id shows only its last four digits, an email only its first two characters
+  and domain; the plain values never leave the server.
+- **A payout ledger — bookkeeping, not money movement.** Partners now see a **Payouts** panel: **available**
+  (lifetime commission minus what's already been paid and what's pending), **paid out**, **pending**, and a
+  history table they can **export as CSV**. Staff record payouts under *Settings → Partner payouts*, where a
+  balance table shows what each partner is owed before a transfer. Recording a payout only **logs** that a
+  transfer happened — nothing here sends money; the actual transfer stays manual (PayPal, bank, …).
+  Tebex-paid partners settle in their own Tebex wallet, so for them the panel points to Tebex rather than
+  showing a LACORE balance. Backed by a new `lacore_payouts` PocketBase collection; if it isn't imported yet
+  the ledger simply shows empty.
+- **Program analytics and a leaderboard for staff.** *Settings → Partner program* now opens with the whole
+  program at a glance: **referred revenue** and total sales across all partners, **commission** earned,
+  **LACORE owed** (unpaid balance for LACORE-paid partners only), partner count, a six-month revenue trend,
+  and a **leaderboard** ranking partners by referred revenue (sales, revenue, commission per partner). It's
+  computed in the same pass that builds the payout balances, so it costs no extra work.
+- **Achievements.** The referral page gained an **Achievements** strip — tiered milestones built only from
+  the partner's *own* numbers (referred sales, commission earned, link clicks, unique customers, renewals),
+  each showing the level reached and progress to the next tier. No other partner's figures are ever exposed
+  here; the cross-partner leaderboard stays staff-only.
+- **A monthly goal.** Partners can set a personal monthly commission target on the referral page and watch
+  this month's earnings fill the bar toward it — with a "goal reached" flourish at 100%. Stored on their own
+  partner record (a new `goal` field on `lacore_partners`); self-service, no admin step. Paired with an
+  optional Discord DM (bot side) the moment a sale is attributed to their code.
+- **A QR code for the referral link.** A QR code button on the referral page renders the partner's link as a
+  scannable code (generated client-side, no external service) with a one-click SVG download — for streams,
+  overlays, print and business cards.
+
+#### Support tickets
+- **More categories, better handling, image uploads.** The Discord ticket panel and the customer portal now
+  offer **8 categories** (Support, Bug report, Installation & setup, Purchase & license, Feature request,
+  Report a player, Partnership, Other) instead of 4. Discord ticket channels are now named
+  **`[type]-[username]-[id]`** (e.g. `bug-max-0001`); each ticket opens with category-tailored *"what to
+  include"* guidance and a default priority (bug reports & player reports open at **high**), and staff get
+  one-click **🔀 Priority** (re-triage) and **➕ Add user** (searchable member dropdown) header buttons.
+  **`/ticket rename`** can now change a ticket's **category** — the channel prefix, the AI setting, and the
+  **Discord category the channel is moved into** all update to match (e.g. renaming a Support ticket to
+  Partnership pulls it into the partner category). The AI doc-assistant is **off** for Purchase, Report and
+  Partnership tickets (human-handled). Each ticket type can also **route to its own Discord category
+  channel**, configurable from the dashboard *Bot configuration* table (or `/config`); unset types fall back
+  to the default tickets category. Openers can finally **attach screenshots** — the ticket channel now grants
+  *Attach Files* / *Embed Links* (this was the missing permission). *(Discord bot lives in its own repo; the
+  portal category list here is kept in sync.)*
+- **Gapless documentation — embeds and every message.** Ticket transcripts silently dropped every embed as
+  "(embed/attachment)" — and since staff dashboard replies, web-portal replies and the AI assistant *all*
+  post as embeds, the entire support side of each conversation was missing from the history. Now every
+  message is rendered in full (embeds, attachment names), read past Discord's 100-message cap, and the
+  conversation view tags each line by source (opener / staff / AI / portal). A new `lacore_ticket_messages`
+  collection records each message the instant it is posted, so the documentation is immediate and complete
+  even for long or long-since-closed tickets. Degrades safely: until the collection is imported, the bot
+  falls back to a full paginated read of the channel.
+
+#### Paid add-ons
+- **Add-on entitlements — unlock features per account from the dashboard.** A customer buys an add-on (e.g.
+  an extra CAD), and staff tick it on for their account under *Settings → Add-on entitlements*. The unlock is
+  **backend-decided per license key** and delivered through the existing `/ingest/config` channel: the
+  account's server receives its entitled add-on list and turns the matching `Feature('…')` flags on.
+  **Fail-closed** — an add-on the account isn't entitled to is forced off at load even if someone edited
+  `cfg-features-sh.lua`, so a licensed server can't switch a paid feature on locally. Add your own add-ons by
+  adding a row to the registry (`modules/entitlements/entitlements-sh.lua` + `landing/lib/addons.mjs`) and
+  gating the module with `Feature('<id>')`. Takes effect on the customer's next restart; new
+  `lacore_entitlements` PocketBase collection; ships with one example add-on, `extracad`.
 
   > ⚠️ **Config note (`configs/cfg-features-sh.lua`):** a new **Add-ons** block at the end of `Features`,
   > holding paid-add-on flags (default **false**). These are entitlement-gated — the dashboard/backend
   > decides them; the local value is only the fail-closed default.
 
-- **The admin dashboard tells you what needs doing.** The overview showed four backward-looking totals
-  and five lists — nothing said "act on this now". A new attention bar sits across the top with the
-  genuine to-dos, each zero when nothing is pending: **open tickets** waiting on a reply, **servers**
-  offline or not seen in three days, **closed-but-unrated** tickets, and active **server blocks**. On a
-  quiet day it collapses to a green "✓ All clear". Every count — and every stat card — is clickable and
-  jumps to (and briefly flashes) the relevant table. Open-ticket counts are computed server-side, since
-  the on-page list is capped at fifteen.
-
-- **The partner dashboard shows more of what it already knows.** The referral page had earnings, a
-  six-month chart and recent orders; it now leads with a six-tile KPI strip — lifetime commission, this
-  month, **month-over-month growth**, **average commission per order**, referred sales and revenue — and
-  adds two panels built from the same attributed orders: **product performance** (revenue and order count
-  per package, as ranked bars) and **customers** (new vs. returning, average spend, and top spenders).
-  Buyer identifiers in the top-spenders list are **masked** — a Discord id shows only its last four
-  digits, an email only its first two characters and domain; the plain values never leave the server.
-
-- **A payout ledger for partners — bookkeeping, not money movement.** Partners now see a **Payouts**
-  panel: **available** (lifetime commission minus what's already been paid and what's pending), **paid
-  out**, **pending**, and a history table they can **export as CSV**. Staff record payouts under
-  *Settings → Partner payouts*, where a balance table shows what each partner is owed before a transfer.
-  Recording a payout only **logs** that a transfer happened — nothing here sends money; the actual
-  transfer stays manual (PayPal, bank, …). Tebex-paid partners settle in their own Tebex wallet, so for
-  them the panel points to Tebex rather than showing a LACORE balance. Backed by a new
-  `lacore_payouts` PocketBase collection; if it isn't imported yet the ledger simply shows empty.
-
-- **Partner-program analytics and a leaderboard for staff.** *Settings → Partner program* now opens with
-  the whole program at a glance: **referred revenue** and total sales across all partners, **commission**
-  earned, **LACORE owed** (unpaid balance for LACORE-paid partners only), partner count, a six-month
-  revenue trend, and a **leaderboard** ranking partners by referred revenue (sales, revenue, commission
-  per partner). It's computed in the same pass that builds the payout balances, so it costs no extra work.
-
-- **Achievements for partners.** The referral page gained an **Achievements** strip — tiered milestones
-  built only from the partner's *own* numbers (referred sales, commission earned, link clicks, unique
-  customers, renewals), each showing the level reached and progress to the next tier. No other partner's
-  figures are ever exposed here; the cross-partner leaderboard stays staff-only.
-
-- **Monthly goal for partners.** Partners can set a personal monthly commission target on the referral
-  page and watch this month's earnings fill the bar toward it — with a "goal reached" flourish at 100%.
-  Stored on their own partner record (a new `goal` field on `lacore_partners`); self-service, no admin
-  step. Paired with an optional Discord DM (bot side) the moment a sale is attributed to their code.
-
-- **QR code for the referral link.** A QR code button on the referral page renders the partner's link as
-  a scannable code (generated client-side, no external service) with a one-click SVG download — for
-  streams, overlays, print and business cards.
-
-- **The unregistered-plate → stolen flow is now a config toggle.** When an officer runs a plate that
-  isn't on file, LACORE asks the driver to `/vreg` and, if they don't in time, flags the **plate** as
-  stolen. A new `Vehicles.vreg` block turns the whole flow on/off (`enabled`) and tunes the window
-  (`seconds`, previously hard-coded to 15). Also editable from the dashboard. Clarified across the docs
-  that **LACORE never deletes the vehicle** here — it only writes a stolen flag on the plate; a car that
-  vanishes the instant it spawns is a *different* resource (a vehicle whitelist, an anticheat, a garage
-  script), which this toggle will not affect.
-
-  > ⚠️ **Config note (`configs/cfg-vehicles-sh.lua`):** one new block, `Vehicles.vreg = { enabled = true,
-  > seconds = 15 }`, defaulting to the previous behaviour. Set `enabled = false` to remove the `/vreg`
-  > prompt and the stolen flag entirely.
-
-- **Gapless ticket documentation — embeds and every message.** Ticket transcripts silently dropped every
-  embed as "(embed/attachment)" — and since staff dashboard replies, web-portal replies and the AI
-  assistant *all* post as embeds, the entire support side of each conversation was missing from the
-  history. Now every message is rendered in full (embeds, attachment names), read past Discord's
-  100-message cap, and the conversation view tags each line by source (opener / staff / AI / portal).
-  A new `lacore_ticket_messages` collection records each message the instant it is posted, so the
-  documentation is immediate and complete even for long or long-since-closed tickets. Degrades safely:
-  until the collection is imported, the bot falls back to a full paginated read of the channel.
-
-- **The built-in hands-up / holster binds can be switched off.** LACORE registers hands up (`/hu`, **U**)
-  and hand-on-holster (`/hh`, **X**). Set **`Features.rpemotes = false`** and neither command is
-  registered and both keys are left free — for anyone running a dedicated emote / roleplay script that
-  owns U and X. Same pattern as the seatbelt toggle; cuffing forces hands up on its own and is not
-  affected. Also toggleable from the dashboard (Features).
-
-- **One config for the 90s theme.** The retro phone's settings used to be scattered across
-  `cfg-phone-sh.lua`, and the year and handset name were hardcoded in the UI. The new
-  `configs/cfg-retro-sh.lua` gathers it in one place: turn the retro phone on, set the **year** it shows,
-  the **phone model name**, the **in-hand prop** and the **carrier**. All cosmetic — the year never
-  touches the in-game clock. Also tunable from the dashboard (Retro / 90s tab).
-
-  Backward compatible: a server still setting `PhoneCfg.retro = true` keeps working, and an old config
-  with no retro block falls back to the shipped `NT-3100` / brand name.
-
-- **Vehicles start insured by default.** Insurance is the flag officers see when they run a plate, and
-  the owner can flip it from their profile. Until now a freshly-registered vehicle started **uninsured**
-  and stayed that way until the owner opted in, so running plates showed uninsured across the board. New
+#### Vehicles & insurance
+- **Vehicles start insured by default.** Insurance is the flag officers see when they run a plate, and the
+  owner can flip it from their profile. Until now a freshly-registered vehicle started **uninsured** and
+  stayed that way until the owner opted in, so running plates showed uninsured across the board. New
   registrations are now insured out of the box. A new switch, **`Vehicles.insuredByDefault`** in
   `cfg-vehicles-sh.lua` (also tunable from the dashboard), turns it back to opt-in.
 
   Only the **first** registration is affected: a vehicle an owner has deliberately un-insured stays
-  un-insured, and re-registering never overrides their choice. (That distinction was also a latent bug —
-  the old `existingVeh.insured or false` would have re-insured an un-insured car under the new default; it
-  is now handled explicitly.)
-
-- **Insurance developer API** (API v1.1.0). `exports['lacore']:GetInsurance(plate)` returns `true` /
-  `false` / `nil` (unknown plate), and `SetInsurance(plate, insured)` writes it — so a mechanic job, an
-  insurance shop or a payment webhook can drive insurance without touching the core. A new event
-  `lacore:api:insuranceChanged (plate, insured, by)` fires on every change. Docs in `modules/api/README.md`.
+  un-insured, and re-registering never overrides their choice. (That distinction was also a latent bug — the
+  old `existingVeh.insured or false` would have re-insured an un-insured car under the new default; it is now
+  handled explicitly.)
 
   > ⚠️ **Config note (`configs/cfg-vehicles-sh.lua`):** one new key, `insuredByDefault`, defaulting to
   > **true**. On update, vehicles registered from now on start insured; existing records are untouched. Set
   > it to `false` to keep the old opt-in behaviour.
+- **Insurance developer API** (API v1.1.0). `exports['lacore']:GetInsurance(plate)` returns `true` / `false`
+  / `nil` (unknown plate), and `SetInsurance(plate, insured)` writes it — so a mechanic job, an insurance
+  shop or a payment webhook can drive insurance without touching the core. A new event
+  `lacore:api:insuranceChanged (plate, insured, by)` fires on every change. Docs in `modules/api/README.md`.
+- **The unregistered-plate → stolen flow is now a config toggle.** When an officer runs a plate that isn't on
+  file, LACORE asks the driver to `/vreg` and, if they don't in time, flags the **plate** as stolen. A new
+  `Vehicles.vreg` block turns the whole flow on/off (`enabled`) and tunes the window (`seconds`, previously
+  hard-coded to 15). Also editable from the dashboard. Clarified across the docs that **LACORE never deletes
+  the vehicle** here — it only writes a stolen flag on the plate; a car that vanishes the instant it spawns is
+  a *different* resource (a vehicle whitelist, an anticheat, a garage script), which this toggle will not
+  affect.
+
+  > ⚠️ **Config note (`configs/cfg-vehicles-sh.lua`):** one new block, `Vehicles.vreg = { enabled = true,
+  > seconds = 15 }`, defaulting to the previous behaviour. Set `enabled = false` to remove the `/vreg` prompt
+  > and the stolen flag entirely.
+
+#### Server-owner controls
+- **Toggle the "ran a plate / person" chat broadcast.** Running someone or a plate in the MDT/CAD posts a
+  `<callsign> ran "<query>"` line in chat to on-duty units (LAPD, LASD and Agency). A new
+  **`MdtConfig.announceRuns`** option lets servers that find this spammy — or want run history kept private —
+  turn it off; the default stays **on** (unchanged behaviour). ⚠️ **Config change:** new
+  `MdtConfig.announceRuns` key in `configs/cfg-mdt-sh.lua` (set it to `false` to disable).
+- **The built-in hands-up / holster binds can be switched off.** LACORE registers hands up (`/hu`, **U**) and
+  hand-on-holster (`/hh`, **X**). Set **`Features.rpemotes = false`** and neither command is registered and
+  both keys are left free — for anyone running a dedicated emote / roleplay script that owns U and X. Same
+  pattern as the seatbelt toggle; cuffing forces hands up on its own and is not affected. Also toggleable
+  from the dashboard (Features).
+- **One config for the 90s theme.** The retro phone's settings used to be scattered across `cfg-phone-sh.lua`,
+  and the year and handset name were hardcoded in the UI. The new `configs/cfg-retro-sh.lua` gathers it in one
+  place: turn the retro phone on, set the **year** it shows, the **phone model name**, the **in-hand prop**
+  and the **carrier**. All cosmetic — the year never touches the in-game clock. Also tunable from the
+  dashboard (Retro / 90s tab).
+
+  Backward compatible: a server still setting `PhoneCfg.retro = true` keeps working, and an old config with no
+  retro block falls back to the shipped `NT-3100` / brand name.
 
 ### Fixed
-- **Admin "open tickets" count was inflated.** The overview counted PocketBase ticket rows with no
-  `closedAt`, which included synced rows for channels that were deleted without a proper close (e.g. it
-  read 22 when only 9 were open). It now uses the bot's **live** count (open channels under the tickets
-  category), falling back to the old heuristic only if the bot is unreachable.
-- **Customer dashboard version was stuck at 3.2.1.** The version came from the `LACORE_VERSION` env pin,
-  which short-circuited the changelog-derived lookup (exactly the drift the design was meant to avoid). The
+- **Admin "open tickets" count was inflated.** The overview counted PocketBase ticket rows with no `closedAt`,
+  which included synced rows for channels that were deleted without a proper close (e.g. it read 22 when only
+  9 were open). It now uses the bot's **live** count (open tickets whose channel still exists), falling back
+  to the old heuristic only if the bot is unreachable.
+- **Customer dashboard version was stuck at 3.2.1.** The version came from the `LACORE_VERSION` env pin, which
+  short-circuited the changelog-derived lookup (exactly the drift the design was meant to avoid). The
   changelog is now the source of truth; `LACORE_VERSION` is only an emergency fallback for the first read
   before the changelog is reachable — so the version self-heals to the latest without touching the server.
-- **The retro 9100-T CAD now shows a stolen flag on an unregistered plate.** Running a plate that was
-  flagged stolen but never registered showed **"NO RECORD"** on the retro terminal (the LAPD and Agency
-  CADs showed it correctly). The retro CAD only read the stolen flag from inside the code path that
-  needs a matching record, so an empty result dropped it. It now raises the caution and prints
-  **`<plate> — STOLEN VEHICLE`** even with no record on file, matching the other CADs.
-
+- **The retro 9100-T CAD now shows a stolen flag on an unregistered plate.** Running a plate that was flagged
+  stolen but never registered showed **"NO RECORD"** on the retro terminal (the LAPD and Agency CADs showed it
+  correctly). The retro CAD only read the stolen flag from inside the code path that needs a matching record,
+  so an empty result dropped it. It now raises the caution and prints **`<plate> — STOLEN VEHICLE`** even with
+  no record on file, matching the other CADs.
 - **Docs reconciled with the actual configs.** A careful audit of the documentation against every
   `configs/*.lua` fixed a batch of stale or wrong reference entries (notify modes, the phone eyefind URL,
   evidence types, air-unit/impound/global-ban wording, member-vehicle gating, the penal-code mockup, and
-  more), and documented recently-added configs that were missing (retro phone, `Features.rpemotes`, the
-  Turf capture keys, the remote-config consent gate, Rich Presence, identity link). A few stale config
-  **comments** were also corrected to match the code — the STT engine is Vosk (not browser
-  SpeechRecognition), the K9 command list includes `sit`/`lay`/`bark`, and Rich Presence isn't
-  convar-driven. Comment/doc only — no behaviour changed.
+  more), and documented recently-added configs that were missing (retro phone, `Features.rpemotes`, the Turf
+  capture keys, the remote-config consent gate, Rich Presence, identity link). A few stale config
+  **comments** were also corrected to match the code — the STT engine is Vosk (not browser SpeechRecognition),
+  the K9 command list includes `sit`/`lay`/`bark`, and Rich Presence isn't convar-driven. Comment/doc only —
+  no behaviour changed.
 
 ## [3.3.0] – Model library, config editor & a rebuilt player list
 

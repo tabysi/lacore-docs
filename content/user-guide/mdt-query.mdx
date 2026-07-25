@@ -167,7 +167,7 @@ For the **full** record, jump to **Persons** or re-run.
 - Person records live in `civilians.json` (DB store `civilians`), keyed by license identifier
 - `/char` presets are stored per identifier in `char_presets.json` (DB store `char_presets`)
 - Stolen-plate flags are in `stolen_plates.json` (DB store `stolen_plates`)
-- Every run is announced in the in-game chat to on-duty units (`MDT` prefix, blue)
+- Every run is announced in the in-game chat to on-duty units (`MDT` prefix, blue). Server owners can turn this off with `MdtConfig.announceRuns = false` in `configs/cfg-mdt-sh.lua` (LASD/CAD runs included)
 - Runs are logged in the admin audit (admin-only access via `/calllog`)
 
 For developers building on these stores, see the [Development reference](https://github.com/tabysi/pvp-corev3-community/blob/main/.github/DEVELOPMENT.md) in the source repo.

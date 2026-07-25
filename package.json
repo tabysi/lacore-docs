@@ -12,20 +12,21 @@
     "deploy": "node scripts/deploy.mjs"
   },
   "dependencies": {
-    "next": "^15.1.6",
+    "next": "^15.5.21",
     "nextra": "^4.2.17",
     "nextra-theme-docs": "^4.2.17",
     "react": "^19.0.0",
     "react-aria": "^3.50.0",
     "react-dom": "^19.0.0"
   },
-  "comment:overrides": "postcss <8.5.10 (GHSA-qx2v-qp2m-jg93) reaches us only through next and runs at build time on our own CSS, so the XSS path (untrusted CSS input) is not reachable. Pinned anyway to keep the alert list clean.",
+  "comment:overrides": "postcss <8.5.10 (GHSA-qx2v-qp2m-jg93) reaches us only through next and runs at build time on our own CSS, so the XSS path (untrusted CSS input) is not reachable. Pinned anyway to keep the alert list clean. sharp is forced to 0.35 (libvips CVEs GHSA-f88m-g3jw-g9cj) because next bundles an older 0.34 copy; it only runs at build time on our own images and the site is statically exported, so next's image optimizer never runs at all.",
   "overrides": {
     "zod": "4.1.12",
-    "postcss": "^8.5.10"
+    "postcss": "^8.5.10",
+    "sharp": "$sharp"
   },
   "devDependencies": {
     "pagefind": "^1.5.2",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.3"
   }
 }
