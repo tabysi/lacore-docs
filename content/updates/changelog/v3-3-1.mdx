@@ -181,6 +181,26 @@ insured by default now, with a matching developer API.
   > ⚠️ **New config file (`configs/cfg-cases-sh.lua`):** the case-number agency prefix, case types,
   > narrative sections, person/vehicle roles and dispositions.
 
+- **Case review — an officer submits, a supervisor signs off.** Submitted cases land in a **review queue**
+  (oldest first, with a badge showing how many are waiting) where a supervisor approves or rejects them.
+  **A rejection requires a reason** — enforced on the server, not just greyed out in the UI — because an
+  officer who has to fix a report needs to know what to fix. The submitting officer is notified of the
+  outcome wherever they are, and both decisions land in the case's own audit trail and the admin audit.
+  Approving **locks** the case: corrections open a **supplement** that carries the parent's number, so a
+  signed-off file is never quietly rewritten.
+
+- **A master name & plate index.** Search a person or a plate and see everywhere it turns up: their own
+  record (warrants, arrests, citations, reports, evidence), their registered vehicles, and every case they
+  appear on — as a suspect, victim, witness or as the officer of record. Clicking a result opens that case
+  as its own tab, so following a thread through the records is one click rather than a new search.
+
+- **Developer API v1.2.0 — personnel and cases.** `GetPersonnelFile` / `GetDutyLog` read a service record,
+  and `GetCase` / `GetCases` / `CreateCase` work with case files. Personnel access is deliberately
+  **read-only**: promotions and discipline sit behind a higher in-game permission bar and an export cannot
+  prove who is asking. A case opened through the API is owned by the **calling resource**, not a fabricated
+  unit, and starts as a draft that goes through the same supervisor review as any other. Documented in
+  `modules/api/README.md` (whose version line had drifted and is now correct again).
+
 - **Officers can add & clear warrants from any CAD — plus a BOLO board on the 9100-T.** A warrant used to be
   something only the person could set on their *own* profile; now any **on-duty unit** can flag or clear a
   warrant on a queried person straight from the record, in **all four terminals** (LAPD PremierOne, LASD

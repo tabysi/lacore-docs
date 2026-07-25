@@ -73,37 +73,108 @@ SupervisorConfig = {
 }
 ```
 
-## The five views
+### Personnel & cases
 
-### Roster
+Two more config files come with the records modules:
 
-Every on-duty unit, live: **status** (colour-coded), **callsign**, **rank**, **name + department**,
-the **incident** they're attached to, and their **location**. Sort by callsign or status, and search by
-callsign, name or department. Units flagged as supervisors carry a **★**; the framework grade shows as
-`G<n>`. Partners sharing a callsign are merged into one row.
+| File | What it holds |
+| --- | --- |
+| `configs/cfg-personnel-sh.lua` | The **write bar** (`writePermission`, `writeMinGrade`) plus the vocabulary: entry types, personnel statuses, and the certifications your departments issue. |
+| `configs/cfg-cases-sh.lua` | The case-number **agency prefix** (`LAPD-26-000142`), case types, narrative sections, person/vehicle roles and dispositions. |
 
-### Map
+Both are read by the terminal at open time, so renaming a certification or adding a case type takes effect
+without touching the UI.
 
-Every unit and every active incident on the LACORE map — the same projection and tiles as the
-[dispatch console](/user-guide/dispatch-console). Unit markers are outlined in their status colour;
-incidents show their number.
+## The terminal
 
-### Dispatch
+It is laid out like a records application, not a game menu: a **module rail** on the left, **several
+records open at once as tabs** along the top, dense sortable grids, labelled field sheets, a
+function-key bar (`F2` search, `F5` refresh, `ESC` close) and a status line. Three themes —
+**classic** (light, the realistic look), **dark** and **amber** — switchable from the ⚙ menu, along
+with opacity and scale. The window is draggable and remembers where you put it.
 
-Pick a **unit** and an **incident** to **assign** (the unit is set to *enroute* and attached), or set a
-picked unit's **status** directly: `CLEAR`, `ENROUTE`, `ON SCENE`, `CODE SIX`, `BUSY`,
-`OUT TO STATION`, `UNAVAILABLE`.
+## Modules
 
-### Broadcast
+### Watch
 
-Send a **division-wide message** to all units, and trigger the **attention tone**. Recent radio traffic
-is listed underneath so you can see what you're talking into.
+The shift at a glance, in four views:
 
-### BOLO / Warrants
+- **Roster** — every on-duty unit: **status** (colour-coded), **callsign**, **rank**, **name +
+  department**, the **incident** they're attached to and their **location**. Sortable and searchable;
+  supervisors carry a **★**, the job grade shows as `G<n>`, and partners sharing a callsign merge into
+  one row. Selecting a unit opens its detail sheet.
+- **Map** — every unit and active incident on the LACORE map, same projection and tiles as the
+  [dispatch console](/user-guide/dispatch-console).
+- **Dispatch** — pick a unit and an incident to **assign** (the unit goes *enroute* and is attached), or
+  set its **status** directly.
+- **Broadcast** — a division-wide message to all units plus the **attention tone**, with the recent radio
+  traffic underneath.
 
-Oversight of both at once: **active BOLOs** with one-click cancel, and **every character currently
-carrying a warrant** (read-only, name + reason). Warrants themselves are set and cleared from a
-person's record in any CAD — see [BOLOs & Charges](/features/bolos-charges).
+### Warrants & BOLO
+
+Active **BOLOs** with one-click cancel, and **every character currently carrying a warrant**. Warrants
+themselves are set and cleared from a person's record in any CAD — see
+[BOLOs & Charges](/features/bolos-charges).
+
+### Personnel
+
+An officer's service record. The index lists everyone the server has seen on duty; opening one gives:
+
+| Tab | Contents |
+| --- | --- |
+| Identity | Name, callsign, department, rank, status, first/last seen |
+| Service | Total time on duty (broken down per department), playtime, and the **shift log** |
+| Training & Certs | Certifications held, and when they were issued |
+| Discipline & Commendations | Commendations, reprimands, counseling, training notes |
+| Activity | Arrests, citations, reports and evidence authored by this officer |
+| History | Callsign history and rank history |
+
+**Reading** a file needs the supervisor rank. **Writing** one is a higher bar — see
+[Editing personnel files](#editing-personnel-files).
+
+<Callout type="info">
+  Nothing from before this feature existed can be attributed — there was no rank, no duty history and no
+  author stored on older records. Files start when the officer was first seen, and the Activity tab states
+  the date its counters begin from rather than implying they cover the server's whole history.
+</Callout>
+
+### Cases
+
+The extended report layer. A case ties an incident, the people and vehicles involved, the reports already
+on their records and a multi-section **narrative** into one numbered file — `LAPD-26-000142`, from its own
+counter, deliberately **not** the incident number (that one rolls over and is reused).
+
+A case is a **container, not a copy**: reports keep living on the person's record and the case points at
+them. File a report the normal way with a case number and it links both ways.
+
+Tabs: **Summary** (with incidents, disposition and submit), **Narrative**, **Persons**, **Vehicles**,
+**Reports**, **Audit**.
+
+### Review queue
+
+Submitted cases waiting for a decision, **oldest first**, with a badge showing how many. A supervisor
+approves or rejects; **a rejection requires a reason** (enforced on the server, not just greyed out) and
+the submitting officer is notified either way.
+
+Approving **locks** the case. Corrections open a **supplement** — a new case carrying the parent's number
+— so a signed-off file is never quietly rewritten.
+
+### Master index
+
+Search a person or a plate and see everywhere it turns up: their own record (warrants, arrests, citations,
+reports, evidence), their registered vehicles, and every case they appear on — as suspect, victim, witness
+or officer of record. Clicking a result opens that case as its own tab.
+
+## Editing personnel files
+
+Promotions, certifications and discipline are career records, so writing them is deliberately a **second,
+higher bar** than reading them. A writer qualifies with **either**:
+
+1. the **`lacore.personnel.write` ACE permission** (also satisfied by staff/dev and by devmode), or
+2. a **job grade** at or above `PersonnelConfig.writeMinGrade`.
+
+Both are checked on the server and re-checked on every write. Without it the file stays fully readable and
+says so. Reads are audited too, and a file containing discipline entries is logged as such.
 
 ## Server authority & audit
 
