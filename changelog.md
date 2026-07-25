@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.3.2] – In development
+
+Nothing has landed in this version yet — 3.3.1 is the current shipped build. Changes made
+from here on are documented in this section.
+
 ## [3.3.1] – Dashboards grow up: admin, customer & partner tooling
 
 This release is mostly about the three dashboards. On the **admin** side there are new Products,
