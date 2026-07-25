@@ -125,20 +125,70 @@ insured by default now, with a matching developer API.
   > decides them; the local value is only the fail-closed default.
 
 #### CAD & MDT
-- **A Supervisor Panel — a rank-gated oversight tablet.** `/supervisor` opens a tablet for shift
-  supervisors and watch commanders with five views: a **live unit roster** (status, rank, incident and
-  location, sortable and searchable), a **live map** of every unit and active incident, **dispatch
-  controls** (assign a unit to an incident, set its status), a **division broadcast** (message to all
-  units + the attention tone), and **BOLO / warrant oversight** (active BOLOs with one-click cancel, and
-  every character currently carrying a warrant). Who counts as a supervisor is **server-decided**: the
-  unit's **job grade** on a framework server (per-department minimum), or a **config allowlist** of
-  license identifiers / callsigns for standalone servers. Gating is enforced server-side for the panel
-  *and* its actions — the client only asks — and it reuses the existing dispatch backend, so a supervisor
-  no longer has to be registered as a dispatcher to direct their shift.
+- **A Supervisor terminal — records, not just a dashboard.** `/supervisor` opens a rank-gated terminal for
+  shift supervisors and watch commanders, built to read like a real public-safety records system rather
+  than a game UI: a module launcher, **several records open at once as tabs**, dense sortable grids,
+  labelled field sheets, a function-key bar and a status line. Four modules ship:
+  **Watch** (live unit roster with rank and location, a live map of every unit and incident, assign /
+  set-status controls and a division broadcast with the attention tone), **Warrants & BOLO** (active
+  BOLOs with one-click cancel and everyone currently carrying a warrant), **Personnel** and **Cases**
+  (below). Who counts as a supervisor is **server-decided**: the unit's **job grade** on a framework
+  server (per-department minimum), or a **config allowlist** of license identifiers / callsigns for
+  standalone servers. Gating is enforced server-side for the terminal *and* its actions — the client only
+  asks — and it reuses the existing dispatch backend, so a supervisor no longer has to be registered as a
+  dispatcher to direct their shift. Every command action is written to the admin audit.
 
-  > ⚠️ **New config file (`configs/cfg-supervisor-sh.lua`):** who may open the panel — `minGrade` /
+  > ⚠️ **New config file (`configs/cfg-supervisor-sh.lua`):** who may open the terminal — `minGrade` /
   > `minGradeByDept` for framework servers, an `allow` list (license identifier or exact callsign) for
   > standalone ones, plus `command` and `leoOnly`. Ships closed to everyone but grade ≥ 3 / listed units.
+  > On a **standalone** server every grade is 0, so the `allow` list is the only way in — leave it empty
+  > and nobody can open it.
+
+- **Personnel files.** The Personnel module is an officer's service record: identity and assignment, a
+  **shift log** with time on duty broken down per department, **callsign and rank history**, training and
+  **certifications**, **discipline and commendations**, and activity counters (arrests, citations, reports,
+  evidence). LACORE carried no rank at all before this, so on-duty units now also carry a job grade, and
+  the roster shows it.
+
+  Reading a file needs the supervisor rank. **Writing one is a deliberately higher bar** — promotions,
+  certifications and discipline are career records — and needs either the `lacore.personnel.write` ACE
+  permission or a job grade at/above `writeMinGrade`. Both are decided on the server and re-checked on
+  every write. Reads are audited too, and a file containing discipline entries is logged as such.
+
+  Activity counters are computed by a **scan** over who authored each record, not incremented on write, so
+  they can always be recomputed and never drift — every LEO write path now stores a stable author identity
+  alongside the display name it stored before. **Honest by construction:** nothing from before this update
+  can be attributed (there was no rank, no duty history and no author on old records), so files start when
+  they were first seen and the Activity tab states the date its counters begin from rather than implying
+  they cover the server's whole history.
+
+  > ⚠️ **New config file (`configs/cfg-personnel-sh.lua`):** the write bar (`writePermission`,
+  > `writeMinGrade`) plus the vocabulary — entry types, statuses and the certifications your departments
+  > issue. Rename or extend them freely; the terminal reads them from here.
+
+- **Case files — the extended report layer.** A case ties an incident, the people and vehicles involved,
+  the reports already on their records and a multi-section **narrative** (synopsis / investigation /
+  statements / conclusion) into one numbered file, with its own audit trail and a `draft → submitted`
+  status. Cases get a real number — `LAPD-26-000142` — from their own counter, deliberately **not** the
+  incident number, which rolls over and is reused.
+
+  A case is a **container, not a copy**: reports keep living on the person's record exactly as before and
+  the case points at them, so nothing had to be migrated and the MDT person query is untouched. Filing a
+  report the normal way with a case number links it both ways, which finally makes "show me every report
+  on this case" answerable. Attaching an incident that doesn't exist is refused rather than left dangling,
+  and an approved case is locked — corrections become a supplement.
+
+  > ⚠️ **New config file (`configs/cfg-cases-sh.lua`):** the case-number agency prefix, case types,
+  > narrative sections, person/vehicle roles and dispositions.
+
+- **Officers can add & clear warrants from any CAD — plus a BOLO board on the 9100-T.** A warrant used to be
+  something only the person could set on their *own* profile; now any **on-duty unit** can flag or clear a
+  warrant on a queried person straight from the record, in **all four terminals** (LAPD PremierOne, LASD
+  PCMS, Agency MDT and the 9100-T retro CAD). It's **server-authoritative and on-duty-gated** — the client
+  only asks; the server sets it, mirrors it onto the person's record and writes it to the **BigBrother
+  audit** — and fires `lacore:api:warrantChanged` for integrations. The **9100-T retro terminal** also gains
+  a **BOLO board**: list active BOLOs, create one (person / vehicle / plate, with a 10-32 danger flag) and
+  cancel them — the other terminals already had this; the retro CAD was BOLO-blind until now.
 - **Officers can add & clear warrants from any CAD — plus a BOLO board on the 9100-T.** A warrant used to be
   something only the person could set on their *own* profile; now any **on-duty unit** can flag or clear a
   warrant on a queried person straight from the record, in **all four terminals** (LAPD PremierOne, LASD
@@ -200,6 +250,13 @@ insured by default now, with a matching developer API.
   retro block falls back to the shipped `NT-3100` / brand name.
 
 ### Fixed
+- **The Supervisor terminal opened but stayed empty.** It was gated for opening and then left out of the
+  data-forward gates, so it never received unit, call or chat syncs — the long-standing failure mode in
+  that file. It is now part of those gates (and of the keyboard + control handling, so typing in it works),
+  it closes the other CADs when it opens instead of two terminals fighting over input focus, and it pulls
+  the radio log and map calibration on open so the broadcast view and map are populated from the first
+  frame. Its config also promised that every action is written to the admin audit — that was not true for
+  the reused dispatch actions, and now is.
 - **Admin "open tickets" count was inflated.** The overview counted PocketBase ticket rows with no `closedAt`,
   which included synced rows for channels that were deleted without a proper close (e.g. it read 22 when only
   9 were open). It now uses the bot's **live** count (open tickets whose channel still exists), falling back
