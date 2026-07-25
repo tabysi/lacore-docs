@@ -72,6 +72,41 @@ insured by default now, with a matching developer API.
 
 ### Fixed
 
+#### In-game
+- **`/unhospital` did nothing.** The server had always answered an early discharge by firing
+  `unhospitalPlayer` at the client — and nothing in the resource ever listened for it. The patient
+  stayed confined until the timer ran out on its own, so the command looked like it was ignored. It
+  now releases exactly the way the timer does when it reaches zero (step outside the hospital,
+  cuffs re-applied if they were cuffed on the way in).
+- **The 9100-T's EMER button never created an incident.** It sent the contact type `Panic`, but the
+  server's special-contact whitelist only accepts `Panic Button` — the on-screen prompt appeared,
+  the details were typed, and the call fell straight through. It sends the accepted string now, the
+  same one `/p` has always used.
+- **`/unhospital <id>` and `/unjail <id>` needed a second word to do anything.** Both are documented
+  as taking an optional reason (or none at all) but demanded two arguments and failed silently when
+  given one. They take the documented form now and say what they expect when the syntax is wrong.
+- **The civilian radial could not stop an emote.** The client callback and the NUI action both
+  existed and were wired to the emote bridge; nothing ever offered them, so an emote could only be
+  cancelled from the emote resource's own command. There is a **Stop Emote** entry under Services
+  now. The service labels also stopped being hardcoded English — they go through the locales like
+  everything else.
+- **Devmode granted only half its permissions.** `HasPermission()` answers `true` for everyone under
+  `lacore_devmode`, but commands registered as *restricted* (`/ban`, `/kick`, `/tempban`, `/unban`,
+  `/dc`, …) are checked by FiveM against ACE *before* any Lua runs — and devmode deliberately skipped
+  handing out an ACE principal. So the exact commands a developer wants while testing were the ones
+  that stayed denied. Devmode now grants the dev group, which is the same reach `HasPermission`
+  already had.
+
+#### Customer portal
+- **The public ban-appeal page returned a JSON 404.** The route guard matched the whole `/appeal/`
+  prefix and handed it to the submit handler, which serves nothing but `POST /appeal/submit` — so a
+  banned player following the link got `{"error":"not found"}` instead of the form. The guard is
+  narrowed to the submit endpoint; the page itself falls through to the static site.
+
+#### Documentation
+- **The holster keys were wrong.** `/hh` was documented as "tap attack to cancel"; the code checks
+  *sprint*, and attack does nothing. Corrected in the keybind reference.
+
 #### Admin dashboard
 - **The page-head controls had no styling at all.** The Refresh button and the "synced" chip rendered with
   no border, square corners and the wrong typeface. The whole colour and radius token set was declared on
