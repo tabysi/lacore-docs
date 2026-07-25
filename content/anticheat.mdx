@@ -47,6 +47,25 @@ LACORE actively guards your server against the common ways cheaters ruin a rolep
   attach a screenshot), so your team has a clear audit trail.
 - **Constantly hardened.** The protection is maintained and expanded with every LACORE update.
 
+## Reviewing flags in your dashboard
+
+Detections always land in **your** database and **your** Discord webhook. If you would rather review
+them as a filterable table than by scrolling a channel, you can also have them copied to your LACORE
+dashboard under **Anticheat**: what tripped, what the system did about it, the player's running score,
+and which players keep coming back.
+
+<Callout type="warning">
+  This is **off by default and stays off until you turn it on**, because a flag is an accusation about a
+  named player. Switching it on sends the detection, the action taken and that player's identifiers to
+  your dashboard account. It never *moves* anything — your own database and Discord log keep receiving
+  everything exactly as before.
+</Callout>
+
+Turn it on with `Anticheat.Report.enabled = true` in `configs/cfg-anticheat-sh.lua`. The server needs an
+active licence key, since that is what attributes the flags to your account. Whitelisted hits are shown
+too, marked as such — an admin repeatedly tripping a check is the clearest signal that a threshold wants
+adjusting.
+
 ## Recommended server hardening
 
 The anti-cheat is strongest when paired with a few standard FiveM server settings. LACORE checks these on

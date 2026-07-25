@@ -4,7 +4,35 @@ title: "3.3.2"
 
 ![LACORE 3.3.2](/changelog/v3-3-2.svg)
 
-# [3.3.2] – In development
+# [3.3.2] – Anticheat you can actually review
 
-Nothing has landed in this version yet — 3.3.1 is the current shipped build. Changes made
-from here on are documented in this section.
+The anticheat has always had the hard part right — server-authoritative checks, a trust score that
+lets one-off blips fade, whitelisting so admins don't catch themselves. What it did not have was a
+place to *look at* the result. Flags went to a Discord channel, and a channel is a bad place to
+answer "is this one player or twelve?".
+
+### Added
+
+#### Anticheat
+- **An Anticheat page in your dashboard.** Every flag as a filterable table: what tripped, what the
+  system did about it, the player's running trust score, and which server it came from. Above it, a
+  **repeat-offenders** panel — because one player with six flags is a case, while six players with one
+  flag each means a threshold wants tuning. Whitelisted hits are shown too, greyed out and labelled:
+  an admin who keeps tripping the aimbot heuristic is the clearest tuning signal there is.
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — new `Anticheat.Report` block.** It ships
+  > **disabled**, and deliberately: a flag is an accusation about a named player, so turning this on
+  > sends the detection, the action taken and that player's identifiers out of your server to your
+  > dashboard account. It never *moves* anything — your own database and Discord webhook keep
+  > receiving everything exactly as before, this is strictly an additional copy. Needs an active
+  > licence key, which is what attributes flags to your account.
+  >
+  > Reporting is batched (one upload per interval, so a flag storm is one request), bounded (the
+  > queue drops its oldest entries rather than growing without limit if the uplink is down) and
+  > fire-and-forget — it can never slow down or block a punishment.
+- **Flags carry the trust score.** `AC.trustOf(src)` exposes the running total, so a reviewer can tell
+  a single blip from a player who has been at it all evening without reading the whole log.
+
+> **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
+> (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short
+> useful life, not an archive, and one noisy server must not fill the database on everyone else's
+> behalf.
