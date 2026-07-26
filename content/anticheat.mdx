@@ -85,6 +85,18 @@ active licence key, since that is what attributes the flags to your account. Whi
 too, marked as such — an admin repeatedly tripping a check is the clearest signal that a threshold wants
 adjusting.
 
+### Tell it when it was wrong
+
+Any flag can be marked a **false positive**, and the page turns those marks into the number that
+actually helps: the share of each detection you have called wrong. One mislabelled row is noise — a
+detection sitting at 40% is a threshold to raise, and you can raise it yourself in the config, where
+your value always wins over the default.
+
+<Callout type="info">
+  Marks are reversible and never leave your account. They are a tuning signal for **your** server, not
+  a vote on anyone else's.
+</Callout>
+
 ## Recommended server hardening
 
 The anti-cheat is strongest when paired with a few standard FiveM server settings. LACORE checks these on

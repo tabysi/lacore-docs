@@ -42,6 +42,31 @@ records are hashed, deduped and attached to a shared player (a ghost if unknown)
   records (same local id from the same community, or same player + reason) are skipped automatically.
 </Callout>
 
+### If you ban from txAdmin
+
+Most teams do — and txAdmin keeps its **own** database. `data/banlist.json` only ever held bans issued
+with LACORE's `/ban` and `/warn`, so a txAdmin server would upload a handful of records while hundreds
+stayed behind.
+
+**Pull in what txAdmin already has** — a one-off. Copy `txData/<profile>/data/playersDB.json` into the
+resource as `data/txadmin-import.json`, then:
+
+```
+/lacore bans import
+```
+
+Bans an admin already lifted, and bans that have run out, are skipped rather than resurrected. Running
+it twice adds nothing the second time, so it is safe to repeat if you are unsure whether it worked.
+
+**Keep them in step from now on** — `Integrations.txAdminBans` in `configs/cfg-integrations-sh.lua`
+ships as `"auto"`, which mirrors every new txAdmin ban and warn into the LACORE list as it happens. Set
+it to `false` if you would rather keep the two apart.
+
+<Callout type="info">
+  Mirroring is **local bookkeeping** — nothing leaves your server. Sharing is still the deliberate
+  `/lacore bans upload`.
+</Callout>
+
 ## 2 · Share with partner communities
 
 In the dashboard under **Community → Players → Bans/Warns Database** you generate a **share key**

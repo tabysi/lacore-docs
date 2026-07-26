@@ -56,6 +56,22 @@ answer "is this one player or twelve?".
   the detail sheet reading "Action decided" rather than "Action taken". Showing `BAN` for a player who
   was never banned would have been worse than showing nothing.
 
+- **The heartbeat is now proof rather than a formality.** It carried no payload: kill the anticheat
+  thread, start your own loop firing the same bare event, and the server saw a healthy client forever —
+  so the one check meant to catch a disabled client was the easiest thing on the list to defeat. Each
+  beat now answers a fresh challenge, and a wrong or missing answer is its own detection. Reusing the
+  digest the anti-dump handshake already had, so this adds a check rather than a mechanism.
+  > The ceiling is honest and unchanged: someone who has already dumped the client can reimplement the
+  > digest. What stands in their way is the salt being *yours*, which is why the server nags while it
+  > is still the shipped default.
+- **Evidence arrives with the story around it.** A screenshot on its own rarely proves anything. Each
+  one now carries position, health and armour, whether the player was in a vehicle, the trust score,
+  and the last five flags with how long ago each fired — gathered when the picture comes back, so it
+  describes that moment rather than the moment it was requested.
+- **You can tell the anticheat it was wrong.** Any flag in the dashboard can be marked a false positive,
+  and the page turns those marks into the number that matters: the share of each detection you have
+  called wrong. One mislabelled row is noise; `SPEED_HACK` sitting at 40% is a threshold to raise — and
+  there was no way to say that before. Marking is reversible and only ever affects your own account's rows.
 - **Three new server-authoritative detections.** All of them run on the server, so a patched-out client
   anticheat does not hide them, and all three default to feeding the trust score rather than acting —
   a new detection is exactly where a false positive is most likely, and observe mode means you will see
@@ -76,6 +92,30 @@ answer "is this one player or twelve?".
   server.cfg convars for a long time and only ever verified one of them. At boot the server now names
   which of `sv_scriptHookAllowed`, `sv_pureLevel`, `sv_enforceGameBuild` and `sv_filterRequestControl`
   are unset — these work below anything a resource can do, and they are worth more than most detections.
+
+#### Bans & playerbase
+- **txAdmin bans and warns now land in LACORE's ban list too.** The two systems each kept their own
+  database and had never heard of each other: `/ban` and `/warn` from the core write
+  `data/banlist.json`, txAdmin writes its own `playersDB.json`. On a team that works in the txAdmin
+  panel — which is most teams — that left the LACORE list nearly empty. It showed up as a number that
+  made no sense (`6 bans · 0 warns` next to 94 and 51 in txAdmin), but the real cost was quieter:
+  `/lacore bans upload` would have reported a cheerful "✓ Shared" after uploading six records while
+  ninety stayed home. Two halves close it:
+  - **`/lacore bans import`** — one-off backfill of what txAdmin already holds. Copy
+    `txData/<profile>/data/playersDB.json` into the resource as `data/txadmin-import.json` and run it.
+    Bans an admin already lifted and bans that have run out are skipped rather than resurrected, and
+    running it twice adds nothing the second time.
+  - **A live bridge** — every future txAdmin ban and warn is mirrored as it happens, so the two lists
+    do not drift apart again. Mirroring is local bookkeeping: nothing leaves your server. Sharing
+    stays the deliberate `/lacore bans upload`.
+  > ⚠️ **Config change (`configs/cfg-integrations-sh.lua`) — new `Integrations.txAdminBans`.** Ships
+  > `"auto"`: the bridge is active when txAdmin is running. Set it to `false` to keep the lists
+  > separate. The import is a manual command and runs regardless.
+  >
+  > A detail worth knowing if you inspect the file: imported records keep LACORE's own numeric `id`
+  > and carry txAdmin's id in a separate `txId` field. `BanPlayer()` derives the next id by adding one
+  > to the last entry's — a txAdmin id (`ABCD-1234`) sitting in that field would have made the next
+  > `/ban` fail on the arithmetic.
 
 ### Changed
 
@@ -107,6 +147,12 @@ answer "is this one player or twelve?".
   constant — client and server both compute the digest and the two must match — so it cannot be
   generated per server, which means the shipped default is a value every LACORE owner knows. It now
   says so once at boot instead of quietly protecting nothing.
+
+#### Bans & playerbase
+- **`/lacore bans list` says which list it is counting.** It printed "Local playerbase: 6 bans", which
+  reads like *every ban on this server* — and on a txAdmin server it is off by an order of magnitude.
+  It now names the source, and either reports how many entries came from txAdmin or points at
+  `/lacore bans import` when none have.
 
 > **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
 > (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short
