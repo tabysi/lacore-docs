@@ -56,6 +56,27 @@ answer "is this one player or twelve?".
   the detail sheet reading "Action decided" rather than "Action taken". Showing `BAN` for a player who
   was never banned would have been worse than showing nothing.
 
+- **Three new server-authoritative detections.** All of them run on the server, so a patched-out client
+  anticheat does not hide them, and all three default to feeding the trust score rather than acting —
+  a new detection is exactly where a false positive is most likely, and observe mode means you will see
+  them before they can do anything anyway.
+  - **On-foot speed, measured server-side.** There was a hole here: the only speed check was the
+    client's, and the server sweep's teleport check needs 700 m in one sample. Anything between a brisk
+    jog and that threshold — up to about 140 m/s — crossed the map unremarked once the client check was
+    gone. The sweep now derives speed from position samples it was already taking, so it needs no new
+    data, and requires two consecutive implausible samples so a player who drives briefly inside one
+    interval cannot be flagged for it.
+  - **Explosions attributed to someone who is nowhere near them.** Catches both blaming another player
+    and scripts detonating at map coordinates. The distance is set far beyond any real throw or launcher
+    flight, so ordinary combat cannot reach it.
+  - **Blacklisted vehicles caught while being driven, not only when spawned.** The existing check fires
+    on entity creation, which misses a vehicle that predates the resource start or arrived by a route
+    that raised no event. The sweep simply asks whether you are sitting in one.
+- **The platform hardening is now checked, not just recommended.** The config has suggested four
+  server.cfg convars for a long time and only ever verified one of them. At boot the server now names
+  which of `sv_scriptHookAllowed`, `sv_pureLevel`, `sv_enforceGameBuild` and `sv_filterRequestControl`
+  are unset — these work below anything a resource can do, and they are worth more than most detections.
+
 ### Changed
 
 #### Anticheat
