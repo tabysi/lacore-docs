@@ -28,6 +28,25 @@ LACORE actively guards your server against the common ways cheaters ruin a rolep
 - ♻️ **Event spam** — mass-action floods (e.g. mass-cuff / dispatch spam), even from a compromised account
 - 🕵️ **Anti-cheat tampering** — attempts to disable or strip out the protection itself
 
+## It's on from the start — watching, not swinging
+
+LACORE ships with the anti-cheat **enabled in observe mode**: every check runs, every hit is logged
+and scored, and **nobody is kicked or banned**. Each entry records what it *would* have done.
+
+That is deliberate. Tuning thresholds needs data, and gathering data used to mean going live and
+risking a wrong ban on your own players — so most servers left the protection switched off, which
+protects nobody. Observe mode removes the trade-off: it is safe to run untouched from day one.
+
+Run it for a week. Watch what your own admins trip and how your busiest firefights look. When the log
+stops surprising you, set `Mode = "enforce"` in `configs/cfg-anticheat-sh.lua` and the same checks
+start acting on what they find.
+
+<Callout type="info">
+  Repeat offenders are tracked **across reconnects**. A player who collects flags, disconnects and
+  comes back does not start from zero — but points also fade on their own during clean play, so an
+  honest player who tripped something once is clear again in minutes.
+</Callout>
+
 ## Why it's effective
 
 <Callout type="info">

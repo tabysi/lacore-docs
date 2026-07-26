@@ -31,6 +31,62 @@ answer "is this one player or twelve?".
 - **Flags carry the trust score.** `AC.trustOf(src)` exposes the running total, so a reviewer can tell
   a single blip from a player who has been at it all evening without reading the whole log.
 
+- **An observe mode — and the anticheat is now ON by default because of it.** Everything detects, logs
+  and scores; nothing is kicked or banned, and every log line says what it *would* have done. This
+  existed as a gap, not a feature request: the anticheat had exactly two states, off or live, so
+  tuning it meant going live and risking a wrong ban on your own players. Almost nobody did, and an
+  anticheat that is off protects nobody however good it is. Run observe for a week, watch what your
+  own admins and your busiest firefights trip, then set `Mode = "enforce"`.
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — `Enabled` now ships `true`, with the new
+  > `Mode = "observe"`.** On update your server starts *detecting* where it did not before, so
+  > expect anticheat lines in your Discord admin log. Nobody is kicked or banned until you switch to
+  > enforce. To go back to silence, set `Enabled = false` — one line, exactly as before.
+- **The trust score survives a reconnect.** It was kept per session and wiped on disconnect, which
+  quietly defeated the escalation design it exists for: the config promises that "only a persistent
+  offender racks up points", but a player who stopped at 7 and rejoined came back at 0 — reconnecting
+  was a full reset, and the one mechanic meant to catch repeat offenders was the easiest to sidestep.
+  Scores are now kept per identifier and decay across the gap exactly as they do during clean play,
+  so someone who earned a few points and stayed away a day still returns clean on their own. Entries
+  that decay to nothing are pruned, so the store does not grow for every player ever seen.
+- **A resource guard.** Stopping LACORE takes the whole anticheat down with it. That is also a
+  perfectly ordinary thing for an owner to do, so this logs and never punishes — but if the resource
+  goes down at 3am with forty players connected and nobody scheduled it, there is now a line saying so.
+- **Observe and whitelist states are visible in the dashboard.** A flag that was decided but not
+  carried out shows the action it *would* have taken next to an `observed` tag, with the row muted and
+  the detail sheet reading "Action decided" rather than "Action taken". Showing `BAN` for a player who
+  was never banned would have been worse than showing nothing.
+
+### Changed
+
+#### Anticheat
+- **The detection parameters no longer ship as a printed guide to evading them.** `configs/` is
+  `escrow_ignore`, so `cfg-anticheat-sh.lua` reached every customer as plain text — including the
+  exact speed to stay under, the damage ceiling, the trust thresholds, and the full list of honeypot
+  event names to avoid. The detection *logic* was obfuscated; the numbers that actually matter for
+  evasion were not. They have moved into `modules/anticheat/`, split by who needs them:
+  - **`anticheat-params-sh.lua`** — only what the client evaluates itself (god-mode strikes, speed,
+    jump, teleport, the weapon and vehicle blacklists, heartbeat timings). Obfuscated by the build.
+  - **`anticheat-params-sv.lua`** — everything else: honeypots, event rate limits, explosion rules,
+    damage ceiling, trust scoring, the server sweep and combat thresholds. This is a *server* script,
+    so it never reaches a client at all. That matters most for the honeypots: an event name cannot be
+    hashed away — registering a handler needs the literal string — so keeping the list off client
+    machines is the only place it is genuinely out of reach.
+  - **Per-server jitter.** Server-evaluated thresholds now sit at a value inside a band rather than on
+    a shared constant, so a number measured on one server does not transfer to the next. The seed is
+    the server's own Cfx licence key, not the clock: a clock seed is guessable *and* re-rolls every
+    restart, which would make the same player flag on Monday and not on Tuesday. Bands are chosen so
+    the tight end still clears legitimate play; parameters without that headroom (the god-health and
+    armour ceilings are exactly the legal maximum) are deliberately left alone.
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — thresholds and lists removed.** What you
+  > still control is unchanged: `Enabled`, and `enabled` / `action` per detection, plus the whitelist
+  > permission, evidence and reporting blocks. If you had customised a threshold, **your value still
+  > wins** — the defaults only fill what your config leaves unset. If you had not, you lose nothing:
+  > verified value-for-value against the previous file, 145 effective settings, identical.
+- **`AntiDump.challengeSalt` warns when it is still the shipped default.** The salt has to be a shared
+  constant — client and server both compute the digest and the two must match — so it cannot be
+  generated per server, which means the shipped default is a value every LACORE owner knows. It now
+  says so once at boot instead of quietly protecting nothing.
+
 > **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
 > (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short
 > useful life, not an archive, and one noisy server must not fill the database on everyone else's
