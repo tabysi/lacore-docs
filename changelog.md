@@ -288,6 +288,53 @@ answer "is this one player or twelve?".
   > header would be a number a player could write down and act on, and it would be wrong. A column
   > that is blank on every server forever is not a column, it is a header.
 
+#### Loading screen
+
+- **LACORE now has a loading screen — two of them, and you pick one.** The first thing anybody sees
+  of your server used to be whatever FiveM draws by default, which is a black screen with a bar. So
+  there are now two finished designs in the box, both 1920×1080, both fed by the game's real
+  progress:
+  - **"Cinematic"** — full-bleed artwork, an enormous headline, and the progress as a wide band
+    across the bottom: a big percentage, the current step, the file the game is actually chewing on,
+    and five step chips. Tips, your rules and the music player stack down the right.
+  - **"Dossier"** — a split screen. Left is a status column: a progress ring, the current step
+    spelled out with a sentence explaining it, and all five steps as rows that tick over from
+    *Waiting* to *Running…* to *Done*. Right is the artwork with the rotating tip laid over it.
+
+  Switching between them is one word in the config and no rebuild. Both read the same data, so
+  nothing is lost by changing your mind later.
+- **Nothing on it is decorative.** The percentage, the bar, the ring and the log line come from the
+  game's own loading events — this is not an animation on a timer that finishes early and leaves the
+  player staring at 100%. The five steps are a readable narration *of* that percentage, not a
+  substitute for it.
+- **Your tips and your rules, or LACORE's.** Leave the lists empty and you get LACORE's own set —
+  translated, and covering LACORE's own keys and commands (the playerlist, `/mdt`, `/report`, the
+  radio). Fill them in and yours are used exactly as typed. Same for the headline. The chrome around
+  them (*Core rules*, *Step 2 of 5*, *Running…*) follows `Language` like everything else, so a
+  German server has a German loading screen out of the box.
+- **A music player, if you bring music.** Title, artist, an equaliser that moves while something is
+  playing, and prev / play / next. It only appears once you have listed at least one track —
+  LACORE ships none, because every track worth playing belongs to someone. Players can also use
+  <kbd>M</kbd> and <kbd>N</kbd>, which work whether or not the cursor is up.
+- **The header tiles are live.** Area of Play and the player count are asked from the server while
+  the screen is still up, and a tile with nothing to show hides itself rather than printing a dash.
+  Queue is there too, but LACORE runs no queue of its own and will not invent one — point
+  `queueExport` at your queue resource's export and it fills in.
+- **Your artwork, not ours.** List one or more 1920×1080 images and they cross-fade with a slow
+  Ken-Burns drift. The placeholder that ships says "replace me" in as many words.
+  > ⚠️ **Config change — new file `configs/cfg-loadingscreen-sh.lua`,** plus a new
+  > `loadingscreen = true` in `configs/cfg-features-sh.lua`. It ships **on**, so after this update
+  > your players see LACORE's loading screen instead of the default one. If you already run a
+  > loading-screen resource, set either switch to `false` — LACORE then takes its own NUI frame
+  > down at runtime and the standard game loading screen shows, exactly as before.
+
+  > **One honest caveat about the first second.** A loading screen is a web page and it opens before
+  > any Lua exists on the connecting client, so it starts on LACORE's built-in defaults and becomes
+  > *your* screen the moment the resource starts on that player. In practice that is the first
+  > moment or two of the load. If you choose "dossier", players may briefly see "cinematic" first —
+  > it cross-fades rather than snapping, but it is there and we would rather write it down than let
+  > you discover it.
+
 ### Fixed
 
 #### CAD & MDT
@@ -318,6 +365,17 @@ answer "is this one player or twelve?".
   > load-time `if not Feature(...) then return end` at the top of a client file does not work for an
   > add-on — it runs before the answer. Gate at the point of use (the command, the open function),
   > which is also the only place a refusal can tell the player why.
+
+#### Dashboard
+
+- **Your dashboard no longer tells you you're up to date when you aren't.** The version badge on the
+  overview read `UP TO DATE` unconditionally — it was a label, not a check, so it said the same thing
+  for a server two releases behind as for one on the newest build (and said it while the page was
+  still loading). It now compares the current release against the version your linked servers
+  actually report on their heartbeat: green when they are all current, amber `UPDATE AVAILABLE` with
+  the version you're on when any of them is behind, and — when no server has reported a version yet —
+  a neutral `LATEST RELEASE`, which states what the number is without claiming anything about your
+  install.
 
 ### Changed
 
