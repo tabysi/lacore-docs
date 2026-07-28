@@ -99,30 +99,47 @@ gradients over it so text stays readable on bright images.
 
 ## Tips, rules and the headline
 
+**These ship written out.** The config arrives with a headline, six tips and five rules already in
+it, so the screen reads like a finished screen the first time you start the server — you edit
+wording rather than invent it:
+
 ```lua
 headline = {
-    kicker = "",   -- the small line above the headline
-    title  = "",   -- the big one ("cinematic")
-    body   = "",   -- the paragraph under it ("cinematic")
-    short  = "",   -- the one-liner over the artwork ("dossier")
+    kicker = "Welcome back",
+    title  = "The south of San Andreas is waiting.",
+    body   = "Stay in character, get on the radio and drive carefully. …",
+    short  = "Stay in character.",   -- the one-liner over the artwork ("dossier")
 },
 
 tips = {
-    "Read the rules in #rules before you spawn.",
+    "Press I for the playerlist — it shows the area of play, dispatch and every unit on duty.",
+    "/mdt opens the computer for your department. Go on duty first with /onduty.",
+    -- … four more
 },
 tipInterval = 6,   -- seconds per tip
 
 rules = {
-    "Stay in character at all times.",
+    "Stay in character at all times — keep IC and OOC separate.",
+    -- … four more
 },
 ```
 
-<Callout type="info">
-  **Empty means "use LACORE's".** Leave a list or a headline field blank and you get LACORE's own
-  copy — **translated**, following `Language` from `config.lua`, and written around LACORE's own
-  keys and commands (the playerlist, `/mdt`, `/report`, the radio). Fill it in and your wording is
-  used verbatim, exactly as typed, because those are your words and translating them would be
-  presumptuous.
+The shipped tips are about **LACORE's own** keys and commands — the playerlist, `/mdt`, `/report`,
+the radio — so they are worth keeping a couple of even after you add your own.
+
+<Callout type="warning">
+  **Filled in also means English.** The translation applies to LACORE's copy, not to text sitting in
+  your config. **Clear a field (`""`) or empty a list (`{}`)** and that one falls back to LACORE's
+  own wording, translated into `Language` from `config.lua`.
+
+  So on a German or Russian server, blanking `headline`, `tips` and `rules` is the one-step way to a
+  loading screen in your players' language:
+
+  ```lua
+  headline = { kicker = "", title = "", body = "", short = "" },
+  tips     = {},
+  rules    = {},
+  ```
 </Callout>
 
 The chrome around your text — *Core rules*, *Step 2 of 5*, *Running…*, *Server online* — always
@@ -220,10 +237,10 @@ What that means in practice:
 | `background.images` | `{}` | Your 1920×1080 artwork, relative to `nui/loading/`. Empty = placeholder. |
 | `background.interval` | `14` | Seconds per image when you list more than one. |
 | `background.drift` | `true` | Slow Ken-Burns push on the artwork. |
-| `headline.*` | `""` | `kicker` / `title` / `body` / `short`. Empty = LACORE's translated copy. |
-| `tips` | `{}` | Rotating tips. Empty = LACORE's translated set. |
+| `headline.*` | written out | `kicker` / `title` / `body` / `short`. `""` = LACORE's translated copy. |
+| `tips` | 6 shipped | Rotating tips. `{}` = LACORE's translated set. |
 | `tipInterval` | `6` | Seconds per tip. |
-| `rules` | `{}` | Your short rules. Empty = LACORE's translated set. |
+| `rules` | 5 shipped | Your short rules. `{}` = LACORE's translated set. |
 | `music.enabled` | `true` | The player still only shows with at least one track. |
 | `music.autoplay` | `true` | Start playing on its own where the browser allows it. |
 | `music.volume` | `0.35` | `0.0` – `1.0`. |

@@ -307,11 +307,20 @@ answer "is this one player or twelve?".
   game's own loading events — this is not an animation on a timer that finishes early and leaves the
   player staring at 100%. The five steps are a readable narration *of* that percentage, not a
   substitute for it.
-- **Your tips and your rules, or LACORE's.** Leave the lists empty and you get LACORE's own set —
-  translated, and covering LACORE's own keys and commands (the playerlist, `/mdt`, `/report`, the
-  radio). Fill them in and yours are used exactly as typed. Same for the headline. The chrome around
-  them (*Core rules*, *Step 2 of 5*, *Running…*) follows `Language` like everything else, so a
-  German server has a German loading screen out of the box.
+- **The texts are already written.** Headline, six tips and five rules ship **filled in**, so the
+  screen reads like a finished screen the first time you start the server rather than a form waiting
+  to be completed. The tips are about LACORE's own keys and commands — the playerlist, `/mdt`,
+  `/report`, the radio — so they are worth keeping a couple of even after you add yours. The chrome
+  around them (*Core rules*, *Step 2 of 5*, *Running…*) always follows `Language`.
+  > Filled in also means **English**. Clearing a field (`""`) or emptying a list (`{}`) falls back to
+  > LACORE's own wording for it, **translated** — so on a German or Russian server, blanking
+  > `headline`, `tips` and `rules` is the one-step way to a loading screen in your players' language.
+- **It is in the dev launcher.** `Ctrl+K` → **Screens → Loading Screen** opens the real page in an
+  iframe and plays both sides of the conversation it normally has: the game's progress and log
+  lines on a timer, and the config payload the resource sends. Switch design live, scrub the
+  progress, pause it, or hit **Replay** to watch the first second again — including the moment the
+  built-in defaults hand over to your config, which is the one part of this screen you cannot
+  otherwise see without connecting to a server.
 - **A music player, if you bring music.** Title, artist, an equaliser that moves while something is
   playing, and prev / play / next. It only appears once you have listed at least one track —
   LACORE ships none, because every track worth playing belongs to someone. Players can also use
@@ -335,10 +344,118 @@ answer "is this one player or twelve?".
   > it cross-fades rather than snapping, but it is there and we would rather write it down than let
   > you discover it.
 
+#### Remote config
+
+- **The data-list editor is no longer blank.** It only ever showed rows you had typed into it, so
+  changing one fine in the penal code meant first retyping all twenty charges — and until you did,
+  the page looked like your server had no penal code at all. Your servers now report their own
+  tables up (the penal code, the phone directory, the blacklisted and member-only vehicle lists),
+  the same way they already report their settings, and the editor opens on those. Every list says
+  where its rows came from: **from your config** (read off your server's own files), **from all
+  servers** (inherited), or **your rows** (saved here). Saving an empty list gives it back rather
+  than storing an empty table, so there is a way out of an override as well as into one.
+  > The report is a snapshot taken at load, *before* any dashboard list is applied — otherwise a
+  > server would report your own override back to you and the "what my server actually has"
+  > baseline would quietly become a copy of the dashboard.
+- **Servers can now be configured one at a time.** Config was one set of values per account, applied
+  to every server you own — fine with one server, useless with three, because a second server could
+  not have its own penal code without changing the first one too. There is now a picker on the
+  Settings and Data lists pages: **All servers** is the default everything inherits, and each server
+  can override individual settings and whole lists on top of it. A setting you do not override keeps
+  following the default and says so (**INHERITED**), so there is no need to copy shared values into
+  every server just to keep them in step.
+  > Nothing changes for a single-server account: the picker only appears once there is a second
+  > server, the account-wide values keep working exactly as they did, and an override layer that
+  > nobody creates is simply never consulted.
+  >
+  > A server has to have started once with a license key before it can be given its own config —
+  > until it reports its identity there is nothing stable to file an override under, and filing it
+  > under an IP address would hand the config to whoever gets that address next. Those servers are
+  > shown in the picker but cannot be picked, with the reason on hover.
+
+#### In-car CAD screen
+
+- **The passenger gets a terminal too — and you can see each other's pointer.** A two-officer unit is
+  the case the dashboard screen is best at: one drives, the other works the CAD. Until now only the
+  driver had a screen at all.
+
+  Each occupant gets their **own** terminal, signed in as themselves — the passenger runs a plate as
+  the passenger, and their callsign, status and active incident stay theirs. On top of that, everyone
+  in the vehicle now sees where the others are pointing: a named, coloured arrow that follows their
+  mouse across the screen and shows when their button is down.
+  > **Pointers are shared; clicks are not, and not by omission.** Every terminal is signed in as its
+  > own unit, so replaying the passenger's click onto the driver's screen would have the *driver*
+  > self-assign to whatever the passenger tapped. You see where your partner is pointing — you each
+  > still act as yourselves.
+
+  The relay takes nothing on trust: the vehicle is read from the sender's own ped rather than from
+  the message, the name on the arrow is the server's rather than the client's, coordinates are
+  range-checked and the whole thing is rate-limited, so a modified client cannot put its cursor in a
+  car it is not in or turn one into a broadcast channel.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `passengers` now ships `true`,** with a
+  > new `sharedCursor` next to it. A terminal is a full browser and this is one per occupied seat
+  > rather than one per car, so a squad that rides four-up is now four browsers in one vehicle. Set
+  > `passengers = false` for the old driver-only behaviour; `sharedCursor = false` keeps the extra
+  > terminals but drops the arrows.
+- **`/cad adjust` — aim the dashboard terminal without leaving the car.** Whether the in-car screen
+  is usable comes down to two blocks of numbers per vehicle model: where the camera goes
+  (`cam.pos` / `cam.look` / `fov`) and which part of your monitor the screen lands on
+  (`cursorRect`, which is what the mouse is mapped through — get it wrong and your clicks land next
+  to where you pointed, which reads as "the screen doesn't work"). Both shipped as one model's
+  measurements and a comment saying to nudge them, which meant edit, restart, look, edit again.
+
+  Now: the mouse aims the real camera, the arrow keys slide it through the cabin, the wheel raises
+  it (Shift for field of view). Then click the top-left corner of the screen and the bottom-right —
+  the frame is drawn live over your view. The finished config lines are printed to the F8 console,
+  ready to paste. Nothing is written to your config from in game, on purpose.
+
 ### Fixed
+
+#### Anticheat
+
+- **The hardening check contradicted itself about `sv_scriptHookAllowed`.** With `sv_scriptHookAllowed 0`
+  in server.cfg, `/lacore doctor` reported it hardened and then, a few lines further down, the anticheat
+  announced that ScriptHookV trainers were allowed — on the same server, in the same boot log. FXServer
+  reports switches like this one back as `false` rather than `0`, and the three places that read it had
+  each picked one spelling: the doctor normalised both, the boot audit compared against `"0"` and so
+  called `false` unsafe, and the older German-language check compared against `"false"` — the same bug
+  mirrored, which would have stayed quiet on a server that really did allow trainers by writing a literal
+  `1`. All three now go through one shared reader (`LacoreBoolIsOn` / `LacoreConvarIsOn` in
+  `shared/shared.lua`), which treats `0`, `false`, `off`, `no` and unset as off and anything else as on.
+  A warning about trainers is only worth printing if it is right, and two checks disagreeing taught
+  owners to ignore both.
+- **The boot log no longer audits your server.cfg twice.** Two anticheat files were separately warning
+  about the same convars at start-up — one of them in German, left over from before the audit was
+  rewritten to cover all four. The duplicate is gone; the hardening audit now lives only in
+  `anticheat-guard-sv.lua`, which is the one that names every unset convar and points at the config
+  block explaining them. Nothing is checked less than before — the removed copy looked at three
+  convars, the one that stayed looks at four.
+- **`lacore_devmode 1` did not turn devmode on.** The same spelling problem, one convar over, and this
+  one had teeth: devmode is read in six places and every one of them tested for the literal string
+  `"true"`, so an owner who wrote `setr lacore_devmode 1` on a development server got no webhook
+  bypass, no permission grants — and an anticheat that was still live and still able to ban them off
+  their own test box. All six now use the shared reader, so `1`, `true`, `yes` and `on` mean the same
+  thing.
+  > ⚠️ **Config change (`configs/cfg-server-sv.lua`).** The line that resolves devmode lives in your
+  > config, so an existing copy keeps the old `== "true"` behaviour until you take the new one. If you
+  > only ever wrote `lacore_devmode "true"`, nothing changes for you and there is nothing to do.
 
 #### CAD & MDT
 
+- **Clicking the in-car screen threw a script error instead of clicking.** The DUI handle and the
+  size the cursor has to be scaled into came back from one call returning three values, read as
+  `X and X() or nil` — which collapses a call to its *first* result, so the width and height were
+  silently nil and the first mouse move crashed on the arithmetic. It only ever fired once the
+  pointer actually reached the terminal, so anyone whose `cursorRect` was still at the shipped
+  default never got far enough to see it: the screen simply looked unresponsive, and fixing the
+  alignment is what surfaced it.
+- **The in-car CAD screen was left behind the moment you drove off.** The focus camera was placed at
+  *world* coordinates and computed once, so the car pulled away from underneath it and the terminal
+  slid out of frame at the first touch of the throttle — the one situation the screen exists for.
+  Both cameras are now attached to the vehicle, with their rotation rebuilt from the vehicle's own
+  every frame, so the view rides along through corners, hills and handbrake turns. The terminal
+  camera also takes the car's roll, which makes a banked corner feel like one instead of like the
+  world tilting.
 - **The Agency MDT's BOARD tab has never worked.** It renders a full bulletin board and asks the
   server for it the moment you open the tab — but the reply was only ever forwarded to the LAPD
   client, so it was dropped on arrival. The tab has been empty for every non-LAPD agency since it
@@ -403,6 +520,13 @@ answer "is this one player or twelve?".
   > permission, evidence and reporting blocks. If you had customised a threshold, **your value still
   > wins** — the defaults only fill what your config leaves unset. If you had not, you lose nothing:
   > verified value-for-value against the previous file, 145 effective settings, identical.
+- **`cfg-anticheat-sh.lua` is English throughout.** `configs/` ships as plain text, so the German
+  comment blocks still sitting in the middle of the file — the client-side detection notes, the
+  anti-dump section, the honeypot and rate-limit explanations, and the whole recommended-server.cfg
+  block at the end — were being read by owners who do not speak German. Translated, with no settings
+  touched: same keys, same values, same order. The server.cfg block also still claimed the anticheat
+  checks `sv_scriptHookAllowed` at boot, which stopped being the whole truth when the audit grew to
+  cover all four convars.
 - **`AntiDump.challengeSalt` warns when it is still the shipped default.** The salt has to be a shared
   constant — client and server both compute the digest and the two must match — so it cannot be
   generated per server, which means the shipped default is a value every LACORE owner knows. It now
