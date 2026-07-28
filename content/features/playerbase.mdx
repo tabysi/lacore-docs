@@ -48,19 +48,57 @@ Most teams do — and txAdmin keeps its **own** database. `data/banlist.json` on
 with LACORE's `/ban` and `/warn`, so a txAdmin server would upload a handful of records while hundreds
 stayed behind.
 
-**Pull in what txAdmin already has** — a one-off. Copy `txData/<profile>/data/playersDB.json` into the
-resource as `data/txadmin-import.json`, then:
+**You do not have to do anything.** On every start LACORE looks for txAdmin's `playersDB.json` beside
+your server and carries over what it finds — bans, warns, the lot. It runs at each boot rather than
+once, which also covers bans issued in the panel while your server was down: those fire no event, so
+without the sync they would never arrive.
 
+Carrying over is safe to repeat. Records keep txAdmin's own action id, so a second pass adds nothing,
+and bans an admin already lifted or that have run out are skipped rather than resurrected. The console
+stays quiet unless something actually came across.
+
+**New bans arrive as they happen.** `Integrations.txAdminBans` in `configs/cfg-integrations-sh.lua`
+ships as `"auto"`, which mirrors every new txAdmin ban and warn the moment it is issued. Set it to
+`false` to switch off both the mirroring and the boot sync.
+
+<Callout type="info">
+  Run `/lacore bans import` to do it on demand and see exactly what happened — which file was found,
+  how many actions it holds, and what was skipped and why. In the **server console** (including
+  txAdmin's live console) type it without the leading slash: `lacore bans import`.
+</Callout>
+
+#### Where it looks
+
+A configured data path first, then txAdmin's own; then the artifacts folder, which is where txAdmin
+puts `txData` by default; and finally the folders above the resource — plus the ones **beside** them.
+That last part covers the common Linux split where the artifacts and the resources sit in separate
+trees (`/home/FXServer/server` next to `/home/FXServer/server-data`), because walking straight up from
+a resource in the second one never passes a `txData` at all.
+
+**If it cannot find the file**, the command says how many paths it tried and lists the folders it
+searched. Two things can put you here, and the list tells them apart: a layout nobody guessed (one line
+will be your own path, off by a folder), or an FXServer build that gives resources no file access
+outside their own folder — which the command names explicitly.
+
+Point LACORE straight at it in `server.cfg`:
+
+```cfg
+setr lacore_txdata_path "/home/FXServer/server/txData"
 ```
-/lacore bans import
-```
 
-Bans an admin already lifted, and bans that have run out, are skipped rather than resurrected. Running
-it twice adds nothing the second time, so it is safe to repeat if you are unsure whether it worked.
+That is the `txData` folder itself — the one holding `<profile>/data/`. The full path to
+`playersDB.json` works too. `Integrations.txAdminDataPath` in `configs/cfg-integrations-sh.lua` does
+the same; the convar wins if both are set. Restart the resource afterwards.
 
-**Keep them in step from now on** — `Integrations.txAdminBans` in `configs/cfg-integrations-sh.lua`
-ships as `"auto"`, which mirrors every new txAdmin ban and warn into the LACORE list as it happens. Set
-it to `false` if you would rather keep the two apart.
+If file access is blocked outright, copy `txData/<profile>/data/playersDB.json` into the resource as
+`data/txadmin-import.json` instead and run `/lacore bans import` — the command prints the exact path to
+copy it to. Live mirroring is unaffected either way; it never touches the filesystem.
+
+<Callout type="warning">
+  txAdmin keeps **one database per profile**. If the sync reports *0 actions* while your panel shows
+  bans, it found a different profile than the one your panel is looking at — a leftover dev profile on
+  the same machine looks identical from the outside.
+</Callout>
 
 <Callout type="info">
   Mirroring is **local bookkeeping** — nothing leaves your server. Sharing is still the deliberate

@@ -94,6 +94,107 @@ answer "is this one player or twelve?".
   which of `sv_scriptHookAllowed`, `sv_pureLevel`, `sv_enforceGameBuild` and `sv_filterRequestControl`
   are unset — these work below anything a resource can do, and they are worth more than most detections.
 
+#### Playerlist
+- **The "I" board is a duty board now.** It used to be one flat, alphabetically indifferent list of
+  24 players per page, which made the question people actually open it for — *who is on duty and what
+  are they doing* — a paging exercise. The board is now split: **units on the left, grouped by
+  department**, each with callsign, roleplay and account name, status and ping; **civilians on the
+  right** as a dense two-column roster. Units are never paged, because an answer to "who is on duty"
+  that is split across pages is not an answer. The arrow keys page the civilian roster instead.
+  - The header carries the **area of play**, your community name (from `cfg-branding-sh.lua`, so it
+    is your name and not ours), players online, units on duty, and the local time.
+  - A **status strip** shows the server alert, whether 911 dispatch is staffed, and who is allowed to
+    connect — the three things that were previously buried in a side column.
+  - Each unit row's left edge carries its **status colour**, the same palette the MDT status buttons
+    use, so a screen full of red or green reads at a glance without anyone reading a word.
+  - Departments are coloured from their **name**, so LSPD is the same blue on every client and does
+    not change colour when another department goes off duty. The colours are now shared with the
+    radio log, which had its own copy — so a department finally looks the same in both places, and
+    an agency the list did not know by name gets a colour of its own instead of the same grey as
+    everyone else.
+- **Two styles, your choice.** The duty board is a lot of screen, and not every server wants it — a
+  mostly-civilian community does not open the list to find out who is on shift. `HudCfg.playerlistStyle`
+  picks between them:
+  - `"duty"` (default) — the full board described above.
+  - `"minimal"` — one compact centred card: ID, name, ping, and department plus callsign for anyone on
+    duty. No grouping, no server panel, no split.
+
+  Both read the same data, honour the same key and the same arrow-key paging; only the drawing differs.
+  The minimal card pages the whole roster as one list rather than splitting it, so the two send
+  different payloads and each ships exactly the rows it draws — nobody pays for the board they did not
+  pick. A value that is neither is reported once in the console and falls back to the duty board,
+  because a typo should not look like a setting that does nothing.
+  > ⚠️ **Config change (`configs/cfg-hud-sh.lua`) — new `HudCfg.playerlistStyle`.** It ships `"duty"`,
+  > so an untouched config keeps the new board. Set it to `"minimal"` for the compact card.
+- **Nothing about either board takes focus.** Both are pure overlays that never swallow a keypress
+  or a click, exactly as before.
+
+#### LAPD MDT
+- **Your status follows the call you are on.** The unit-status grid is gone from the Home screen.
+  Status is now set by the things you were already doing: Enroute and Station from the toolbar,
+  Code 6 and Traffic Stop when they create an incident, and a new **Detach** button on the incident
+  bar to hand the call back and go CLEAR. Every status is still available directly from the status
+  badge in the command bar — that stays as the deliberate way to reach BUSY and UNAVAILABLE, which
+  belong to no incident at all.
+- **Code 6 while you are already on a call no longer opens a second one.** It set out a fresh
+  incident and moved the unit onto it, quietly abandoning the call being worked — the board then
+  showed an officer attached to something nobody had dispatched. Now it just puts you Code 6 on the
+  call you are on. A traffic stop during another call still creates its own incident, because that
+  genuinely is a separate event and dispatch needs it as one.
+- **Detach was previously not something a unit could do.** The only route was going CLEAR, which is
+  what detaches server-side but says so nowhere on screen; otherwise it took a dispatcher running
+  `/ddetach`. The button sends exactly that CLEAR, so the rule it depends on cannot drift.
+- **Fire/EMS units were missing their own statuses.** The MDT tested for the job label `Fire/EMS`,
+  but the job a medic actually carries in-game is `AMR` — so ON SCENE never appeared in the status
+  list for a real medic, and the Fire/EMS request button never rendered for them. The Lua side had
+  gated on all four spellings all along; this side had drifted from it.
+- **Four buttons that did nothing are gone.** *Edit* called a command registered nowhere in the
+  resource and now opens the incident's Comments, the one part of a call a unit can genuinely edit.
+  *Primary Unit*, *Import to Incident* and *Options* were bound to nothing and have been removed
+  rather than left greyed out. *Locate on Mobile Map* was live but unguarded: with no incident
+  selected it sent a null the server drops, so it looked ready and did nothing — it is now disabled
+  until there is something to locate.
+
+#### In-car CAD screen
+- **The Mobile Client on the dashboard screen of your patrol vehicle.** Live, while you drive, rendered
+  into the model's own screen — the same terminal the MDT key opens, not a cut-down copy of it. Display
+  only: it takes no focus, no controls and no keys, so nothing about driving changes.
+  > ⚠️ **New config file (`configs/cfg-vehiclescreen-sh.lua`).** Ships enabled with one entry, for the
+  > 2020 Interceptor Utility. Every other vehicle needs its own entry, because this depends on the
+  > **model**: a screen has to be a surface the game can be told to draw on, and that is decided when
+  > the model is built — a script cannot add one. `/lacore screen target` and `/lacore screen dui` tell
+  > you which of the two routes your vehicle supports; run them once per model before adding it.
+  - **Two routes, per model.** A named render target where the model declares one — that draws on your
+    vehicle only. Otherwise the screen's texture is replaced, which works anywhere but swaps it for
+    every vehicle of that model *on your own screen* (other players still see their own). The render
+    target wins wherever a model offers one.
+  - **It follows the terminal you have open.** Which tab, which incident, light or dark: all of that is
+    decided inside the UI by clicking, never travels through the game, and so was invisible to the
+    screen — it sat on Home while the driver worked in Calls. The open window now reports its view and
+    the screen follows it. One direction only; the screen never argues back.
+  - `VehicleScreen.width`/`height` should match the **shape** of the screen in the model, not just a
+    size — the image is stretched onto whatever the modder built, so a square texture on a portrait
+    tablet arrives squashed. It is also the cost of the feature: this is a real browser rendering
+    continuously.
+  - The screen exists only while you are sitting in a vehicle that has one, and it is released on
+    leaving, on switching vehicle and on resource stop. A browser nobody is looking at is a leak.
+- **`/cad` leans the camera in and hands you the mouse.** The terminal stops being something you read
+  past and becomes something you use: the camera moves to the screen, the cursor maps onto it, and
+  clicks land in the CAD. Run it again or press Escape to lean back out. Bindable to a key under
+  *LACORE: Focus the in-car screen*; rename or disable the command with `VehicleScreen.focusCommand`.
+  - The move starts from wherever you are already looking and eases in and out. A scripted camera that
+    simply switches on jumps, however good its destination is, and a linear interpolation arrives with
+    a jolt because it is still at full speed when it stops.
+  - Looking, shooting and leaving the vehicle are held while the mouse belongs to the terminal —
+    otherwise aiming at a button would swing the camera and clicking would fire the weapon. A held
+    click is released if the pointer leaves the screen, so the UI is never left thinking a button is
+    still down.
+  - `VehicleScreen.cursorRect` says where the terminal ends up on your monitor once the camera has
+    settled, and that is what the pointer is mapped through. If clicks land next to where you pointed,
+    that is the setting to nudge — not the camera.
+  > **No typing.** There is no keyboard channel into a browser rendered this way, so anything that
+  > needs text — a name query — still wants the real terminal. The MDT key is unchanged.
+
 #### Bans & playerbase
 - **txAdmin bans and warns now land in LACORE's ban list too.** The two systems each kept their own
   database and had never heard of each other: `/ban` and `/warn` from the core write
@@ -102,21 +203,121 @@ answer "is this one player or twelve?".
   made no sense (`6 bans · 0 warns` next to 94 and 51 in txAdmin), but the real cost was quieter:
   `/lacore bans upload` would have reported a cheerful "✓ Shared" after uploading six records while
   ninety stayed home. Two halves close it:
-  - **`/lacore bans import`** — one-off backfill of what txAdmin already holds. Copy
-    `txData/<profile>/data/playersDB.json` into the resource as `data/txadmin-import.json` and run it.
-    Bans an admin already lifted and bans that have run out are skipped rather than resurrected, and
-    running it twice adds nothing the second time.
+  - **A sync that finds txAdmin's database by itself.** On every start LACORE looks for
+    `playersDB.json` beside the server and carries over what it finds. Nothing to copy, nothing to
+    configure, nothing to redo after the server moves. It runs at each boot rather than once because
+    that also covers bans issued in the panel while the server was **down**: those fire no event, so
+    the live bridge alone would never see them. Repeating is free — records keep txAdmin's own action
+    id — and bans an admin already lifted or that have run out are skipped rather than resurrected.
+    The console stays quiet unless something actually came across.
+    > **Where it looks.** A configured data path first, then txAdmin's own; then the artifacts folder,
+    > which is where txAdmin puts `txData` by default and which LACORE derives from the running
+    > `monitor` resource; and finally the folders above its own, plus the ones **beside** them. That
+    > last part matters on the common Linux split where the artifacts and the resources live in
+    > separate trees — `/home/FXServer/server` next to `/home/FXServer/server-data` — because walking
+    > straight up from a resource in the second one never passes a `txData` at all.
+    >
+    > There is no official channel for any of this: txAdmin's history routes want an authenticated
+    > admin session, and its resource-facing token does not cover the database. So the file is read
+    > directly, and since it lives outside the resource, both ways a server script can reach outside
+    > are tried in turn. Some FXServer builds allow neither. When it comes up empty the command says
+    > how many paths it tried and **lists the folders it searched** — a layout nobody guessed looks
+    > exactly like a build that refuses the read, and the list is what tells the two apart. Usually one
+    > line in it is your own path, off by a folder.
+  - **`/lacore bans import`** — the same thing on demand, with the full account: which file it found,
+    how many actions it holds, and what was skipped and why.
   - **A live bridge** — every future txAdmin ban and warn is mirrored as it happens, so the two lists
     do not drift apart again. Mirroring is local bookkeeping: nothing leaves your server. Sharing
     stays the deliberate `/lacore bans upload`.
-  > ⚠️ **Config change (`configs/cfg-integrations-sh.lua`) — new `Integrations.txAdminBans`.** Ships
-  > `"auto"`: the bridge is active when txAdmin is running. Set it to `false` to keep the lists
-  > separate. The import is a manual command and runs regardless.
+  > ⚠️ **Config change (`configs/cfg-integrations-sh.lua`) — new `Integrations.txAdminBans` and
+  > `Integrations.txAdminDataPath`.** The first ships `"auto"`: the bridge is active when txAdmin is
+  > running. Set it to `false` to keep the lists separate. The import is a manual command and runs
+  > regardless. The second ships empty and should stay that way — it is the escape hatch for a layout
+  > the search does not recognise, and `/lacore bans import` tells you when that is the case. Give it
+  > the `txData` folder (the one holding `<profile>/data/`), e.g. `/home/FXServer/server/txData`;
+  > `setr lacore_txdata_path "…"` in `server.cfg` does the same and takes precedence.
   >
   > A detail worth knowing if you inspect the file: imported records keep LACORE's own numeric `id`
   > and carry txAdmin's id in a separate `txId` field. `BanPlayer()` derives the next id by adding one
   > to the last entry's — a txAdmin id (`ABCD-1234`) sitting in that field would have made the next
   > `/ban` fail on the arithmetic.
+
+#### Pennsylvania CAD (new terminal)
+
+- **A sixth terminal, in the style of an old county CAD.** Where the LAPD Mobile Client is a modern
+  screen, this one is the terminal that has been bolted into a cruiser since the nineties: a left rail
+  of F-key buttons, two stacked tables — **Current Units** over **Current Incidents** — a command line
+  along the bottom and a `WAITING FOR RESPONSE` strip that lights up while the server is answering.
+  Every button is a real F-key, and the button matching your current status greys out so you can see
+  what you are without reading anything.
+
+  It is a **re-skin, not a second dispatch system**. The units and incidents on it are the same ones
+  the LAPD client, the dispatch console and every other terminal see; a call raised here shows up
+  everywhere, and a call cleared here is cleared for everyone. Nothing is duplicated and nothing is
+  hidden from the rest of the server.
+
+  What it does that the other terminals don't:
+  - **Elapsed time, not a clock.** Both tables show how long — `00h 17m` since a unit last changed
+    status, `01h 08m` since a call came in. That is the number that tells a supervisor a unit has
+    been sitting on the same status for an hour.
+  - **Units on a call read warm.** Assigned units are orange in the list, so who is committed and
+    who is free is a glance, not a comparison.
+  - **Edit Columns.** Each table's columns can be switched off individually, per user.
+  - **Create a Call** from the terminal itself, from a grid of call types the server owner writes.
+  - **A hold-to-fire panic button**, pinned to the bottom of the rail. Holding it is deliberate — a
+    stray click must never broadcast a panic — and it fires straight through without the on-screen
+    keyboard the other backup buttons open.
+
+  Open it with `/mdt` or `/penncad`. A department opts in by its **name**: any dept containing
+  `pennsylvania`, `penn cad` or `mobilecom` gets this terminal instead of the LAPD one.
+
+  > **This terminal is a paid add-on** (`Extra CAD`), so it is unlocked per licence key rather than
+  > by a switch in your config. Nothing to install: it ships in the resource and turns itself on once
+  > your key carries the entitlement. Until then a department tagged for it keeps whatever terminal it
+  > had — the tag is simply ignored, so tagging a dept early is harmless.
+
+  > ⚠️ **Config change — new file `configs/cfg-penn-sh.lua`.** It holds the department tags that
+  > route a player here, the Create-a-Call type grid, the disposition codes, the plate-button label
+  > and an optional cosmetic prefix for call numbers. It ships with sensible defaults and the
+  > terminal works untouched; edit it only to opt your own departments in or to change the call-type
+  > list.
+
+  > **Two columns from the reference terminal are deliberately absent: Site/District and Latitude.**
+  > LACORE has no station, beat or district concept to fill the first, and no latitude at all — call
+  > coordinates are GTA world units, not degrees. Printing a world coordinate under a "Latitude"
+  > header would be a number a player could write down and act on, and it would be wrong. A column
+  > that is blank on every server forever is not a column, it is a header.
+
+### Fixed
+
+#### CAD & MDT
+
+- **The Agency MDT's BOARD tab has never worked.** It renders a full bulletin board and asks the
+  server for it the moment you open the tab — but the reply was only ever forwarded to the LAPD
+  client, so it was dropped on arrival. The tab has been empty for every non-LAPD agency since it
+  shipped. Same root cause, same fix, for three more panels: **dispatch chat** and **call history**
+  never reached the LASD, EMS or Supervisor terminals either, and a **dispatcher assigning a unit**
+  never updated anything except the LAPD client.
+  > These were each gated on "is the LAPD MDT open?" instead of "is *any* terminal open?". They now
+  > all go through the one shared check, so a panel added to any terminal gets its data by default
+  > rather than by remembering to extend a list.
+
+- **A call raised from a non-LAPD terminal is no longer filed under LAPD.** Unit-created incidents
+  (traffic stop, Code 6, self-created) hardcoded `LAPD` into the Agency column regardless of who
+  made them. They now carry the creating unit's own department.
+
+#### Paid add-ons
+
+- **A purchased add-on's interface can now actually unlock.** Entitlements were applied on the
+  server only, and client-side scripts read the shipped config where every add-on flag is `false` —
+  so an add-on whose value is a *screen* could never open for anyone, no matter what the account
+  owned. The server now hands each client the list of add-ons it unlocked, and the client applies it
+  the same fail-closed way: no answer, an empty answer or a corrupt one leaves everything off. The
+  server still decides; a client can only ever receive the list.
+  > For add-on authors: the answer arrives a moment **after** the resource starts, so the usual
+  > load-time `if not Feature(...) then return end` at the top of a client file does not work for an
+  > add-on — it runs before the answer. Gate at the point of use (the command, the open function),
+  > which is also the only place a refusal can tell the player why.
 
 ### Changed
 

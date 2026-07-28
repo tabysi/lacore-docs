@@ -4,52 +4,100 @@ title: "Player List"
 
 # Player List
 
-Press **I** to open the board: who is online, what they are doing, and how the server itself is doing. It is a read-only overlay — the game keeps running underneath and your mouse stays in the world, so you can open it mid-scene without losing control of your character.
+Press **I** to open the board: who is on duty, what they are doing, who else is online, and how the server itself is doing. It is a read-only overlay — the game keeps running underneath and your mouse stays in the world, so you can open it mid-scene without losing control of your character.
+
+There are **two styles**, and your server owner picks one in `configs/cfg-hud-sh.lua`:
+
+| Style | What you get |
+|-------|--------------|
+| **`"duty"`** *(default)* | The full-screen duty board — units grouped by department, a civilian roster, area of play and server state. Everything on this page. |
+| **`"minimal"`** | A compact centred card: ID, name, ping, and department plus callsign for anyone on duty. Jump to [Minimal style](#-minimal-style). |
+
+Both read the same data and use the same keys.
 
 > 📑 **Related:** [Keybinds](/getting-started/keybinds) · [Using the MDT](/user-guide/mdt) · [Dispatch Console](/user-guide/dispatch-console)
 
 ---
 
-## 👥 The roster
-
-One row per player, 24 to a page.
+## 🗺 The header
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│ ONLINE PLAYERS  58                        Page 2 of 3  ← → to page│
-│ ──────────────────────────────────────────────────────────────── │
-│ │ 101  Tabysi          YOU     LAPD · 1A-12   CLEAR      22 ms   │
-│ │ 102  SomeDevGuy      DEV     AMR · M-7      ON SCENE   64 ms   │
-│ │ 103  Randomer                                         141 ms   │
-│ │      Spawn session                                             │
-└──────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│ LACORE ROLEPLAY                              ONLINE   ON DUTY   LOCAL TIME │
+│ SANDY SHORES                                     64        26       21:47  │
+│ Area of play · unchanged 42 min                                            │
+│ ────────────────────────────────────────────────────────────────────────── │
+│ ⚑ ALERT  Pursuit policy in effect.      ● 911 dispatch · 2 on duty │ All … │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+The big line is the **area of play** and how long it has been unchanged. Above it is your community name, which comes from `configs/cfg-branding-sh.lua` — it is your name, not ours.
+
+The strip below carries the three things worth knowing before you commit to a scene: the current **server alert**, whether **911 dispatch is staffed**, and whether the server is open to everyone, members-only, or currently running **without emergency services**.
+
+---
+
+## 🚓 Units, by department
+
+The left half is the duty board. Units are grouped by their department, and **never paged** — the whole point of the board is to answer "who is on duty right now", and an answer split across pages is not one.
+
+```
+┃ LSPD  9 on duty ───────────────────
+┃ 1-L-30     Michael Adams      CLEAR      22
+┃            Tabysi
+┃ 1-ADAM-12  Sarah Reed         ON SCENE   41
+┃            SomePlayer
 ```
 
 | Column | What it means |
 |--------|---------------|
-| **ID** | The server ID. This is what staff commands and `/report` refer to. |
-| **Name** | The player's account name. |
-| Second line | Their **character name**, or which session they are in if they have not joined RP yet. |
-| **Badge** | `YOU` for yourself, otherwise their role — Staff, Dev, Supporter, Donator, Member. |
-| **Unit** | Department and callsign, e.g. `LAPD · 1A-12`. Only for players on duty. |
-| **Status** | Their duty status, in the same colours the MDT uses — CLEAR, ENROUTE, ON SCENE, BUSY, … |
+| **Callsign** | Their unit callsign. `—` if they are on duty without one. |
+| **Name** | Their **character name** on top, account name underneath. |
+| **Status** | Duty status in the same colours the MDT uses — CLEAR, ENROUTE, ON SCENE, BUSY, … |
 | **Ping** | Green under 60 ms, amber under 120 ms, red above. `—` means it is not known yet. |
 
-The coloured edge on the left of each row repeats the role, so a screen full of names is still scannable at a glance. Players in a **different session** than you are dimmed.
+The **left edge of each row carries the status colour**, so a department that has gone quiet or one that is all lit up reads before you have read a single word. A unit with no status yet shows its department's colour instead.
 
-> ℹ️ **Why some players have no character name.** Someone still in the spawn or freeroam session has not picked a character yet, so the board shows the session instead of a name. That is not an error.
+**Department colours come from the department name**, so LSPD is the same blue on every player's screen, and it does not change when another department goes off duty. Well-known agency names (LSPD/LAPD, sheriff/BCSO, AMR/EMS/fire) keep their traditional colours; anything you have named yourself gets its own stable colour. The same colours are used in the radio log.
 
 ---
 
-## 🖥 Server panel
+## 👥 The civilian roster
 
-The column on the right is the state of the server itself:
+The right half is everyone not on duty, two dense columns, sorted by server ID.
 
-- **Area of Play** — the current AOP and how long ago it changed. Hidden entirely when the AOP feature is switched off.
-- **Server status** — whether the server is members-only, open to everyone, or currently running **without emergency services** (nobody on duty).
-- **Dispatcher** — whether a 911 dispatcher is on, and how many.
-- **Units on duty** — LEO and Fire/EMS, each as *on duty · available*.
-- The in-game **clock**.
+```
+  12 ● Michael Adams        22     31 ● Elena Cruz          58
+  17 ● Sarah Reed           45     36 ● Marcus Hale        141
+```
+
+The dot is the player's **role** — Staff, Dev, Supporter, Donator, Member — with the legend along the bottom. Players in a **different session** than you are dimmed, and you are highlighted.
+
+This is the half the **arrow keys page**, and only when there is more than one page.
+
+> ℹ️ **Why some players show no character name.** Someone still in the spawn or freeroam session has not picked a character yet, so the board shows the session instead. That is not an error.
+
+---
+
+## 📄 Minimal style
+
+If your owner set `playerlistStyle = "minimal"`, the board is a single centred card instead:
+
+```
+┌──────────────────────────────────────────────────────┐
+│ LACORE ROLEPLAY  64  17 on duty     SANDY SHORES 21:47│
+│ ──────────────────────────────────────────────────── │
+│ │  1  Michael Adams ●        LSPD · 1-L-30  CLEAR  22 │
+│ │  2  Sarah Reed             AMR · M-1   ON SCENE  41 │
+│ │  3  Randomer               Spawn session         141 │
+│ ──────────────────────────────────────────────────── │
+│ Page 1 of 3                              ← → to page │
+└──────────────────────────────────────────────────────┘
+```
+
+Everyone is in one list sorted by server ID — no split, no department grouping. Players on duty show their department and callsign with their status colour; everyone else shows their character name, or which session they are in. The dot after a name is their role, and the header still carries the player count, how many are on duty, the area of play and the clock.
+
+The arrow keys page this list, and because it is one list rather than two, **the page covers everybody** — units included.
 
 ---
 
@@ -58,7 +106,7 @@ The column on the right is the state of the server itself:
 | Key | Action |
 |-----|--------|
 | **I** | Open / close the board |
-| **←** / **→** | Previous / next page (only when there is more than one) |
+| **←** / **→** | Previous / next page — the civilian roster on the duty board, the whole list on the minimal card |
 
 There is nothing to click: the board takes no cursor, so it can never trap your mouse in the UI. Names above heads are shown while it is open, as before.
 
@@ -74,12 +122,17 @@ The board is part of the HUD and follows the HUD config (`configs/cfg-hud-sh.lua
 HudCfg = {
     enabled    = true,   -- master switch for the whole HUD
     playerlist = true,   -- the "I" board
+    playerlistStyle = "duty",   -- "duty" | "minimal"
     nameplates = true,   -- names above heads while the board is open
 }
 ```
 
 Turning `playerlist` off leaves the key registered but the board never opens.
 
+`playerlistStyle` picks which board is drawn. Anything other than `"duty"` or `"minimal"` is reported once in the server console and falls back to `"duty"` — a typo should not quietly look like a setting that does nothing. The two styles send different data (the minimal card pages the whole roster as one list, the duty board sends units in full and pages only civilians), so each ships exactly the rows it draws.
+
 **Ping is read on the server**, not on each client — with OneSync a client only sees players inside its own scope, so a client-side reading would be blank for everyone across the map.
 
-Roles come from the Discord role mapping (see [Discord configuration](/configuration/discord)); a player with no role simply has no badge.
+Roles come from the Discord role mapping (see [Discord configuration](/configuration/discord)); a player with no role simply has no dot colour of their own.
+
+The area of play disappears from the header when the AOP feature is switched off; the board then says so rather than leaving a gap.
