@@ -122,9 +122,10 @@ answer "is this one player or twelve?".
   mostly-civilian community does not open the list to find out who is on shift. `HudCfg.playerlistStyle`
   picks between them:
   - `"duty"` (default) — the full board described above.
-  - `"minimal"` — one compact centred card: ID, name, ping, and department plus callsign for anyone on
-    duty. No grouping, no server panel, no split. Its header still carries on-duty **and** available
-    counts for the whole roster, because that number is worth one line even when the layout isn't.
+  - `"minimal"` — one compact centred card: server ID, account name, character name, ping, and
+    department plus callsign for anyone on duty. No grouping, no server panel, no split. Its header
+    still carries on-duty **and** available counts for the whole roster, because that number is worth
+    one line even when the layout isn't.
 
   Both read the same data, honour the same key and the same arrow-key paging; only the drawing differs.
   The minimal card pages the whole roster as one list rather than splitting it, so the two send
@@ -133,6 +134,23 @@ answer "is this one player or twelve?".
   because a typo should not look like a setting that does nothing.
   > ⚠️ **Config change (`configs/cfg-hud-sh.lua`) — new `HudCfg.playerlistStyle`.** It ships `"duty"`,
   > so an untouched config keeps the new board. Set it to `"minimal"` for the compact card.
+- **Every row now says server ID, account name and character name — all three, everywhere.** Each
+  board had two of the three and a different two: a unit on the duty board showed both names but no
+  ID, a civilian showed the ID and the account name but never the character behind it, and on the
+  minimal card anyone on duty lost their character name to the department-and-callsign block. So the
+  one thing an admin opens the board for — *which ID is that, and who is playing them* — was never on
+  a single row. It is now.
+  - **Units on the duty board carry their server ID** in front of the callsign. A unit is addressed
+    by callsign in character; every admin command takes the ID, and it was the one number the board
+    would not give you.
+  - **Civilians carry their character name** next to their account name. The two share the row evenly,
+    so a long Steam name cannot push the roleplay name off it, and the roster stays two dense columns
+    — no extra line per player, no fewer players per page.
+  - **The minimal card shows the character name on every row**, on duty or not, and got wider to fit
+    it. The department and callsign next to a unit say which callsign is talking, not who is playing
+    it.
+  - Someone still in the spawn or freeroam session shows the **session** where the character name
+    goes, exactly as before — they have not picked one yet, and that is not an error.
 - **Nothing about either board takes focus.** Both are pure overlays that never swallow a keypress
   or a click, exactly as before.
 
@@ -163,6 +181,38 @@ answer "is this one player or twelve?".
   until there is something to locate.
 
 #### In-car CAD screen
+- **The dashboard has its own terminal now, and it is the default.** The screen shipped showing the full
+  Mobile Client, and that was the wrong call. The MDT is drawn for a 1080p window and a mouse pointer;
+  the dashboard is a *texture*, sampled onto the screen mesh at whatever mipmap the distance picks and
+  then run through the same temporal antialiasing that softens every fine edge in the game. An 11px
+  label does not survive that trip. No amount of resolution fixes a UI that is the wrong size for the
+  surface — so there is now one built for the surface:
+  - **Nothing under ~2vh, nothing thinner than 500 weight, no control smaller than a fingertip.** On the
+    default 864 x 1450 screen that is a 64px callsign, a 52px call type and 109px buttons. It is designed
+    for the resolution the screen actually has rather than fighting for pixels it will never get.
+  - **Three tabs and a status dock.** ACTIVE (the call you are on: type, location, narrative, attached
+    units, the last four comments), CALLS (everything outstanding, tap one to open it), UNITS (who else
+    is out, partners merged onto one row). The **status dock sits along the bottom on every tab** — status
+    is the thing a unit changes constantly, and burying it a tab deep is what sends everyone back to the
+    real terminal.
+  - **It is worked, not just read.** `/cad` already leaned the camera in and mapped the mouse onto the
+    screen; there was simply nothing on it to click. Now there is: attach and detach, GPS to a call,
+    Code 6 / On Scene, request backup, and every status in the dock. Anything needing typed text — a name
+    query, a comment — is deliberately **absent** rather than present and dead, because a DUI has no
+    keyboard channel and a button that silently does nothing is worse than no button.
+  - **Attached units on a call were always empty.** The panel read `call.attachedUnits`, a field that
+    exists only in the dev mock — the server puts the incident number on the *unit*, not a unit list on
+    the call. Derived from the units list now, so it shows what it always claimed to.
+  - **Every button on the screen would have POSTed at the wrong resource.** Callbacks are addressed to
+    the resource by name, and the name comes from `GetParentResourceName()` — which is injected into NUI
+    *frames*. The dashboard is a DUI, a separate browser handed a texture, and it cannot count on that.
+    The fallback was the literal string `lacore`, which is only right on servers running the standalone
+    product. The resource name now travels in the DUI's URL, so it is right on both.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `VehicleScreen.view` now ships `"incar"`.**
+  > An existing config file keeps whatever it says, so set it by hand if you are keeping yours.
+  > `"mdt"` still does exactly what it did — the whole Mobile Client on the screen — and is still there
+  > for owners who want it and will take the softness. `"compact"` is accepted as the old spelling of
+  > `"incar"` and behaves identically, so a config that already said it needs no edit.
 - **The Mobile Client on the dashboard screen of your patrol vehicle.** Live, while you drive, rendered
   into the model's own screen — the same terminal the MDT key opens, not a cut-down copy of it. Display
   only: it takes no focus, no controls and no keys, so nothing about driving changes.
@@ -201,37 +251,16 @@ answer "is this one player or twelve?".
     that is the setting to nudge — not the camera.
   > **No typing.** There is no keyboard channel into a browser rendered this way, so anything that
   > needs text — a name query — still wants the real terminal. The MDT key is unchanged.
-- **The terminal is sharp once you have leaned in.** Painting a browser into the *world* costs resolution
-  three times over: the render target the model declares has its size baked into the vehicle, where no
-  setting can raise it; the screen mesh is then sampled at whatever mipmap the viewing distance picks; and
-  the whole frame goes through the same temporal antialiasing that softens every fine edge in the game.
-  That is fine for a screen you glance at while driving past it. It is not fine for reading a name off a
-  record, which is the entire point of `/cad`. So once the camera has arrived, the same texture is drawn a
-  second time as a flat image straight onto your monitor — no render target, no mipmap, no projection, the
-  pixels the browser actually produced. It fades in as the lean settles and out as the view pulls away, so
-  it reads as the screen coming into focus rather than as a picture appearing over it.
-  - It is drawn at **`cursorRect`** — the rectangle the mouse was already being mapped through — rather
-    than at one of its own. That is what stops it drifting out of line with your own clicks: there is only
-    one number, so the picture and the pointer are right together or wrong together. A `cursorRect` that
-    was never set properly now shows up as an image sitting off the screen bezel instead of only as clicks
-    that quietly miss, which makes `/cad adjust` a great deal easier to aim than it was to diagnose.
-  - **Only while focused, and never during `/cad adjust`.** The screen you read while driving is untouched.
-    And the tuning tool sets `cursorRect` by clicking the screen's two corners, so it needs the real one
-    visible — an overlay drawn at the rectangle being measured would cover the thing being measured.
-  - **The screen was also the wrong shape, which the sharp copy cannot fix.** `VehicleScreen.width`/
-    `height` shipped at 768 x 1024 — a ratio of 0.75. But the Interceptor's tablet lands on a 16:9
-    monitor at 0.265 of the width by 0.791 of the height, which is a ratio of **0.596**: the browser was
-    rendering a fifth too wide and being squeezed onto the quad, so every glyph arrived horizontally
-    compressed. Compressed text reads as soft text, which is why this hid behind the resolution problem
-    for so long. The default is now **864 x 1450** — measured off `cursorRect` rather than estimated, and
-    incidentally 60% more pixels. The overlay deliberately reproduces whatever shape you set, stretch
-    included: correcting it there instead would put the picture somewhere the clicks are not.
-  > ⚠️ **Config changes (`configs/cfg-vehiclescreen-sh.lua`) — new `VehicleScreen.focusOverlay`, and
-  > `VehicleScreen.width`/`height` re-defaulted.** The overlay ships **on**, including for a config file
-  > that predates it; set it to `false` for the previous behaviour, where the focused terminal is the
-  > model's own screen and nothing else. The new 864 x 1450 only reaches you if you take the new config
-  > file — an existing one keeps its own numbers, so change them by hand if you are keeping it, and redo
-  > the ratio against your own `cursorRect` if you have re-measured it with `/cad adjust`.
+- **The screen was the wrong shape.** `VehicleScreen.width`/`height` shipped at 768 x 1024 — a ratio of
+  0.75. But the Interceptor's tablet lands on a 16:9 monitor at 0.265 of the width by 0.791 of the height,
+  which is a ratio of **0.596**: the browser was rendering a fifth too wide and being squeezed onto the
+  quad, so every glyph arrived horizontally compressed. Compressed text reads as soft text, which is why
+  this hid behind "the screen is a bit blurry" for so long. The default is now **864 x 1450** — measured
+  off `cursorRect` rather than estimated, and incidentally 60% more pixels.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `VehicleScreen.width`/`height`
+  > re-defaulted.** The new 864 x 1450 only reaches you if you take the new config file — an existing one
+  > keeps its own numbers, so change them by hand if you are keeping it, and redo the ratio against your
+  > own `cursorRect` if you have re-measured it with `/cad adjust`.
 
 #### Bans & playerbase
 - **txAdmin bans and warns now land in LACORE's ban list too.** The two systems each kept their own

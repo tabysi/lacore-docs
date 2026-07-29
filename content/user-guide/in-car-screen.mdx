@@ -1,0 +1,195 @@
+---
+title: "In-Car Screen"
+---
+
+# In-Car Screen
+
+The dashboard screen of your patrol vehicle, running a live terminal. It fills itself in as calls come in, it follows what you are doing, and once you run **`/cad`** the camera leans in and hands you the mouse so you can work it — attach to a call, set your status, drop a GPS marker.
+
+It is drawn **per client**, not per vehicle: your partner sees their own terminal signed in as themselves, and a civilian sitting in the same car sees the model's own texture, untouched.
+
+> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [MDT Toolbar & Status](/user-guide/mdt-toolbar) · [Working with Incidents](/user-guide/mdt-incidents) · [Commands & Keybinds](/commands)
+
+---
+
+## 👮 Who gets a screen
+
+Your server owner picks the audience in `configs/cfg-vehiclescreen-sh.lua`:
+
+| `VehicleScreen.audience` | Who sees a terminal |
+|--------------------------|---------------------|
+| `"leo"` *(default)* | Law Enforcement on duty |
+| `"duty"` | Anyone on duty — LEO or Fire/EMS |
+| `"all"` | Everyone, civilians included (mostly useful for testing) |
+
+Off duty, in a vehicle with no entry in the config, or outside the audience: the screen stays the model's own and `/cad` tells you there is nothing here.
+
+---
+
+## 🖥 What is on it
+
+```
+┌──────────────────────────────────┐
+│ 1-ADAM-15  LAPD    ENROUTE 21:47 │
+│ ┌────────┬────────┬────────┐     │
+│ │ ACTIVE │ CALLS 4│ UNITS 5│     │
+│ └────────┴────────┴────────┘     │
+│ ┃ #4821   ASSIGNED   CODE 3      │
+│ ┃ 459 - BURGLARY IN PROGRESS     │
+│ ┃ 1234 Grove Street · POSTAL 1337│
+│ ┃ Caller reports two suspects…   │
+│ ┃ [1-ADAM-15] [1-DAVID-3]        │
+│                                  │
+│ DISPATCH  RP is staying inside.  │
+│ 1-ADAM-15 Enroute from Vespucci. │
+│                                  │
+│ [ GPS ][CODE 6][BACKUP][DETACH]  │
+│ ────────────────────────────────  │
+│ [CLEAR][ENROUTE][CODE 6][BUSY]   │
+└──────────────────────────────────┘
+```
+
+The header always carries **your callsign, your department, your current status and the clock** — the status sits there rather than only in the dock below, so a status the dock does not offer (`UNAVAILABLE`, `OUT TO STATION`) is still visible at a glance.
+
+Three tabs:
+
+| Tab | What it shows |
+|-----|---------------|
+| **ACTIVE** | The call you have open: incident number, state, response code, type, address and postal, the original message, every unit attached to it, and the last four comments. |
+| **CALLS** | Everything still outstanding, newest first. Yours is marked. Tap a call to open it. |
+| **UNITS** | Who else is out — callsign, the officers in it, the incident they are on, their status. Partners sharing a callsign are one row, not two. |
+
+Along the bottom is the **status dock**, on every tab: `CLEAR`, `ENROUTE`, `CODE SIX` (LEO) or `ON SCENE` (Fire/EMS), `BUSY`. The one you are on is filled in. Status is the thing a unit changes constantly, so it is never more than one tap away.
+
+> ℹ️ **Everything here is the real CAD.** A status set on the dashboard is the status dispatch sees; attaching here attaches you for real. It is the same backend the MDT key opens, not a copy that has to be re-done later.
+
+---
+
+## 🎯 Working it — `/cad`
+
+```bash
+/cad
+```
+
+The camera leans in to the terminal and the mouse becomes a pointer on the screen. Run `/cad` again — or press **Escape** — to lean back out. It is also bindable in FiveM's own key bindings under **"LACORE: Focus the in-car screen"**, and your owner can rename the command (`VehicleScreen.focusCommand`).
+
+| Input | What it does |
+|-------|--------------|
+| **Mouse** | Moves the pointer on the terminal and clicks it |
+| **Mouse wheel** | Scrolls the list you are pointing at |
+| **Escape** | Leans back out |
+
+While you are leaned in, looking around, shooting, the weapon wheel and leaving the vehicle are blocked — the mouse belongs to the terminal, and a click that fires your sidearm instead of attaching you to a call is not a trade anyone wants. **Driving is not blocked.** The camera is attached to the vehicle and rides along through corners and hills, so the screen stays exactly where you put it.
+
+> ⚠️ **There is no typing.** The dashboard terminal is a separate browser handed to the game as a texture, and there is no keyboard channel into it. Anything that needs text — a name query, writing a comment — still wants the real terminal, and the MDT key is unchanged. Those controls are deliberately **absent** from the screen rather than present and dead.
+
+### Two officers, one car
+
+Each occupant gets **their own terminal, signed in as themselves** — the passenger runs the CAD as the passenger, and their status and callsign stay theirs. With `VehicleScreen.sharedCursor` on you also see each other's **pointer**, so "look at this call" has something to point with.
+
+Pointers travel; **clicks do not**. Every terminal is signed in as its own unit, so replaying the passenger's click on the driver's screen would have the driver self-assign to whatever the passenger tapped.
+
+---
+
+## 🛠 For server owners
+
+### This needs support from the vehicle model
+
+A screen has to be a surface the game can be told to draw on, and that is decided when the model is built — **a script cannot add one**. There are two routes a model can offer, and one command each to find out which you have:
+
+```bash
+/lacore screen target
+```
+
+```bash
+/lacore screen dui
+```
+
+`target` registers the model's named render target and draws into it — whatever lights up **is** the render target. `dui` runs the full fallback chain (browser → runtime texture → texture replacement). Both stop on their own after 45 seconds and when you leave the vehicle; `/lacore screen off` stops them early. Run them once per model before adding it to the config.
+
+The **render target wins** wherever a model offers one: it draws on your vehicle only. The texture-replacement fallback works anywhere but swaps the texture for *every* vehicle of that model on your own screen — a parked cruiser nearby then shows your CAD too. Other players still see their own.
+
+### The config
+
+`configs/cfg-vehiclescreen-sh.lua`, one entry per model:
+
+```lua
+VehicleScreen.models = {
+    ["lapd20fpiu"] = {
+        renderTarget = "script_rt_dials_feroci",  -- preferred route
+        txd          = "lapd20fpiu",              -- fallback route
+        texture      = "mdt_screen",
+        cam = {
+            pos  = { x = 0.040, y = 0.210, z = 0.680 },
+            look = { x = -0.010, y = 1.203, z = 0.575 },
+            fov  = 38.000,
+        }
+    },
+}
+```
+
+Give both where you have both — the render target is used when the game hands one out, the replacement only if it does not.
+
+### Which terminal is drawn
+
+```lua
+VehicleScreen.view = "incar"
+```
+
+| Value | What you get |
+|-------|--------------|
+| `"incar"` *(default)* | The in-car terminal on this page — built for a dashboard, worked with the mouse. |
+| `"mdt"` | The full LACORE Mobile Client, exactly as the MDT key opens it, filling the screen. |
+| `"compact"` | Accepted as the old spelling of `"incar"`; behaves identically. |
+
+> ⚠️ **If the screen "looks bad", this is almost always why.** The MDT is drawn for a 1080p window and a mouse pointer. The dashboard is a *texture*: whatever the browser produces is sampled onto the screen mesh at whatever mipmap the viewing distance picks, then run through the same temporal antialiasing that softens every fine edge in the game. An 11px label does not survive that trip, and no amount of resolution fixes a UI that is the wrong size for the surface. `"incar"` is sized for the resolution the screen actually has — nothing under about 2% of the screen height, nothing thinner than a medium weight, no control smaller than a fingertip. `"mdt"` is still offered for owners who want the whole terminal and will take the softness.
+
+### Size — give it the *shape*, not just a number
+
+```lua
+VehicleScreen.width  = 864
+VehicleScreen.height = 1450
+```
+
+The texture is stretched onto whatever quad the modder built, so a square image on a portrait tablet arrives squashed — and squashed text reads as *blurry* text, which is why this is easy to miss.
+
+Measure it off `cursorRect` rather than guessing. The default is the Interceptor's tablet: it lands on a 16:9 monitor at 0.265 of the width by 0.791 of the height, so the ratio is `(0.265 × 16) / (0.791 × 9) = 0.596` — hence 864 × 1450. Widescreen dash panels want something more like 1280 × 720; the terminal switches to a two-column layout on its own when the screen is wider than it is tall.
+
+This is also the main cost of the feature — a real browser rendering continuously — so do not go higher than the screen is worth reading at. Note that `VehicleScreen.passengers` puts one browser in **every occupied seat**, not one per car.
+
+### Aiming it: `/cad adjust`
+
+Two blocks of numbers decide whether the terminal is usable — where the camera goes, and which part of your monitor the screen lands on (`cursorRect`, which is what the mouse is mapped through). Both are per model, and no two models put their screen in the same place. Do not edit them by hand and restart to look. Sit in the vehicle and run:
+
+```bash
+/cad adjust
+```
+
+**Step 1 — put the screen in frame**
+
+| Input | Action |
+|-------|--------|
+| **Mouse** | Aim the camera |
+| **Arrow keys** | Slide the camera through the cabin |
+| **Wheel** | Height · **Shift + Wheel** field of view |
+| **Alt** | Move faster |
+| **Enter** | Continue to step 2 · **Esc** cancel, nothing is saved |
+
+**Step 2 — mark the screen on your monitor**
+
+Click the **top-left** corner of the terminal, then the **bottom-right**. The frame is drawn live so you can see what you claimed. **Del** starts the rectangle over, **Enter** finishes.
+
+The finished config lines are printed to the **F8 console**, ready to paste back into the file. Nothing is written to disk — a tool that edits your config while you are driving is a tool that eventually edits it wrongly.
+
+### When something is wrong
+
+| Symptom | Almost always |
+|---------|---------------|
+| The terminal does not react to clicks | `cursorRect` — outside that rectangle no click is sent at all. Fix it with `/cad adjust`, not the camera. |
+| Text is soft and hard to read | `VehicleScreen.view = "mdt"`. Try `"incar"`. If it is already `"incar"`, check that `width`/`height` match the screen's shape. |
+| The screen stays the model's own | No entry for that model, you are outside the `audience`, or the model offers neither route — run `/lacore screen target` and `/lacore screen dui`. |
+| The camera leans in somewhere else | `cam.pos` / `cam.look` are one measurement of one model. Re-run `/cad adjust`. |
+
+The whole feature sits behind the CAD feature toggle (`Features.cad.enabled` in `configs/cfg-features-sh.lua`) and its own `VehicleScreen.enabled`.
+
+> 📸 **Screenshot pending** — this page still needs a capture of the screen in a vehicle. Drop it in `content/user-guide/images/` and link it here.

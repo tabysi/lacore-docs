@@ -11,7 +11,7 @@ There are **two styles**, and your server owner picks one in `configs/cfg-hud-sh
 | Style | What you get |
 |-------|--------------|
 | **`"duty"`** *(default)* | The full-screen duty board — units grouped by department, a civilian roster, area of play and server state. Everything on this page. |
-| **`"minimal"`** | A compact centred card: ID, name, ping, and department plus callsign for anyone on duty. Jump to [Minimal style](#-minimal-style). |
+| **`"minimal"`** | A compact centred card: server ID, account name, character name, ping, and department plus callsign for anyone on duty. Jump to [Minimal style](#-minimal-style). |
 
 Both read the same data and use the same keys.
 
@@ -45,16 +45,17 @@ The left half is the duty board. Units are grouped by their department, and **ne
 
 ```
 ┃ LSPD  9 on duty  4 available ───────
-┃ 1-L-30     Michael Adams      CLEAR      22
-┃            Tabysi
-┃ 1-ADAM-12  Sarah Reed         ON SCENE   41
-┃            SomePlayer
+┃ 12  1-L-30     Michael Adams      CLEAR      22
+┃                Tabysi
+┃ 17  1-ADAM-12  Sarah Reed         ON SCENE   41
+┃                SomePlayer
 ```
 
 Every department header carries **how many of its units are available** next to the on-duty total — the same CLEAR rule as the header. A department with nobody clear shows its `0 available` in red instead of green, because that is the state you want to notice, not the one you want hidden.
 
 | Column | What it means |
 |--------|---------------|
+| **ID** | Their **server ID** — the number every admin command takes. Units are addressed by callsign in character, but the ID is what you need out of it. |
 | **Callsign** | Their unit callsign. `—` if they are on duty without one. |
 | **Name** | Their **character name** on top, account name underneath. |
 | **Status** | Duty status in the same colours the MDT uses — CLEAR, ENROUTE, ON SCENE, BUSY, … |
@@ -71,9 +72,11 @@ The **left edge of each row carries the status colour**, so a department that ha
 The right half is everyone not on duty, two dense columns, sorted by server ID.
 
 ```
-  12 ● Michael Adams        22     31 ● Elena Cruz          58
-  17 ● Sarah Reed           45     36 ● Marcus Hale        141
+  12 ● Michael Adams   Tabysi        22     31 ● Elena Cruz    Someone      58
+  17 ● Sarah Reed      SomePlayer    45     36 ● Marcus Hale   Spawn …     141
 ```
+
+Each row is **server ID · role · account name · character name · ping**. The two names share the row evenly, so a long Steam name can never push the character name off it.
 
 The dot is the player's **role** — Staff, Dev, Supporter, Donator, Member — with the legend along the bottom. Players in a **different session** than you are dimmed, and you are highlighted.
 
@@ -91,15 +94,15 @@ If your owner set `playerlistStyle = "minimal"`, the board is a single centred c
 ┌──────────────────────────────────────────────────────┐
 │ LACORE ROLEPLAY 64 17 on duty 8 available  SANDY … 21:47│
 │ ──────────────────────────────────────────────────── │
-│ │  1  Michael Adams ●        LSPD · 1-L-30  CLEAR  22 │
-│ │  2  Sarah Reed             AMR · M-1   ON SCENE  41 │
-│ │  3  Randomer               Spawn session         141 │
+│ │  1  Tabysi ●     Michael Adams  LSPD · 1-L-30  CLEAR  22 │
+│ │  2  SomePlayer   Sarah Reed        AMR · M-1  ON SCENE  41 │
+│ │  3  Randomer     Spawn session                        141 │
 │ ──────────────────────────────────────────────────── │
 │ Page 1 of 3                              ← → to page │
 └──────────────────────────────────────────────────────┘
 ```
 
-Everyone is in one list sorted by server ID — no split, no department grouping. Players on duty show their department and callsign with their status colour; everyone else shows their character name, or which session they are in. The dot after a name is their role, and the header still carries the player count, how many are on duty, how many of those are available, the area of play and the clock.
+Everyone is in one list sorted by server ID — no split, no department grouping. Every row carries the **server ID, the account name and the character name**, on duty or not: the department and callsign next to a unit say which callsign is talking, not who is playing it. Someone who has not picked a character yet shows which session they are in instead. Players on duty additionally show their department and callsign with their status colour. The dot after a name is their role, and the header still carries the player count, how many are on duty, how many of those are available, the area of play and the clock.
 
 The arrow keys page this list, and because it is one list rather than two, **the page covers everybody** — units included.
 
