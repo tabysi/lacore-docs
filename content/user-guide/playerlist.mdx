@@ -23,8 +23,8 @@ Both read the same data and use the same keys.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ LACORE ROLEPLAY                              ONLINE   ON DUTY   LOCAL TIME │
-│ SANDY SHORES                                     64        26       21:47  │
+│ LACORE ROLEPLAY                    ONLINE  ON DUTY  AVAILABLE  LOCAL TIME  │
+│ SANDY SHORES                           64       26         11      21:47   │
 │ Area of play · unchanged 42 min                                            │
 │ ────────────────────────────────────────────────────────────────────────── │
 │ ⚑ ALERT  Pursuit policy in effect.      ● 911 dispatch · 2 on duty │ All … │
@@ -32,6 +32,8 @@ Both read the same data and use the same keys.
 ```
 
 The big line is the **area of play** and how long it has been unchanged. Above it is your community name, which comes from `configs/cfg-branding-sh.lua` — it is your name, not ours.
+
+**Available** counts the units whose status is **CLEAR** — the ones who could take a call right now. It is deliberately a separate number from *on duty*: twenty-six on shift with two clear is a very different server than twenty-six with twenty clear.
 
 The strip below carries the three things worth knowing before you commit to a scene: the current **server alert**, whether **911 dispatch is staffed**, and whether the server is open to everyone, members-only, or currently running **without emergency services**.
 
@@ -42,12 +44,14 @@ The strip below carries the three things worth knowing before you commit to a sc
 The left half is the duty board. Units are grouped by their department, and **never paged** — the whole point of the board is to answer "who is on duty right now", and an answer split across pages is not one.
 
 ```
-┃ LSPD  9 on duty ───────────────────
+┃ LSPD  9 on duty  4 available ───────
 ┃ 1-L-30     Michael Adams      CLEAR      22
 ┃            Tabysi
 ┃ 1-ADAM-12  Sarah Reed         ON SCENE   41
 ┃            SomePlayer
 ```
+
+Every department header carries **how many of its units are available** next to the on-duty total — the same CLEAR rule as the header. A department with nobody clear shows its `0 available` in red instead of green, because that is the state you want to notice, not the one you want hidden.
 
 | Column | What it means |
 |--------|---------------|
@@ -85,7 +89,7 @@ If your owner set `playerlistStyle = "minimal"`, the board is a single centred c
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│ LACORE ROLEPLAY  64  17 on duty     SANDY SHORES 21:47│
+│ LACORE ROLEPLAY 64 17 on duty 8 available  SANDY … 21:47│
 │ ──────────────────────────────────────────────────── │
 │ │  1  Michael Adams ●        LSPD · 1-L-30  CLEAR  22 │
 │ │  2  Sarah Reed             AMR · M-1   ON SCENE  41 │
@@ -95,7 +99,7 @@ If your owner set `playerlistStyle = "minimal"`, the board is a single centred c
 └──────────────────────────────────────────────────────┘
 ```
 
-Everyone is in one list sorted by server ID — no split, no department grouping. Players on duty show their department and callsign with their status colour; everyone else shows their character name, or which session they are in. The dot after a name is their role, and the header still carries the player count, how many are on duty, the area of play and the clock.
+Everyone is in one list sorted by server ID — no split, no department grouping. Players on duty show their department and callsign with their status colour; everyone else shows their character name, or which session they are in. The dot after a name is their role, and the header still carries the player count, how many are on duty, how many of those are available, the area of play and the clock.
 
 The arrow keys page this list, and because it is one list rather than two, **the page covers everybody** — units included.
 

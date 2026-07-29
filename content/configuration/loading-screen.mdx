@@ -210,16 +210,25 @@ queueExport = "connectqueue:getQueueSize",
 The export is called **on the server** and must return a number. Anything else — a typo, a stopped
 resource, an export that throws — hides the tile instead of breaking the loading screen.
 
-## One honest caveat about the first second
+## One honest caveat about the early load
 
-A loading screen is a web page, and it opens **before any Lua exists on the connecting client**. So
-it starts on LACORE's built-in defaults and becomes *your* screen the moment the resource starts on
-that player — in practice the first moment or two of the load.
+A loading screen is a web page, and it opens **before any Lua exists on the connecting client** —
+the game is still running its own init functions long before a single resource starts. So the screen
+runs on LACORE's built-in defaults for a good part of the join and becomes *your* screen the moment
+the resource starts on that player.
+
+Those defaults are a **complete screen**, not a placeholder: LACORE's own headline, tips, rules and
+phase names are compiled into the page and shown from the first frame. What they cannot know is
+anything that belongs to *you*.
 
 What that means in practice:
 
-- The percentage, the bar and the artwork are correct from the first frame.
-- Your tips, rules, headline and language appear a moment later, fading in rather than popping.
+- The percentage, the bar, the phase readout and the artwork are correct from the first frame.
+- LACORE's own headline, tips and rules are on screen immediately, in English. If you edited them —
+  or run a German or Russian server — your wording replaces them once the resource starts.
+- Your community name, Discord invite, support channel, player count and area of play only appear
+  once the resource starts. Their tiles stay **hidden** until then rather than showing a placeholder
+  or somebody else's invite.
 - If you chose **`"dossier"`**, players may briefly see **`"cinematic"`** first. It cross-fades
   rather than snapping, but it is there.
 

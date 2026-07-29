@@ -101,7 +101,14 @@ answer "is this one player or twelve?".
   right** as a dense two-column roster. Units are never paged, because an answer to "who is on duty"
   that is split across pages is not an answer. The arrow keys page the civilian roster instead.
   - The header carries the **area of play**, your community name (from `cfg-branding-sh.lua`, so it
-    is your name and not ours), players online, units on duty, and the local time.
+    is your name and not ours), players online, units on duty, units available, and the local time.
+  - **Every department says how many of its units are available**, next to the on-duty total: `LAPD ·
+    4 on duty · 2 available`. "Six units are on" and "six units can take your call" are different
+    answers, and the board was only giving the first one — so a dispatcher had to read every status
+    badge in a column to work out the second. Available means `CLEAR` and nothing else, the same rule
+    the server counts LEO and Fire availability by, so the two can never disagree. A department with
+    nobody clear turns its number red rather than hiding it — zero available is the state most worth
+    seeing.
   - A **status strip** shows the server alert, whether 911 dispatch is staffed, and who is allowed to
     connect — the three things that were previously buried in a side column.
   - Each unit row's left edge carries its **status colour**, the same palette the MDT status buttons
@@ -116,7 +123,8 @@ answer "is this one player or twelve?".
   picks between them:
   - `"duty"` (default) — the full board described above.
   - `"minimal"` — one compact centred card: ID, name, ping, and department plus callsign for anyone on
-    duty. No grouping, no server panel, no split.
+    duty. No grouping, no server panel, no split. Its header still carries on-duty **and** available
+    counts for the whole roster, because that number is worth one line even when the layout isn't.
 
   Both read the same data, honour the same key and the same arrow-key paging; only the drawing differs.
   The minimal card pages the whole roster as one list rather than splitting it, so the two send
@@ -193,6 +201,37 @@ answer "is this one player or twelve?".
     that is the setting to nudge — not the camera.
   > **No typing.** There is no keyboard channel into a browser rendered this way, so anything that
   > needs text — a name query — still wants the real terminal. The MDT key is unchanged.
+- **The terminal is sharp once you have leaned in.** Painting a browser into the *world* costs resolution
+  three times over: the render target the model declares has its size baked into the vehicle, where no
+  setting can raise it; the screen mesh is then sampled at whatever mipmap the viewing distance picks; and
+  the whole frame goes through the same temporal antialiasing that softens every fine edge in the game.
+  That is fine for a screen you glance at while driving past it. It is not fine for reading a name off a
+  record, which is the entire point of `/cad`. So once the camera has arrived, the same texture is drawn a
+  second time as a flat image straight onto your monitor — no render target, no mipmap, no projection, the
+  pixels the browser actually produced. It fades in as the lean settles and out as the view pulls away, so
+  it reads as the screen coming into focus rather than as a picture appearing over it.
+  - It is drawn at **`cursorRect`** — the rectangle the mouse was already being mapped through — rather
+    than at one of its own. That is what stops it drifting out of line with your own clicks: there is only
+    one number, so the picture and the pointer are right together or wrong together. A `cursorRect` that
+    was never set properly now shows up as an image sitting off the screen bezel instead of only as clicks
+    that quietly miss, which makes `/cad adjust` a great deal easier to aim than it was to diagnose.
+  - **Only while focused, and never during `/cad adjust`.** The screen you read while driving is untouched.
+    And the tuning tool sets `cursorRect` by clicking the screen's two corners, so it needs the real one
+    visible — an overlay drawn at the rectangle being measured would cover the thing being measured.
+  - **The screen was also the wrong shape, which the sharp copy cannot fix.** `VehicleScreen.width`/
+    `height` shipped at 768 x 1024 — a ratio of 0.75. But the Interceptor's tablet lands on a 16:9
+    monitor at 0.265 of the width by 0.791 of the height, which is a ratio of **0.596**: the browser was
+    rendering a fifth too wide and being squeezed onto the quad, so every glyph arrived horizontally
+    compressed. Compressed text reads as soft text, which is why this hid behind the resolution problem
+    for so long. The default is now **864 x 1450** — measured off `cursorRect` rather than estimated, and
+    incidentally 60% more pixels. The overlay deliberately reproduces whatever shape you set, stretch
+    included: correcting it there instead would put the picture somewhere the clicks are not.
+  > ⚠️ **Config changes (`configs/cfg-vehiclescreen-sh.lua`) — new `VehicleScreen.focusOverlay`, and
+  > `VehicleScreen.width`/`height` re-defaulted.** The overlay ships **on**, including for a config file
+  > that predates it; set it to `false` for the previous behaviour, where the focused terminal is the
+  > model's own screen and nothing else. The new 864 x 1450 only reaches you if you take the new config
+  > file — an existing one keeps its own numbers, so change them by hand if you are keeping it, and redo
+  > the ratio against your own `cursorRect` if you have re-measured it with `/cad adjust`.
 
 #### Bans & playerbase
 - **txAdmin bans and warns now land in LACORE's ban list too.** The two systems each kept their own
@@ -470,6 +509,23 @@ answer "is this one player or twelve?".
   (traffic stop, Code 6, self-created) hardcoded `LAPD` into the Agency column regardless of who
   made them. They now carry the creating unit's own department.
 
+#### Loading screen
+
+- **The loading screen was blank for most of the join.** Headline, tips, rules and the phase readout
+  were held back until the server's config arrived, and that config is sent from client Lua — which
+  does not run until the game has finished its own init functions, most of the way through the load.
+  So the screen a player actually spent their join looking at was a logo, a percentage and a lot of
+  empty space, and the finished screen only appeared at the very end. The page now ships LACORE's own
+  headline, tips, rules and phase hints compiled in, and draws a complete screen from the first frame;
+  the config still replaces every word of it the moment it lands. On a default install the two are
+  identical, so there is nothing to see when the swap happens.
+  > The built-in copy is a verbatim mirror of the `ls_*` keys in `lang/en.lua` and is **English only** —
+  > it exists before any locale can be loaded. Translated wording is part of the config and arrives
+  > with it, exactly as before.
+- **Nothing that belongs to you is guessed at.** Only LACORE's own copy is defaulted. Your community
+  name, Discord invite, support channel, player count and area of play stay empty until the config
+  arrives, and their tiles stay hidden rather than briefly showing somebody else's invite.
+
 #### Paid add-ons
 
 - **A purchased add-on's interface can now actually unlock.** Entitlements were applied on the
@@ -537,6 +593,25 @@ answer "is this one player or twelve?".
   reads like *every ban on this server* — and on a txAdmin server it is off by an order of magnitude.
   It now names the source, and either reports how many entries came from txAdmin or points at
   `/lacore bans import` when none have.
+
+#### Documentation
+- **The Command Reference now lists every command and every keybind.** It was written by hand and had
+  drifted: roughly a third of the resource's commands were missing — `/supervisor`, `/penncad`,
+  `/cad`, `/spawnpoint`, the renameable `/settings`, the RP chat commands' feature groups, and the
+  whole developer/debug set. Keybinds were mentioned in passing per module rather than listed, so
+  there was no single place to answer "what is bound to what". Rebuilt from the source: all 32
+  keybinds (11 with a default key, 21 unbound) in one table, every command grouped by role, and ACE-
+  restricted commands marked as such rather than lumped in with the ones that check your job.
+- **The conflicts are written down instead of discovered.** `X` is bound twice (hand-on-holster and
+  release/uncuff), `/run` fires both the MDT query and the RP action, `/settings` is claimed by most
+  HUD resources, and a few names are registered by more than one LACORE file so load order decides
+  the winner. None of them break a stock install, which is exactly why they used to cost an evening
+  when something behaved oddly — each now says which toggle or rebind resolves it.
+- **A searchable version of it on the website** at `lacore.netica.dev/keybinds`. The same data, but
+  the keybinds are drawn on an actual keyboard you click — which answers "is `X` free?" in a glance
+  where a table needs reading end to end — and the 154 commands filter live by text, by category, and
+  by whether they are ACE-gated, job-checked or a dev tool. Every row carries the file and line it
+  was read from, so nothing here has to be taken on trust. Linked from the main nav as **Commands**.
 
 > **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
 > (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short

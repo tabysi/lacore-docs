@@ -15,24 +15,90 @@ Every `<arg>` is required, `[arg]` is optional. Many commands only work in a cer
   your team or check the [Support & FAQ](/support).
 </Callout>
 
+**Legend** — 🔒 needs an ACE permission (or the server console) · 🧪 developer / debug tool, not
+meant for players. Everything else either checks your job and duty status when you run it, or is
+open to everyone.
+
+## ⌨️ Keybinds
+
+All keybinds are rebindable in *FiveM Settings ▸ Key Bindings ▸ FiveM*.
+
+### Bound by default
+
+| Key | Action |
+|-----|--------|
+| **G** | Toggle engine |
+| **I** | Toggle the player list |
+| **K** | Seatbelt on / off *(only when `Features.seatbelt` is on)* |
+| **O** | Open / close the MDT |
+| **U** | Hands up *(only when `Features.rpemotes` is on)* |
+| **X** | Hand on holster *(only when `Features.rpemotes` is on)* |
+| **X** | Put down carried person / uncuff nearest |
+| **F1** | Open the phone (`PhoneCfg.openKey`) |
+| **F5** | Air Unit: heli cam (`AirUnit.keys.helicam`) |
+| **F6** | Air Unit: auto-orbit (`AirUnit.keys.orbit`) |
+| **F7** | Air Unit: spotlight (`AirUnit.keys.spotlight`) |
+
+<Callout type="warning">
+  **X is bound twice** — "Place hand on holster" and "Release carried / Uncuff nearest". Both
+  handlers fire. Either turn `Features.rpemotes` off (if another resource owns your RP emotes) or
+  rebind one of them in the FiveM key settings.
+</Callout>
+
+### Unbound by default
+
+Bind these yourself in *FiveM Settings ▸ Key Bindings ▸ FiveM*:
+
+| Binding | Action |
+|---------|--------|
+| LACORE: Open settings menu | Open the settings menu |
+| Change Firing Mode | Toggle your weapon's firing mode |
+| Open/Close Front Driver Door | `door 1` |
+| Open/Close Front Passenger Door | `door 2` |
+| Open/Close Trunk | Trunk |
+| Dismiss player report (staff only) | `rd` |
+| LACORE: Open the admin menu (staff) | Admin menu |
+| Open civilian menu (hold) | Civilian radial — hold to open, release to close |
+| Mobile fingerprint ID (LEO) | `/mobileid` (`Fingerprint.openKey`) |
+| Radio: hold to transcribe | Speech-to-text push-to-talk |
+| Put dragged person in nearest vehicle | `/putin` |
+| LACORE: Focus the in-car screen | `/cad` (`VehicleScreen.focusCommand`) |
+| K9 — deploy, heel, stay, sit, lay, bark, search, engage, car | 9 separate bindings, one per K9 order |
+
+That's **32 bindings** in total: 11 with a default key, 21 unbound.
+
 ## 🧍 Character & session
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/char` | Everyone | Open your character data sheet. **Saving sets your RP name** and joins you to the session. Supports unlimited presets. |
+| `/char [name]` | Everyone | Open your character data sheet. **Saving sets your RP name** and joins you to the session. Supports unlimited presets. |
 | `/character` | Everyone | Alias of `/char`. |
-| `/vreg` | Everyone | Register the vehicle you're currently driving (plate, make, model, colour, owner…). |
 | `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config). |
+| `/vreg` | Everyone | Register the vehicle you're currently driving (plate, make, model, colour, owner…). |
 | `/phone` | Everyone | Open / close the LACORE phone (default key **F1**). |
+| `/settings` | Everyone | Open the settings menu. **The name is configurable** — see the note below. |
+| `/vehicle` | Everyone | Toggle the vehicle menu. |
+| `/session` | Everyone | Toggle the session menu. |
+| `/playerlist` | Everyone | Toggle the player list (default **I**). |
+| `/playtime` 🔒 | — | Show your playtime. |
+| `/showid` | Everyone | Show your server ID. |
+
+<Callout type="info">
+  **`/settings` is renameable.** HUD resources commonly own `/settings` too, and two resources can't
+  share a command — so ours would silently shadow theirs. Set `HudCfg.settingsCommand` to another
+  name, or to `''` to drop the command entirely. The menu stays reachable either way via the
+  "LACORE: Open settings menu" keybind.
+</Callout>
 
 ## 👮 Duty & jobs
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/onduty <agency> <callsign>` | Member | Go on duty for an agency with a callsign (e.g. `/onduty LAPD 1A-12`). Sets dept, motto and loadout. |
-| `/offduty` | On-duty | Go off duty, clear weapons & callsign. |
-| `/job [name]` | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
+| `/onduty <agency> <callsign>` 🔒 | Member | Go on duty for an agency with a callsign (e.g. `/onduty LAPD 1A-12`). Sets dept, motto and loadout. |
+| `/offduty` 🔒 | On-duty | Go off duty, clear weapons & callsign. |
+| `/job [name]` 🔒 | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
 | `/jobmenu` | Everyone | Toggle the job / session menu. |
+| `/canceljob` | Everyone | Cancel your current civilian activity. |
 
 ## 🚓 MDT & CAD
 
@@ -41,11 +107,22 @@ Every `<arg>` is required, `[arg]` is optional. Many commands only work in a cer
 | `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → LACORE Mobile Client, other LE → Agency MDT, LASD/Sheriff/BCSO → LASD CAD, Fire/EMS → EMS CAD. |
 | `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
 | `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
+| `/penncad` | LEO | Always opens the Pennsylvania CAD. |
 | `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
 | `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |
 | `/dispatch [on\|off\|open]` | LEO / Dispatcher | `on`/`off` = dispatcher duty; no arg or `open` = open the dispatch console. |
+| `/supervisor` | Supervisors | Open the supervisor / watch-commander panel. Rank is verified server-side. Renameable via `SupervisorConfig.command`. |
+| `/cad [adjust]` | Everyone | Lean in / out of the in-car screen. `/cad adjust` opens the alignment tool. Renameable via `VehicleScreen.focusCommand`. |
 
-See [Using the MDT](/user-guide/mdt) and [Dispatch Console](/user-guide/dispatch-console).
+<Callout type="warning">
+  **`/run` exists twice.** The MDT query above is a client command; there is also an RP chat command
+  `/run` ("X runs …") in the `chat.actions` feature group. Client and server commands don't exclude
+  each other in FiveM, so both fire. Switch `Features.chat.actions` off if your server has its own RP
+  chat resource.
+</Callout>
+
+See [Using the MDT](/user-guide/mdt), [Dispatch Console](/user-guide/dispatch-console) and
+[Supervisor panel](/features/supervisor).
 
 ## 📞 Emergency & non-emergency calls
 
@@ -55,15 +132,23 @@ See [Using the MDT](/user-guide/mdt) and [Dispatch Console](/user-guide/dispatch
 | `/311 [message]` | Everyone | Non-emergency call to dispatch. |
 | `/hangup` | Everyone | End the current dispatch call. |
 
-## 📹 CCTV (LEO / Security)
+## 📡 Dispatcher text commands
+
+These mirror the dispatch console buttons (dispatcher duty required):
 
 | Command | What it does |
 |---------|--------------|
-| `/cctv` | Open the CCTV surveillance viewer (fixed cameras + placed field cameras). |
-| `/camtool` | Toggle the field-camera placement freecam (aim + click to place a camera/pole). |
-| `/cameras` | Manage placed field cameras (rename / delete / view / toggle tool). |
+| `/ddispatcher <onduty\|offduty>` | Go on / off dispatcher duty. |
+| `/denroute <callsign> <inc>` | Mark a unit en route to an incident. |
+| `/donscene <callsign>` | Mark a unit on scene. |
+| `/dcode6 <callsign>` | Put a unit on Code 6. |
+| `/dbusy <callsign>` | Mark a unit busy. |
+| `/dclear <callsign>` | Clear a unit (detaches it from its incident). |
+| `/dunavailable <callsign>` | Mark a unit unavailable. |
+| `/dattach <callsign> <inc>` | Attach a unit to an incident. |
+| `/ddetach <callsign>` | Detach a unit from its incident. |
 
-See [CCTV Surveillance](/features/cctv).
+See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).
 
 ## 📟 LEO / Fire-EMS field commands
 
@@ -72,7 +157,7 @@ See [CCTV Surveillance](/features/cctv).
 | `/p` | LEO / Fire-EMS | **Panic button** — broadcasts your callsign & location to all units. |
 | `/xmit <message>` | LEO / Fire-EMS | Transmit a dispatch radio message. |
 | `/cb <message>` | LEO | Crime broadcast with your callsign & current street. |
-| `/leoreq <unit>` | On-duty | Request a unit to your scene (RP, unit "arrives" after a delay). |
+| `/leoreq <unit>` | On-duty | Request a unit to your scene (RP, unit "arrives" after 20–120 s). |
 | `/release` · `/uncuff` | LEO | Put down a carried person / uncuff the nearest cuffed person (default key **X**). |
 | `/putin` | LEO | Put the person you're dragging into the nearest vehicle. |
 | `/mobileid` | LEO | Scan a restrained suspect's fingerprint and return their identity. See [Mobile Fingerprint ID](/configuration/gameplay-modules). |
@@ -81,6 +166,7 @@ See [CCTV Surveillance](/features/cctv).
 | `/impound [reason]` | LEO | Impound the nearest vehicle. |
 | `/impounds` | LEO | Open the impound-lot panel (view / release impounded vehicles). |
 | `/inmates` | LEO | Open the jail / corrections inmate roster. |
+| `/releaseinmate <id>` | LEO | Release an inmate. |
 | `/lpr` | LEO (LASD) | Scan the plate of the vehicle in front of you (Licence-Plate Reader). |
 | `/grabstretcher` | Fire-EMS | Grab / deploy a stretcher. |
 | `/jail <id> <minutes> [reason]` | LEO | Jail a player. |
@@ -95,7 +181,7 @@ See [CCTV Surveillance](/features/cctv).
 | Command | What it does |
 |---------|--------------|
 | `/k9` | Deploy or recall your K9 unit. |
-| `/k9 <command>` | Command the dog: `heel` · `stay` · `sit` · `lay` · `bark` · `search` · `engage` · `car` · `help`. |
+| `/k9 <command>` | Command the dog: `heel` · `stay` · `sit` · `lay` · `bark` · `search` · `engage` (or `attack`) · `car` · `help`. |
 
 Every K9 action (deploy, heel, stay, sit, lay, bark, search, engage, car) is also a **keybindable
 command** — bind it in *FiveM Settings → Key Bindings* (all unbound by default). See
@@ -111,12 +197,22 @@ Air-unit controls are **keybinds**, rebindable in *FiveM Settings → Key Bindin
 | Toggle auto-orbit | **F6** |
 | Toggle spotlight | **F7** |
 
+## 📹 CCTV (LEO / Security)
+
+| Command | What it does |
+|---------|--------------|
+| `/cctv` | Open the CCTV surveillance viewer (fixed cameras + placed field cameras). |
+| `/camtool` | Toggle the field-camera placement freecam (aim + click to place a camera/pole). |
+| `/cameras` | Manage placed field cameras (rename / delete / view / toggle tool). |
+
+See [CCTV Surveillance](/features/cctv).
+
 ## 🎙️ Radio (LEO / Fire-EMS)
 
 | Command | What it does |
 |---------|--------------|
 | `/radiolog` | Open the **radio transcript log** (offline speech-to-text). |
-| `/sttcheck` | Diagnose whether offline speech-to-text works in your client. |
+| `/sttcheck` 🔒 | Diagnose whether offline speech-to-text works in your client. |
 
 "Radio: hold to transcribe" is a keybind — set it in *FiveM Settings → Key Bindings*.
 See [Radio Transcript](/features/radio-stt).
@@ -130,36 +226,7 @@ See [Radio Transcript](/features/radio-stt).
 | `/drop` | Drop your currently equipped weapon. |
 | `/firingmode` | Toggle your weapon's firing mode. |
 | `/headlightmode` | Toggle headlight mode. |
-| `/hup [texture]` | Put on / take off a helmet (optional texture index). |
-
-## 🎭 Roleplay
-
-| Command | What it does |
-|---------|--------------|
-| `/me <action>` | Local emote — "**You** do X" to nearby players. |
-| `/gme <action>` | Global version of `/me`. |
-| `/do <text>` | Local scene description ("The door is locked"). |
-| `/gdo <text>` | Global version of `/do`. |
-| `/search <target>` · `/gsearch <target>` | RP: "searches X, what do I find?" (local / global). |
-| `/give <item>` | RP: hand something over (local). |
-| `/report <id> <message>` | Report a player / issue to staff. |
-
-> RP commands need a name set first (run `/char`).
-
-Emotes are provided by DPEmotes / RPEmotes (`/e <name>`, `/emotemenu`) — LACORE's civilian radial
-bridges to whichever is installed. See [Civilian Layer](/features/civilian).
-
-## 🧍‍♂️ Civilian layer
-
-| Command | What it does |
-|---------|--------------|
-| `/prop [id\|pickup]` | Place a prop by id, `/prop pickup` removes the nearest, no arg opens the prop menu. |
-| `/canceljob` | Cancel your current civilian activity. |
-| `/orgaccept` | Accept a pending organisation invite. |
-| `/turf` | Show turf / territory ownership and your organisation's influence. |
-
-The **civilian radial** ("Open civilian menu") is a hold-keybind — bind it in
-*FiveM Settings → Key Bindings*. See [Civilian Layer](/features/civilian).
+| `/hup [texture]` 🔒 | Put on / take off a helmet (optional texture index). |
 
 ## 🚗 Vehicle controls
 
@@ -171,6 +238,7 @@ The **civilian radial** ("Open civilian menu") is a hold-keybind — bind it in
 | `/window <1-4\|front\|rear\|all> <up\|down>` | Roll windows up/down. |
 | `/trunk` | Open/close the trunk. |
 | `/hood` | Open/close the hood. |
+| `/dv` | Delete the vehicle you're in or aiming at. |
 
 ## 🌍 World & navigation
 
@@ -178,46 +246,84 @@ The **civilian radial** ("Open civilian menu") is a hold-keybind — bind it in
 |---------|--------------|
 | `/postal <code>` | Draw a GPS route to a postal code. |
 | `/bus <route name>` | Draw a bus route on the map. |
-| `/playerlist` | Toggle the player list (default **I**). |
-| `/playtime` | Show your playtime. |
-| `/showid` | Show your server ID. |
 | `/dismiss` | Dismiss the nearest spawned ped/world prompt. |
 | `/hu` | Hands up (default **U**). |
 | `/hh` | Hand on holster (default **X**). |
-| `/settings` / `/vehicle` / `/session` | Open the matching in-game menus. |
+
+## 🎭 Roleplay
+
+Each RP command is only registered while its feature group is on
+(`Features.chat.*` in `configs/cfg-features-sh.lua`) — so a server that already runs its own RP chat
+resource can switch ours off and avoid every line being posted twice.
+
+| Command | Feature group | What it does |
+|---------|---------------|--------------|
+| `/me <action>` | `chat.rp` | Local emote — "**You** do X" to nearby players. |
+| `/gme <action>` | `chat.rp` | Global version of `/me`. |
+| `/do <text>` | `chat.rp` | Local scene description ("The door is locked"). |
+| `/gdo <text>` | `chat.rp` | Global version of `/do`. |
+| `/run <text>` | `chat.actions` | RP: "X runs …" (local). |
+| `/grun <text>` | `chat.actions` | Global version of `/run`. |
+| `/search <target>` | `chat.actions` | RP: "searches X, what do I find?" (local). |
+| `/gsearch <target>` | `chat.actions` | Global version of `/search`. |
+| `/give <item>` | `chat.actions` | RP: hand something over (local). |
+| `/leoreq <unit>` | `chat.leoreq` | Request a unit to your scene. |
+| `/report <id> <message>` | `chat.report` | Report a player / issue to staff. |
+
+> RP commands need a name set first (run `/char`).
+
+Emotes are provided by DPEmotes / RPEmotes (`/e <name>`, `/emotemenu`) — LACORE's civilian radial
+bridges to whichever is installed. See [Civilian Layer](/features/civilian).
+
+## 🧍‍♂️ Civilian layer
+
+| Command | What it does |
+|---------|--------------|
+| `/prop [id\|pickup]` | Place a prop by id, `/prop pickup` removes the nearest, no arg opens the prop menu. |
+| `/orgaccept` | Accept a pending organisation invite. |
+| `/turf` | Show turf / territory ownership and your organisation's influence. |
+
+The **civilian radial** ("Open civilian menu") is a hold-keybind — bind it in
+*FiveM Settings → Key Bindings*. See [Civilian Layer](/features/civilian).
 
 ## 🛠️ Server staff / admin
 
-Restricted to staff — listed for server owners. Many require ACE permissions.
+Restricted to staff — listed for server owners. 🔒 marks a real ACE-restricted command; the ACE
+groups `lacore_dev` / `lacore_staff` / `lacore_mod` are created automatically and filled from your
+Discord roles. See [Anti-Cheat & Security](/anticheat) and [Discord setup](/configuration/discord).
 
 | Command | What it does |
 |---------|--------------|
 | `/admin` | Open the admin GUI menu (players / self / world). |
 | `/bblog` | Open the Big Brother admin-log panel. |
-| `/calllog` | Print the MDT call/audit log. |
-| `/aop <text>` | Set the Area of Play. |
-| `/aopvote A/B/C` | Start an AOP vote. |
-| `/alert <text>` | Server-wide alert banner. |
-| `/warn <id> <reason>` · `/advise <id> <text>` | Warn / advise a player. |
-| `/kick <id> <reason>` | Kick a player. |
-| `/ban <id> <reason>` · `/tempban <id> <time> <reason>` · `/unban <id>` | Ban management. |
-| `/dc <id>` | Force-disconnect a player. |
-| `/msg <id> <text>` · `/smsg <id> <text>` | Direct message / staff message. |
-| `/staff` | Toggle staff mode. |
-| `/wl ...` | Whitelist management. |
-| `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
-| `/releaseinmate <id>` | Release an inmate (corrections). |
-| `/lacoreconfig` | Back up / restore LACORE configs across reinstalls. |
+| `/calllog` 🔒 | Print the MDT call/audit log. |
 | `/myperms` | Show your own ACE permissions. |
-| `/time <h> [m]` · `/freezetime` · `/ft` · `/rft` | World time control / freeze helpers. |
-| `/patrolhost` | Patrol host controls. |
-| `/deleteentity` · `/dv` | Delete the entity / vehicle you're aiming at / in. |
+| `/staff` 🔒 | Toggle staff mode. |
+| `/wl` 🔒 | Toggle the server whitelist on / off. |
+| `/aop <text>` 🔒 | Set the Area of Play. |
+| `/aopvote A/B/C` 🔒 | Start an AOP vote. |
+| `/alert <text>` 🔒 | Server-wide alert banner. |
+| `/warn <id> <reason>` 🔒 · `/advise <id> <text>` 🔒 | Warn / advise a player. |
+| `/kick <id> <reason>` 🔒 | Kick a player. |
+| `/ban <id> <reason>` 🔒 · `/tempban <id> <time> <reason>` 🔒 · `/unban <id>` 🔒 | Ban management. |
+| `/dc <id>` | Force-disconnect a player (checks the `timeout` ACE). |
+| `/msg <id> <text>` · `/smsg <id> <text>` 🔒 | Direct message / staff message. |
+| `/patrolhost` 🔒 | Patrol host controls. |
+| `/time <h> [m]` 🔒 · `/freezetime` 🔒 · `/ft` · `/rft` | World time control / freeze helpers. |
+| `/deleteentity` | Delete the entity you're aiming at. |
+| `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
+| `/lacoreconfig` | Back up / restore LACORE configs across reinstalls. |
 
 ### 🗺️ NADS — worldbuilding (staff)
 
 The New Address System lets staff record street-address points on the map:
 
-`/startnads <start-number> [street]` · `/finishnads` · `/cancelnads` · `/generatenadsblips`
+| Command | What it does |
+|---------|--------------|
+| `/startnads <start-number> [street]` 🔒 | Start recording addresses. |
+| `/finishnads` | Finish and save the run. |
+| `/cancelnads` | Abort the run. |
+| `/generatenadsblips` | Generate blips for every recorded address. |
 
 ## 🧰 Owner commands (`/lacore`)
 
@@ -233,12 +339,41 @@ Console or staff — health checks and diagnostics:
 | `/lacore telemetry` | Owner telemetry status. |
 | `/lacore help` | List every subcommand. |
 
-## 📡 Dispatcher text commands
+Modules can register their own subcommands, so `/lacore help` is always the authoritative list on
+your build.
 
-These mirror the dispatch console buttons (dispatcher duty required):
+## 🧪 Developer & debug commands
 
-`/ddispatcher <onduty|offduty>` · `/denroute <callsign> <inc>` · `/donscene <callsign>` ·
-`/dcode6 <callsign>` · `/dbusy <callsign>` · `/dclear <callsign>` ·
-`/dunavailable <callsign>` · `/dattach <callsign> <inc>` · `/ddetach <callsign>`
+Not meant for players — these exist for development, content creation and troubleshooting.
 
-See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).
+| Command | What it does |
+|---------|--------------|
+| `/dev` | Toggle dev mode. |
+| `/citydebug` | Print city / zone debug info. |
+| `/menutest` | Test harness for the native menu library. |
+| `/spawnpoint` | Capture a spawn point where you stand and print a config line for it. |
+| `/preview <model>` | Look at a model in 3D, in game. |
+| `/capturetest` | Test the model renderer. |
+| `/modelcapture <model>` | Render preview images for a model. |
+| `/modelscan` | Inventory every model this server streams. |
+| `/streambudget` | Report on the stream budget. |
+| `/devphone` 🔒 | Open the new phone module in dev mode. |
+| `/phonehold` 🔒 | Phone hold animation (debug). |
+
+## ⚠️ Known command conflicts
+
+A few names collide, either with each other or with what other resources commonly claim. None of
+these break anything, but they're worth knowing when something behaves unexpectedly:
+
+- **`X` is bound twice** — "hand on holster" and "release / uncuff". Rebind one, or turn
+  `Features.rpemotes` off.
+- **`/run` runs twice** — the MDT query (client) and the RP action (server) both fire. Turn
+  `Features.chat.actions` off if you don't want the RP line.
+- **`/settings` is claimed by many HUD resources** — rename ours via `HudCfg.settingsCommand`, or
+  set it to `''` and use the keybind.
+- **`/prop`, `/char`, `/character` and `/hangup` are each registered by more than one LACORE file.**
+  The one that loads last wins, which is the intended one in a stock install — worth remembering if
+  you reorder `fxmanifest.lua`.
+- **Turning a module off removes its commands entirely**, which is the point: the name is then free
+  for whichever resource you'd rather have own it. See
+  [Feature toggles](/configuration/features).
