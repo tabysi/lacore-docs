@@ -182,38 +182,47 @@ answer "is this one player or twelve?".
   until there is something to locate.
 
 #### In-car CAD screen
-- **The dashboard has its own terminal now, and it is the default.** The screen shipped showing the full
-  Mobile Client, and that was the wrong call. The MDT is drawn for a 1080p window and a mouse pointer;
-  the dashboard is a *texture*, sampled onto the screen mesh at whatever mipmap the distance picks and
-  then run through the same temporal antialiasing that softens every fine edge in the game. An 11px
-  label does not survive that trip. No amount of resolution fixes a UI that is the wrong size for the
-  surface — so there is now one built for the surface:
-  - **Nothing under ~2vh, nothing thinner than 500 weight, no control smaller than a fingertip.** On the
-    default 864 x 1450 screen that is a 64px callsign, a 52px call type and 109px buttons. It is designed
-    for the resolution the screen actually has rather than fighting for pixels it will never get.
-  - **Three tabs and a status dock.** ACTIVE (the call you are on: type, location, narrative, attached
-    units, the last four comments), CALLS (everything outstanding, tap one to open it), UNITS (who else
-    is out, partners merged onto one row). The **status dock sits along the bottom on every tab** — status
-    is the thing a unit changes constantly, and burying it a tab deep is what sends everyone back to the
-    real terminal.
-  - **It is worked, not just read.** `/cad` already leaned the camera in and mapped the mouse onto the
-    screen; there was simply nothing on it to click. Now there is: attach and detach, GPS to a call,
-    Code 6 / On Scene, request backup, and every status in the dock. Anything needing typed text — a name
-    query, a comment — is deliberately **absent** rather than present and dead, because a DUI has no
-    keyboard channel and a button that silently does nothing is worse than no button.
-  - **Attached units on a call were always empty.** The panel read `call.attachedUnits`, a field that
+- **The Mobile Client on the dashboard is legible now.** It is the same terminal it always was — same
+  layout, same ribbon, same look — but it was being drawn far too small to read, and the reason is worth
+  stating because it is not the one everybody reaches for. It was never a shortage of resolution. It was
+  three scalings stacked:
+  1. the terminal is drawn at real pixel sizes for a **monitor** — 9px labels, 12px values;
+  2. the browser renders it into a **texture** (864 x 1450 by default);
+  3. that texture is then shown on the screen mesh, which while you are leaned in occupies roughly
+     509 x 854 pixels of a 1080p monitor — so a 9px label arrives as about **5**, before the mipmap and
+     the frame's temporal antialiasing get to it.
+
+  Raising `width`/`height` does not help: it only makes step 3 worse. What helps is laying the terminal
+  out at the size it was *designed* for and spending the surplus texture pixels on scale. So the screen
+  now renders the Mobile Client **zoomed**: `#mdt-container` lays out at ~592 x 994 instead of
+  864 x 1450 — its own window is 28vw x 92vh, about 538 x 994 on a 1080p monitor — and every glyph is
+  drawn 1.46x larger into the same texture. That 9px label now lands at **7.7** monitor pixels, and the
+  12px values at **10.3**, which is what they look like in the window.
+  - **The zoom is worked out from the screen, not hardcoded.** Whichever axis runs out first, so the
+    terminal is never laid out *smaller* than its own window in either direction — and never below 1, so
+    a wide, short dash panel is left exactly as it was rather than being zoomed out into confetti.
+  - **It is a zoom, not a transform.** Zoom is a layout property, so the browser's own hit testing
+    accounts for it and the mouse coordinates `/cad` sends (in texture pixels) still land on what they
+    look like they land on. A transform would have needed the same factor applied by hand on the Lua
+    side, in a second place, forever.
+  - `VehicleScreen.zoom` overrides it — `1` is the old raw behaviour, `2` is twice the size and half the
+    rows on screen. ⚠️ Zoom trades content for legibility: the higher it goes, the fewer call rows fit.
+- **Every button on the screen would have POSTed at the wrong resource.** Callbacks are addressed to the
+  resource by name, and the name comes from `GetParentResourceName()` — which is injected into NUI
+  *frames*. The dashboard is a DUI, a separate browser handed a texture, and it cannot count on that. The
+  fallback was the literal string `lacore`, which is only right on servers running the standalone
+  product; on the core it meant every click on the dashboard quietly went nowhere. The resource name now
+  travels in the DUI's URL, so it is right on both.
+- **A stripped dashboard terminal, for owners who want one.** `VehicleScreen.view = "incar"` swaps the
+  Mobile Client for a much smaller screen: active incident, the call list, who else is out, and a status
+  dock along the bottom that is on every tab. Everything on it is sized for a texture rather than a
+  monitor and no control is smaller than a fingertip. Attach and detach, GPS, Code 6 / On Scene, request
+  backup. Anything needing typed text — a name query, a comment — is deliberately **absent** rather than
+  present and dead, because a DUI has no keyboard channel.
+  - **Attached units on a call were always empty there.** It read `call.attachedUnits`, a field that
     exists only in the dev mock — the server puts the incident number on the *unit*, not a unit list on
     the call. Derived from the units list now, so it shows what it always claimed to.
-  - **Every button on the screen would have POSTed at the wrong resource.** Callbacks are addressed to
-    the resource by name, and the name comes from `GetParentResourceName()` — which is injected into NUI
-    *frames*. The dashboard is a DUI, a separate browser handed a texture, and it cannot count on that.
-    The fallback was the literal string `lacore`, which is only right on servers running the standalone
-    product. The resource name now travels in the DUI's URL, so it is right on both.
-  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `VehicleScreen.view` now ships `"incar"`.**
-  > An existing config file keeps whatever it says, so set it by hand if you are keeping yours.
-  > `"mdt"` still does exactly what it did — the whole Mobile Client on the screen — and is still there
-  > for owners who want it and will take the softness. `"compact"` is accepted as the old spelling of
-  > `"incar"` and behaves identically, so a config that already said it needs no edit.
+  > **The default is unchanged: `"mdt"`.** `"compact"` is accepted as the old spelling of `"incar"`.
 - **The Mobile Client on the dashboard screen of your patrol vehicle.** Live, while you drive, rendered
   into the model's own screen — the same terminal the MDT key opens, not a cut-down copy of it. Display
   only: it takes no focus, no controls and no keys, so nothing about driving changes.

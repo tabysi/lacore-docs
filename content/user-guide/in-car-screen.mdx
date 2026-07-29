@@ -4,7 +4,7 @@ title: "In-Car Screen"
 
 # In-Car Screen
 
-The dashboard screen of your patrol vehicle, running a live terminal. It fills itself in as calls come in, it follows what you are doing, and once you run **`/cad`** the camera leans in and hands you the mouse so you can work it — attach to a call, set your status, drop a GPS marker.
+The dashboard screen of your patrol vehicle, running the **LAPD Mobile Client** — the same terminal the MDT key opens, not a cut-down copy of it. It fills itself in as calls come in, it follows what you are doing in the window, and once you run **`/cad`** the camera leans in and hands you the mouse so you can work it.
 
 It is drawn **per client**, not per vehicle: your partner sees their own terminal signed in as themselves, and a civilian sitting in the same car sees the model's own texture, untouched.
 
@@ -28,6 +28,28 @@ Off duty, in a vehicle with no entry in the config, or outside the audience: the
 
 ## 🖥 What is on it
 
+The whole [Mobile Client](/user-guide/mdt) — the ribbon, the incident panel, calls, units, query, everything the MDT key gives you. It fills the screen instead of sitting in a corner window, but nothing is removed and nothing is rearranged: one terminal, one set of habits, whether you are looking at the dashboard or at the window.
+
+It also **follows the window you have open**. Which tab you are on, which incident you picked, light or dark: all of that is decided by clicking inside the UI and never travels through the game, so the screen used to sit on Home while you worked in Calls. The open window now reports its view and the screen follows it — one direction only, the screen never argues back.
+
+> ℹ️ **It is the real CAD, not a preview.** A status set on the dashboard is the status dispatch sees; attaching here attaches you for real.
+
+### Why it is bigger than the terminal in your window
+
+The Mobile Client is drawn at real pixel sizes for a monitor — 9px labels, 12px values. Perfectly legible in its own window. On a dashboard it is not, and the reason is three scalings stacked rather than a shortage of resolution:
+
+1. the terminal is drawn at monitor pixel sizes;
+2. the browser renders it into a **texture** (864 × 1450 by default);
+3. that texture is shown on the screen mesh, which while you are leaned in occupies roughly 509 × 854 pixels of a 1080p monitor — so a 9px label arrives as about **5**, before the mipmap and the game's antialiasing get to it.
+
+Making the texture bigger does not help; it only makes step 3 worse. So the screen lays the terminal out at the size it was *designed* for and spends the surplus texture pixels on scale instead: the terminal renders **zoomed**, and that 9px label lands at about 7.7 monitor pixels — what it looks like in the window.
+
+Your owner can push it further or turn it off with `VehicleScreen.zoom`. It is a trade: **more zoom means bigger text and fewer call rows on screen**, because the terminal is being laid out in a smaller box.
+
+### The alternative: a stripped dashboard terminal
+
+If the full CAD is more than you want on a windscreen, `VehicleScreen.view = "incar"` swaps it for a much smaller screen — active incident, the call list, who else is out, and a status dock along the bottom that is on every tab:
+
 ```
 ┌──────────────────────────────────┐
 │ 1-ADAM-15  LAPD    ENROUTE 21:47 │
@@ -40,18 +62,11 @@ Off duty, in a vehicle with no entry in the config, or outside the audience: the
 │ ┃ Caller reports two suspects…   │
 │ ┃ [1-ADAM-15] [1-DAVID-3]        │
 │                                  │
-│ DISPATCH  RP is staying inside.  │
-│ 1-ADAM-15 Enroute from Vespucci. │
-│                                  │
 │ [ GPS ][CODE 6][BACKUP][DETACH]  │
 │ ────────────────────────────────  │
 │ [CLEAR][ENROUTE][CODE 6][BUSY]   │
 └──────────────────────────────────┘
 ```
-
-The header always carries **your callsign, your department, your current status and the clock** — the status sits there rather than only in the dock below, so a status the dock does not offer (`UNAVAILABLE`, `OUT TO STATION`) is still visible at a glance.
-
-Three tabs:
 
 | Tab | What it shows |
 |-----|---------------|
@@ -59,9 +74,7 @@ Three tabs:
 | **CALLS** | Everything still outstanding, newest first. Yours is marked. Tap a call to open it. |
 | **UNITS** | Who else is out — callsign, the officers in it, the incident they are on, their status. Partners sharing a callsign are one row, not two. |
 
-Along the bottom is the **status dock**, on every tab: `CLEAR`, `ENROUTE`, `CODE SIX` (LEO) or `ON SCENE` (Fire/EMS), `BUSY`. The one you are on is filled in. Status is the thing a unit changes constantly, so it is never more than one tap away.
-
-> ℹ️ **Everything here is the real CAD.** A status set on the dashboard is the status dispatch sees; attaching here attaches you for real. It is the same backend the MDT key opens, not a copy that has to be re-done later.
+Everything on it is sized for a texture rather than a monitor, and no control is smaller than a fingertip. Attach and detach, GPS, Code 6 / On Scene, request backup, and every status in the dock. **This is not the default** — the dashboard shows the Mobile Client unless your owner changes it.
 
 ---
 
@@ -133,16 +146,28 @@ Give both where you have both — the render target is used when the game hands 
 ### Which terminal is drawn
 
 ```lua
-VehicleScreen.view = "incar"
+VehicleScreen.view = "mdt"
 ```
 
 | Value | What you get |
 |-------|--------------|
-| `"incar"` *(default)* | The in-car terminal on this page — built for a dashboard, worked with the mouse. |
-| `"mdt"` | The full LACORE Mobile Client, exactly as the MDT key opens it, filling the screen. |
+| `"mdt"` *(default)* | The LAPD Mobile Client, exactly as the MDT key opens it, filling the screen. |
+| `"incar"` | The stripped dashboard terminal — active incident, calls, units, status dock. |
 | `"compact"` | Accepted as the old spelling of `"incar"`; behaves identically. |
 
-> ⚠️ **If the screen "looks bad", this is almost always why.** The MDT is drawn for a 1080p window and a mouse pointer. The dashboard is a *texture*: whatever the browser produces is sampled onto the screen mesh at whatever mipmap the viewing distance picks, then run through the same temporal antialiasing that softens every fine edge in the game. An 11px label does not survive that trip, and no amount of resolution fixes a UI that is the wrong size for the surface. `"incar"` is sized for the resolution the screen actually has — nothing under about 2% of the screen height, nothing thinner than a medium weight, no control smaller than a fingertip. `"mdt"` is still offered for owners who want the whole terminal and will take the softness.
+### Legibility — `VehicleScreen.zoom`
+
+```lua
+VehicleScreen.zoom = nil   -- nil = work it out from the screen size
+```
+
+The Mobile Client is drawn at monitor pixel sizes and then shown *smaller* than it was drawn (see [why it is bigger](#why-it-is-bigger-than-the-terminal-in-your-window) above), so it is rendered zoomed. Left at `nil` the zoom is derived from `width`/`height` against the terminal's own window size (28vw × 92vh, about 538 × 994 on 1080p): whichever axis runs out first, so the layout is never *smaller* than that window in either direction, and never zoomed below 1 — a wide, short dash panel is left exactly as it was rather than shrunk into confetti.
+
+Set a number to override: `1` is no scaling at all (the raw terminal), `2` is twice the size.
+
+> ⚠️ **Zoom trades content for legibility.** The terminal is being laid out in a smaller box, so the higher it goes the fewer call rows and unit rows fit on screen. It is a zoom, not a font-size setting.
+
+> ℹ️ **Clicks still land.** This is a CSS *zoom*, which is a layout property, so the browser's own hit testing accounts for it — the mouse coordinates `/cad` sends are unaffected and `cursorRect` does not need re-measuring after changing it.
 
 ### Size — give it the *shape*, not just a number
 
@@ -153,9 +178,9 @@ VehicleScreen.height = 1450
 
 The texture is stretched onto whatever quad the modder built, so a square image on a portrait tablet arrives squashed — and squashed text reads as *blurry* text, which is why this is easy to miss.
 
-Measure it off `cursorRect` rather than guessing. The default is the Interceptor's tablet: it lands on a 16:9 monitor at 0.265 of the width by 0.791 of the height, so the ratio is `(0.265 × 16) / (0.791 × 9) = 0.596` — hence 864 × 1450. Widescreen dash panels want something more like 1280 × 720; the terminal switches to a two-column layout on its own when the screen is wider than it is tall.
+Measure it off `cursorRect` rather than guessing. The default is the Interceptor's tablet: it lands on a 16:9 monitor at 0.265 of the width by 0.791 of the height, so the ratio is `(0.265 × 16) / (0.791 × 9) = 0.596` — hence 864 × 1450. Widescreen dash panels want something more like 1280 × 720. (The `"incar"` view switches to a two-column layout on its own when the screen is wider than it is tall; the Mobile Client keeps its own layout.)
 
-This is also the main cost of the feature — a real browser rendering continuously — so do not go higher than the screen is worth reading at. Note that `VehicleScreen.passengers` puts one browser in **every occupied seat**, not one per car.
+> ⚠️ **This is not the setting that makes text bigger** — `zoom` above is. Raising `width`/`height` gives the browser more pixels to draw the *same* small text into, and then shows them at the same size on your monitor, so it changes nothing you can read and costs performance. It is the main cost of the feature — a real browser rendering continuously — so do not go higher than the screen is worth reading at, and note that `VehicleScreen.passengers` puts one browser in **every occupied seat**, not one per car.
 
 ### Aiming it: `/cad adjust`
 
@@ -186,7 +211,7 @@ The finished config lines are printed to the **F8 console**, ready to paste back
 | Symptom | Almost always |
 |---------|---------------|
 | The terminal does not react to clicks | `cursorRect` — outside that rectangle no click is sent at all. Fix it with `/cad adjust`, not the camera. |
-| Text is soft and hard to read | `VehicleScreen.view = "mdt"`. Try `"incar"`. If it is already `"incar"`, check that `width`/`height` match the screen's shape. |
+| Text is small or soft | Raise `VehicleScreen.zoom` — not `width`/`height`, which does not change what you can read. Also check that `width`/`height` match the screen's **shape**: a stretched texture reads as a blurry one. |
 | The screen stays the model's own | No entry for that model, you are outside the `audience`, or the model offers neither route — run `/lacore screen target` and `/lacore screen dui`. |
 | The camera leans in somewhere else | `cam.pos` / `cam.look` are one measurement of one model. Re-run `/cad adjust`. |
 
