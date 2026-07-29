@@ -10,6 +10,7 @@ export default {
   'lasd-cad': 'LASD CAD / PCMS',
   'retro-mdt': '9100-T Retro Terminal',
   'in-car-screen': 'In-Car Screen',
+  'bug-reports': 'Bug Reports',
   'civilian-vehicles': 'Civilian & Vehicles',
   playerlist: 'Player List',
 }

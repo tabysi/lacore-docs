@@ -1,0 +1,63 @@
+---
+title: "Bug Reports"
+---
+
+# Bug Reports
+
+**`/lacorereport`** opens a small form for reporting a bug in LACORE itself — not a player, not an in-character incident. What you write goes straight to the **LACORE dashboard**, the team's own review inbox, over the same connection the resource already uses to report telemetry home. It does **not** go into your server's own database, and it is not a replacement for `/report` (reporting a *player*) or a support ticket.
+
+> 📑 **Related:** [Commands & Keybinds](/commands) · [In-Car Screen](/user-guide/in-car-screen)
+
+---
+
+## ✍️ Using it
+
+```bash
+/lacorereport
+```
+
+A form opens: pick a **category** (Bug, Exploit, Translation, Suggestion, Other by default), write what happened, and send it. There is a short cooldown between reports — the form shows a countdown if you try again too soon — so it stays a report tool, not a chat channel.
+
+> ℹ️ **No typing shortcuts here either way** — this is the real game UI, not a dashboard screen rendered onto a texture, so there is nothing unusual about the keyboard. If you have trouble typing, check that nothing else is holding NUI focus.
+
+What travels with your report, automatically:
+
+- Your account name and, if you have one, your **character name**, department and callsign — so a report about "the MDT drops my status" can actually be traced to a unit.
+- Your position in the world, if available — useful for anything location-specific.
+- Which server it came from.
+
+Nothing you type is sent anywhere else. The report is read by the LACORE team; your server owner can also see **that you reported something and what category it was**, on their own dashboard, but only if the server is running under an active licence key — see below.
+
+---
+
+## 🛠 For server owners
+
+### It reaches you too — if the server is licensed
+
+Every report is stored regardless of licensing, because the point of the command is that bugs about the *product* reach the people who fix it, even from a server that has never set anything up. But your **own** dashboard only shows the reports filed **on your servers**, and that link only exists when the server carries an active `lacore_license_key` (the same key used for [remote config](/configuration/main) and telemetry). Find it under **Bug Reports** in your dashboard nav.
+
+An unlicensed server's reports still reach the LACORE team — they just have no account to additionally show up on.
+
+### Your own copy, in Discord
+
+```lua
+-- configs/cfg-server-sv.lua
+Webhooks.BugReport = GetConvar("lacore_webhook_bugreport", "")
+```
+
+Set the `lacore_webhook_bugreport` convar in `server.cfg` to also log every report to your own Discord — the same "your local output is never replaced, only added to" principle every other webhook in that file follows. This is entirely optional and has no bearing on whether the report reaches the LACORE dashboard.
+
+### Turning it off, renaming it, tuning it
+
+```lua
+-- configs/cfg-report-sh.lua
+Report.enabled     = true                -- master switch
+Report.command     = "lacorereport"      -- rename if something else owns this name
+Report.cooldownSec = 120                 -- seconds between two reports, per player
+Report.maxLength   = 800                 -- longest report a player can type
+Report.categories  = { "Bug", "Exploit", "Translation", "Suggestion", "Other" }
+```
+
+`Features.bugreport` (`configs/cfg-features-sh.lua`) is the same switch from the shared feature-toggle file, for owners who prefer to turn features off from one place — either setting disables the command entirely, with no trace left in `/help`.
+
+The cooldown is enforced **on the server**, not just shown by the form: a modified client cannot skip the wait, because the server keeps its own timer per player and rejects an early submit regardless of what the form displays.

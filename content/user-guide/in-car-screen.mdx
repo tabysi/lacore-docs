@@ -169,6 +169,24 @@ Set a number to override: `1` is no scaling at all (the raw terminal), `2` is tw
 
 > ℹ️ **Clicks still land.** This is a CSS *zoom*, which is a layout property, so the browser's own hit testing accounts for it — the mouse coordinates `/cad` sends are unaffected and `cursorRect` does not need re-measuring after changing it.
 
+### Glow — `VehicleScreen.brightness`
+
+```lua
+VehicleScreen.brightness = 0.6   -- 1.0 = off
+```
+
+If your screen looks like a lamp — washed out, blue, blooming into the cabin at night — that is the **vehicle model**, not the terminal.
+
+A vehicle can only offer a render target on a material the engine already knows, and those are **instrument clusters**. The one the shipped Interceptor entry uses is `script_rt_dials_feroci` — GTA's own name for the Feroci dial cluster. Dial clusters are built *self-illuminated* so they glow at night, so anything drawn there is treated as a light source: multiplied by the material's emissive factor, then run through bloom.
+
+It is not the UI being bright. The terminal's own background is `rgb(21, 34, 50)` — luminance **32 out of 255**, all but black — and it still comes out as a lit panel.
+
+Nothing in a resource can reach that emissive factor or the bloom; both live in the model. What can be changed is the input, and since the game *multiplies*, halving what is drawn roughly halves the glow. That is what this setting does.
+
+Set `1.0` to switch it off — worth doing if your model's screen is not emissive, where dimming would only look dark. Lower it further if yours still glows at `0.6`.
+
+> ℹ️ **Clicks are unaffected.** The dimmer takes no pointer events; the mouse belongs to the terminal underneath it.
+
 ### Size — give it the *shape*, not just a number
 
 ```lua
@@ -212,6 +230,7 @@ The finished config lines are printed to the **F8 console**, ready to paste back
 |---------|---------------|
 | The terminal does not react to clicks | `cursorRect` — outside that rectangle no click is sent at all. Fix it with `/cad adjust`, not the camera. |
 | Text is small or soft | Raise `VehicleScreen.zoom` — not `width`/`height`, which does not change what you can read. Also check that `width`/`height` match the screen's **shape**: a stretched texture reads as a blurry one. |
+| The screen glows / is washed out | The model's screen material is self-illuminated. Lower `VehicleScreen.brightness`. |
 | The screen stays the model's own | No entry for that model, you are outside the `audience`, or the model offers neither route — run `/lacore screen target` and `/lacore screen dui`. |
 | The camera leans in somewhere else | `cam.pos` / `cam.look` are one measurement of one model. Re-run `/cad adjust`. |
 

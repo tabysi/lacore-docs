@@ -155,6 +155,29 @@ answer "is this one player or twelve?".
 - **Nothing about either board takes focus.** Both are pure overlays that never swallow a keypress
   or a click, exactly as before.
 
+#### Bug reports
+- **`/lacorereport` — a bug report straight to the LACORE dashboard.** Reports go over the same relay
+  channel telemetry already uses, not into your own database: this is how a bug in the resource itself
+  reaches the people who fix it, rather than sitting in a Discord channel nobody at LACORE reads. A
+  small form opens with a category and a message; the player's account name, character name if they
+  have one, department, callsign and position travel with it automatically, so "the MDT drops my status"
+  is traceable to an actual unit instead of an anonymous line of text.
+  - **Stored regardless of licensing.** An anticheat flag is only useful with an account to review it
+    against, so that feed drops anything unlicensed. A bug report about the product is useful to us
+    either way — if anything, an unlicensed dev server is exactly where a rough edge is likeliest to
+    show up first. So every report reaches the LACORE team; a server with an active
+    `lacore_license_key` additionally gets its own rows on its own dashboard, under **Bug Reports** —
+    see which of your players is reporting something, without leaving your own admin panel.
+  - **Rate-limited server-side, not just in the form.** `Report.cooldownSec` (120s by default) is
+    enforced by a table the server keeps per source id; the client mirrors it for the countdown label,
+    but a modified client cannot skip the wait because that copy is never what gets checked.
+  - **Your own copy stays optional.** Set `Webhooks.BugReport` (`configs/cfg-server-sv.lua`) to also log
+    every report to your own Discord — the same "additional, never a replacement" rule every webhook in
+    that file already follows.
+  > ⚠️ **New config file (`configs/cfg-report-sh.lua`)** — command name, cooldown, max length and the
+  > category list. Also gated by the new `Features.bugreport` (`configs/cfg-features-sh.lua`), for
+  > owners who prefer one place to switch features off; either setting disables the command entirely.
+
 #### LAPD MDT
 - **Your status follows the call you are on.** The unit-status grid is gone from the Home screen.
   Status is now set by the things you were already doing: Enroute and Station from the toolbar,
@@ -207,6 +230,26 @@ answer "is this one player or twelve?".
     side, in a second place, forever.
   - `VehicleScreen.zoom` overrides it — `1` is the old raw behaviour, `2` is twice the size and half the
     rows on screen. ⚠️ Zoom trades content for legibility: the higher it goes, the fewer call rows fit.
+- **The screen no longer glows like a lamp — and the reason was never the UI.** A vehicle can only offer a
+  render target on a material the engine already knows, and those are **instrument clusters**: the one the
+  shipped model uses is `script_rt_dials_feroci`, GTA's own name for the Feroci dial cluster. Dial
+  clusters are built *self-illuminated* so they glow at night, so whatever is drawn there is treated as a
+  light source — multiplied by the material's emissive factor and then run through bloom. The terminal's
+  own background is `rgb(21,34,50)`, luminance **32 of 255**, all but black, and it still came out as a
+  lit blue panel. Nothing in a resource can reach that emissive factor or the bloom; both live in the
+  model. What can be changed is the input, and since the game *multiplies*, halving what is drawn roughly
+  halves the glow. `VehicleScreen.brightness` does exactly that, and ships at **0.6**.
+  - It is a black sheet at `1 - brightness`, not `filter: brightness()`, because the two are the same
+    arithmetic — `c × b` against `c × (1 − a)` — while the sheet is one composited quad instead of a
+    per-pixel filter pass over the whole document every frame, and it does not turn the page into a
+    containing block for the terminal's own fixed positioning. It takes **no pointer events**, so clicks
+    land exactly as before.
+  - It sits above everything the terminal can draw, modals included — otherwise a dialog would have been
+    the one thing on the screen still glowing.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — new `VehicleScreen.brightness`, shipping
+  > `0.6`.** An existing config file has no such line and stays undimmed, so add it if you are keeping
+  > yours. Set `1.0` to switch it off — worth doing if your model's screen is *not* emissive, where this
+  > would only look dark.
 - **Every button on the screen would have POSTed at the wrong resource.** Callbacks are addressed to the
   resource by name, and the name comes from `GetParentResourceName()` — which is injected into NUI
   *frames*. The dashboard is a DUI, a separate browser handed a texture, and it cannot count on that. The
