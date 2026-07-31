@@ -180,8 +180,8 @@ answer "is this one player or twelve?".
 #### LAPD MDT
 - **Your status follows the call you are on.** The unit-status grid is gone from the Home screen.
   Status is now set by the things you were already doing: Enroute and Station from the toolbar,
-  Code 6 and Traffic Stop when they create an incident, and a new **Detach** button on the incident
-  bar to hand the call back and go CLEAR. Every status is still available directly from the status
+  Code 6 and Traffic Stop when they create an incident, and **CLEAR** from the status dropdown to
+  hand the call back. Every status is still available directly from the status
   badge in the command bar — that stays as the deliberate way to reach BUSY and UNAVAILABLE, which
   belong to no incident at all.
 - **Code 6 while you are already on a call no longer opens a second one.** It set out a fresh
@@ -191,7 +191,8 @@ answer "is this one player or twelve?".
   genuinely is a separate event and dispatch needs it as one.
 - **Detach was previously not something a unit could do.** The only route was going CLEAR, which is
   what detaches server-side but says so nowhere on screen; otherwise it took a dispatcher running
-  `/ddetach`. The button sends exactly that CLEAR, so the rule it depends on cannot drift.
+  `/ddetach`. CLEAR in the status dropdown is now the documented detach — it sends exactly that
+  status, so the rule it depends on cannot drift.
 - **Fire/EMS units were missing their own statuses.** The MDT tested for the job label `Fire/EMS`,
   but the job a medic actually carries in-game is `AMR` — so ON SCENE never appeared in the status
   list for a real medic, and the Fire/EMS request button never rendered for them. The Lua side had
@@ -529,7 +530,188 @@ answer "is this one player or twelve?".
   the frame is drawn live over your view. The finished config lines are printed to the F8 console,
   ready to paste. Nothing is written to your config from in game, on purpose.
 
+#### Replay & Director's Cut (new)
+
+- **`/replay` records what happens around you and plays it back.** A player starts a take, and every
+  player in range — plus whatever vehicle they are sitting in — is sampled ten times a second into a
+  clip. `/replay stop` ends the take, `save` keeps it, `list` shows what you have, `play` rebuilds the
+  scene out of ghost entities and watches it through a scripted camera. This is the raw material for
+  trailers and highlight videos, and it is deliberately not an admin tool: playback is local to
+  whoever started it, nobody else on the server sees it, and nothing in it is real.
+
+  Clips are stored in a purpose-built binary format (`.lcr`) rather than JSON. One sample is 26 bytes,
+  so a 3-minute take with 20 people in shot is about 900 KB of frame data and parses with
+  `string.unpack` instead of a megabyte of decimal digits. Positions are interpolated on playback
+  (Catmull-Rom — at 10 Hz a car covers ~3 m between samples, and interpolating that in straight lines
+  makes a smooth drive read as a series of corners), rotation takes the short way round the ±180° seam,
+  and a ped riding in a vehicle is put back in its seat rather than positioned on its own.
+
+  On disk and on the wire the payload is base64-armoured, which costs a third more space (~1.2 MB for
+  that same take). That is not decoration: a `.lcr` payload is **60% NUL bytes**, because floats and
+  small integers are full of zeros, and the round trip through `SaveResourceFile` / `LoadResourceFile`
+  and the event channel treats the buffer as a C string and stops at the first one. That NUL is byte 6
+  — the high half of the version field — so an 11 KB clip came back as exactly 5 bytes: `LCR1` plus
+  one. Base64 contains no NUL bytes and survives every one of those paths. A clip that is 33% larger
+  beats a clip that is 99.96% missing.
+
+  The index also records each clip's stored length, and a read that returns a different one now says so
+  by name — that class of bug first showed up as a decode failure three steps away from its cause.
+
+  > ⚠️ **New config file (`configs/cfg-replay-sh.lua`) and a new `Features.replay` toggle
+  > (`configs/cfg-features-sh.lua`, ships ON).** Clips live on **your** server's disk, so this file is
+  > mostly about what that is allowed to cost you: `maxDurationSec` bounds one take, and
+  > `maxClipsPerPlayer` / `maxTotalBytesPerPlayer` bound one player (defaults: 20 clips, 20 MB — about
+  > twenty 3-minute takes each). Both are enforced server-side, and a save past either is refused
+  > rather than quietly pruning something. `saveCooldownSec` is what stops a modified client from
+  > turning saves into disk hammering.
+  >
+  > Clips land in the resource's `data/` folder when it exists, and in the resource root when it does
+  > not — because a resource cannot create a directory, and plenty of deployments do not carry an
+  > empty one. Which of the two applies is decided by writing a probe file and reading it back, since
+  > a write that silently goes nowhere is otherwise indistinguishable from one that worked. If it
+  > falls back to the root, one line in the console says so.
+
+  Known limits, stated plainly rather than discovered later:
+  - **There is no video file at the end.** FiveM cannot encode video. This sets up the *shot* — the
+    scene, the framing, the timing — and you capture it with OBS or ShadowPlay like any other
+    gameplay.
+  - **Only the poses in `Replay.animCandidates` are recognised.** FiveM has no native that asks a ped
+    which animation it is playing, only one that checks a dict+clip you already name. Everything else
+    replays as walk / run / idle chosen from how fast the ghost is actually moving.
+  - **Ambient NPCs and traffic are not recorded yet** — only players and their vehicles. The format
+    already has room for them.
+  - **Ghost vehicles' wheels do not turn**, because they are positioned by hand rather than driven.
+
+- **A Director's Cut window (`/replay`).** The clip library, the recording HUD, the playback overlay
+  and the cutting-room editor, in two looks — LACORE blue, or a warm monospace "Cinema" grade for
+  people who spend their evening in it. Which screen is up decides who gets the mouse: the library
+  and the editor are windows and own the cursor, while the recording and playback HUDs deliberately
+  do not take focus at all — someone mid-take is still playing, and someone watching a playback needs
+  BACKSPACE to reach the game rather than a browser that swallowed the keyboard.
+
+  Working from the window: start, stop, save and discard a take, browse the library with its live
+  storage quota, play a clip, delete one, and open a clip in the cutting room. **Letterbox bars, film
+  grain and vignette are real too** — drawn straight over the game, which is something a browser
+  overlay is genuinely better at than Lua.
+
+- **The cutting room, built to the design's own measurements.** 56px header, 300px scene panel, 360px
+  inspector, 262px timeline, 110px track gutter, and a ruler with four stacked lanes: a time scale,
+  SHOTS, KEYS and DATA. Scene rows carry an ON/OFF visibility toggle, the model name, a kind tag and
+  either a `CAM` badge (this is what the camera is filming) or a `SET` button. The viewport draws the
+  framing over the game: letterbox bars, a dashed safe-area guide, live readouts in three corners, and
+  a scanline pass.
+
+  Two places depart from the mock, both deliberately. The prototype fills its viewport with a "GHOST
+  SCENE — PLACEHOLDER" card because it has no game behind it; here the game *is* behind it, so that
+  rectangle is left transparent and everything drawn over it is kept exactly as specified. And the
+  DATA lane, which the mock fills with a decorative waveform, shows real samples per second — where
+  the bars dip, entities were out of recording range, which is the only reason to have that lane at
+  all. (The ruler's marks also line up with the lanes, which in the mock they did not.)
+
+- **The camera engine.** Opening a clip for editing no longer reads out a list of names: it builds
+  the scene, parks it on frame one and puts a real camera in it, so the middle of the window is the
+  shot rather than a picture of one.
+
+  - **Four modes.** *Follow* sits behind the subject, *orbit* circles it, *fixed* stays put and keeps
+    looking at it, and *free* is flown by hand — mouse to aim, WASD to move, E/Q for height, shift to
+    hurry, alt to creep. Flying borrows the mouse from the browser, so the panels stay on screen but
+    go click-through until you stop; ESC or BACKSPACE gives the cursor back.
+  - **Keyframes that record the shot, not a number.** Adding a key captures where the camera actually
+    is — position, aim and focal length — and a clip with two such keys flies the path between them
+    instead of tracking anything. Keys without a pose still ease the field of view. Curves: linear,
+    ease-in, ease-out, ease-in-out.
+  - **A shot list that edits.** A shot owns a stretch of the clip and dictates the mode (and its
+    subject) while the playhead is inside it. Shots **cut** at their boundaries rather than gliding
+    between them, because that is what a shot boundary means; movement within a shot is what
+    keyframes are for.
+
+    Adding one at the playhead *is* a cut: the new shot runs to whatever starts next, and a shot
+    already covering that moment is trimmed to end there. Each row can be renamed, have its in or out
+    point pulled to the playhead, or be told to adopt whatever the camera is set to now — frame it
+    first, then say "this shot looks like that". The list is kept sorted and non-overlapping, and an
+    edit that would leave a sliver behind is refused with a reason rather than quietly producing a
+    third-of-a-second shot or deleting a neighbour as a side effect.
+
+    The viewport's mode readout reports what is actually in effect — the covering shot's mode, not the
+    inspector's — because those two legitimately disagree while you are setting up the next shot.
+  - **A transport that actually drives the scene.** The playhead is now a real one: scrub the ruler
+    and the ghosts move with it, 0.25×–2× re-times them, pause parks them. Field of view, roll,
+    distance, height and subject all reach the camera as you drag them. Hiding an entity in the scene
+    list removes it from the shot.
+  - Roll works, which sounds trivial and is not: the obvious way to aim a camera at something
+    (`PointCamAtCoord`) rewrites the rotation every frame and silently discards the roll, so the
+    look-at is computed by hand and applied where a dutch angle survives.
+
+- **The look of a shot.** Letterbox (2.39:1, 1.85:1, off), film grain, vignette, five colour grades
+  and depth of field, all live, and all landing in whatever you capture with because they are applied
+  to the picture rather than to a preview of it.
+
+  The grades are split across the two halves of this feature by what each half can honestly do, and
+  the split is visible in the config:
+
+  - A **tint** is a coloured sheet the UI draws over the game. It works on every build, needs no game
+    assets, and can warm or cool a shot — but it can never *remove* colour. You cannot desaturate by
+    adding paint. *Warm*, *Cold* and part of *Vintage* are this, and they are guaranteed to work.
+  - A **timecycle modifier** is the game's own post-processing, and the only way to desaturate, crush
+    contrast or fog a scene. The catch is that it is addressed by asset name, so a name the build does
+    not have does nothing at all — silently. *Noir* needs one.
+
+  So each grade's mechanism lives in `Replay.grades` and can be retuned per server, and the Look tab
+  labels the two kinds differently: a grade that leans on a game filter says so, and tells you where
+  to pick another if it looks unchanged. That beats five buttons where one quietly does nothing.
+
+  **Depth of field** is real camera work (`SetCamUseShallowDofMode` and friends): the focus distance
+  sets an in-focus band whose width is configurable, and the high-quality pass is re-requested every
+  frame because it is a per-frame request, not a setting. **Clean mode** now suppresses everything of
+  ours — the HUD, the flight banner, the busy strip, the viewport labels — so a capture has only the
+  bars and the grade in it.
+
+  > ⚠️ **Config additions (`configs/cfg-replay-sh.lua`): `Replay.grades` and the `Replay.dof*`
+  > band.** The comments name the timecycle modifiers that ship with the game and are already used
+  > elsewhere in LACORE, so they are safe to point at: `cinema`, and the `phone_cam` … `phone_cam13`
+  > family the phone's own camera filters use. Which of those looks like what varies between builds —
+  > if *Noir* does not come out monochrome on your server, try another number.
+  >
+  > A grade is cleared when the replay ends. That is deliberate and worth stating: a timecycle left
+  > applied would tint the player's entire game afterwards with nothing on screen to explain why.
+
+- **Debug logging for when a clip will not behave.** `Replay.debug` in `configs/cfg-replay-sh.lua`, or
+  `/replay debug` to flip it without a restart — the client half immediately, the server half if you
+  have admin permission, because verbose console output is not something a player should be able to
+  inflict on an owner.
+
+  It logs the things that fail *quietly*, which is the only kind worth logging: the path a clip
+  resolved to and whether the write landed, chunk-by-chunk transfer with the byte counts on both ends
+  (a short arrival names itself, since binary crossing an event channel is this feature's least certain
+  moving part), quota and cooldown verdicts with the actual numbers, encode and decode results, models
+  that would not load into a ghost, the timecycle name a grade resolved to — a name the build does not
+  have is accepted without complaint and simply does nothing, so seeing it is the difference between
+  "wrong name" and "subtle grade" — and every NUI focus change, because a focus taken and not given
+  back is the worst thing this feature can do to a player. Per-frame state is deliberately left out;
+  at 10 Hz a sampler would bury everything else.
+
 ### Fixed
+
+#### Saved data (server)
+
+- **Every local JSON store silently wrote nothing on servers without a `data/` folder.** Found while
+  testing the replay recorder: a clip refused to save, and the reason turned out to reach much further
+  than replays. A resource cannot create a directory — no native does it, and `SaveResourceFile` will
+  not create missing path components — so on a deployment whose upload does not carry `data/`, every
+  write into it failed. Silently: the native returns false, and nothing was checking.
+
+  That is worse than it first sounds, because `DBSaveStore` writes the file **and** the database on
+  every save, not the file only as a fallback. So the local mirror — the copy the server reads when
+  MySQL is unreachable — had never been written at all on those servers. The safety net was missing
+  precisely where it was needed. Affected the ban list, incidents, call logs, anticheat trust scores,
+  case files, CCTV cameras, civilian activities, organisations, turf, corrections, the config backup
+  and the remote-config cache.
+
+  Now the folder is not assumed, it is tested: `DBDataPath()` in `modules/db/db-sv.lua` writes a probe
+  once and reads it back — a write that goes nowhere can only be told apart from one that worked by
+  the read that follows — and falls back to the resource root when `data/` is unusable, saying so once
+  in the console. Servers that already have a working `data/` keep using it, so nothing moves. Every
+  writer now routes through it, and a failed write prints a line instead of being swallowed.
 
 #### Anticheat
 
@@ -632,6 +814,42 @@ answer "is this one player or twelve?".
   install.
 
 ### Changed
+
+#### LAPD MDT — the Mobile Client, redrawn as the terminal it plays
+- **A complete visual redesign of the LACORE Mobile Client**, taken 1:1 from the new design draft:
+  green-phosphor type on navy, hard white frame lines around the incident panel and every data well,
+  a gradient ribbon with the icon artwork in its three original frame sizes, and a black Courier
+  narrative window — the look of the in-car terminal the MDT has always pretended to be. Same
+  markup, same wiring: every action, event and store field behaves exactly as before.
+- **The status strip is one row of cells now** — Incident, callsign, Unread, Night, Veh., your
+  status dropdown, and a solid green **GPS Online** block at the end. The clock and the department
+  tag are gone from the strip; the design does not carry them and the game shows the time anyway.
+- **Requests moved into the bottom bar.** The REQUEST button strip is gone; **Options ▾** on the
+  bottom bar opens the same five requests (LEO Backup, Fire/EMS, Coroner, Tow, Crime Broadcast) as
+  a pop-up menu, which is where the real terminal keeps them.
+- **The bottom bar carries the full cell row**: paging arrows, Edit, Create Report, Clear Incident,
+  Close View, **Primary Unit** (assigns you to the selected incident — the same server-side
+  self-assign the Calls tab offers), **Import to Incident** (on the real bar, nothing behind it here
+  yet — greyed out rather than pretending), Locate on Map, Options.
+- **The rail glows where the records are.** Sections holding records (Previous, Unit Details,
+  Comments …) light up amber with their count, exactly as drawn — so the officer sees there are 50
+  previous calls without opening the tab. The emoji icons became the design's stroke glyphs.
+- **The ribbon is exactly the terminal's nine buttons.** BOLO and Cite/Charge are records, not
+  ribbon tools, so their extra F10/F11 buttons are gone from the toolbar: both live in the rail now
+  with the other record sections — an active BOLO lights its row amber with the count, which is a
+  louder signal than the old badge was — and F10/F11 on the keyboard still jump straight to them.
+- **Auto Scroll is a real switch now.** The button in the field mask toggles whether new comment
+  lines keep the narrative pinned to the bottom; before it was a printed label.
+- **Unit Details shows the terminal's five columns** (Unit, St, Location, Inc, Code); History and
+  Previous are plain row tables, and clicking a history row opens that incident. The separate
+  Detach button on the location bar is gone — setting **CLEAR** in the status dropdown is, and
+  always was, the detach.
+- **The skin toggle keeps working.** The terminal design is the new default look; ◫ in the title
+  bar still switches to the LACORE ONE skin (stored under a new key, so every install actually sees
+  the redesign once before choosing). The MDT's separate white mode is retired — the terminal has
+  one look, and ONE brings its own light mode.
+  > Verified in the NUI preview against the design values (colours, spacing, layout measured 1:1);
+  > not yet tested in-game — the Lua side is untouched, so only the visuals need eyes on a server.
 
 #### Anticheat
 - **The detection parameters no longer ship as a printed guide to evading them.** `configs/` is
