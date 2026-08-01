@@ -813,6 +813,28 @@ answer "is this one player or twelve?".
   a neutral `LATEST RELEASE`, which states what the number is without claiming anything about your
   install.
 
+#### Phone
+
+- **The retro brick phone could not reach anybody — dialled numbers failed, saved contacts failed, and
+  new contacts could not even be typed in correctly.** Three reports, one root cause: every LACORE
+  number carries a dash (`555-0123` — the server generates them that way), but a 90s keypad has no dash
+  key. A number dialled as `5550123` was compared against `555-0123` character by character, never
+  matched, and the call failed; a contact saved on the brick phone stored the dash-less spelling, so
+  calling *it* failed the same way. The server now keeps a digits-only index next to the exact one and
+  canonicalises every number the phone sends in — `5550123` reaches `555-0123`, and a dash-less contact
+  is corrected to the real spelling as it is saved. Directory numbers such as `311` pass through
+  untouched. The keypad also gained the missing key: `*` types the dash (the key carries a small `-`
+  label). This covers the modern phone's dial pad too, which had no dash key either.
+- **Players who had not opened their phone this session were unreachable.** The number → player lookup
+  was only filled in when someone touched their own phone, so a player connected for an hour who never
+  pressed F1 could not receive calls or SMS — the caller just heard the call fail, even with the number
+  spelled perfectly. The lookup now falls back to searching online players by license, and the incoming
+  call opens the callee's phone as it always did.
+- **A failed call on the brick phone showed nothing at all.** The modern phone flashes a "call failed"
+  notice; the retro LCD returned silently to wherever it was, which reads as "calls just don't go
+  through". It now shows a `✕ Call failed` screen with the dialled number for a couple of seconds, plus
+  a low error tone.
+
 ### Changed
 
 #### LAPD MDT — the Mobile Client, redrawn as the terminal it plays
