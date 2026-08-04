@@ -700,8 +700,9 @@ answer "is this one player or twelve?".
   everything else fell through to the Agency MDT. That works for the shipped agencies and nowhere
   else. An owner adding "Vespucci Sheriff's Office" got the Sheriff CAD by accident; one adding
   "VSPD" who *wanted* it had no way to ask. It is also why the three sheriff's offices that ship in
-  the config — VCSO, RSO and SBCSD — open the Agency MDT to this day: their names say nothing about a
-  terminal.
+  the config — VCSO, RSO and SBCSD — opened the Agency MDT: their names say nothing about a terminal.
+  **They now ship with `cad = "lasd"`** and open the Sheriff CAD, which is what a sheriff's office
+  wants; delete the line to put one of them back on the Agency MDT.
 
   The guess is unchanged and still runs, so every existing config routes exactly as it did — `cad` is
   simply asked first. A terminal that is switched off in `cfg-features-sh.lua`, whose module is not

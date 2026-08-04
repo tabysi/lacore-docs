@@ -129,10 +129,10 @@ So a new faction picks its terminal in one line:
 }
 ```
 
-<Callout type="warning">
+<Callout type="info">
   Name-based routing is why the three shipped sheriff's offices — **VCSO**, **RSO** and **SBCSD** —
-  open the *Agency* MDT today: their `short` says nothing about a terminal. Add `cad = "lasd"` to move
-  them to the Sheriff CAD.
+  used to open the *Agency* MDT: their `short` says nothing about a terminal. They now ship with
+  `cad = "lasd"` and open the Sheriff CAD. Remove the line to put one of them back.
 </Callout>
 
 A terminal that is switched off in [`cfg-features-sh.lua`](/configuration/features), or an add-on that
