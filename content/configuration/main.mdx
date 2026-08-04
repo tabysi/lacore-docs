@@ -46,18 +46,20 @@ CallCenter = {
   with other pma-voice usage.
 </Callout>
 
-## Agencies
+## Agencies (departments / factions)
 
-`agencies` is the master list of departments used across the CAD/MDT. Each entry defines the
-department shown on duty and its loadout:
+`agencies` is the master list of departments used across the CAD/MDT — every faction on your server
+is one entry in this table. Players go on duty with `/onduty <short> <callsign>`, which sets their
+department, hands out the loadout and decides which terminal `/mdt` opens.
 
 ```lua
 agencies = {
   {
-    type = "Law Enforcement",           -- routes the MDT (see below)
+    type  = "Law Enforcement",
     short = "LAPD",
-    long = "Los Angeles Police Department",
+    long  = "Los Angeles Police Department",
     motto = "To Protect and Serve",
+    cad   = "lapd",                     -- which CAD design this agency opens
     equipment = {
       { weapon = "WEAPON_SERVICEPISTOL", components = { "COMPONENT_AT_PI_FLSH" } },
       { weapon = "WEAPON_TASER7", tint = 1 },
@@ -70,19 +72,73 @@ agencies = {
 }
 ```
 
-The `type` field controls which terminal a member gets and how dispatch treats them:
+### Fields
 
-| `type` | Terminal / role |
+| Field | Required | Description |
+| --- | --- | --- |
+| `type` | yes | The kind of department — see the table below. Decides the role, not the look. |
+| `short` | yes | What players type: `/onduty LAPD 1A-12`. Also what the CAD shows as the department. |
+| `long` | yes | Full name, shown in the MDT header and in the on-duty message. |
+| `motto` | no | One line under the name in the MDT. `""` for none. |
+| `cad` | no | **Which CAD/MDT design this agency opens** — see [Choosing the CAD design](#choosing-the-cad-design). |
+| `equipment` | no | Loadout handed out on duty. Supports `components`, `tint`, and `rack` (weapon goes in the vehicle rack instead of the officer's hands). |
+| `wallpaper` | no | `{ in-car screen, MDT background }` — texture names or an RGB triple. |
+| `primary` / `secondary` | no | MDT accent colours as `{ r, g, b }`. |
+
+The `type` field controls the role a member gets and how dispatch treats them:
+
+| `type` | Role |
 | --- | --- |
-| `Law Enforcement` | LAPD / LASD / Agency MDT (by `short`/dept name). |
-| `Fire/EMS` | EMS / Fire CAD. |
+| `Law Enforcement` | Full LEO: CAD, calls, units, queries, charges. |
+| `Fire/EMS` | Fire / medical units in the EMS CAD. |
 | `Coroner` | Coroner tools. |
-| `Tow Truck` | Tow contacts. |
+| `Tow Truck` | Tow contacts (the only type any player may go on duty as without membership). |
 | `Private Security` | CCTV `security` access + limited tools. |
 | `Animal Control` / `Public Works` | Utility departments. |
 
-`equipment` entries support `components`, `tint`, and `rack` (weapon on a station rack). `wallpaper`
-is the MDT background (texture names or an RGB triple).
+### Choosing the CAD design
+
+LACORE ships several CAD/MDT terminals. They are **re-skins of one system**: same calls, same units,
+same incidents, same dispatch. Only the look differs — so `cad` is purely which terminal your
+department sits in front of.
+
+| `cad` | Terminal |
+| --- | --- |
+| `"lapd"` | **LACORE Mobile Client** — the LAPD PremierOne terminal (green-on-navy in-car look). |
+| `"lasd"` | **CAD / PCMS** — the Sheriff terminal (amber/teal). |
+| `"agency"` | **Agency MDT** — the CHP-style dark blue terminal. |
+| `"ems"` | **EMS / Fire CAD**. |
+| `"retro"` | **9100-T** — the green-phosphor 90s terminal. |
+| `"penn"` | **Pennsylvania CAD** — retro county terminal (add-on, see [Pennsylvania CAD](/configuration/cad-terminals)). |
+
+<Callout type="info">
+  `cad` is optional. Leave it out and LACORE guesses from the department name, exactly as it always
+  has — see [Terminal routing](/configuration/cad-terminals) for the full order.
+</Callout>
+
+So a new faction picks its terminal in one line:
+
+```lua
+{
+  type  = "Law Enforcement",
+  short = "VSPD",
+  long  = "Vespucci Police Department",
+  motto = "",
+  cad   = "lasd",          -- open the Sheriff CAD, despite the name saying "PD"
+  equipment = { { weapon = "WEAPON_SERVICEPISTOL" } },
+}
+```
+
+<Callout type="warning">
+  Name-based routing is why the three shipped sheriff's offices — **VCSO**, **RSO** and **SBCSD** —
+  open the *Agency* MDT today: their `short` says nothing about a terminal. Add `cad = "lasd"` to move
+  them to the Sheriff CAD.
+</Callout>
+
+A terminal that is switched off in [`cfg-features-sh.lua`](/configuration/features), or an add-on that
+is not unlocked on your server, is skipped and the name guess applies instead — so a department never
+ends up with no terminal at all. A `cad` value that isn't in the table above is reported once in the
+server console and then ignored.
 
 ## Other lists in `config.lua`
 

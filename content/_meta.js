@@ -20,6 +20,7 @@ export default {
   '--products': { type: 'separator', title: 'Products & updates' },
   products: 'Products',
   'lacore-mdt': 'LACORE MDT (Standalone)',
+  'lacore-roblox': 'LACORE for Roblox',
   updates: 'Updates & Changelog',
 
   '--portal': { type: 'separator', title: 'Customer Portal' },

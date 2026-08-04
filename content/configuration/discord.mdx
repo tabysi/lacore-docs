@@ -26,9 +26,11 @@ need LACORE's Discord layer or its members-only whitelist. Switch either off her
 
 ```lua
 AccessControl = {
-    whitelist    = true,    -- members-only join gate (/wl). false = disabled entirely.
-    discordRoles = true,    -- require + read Discord roles and bridge them to ACE. false = off.
-    membership   = "auto",  -- who counts as a "member" for member-only perks. See below.
+    whitelist     = true,    -- members-only join gate (/wl). false = disabled entirely.
+    discordRoles  = true,    -- require + read Discord roles and bridge them to ACE. false = off.
+    membership    = "auto",  -- who counts as a "member" for member-only perks. See below.
+    minNameLength = 3,       -- shortest player name allowed at connect. 0 = no check.
+    maxNameLength = 20,      -- longest player name allowed at connect. 0 = no check.
 }
 ```
 
@@ -36,6 +38,16 @@ AccessControl = {
 | --- | --- |
 | `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans and the global-ban network still apply.** |
 | `discordRoles` | LACORE no longer requires Discord at connect (no “join our Discord” rejection), doesn't read Discord roles, and doesn't bridge them to ACE. Duty-role gating (`DutyRoles`) is skipped, and Staff/Dev powers come from **ACE / txAdmin** only. |
+
+### Player-name limits
+
+`minNameLength` and `maxNameLength` are enforced **at connect** — a name outside the range is rejected
+with "name too short" / "name too long". Set either to `0` to disable that check.
+
+<Callout type="info">
+  The defaults keep names RP-friendly. If players on a fresh or plug-and-play server are being turned
+  away, it is usually long Steam names hitting `maxNameLength = 20` — raise it.
+</Callout>
 
 ### Membership (member-only perks)
 
@@ -89,6 +101,7 @@ DiscordAuth = {
         LeadDeveloper = "1395534398299832431",
         LOA           = "1310081058762653696",
         LE            = "1285460493619953720",
+        leodoorkeys   = "1410047211722772633",
         -- Supporter / Donator tiers … (leave empty = "never present")
     },
 }
@@ -101,6 +114,27 @@ DiscordAuth = {
 
 Role names referenced elsewhere (profile badges, Big Brother access, duty whitelist) must match keys
 in this `roles` table.
+
+### The shipped role names
+
+| Role key | What it does |
+| --- | --- |
+| `Member` | Member-only perks — agency duty, member vehicles, board vote. See [Membership](#membership-member-only-perks). |
+| `Staff` | Staff powers, anti-cheat bypass, Big Brother access. |
+| `Dev` | Developer powers, same bypasses as `Staff`. |
+| `LOA` | **Rejects the connection.** While Discord auth is on, a player holding this role is turned away at connect with the "leave of absence" reason. |
+| `LE` | The default requirement for going on Law Enforcement duty (see [Duty whitelist](#duty-whitelist)). |
+| `SupporterSGT`, `SupporterIII1`, `SupporterIII`, `SupporterII`, `SupporterI` | Any one of them marks the player as a **supporter** — the role colour in the player list. Empty by default. |
+| `AssetDonatorIII`, `AssetDonatorII`, `AssetDonatorI` | Any one of them marks the player as a **donator**, likewise. Empty by default. |
+| `LeadDeveloper`, `leodoorkeys` | Mapped and fetched, but nothing in LACORE reads them — they are there for your own scripts and for the dashboard's remote config. |
+
+<Callout type="warning">
+  `LOA` is a **connect block**, not a badge. Give it to someone on leave and they cannot join until it
+  is taken away again. Leave the ID empty if you don't want that behaviour.
+</Callout>
+
+The IDs shipped in the file are from the developer's own guild — replace them with yours, or empty
+the ones you don't use. In `devmode` every flag above is granted to everyone.
 
 ## Duty whitelist
 

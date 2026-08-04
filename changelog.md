@@ -690,6 +690,29 @@ answer "is this one player or twelve?".
   back is the worst thing this feature can do to a player. Per-frame state is deliberately left out;
   at 10 Hz a sampler would bury everything else.
 
+#### CAD terminals
+- **A department picks its own CAD design now.** `agencies` in `config.lua` takes a `cad` field —
+  `"lapd"`, `"lasd"`, `"agency"`, `"ems"`, `"retro"` or `"penn"` — and that department opens that
+  terminal, full stop.
+
+  Until now the terminal was guessed from the department *name*: a `short` containing "lasd",
+  "sheriff" or "bcso" got the Sheriff CAD, "90s" got the retro one, "lapd" got the Mobile Client, and
+  everything else fell through to the Agency MDT. That works for the shipped agencies and nowhere
+  else. An owner adding "Vespucci Sheriff's Office" got the Sheriff CAD by accident; one adding
+  "VSPD" who *wanted* it had no way to ask. It is also why the three sheriff's offices that ship in
+  the config — VCSO, RSO and SBCSD — open the Agency MDT to this day: their names say nothing about a
+  terminal.
+
+  The guess is unchanged and still runs, so every existing config routes exactly as it did — `cad` is
+  simply asked first. A terminal that is switched off in `cfg-features-sh.lua`, whose module is not
+  loaded, or which is a locked add-on is skipped and the guess applies instead: a department never
+  ends up with no terminal because of a setting somewhere else. A `cad` value that is not one of the
+  six is named once in the server console and then ignored, because a typo that behaves like "no
+  preference" reads as the setting doing nothing.
+
+  All six terminals are re-skins of one system — same calls, same units, same incidents — so this is
+  purely which terminal a department sits in front of.
+
 ### Fixed
 
 #### Saved data (server)
@@ -933,6 +956,33 @@ answer "is this one player or twelve?".
   where a table needs reading end to end — and the 154 commands filter live by text, by category, and
   by whether they are ACE-gated, job-checked or a dev tool. Every row carries the file and line it
   was read from, so nothing here has to be taken on trust. Linked from the main nav as **Commands**.
+
+#### Documentation
+- **Every config file is in the docs now.** The config file map was missing eight of them entirely —
+  case files, personnel files, the supervisor panel, the Pennsylvania CAD, the in-car screen, the
+  model library, the replay tool and the bug-report form — which meant the only way to find those
+  settings was to open the Lua and read the header. Three new pages carry them: **CAD Terminals &
+  Routing** (which terminal a department gets, `cfg-mdt-sh`, `cfg-penn-sh`, `cfg-vehiclescreen-sh`),
+  **Records, Personnel & Supervisor**, and **HUD & Player List**. The rest were folded into the pages
+  they belong to.
+- **The settings that existed but were never written down.** The anti-cheat page grew a full
+  configuration reference — every detection with its side, default action and what it is actually
+  looking for, plus the trust score, whitelist, evidence capture and dashboard reporting. Thresholds
+  stay out of it on purpose: they live in the obfuscated params file precisely so they are not a
+  printed guide to staying under them. Discord & Duty gained the player-name limits and a table of
+  what each shipped role does — including that **LOA is a connect block**, not a badge, which is the
+  kind of thing that should never have to be discovered.
+- **The agency table is documented as the faction table it is**, with every field, the `type` values,
+  and the new `cad` field.
+
+#### Customer portal
+- **The customer dashboard has the admin dashboard's sidebar now.** Its sections used to sit in a
+  horizontal row inside the header while the admin area carried them in a vertical rail, so staff
+  flipping between the two views watched the navigation jump from the top of the screen to the left
+  of it. Both areas draw the same sidebar from the same component — the customer rail is captioned
+  `// ACCOUNT` instead of `// STAFF AREA`, and the staff-only parts (the ⌘K search, the per-section
+  counts, the BUILD block reporting bot and bridge health) stay where they were. On a narrow screen
+  both still collapse into the same header menu.
 
 > **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
 > (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short
