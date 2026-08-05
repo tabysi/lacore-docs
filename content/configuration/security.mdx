@@ -144,6 +144,44 @@ BigBrother = {
 Discord mirroring uses the `lacore_bb_webhook*` convars — see
 [Server Convars](/configuration/convars#big-brother-admin-logging).
 
+### What Big Brother sends to LACORE
+
+<Callout type="warning">
+  **Every line Big Brother logs is also copied to the LACORE dashboard.** This is part of the licence
+  and has no off switch — unlike the anticheat's dashboard reporting (`Anticheat.Report`), which is
+  opt-in. If you run a server with your own privacy obligations, this is the section you need to
+  disclose to your players.
+</Callout>
+
+Per line, what leaves your server is: the **category**, **severity**, **action**, the **detail text**,
+the **player name and identifier**, the in-game **server id**, **coordinates and zone** where the event
+carries them, a **timestamp**, plus your server's **hostname** and **licence key**.
+
+For the `chat` and `command` categories, "detail text" is **the message or command itself**.
+
+What does not change: the local database table and your Discord webhooks keep working exactly as
+before. This is an additional copy, never a move.
+
+What you still control, because the reporting rides on `BBLog()` rather than around it:
+
+| You set | Effect on reporting |
+| --- | --- |
+| `enabled = false` | Nothing is logged at all, so nothing is sent. |
+| `categories.chat = false` (any category) | That category is never logged, so it is never sent. |
+| `retentionDays` | Your local table only. The dashboard copy has its own retention. |
+
+Transport is batched and bounded, so a busy server is not an HTTP storm and an offline uplink cannot
+grow a buffer without limit:
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `dashboard.batchSeconds` | `30` | Seconds between uploads. |
+| `dashboard.maxBatch` | `200` | Rows per upload. Anything over is dropped, **oldest first**. |
+
+Reporting needs an active licence key (`setr lacore_license_key`) — that is what attributes rows to a
+dashboard account. Without one the module stays inert and says so once in the console; local logging
+is unaffected.
+
 ## Discord Rich Presence — `configs/cfg-presence-sh.lua`
 
 Controls the Discord status players see while playing and the invite link on the connect screen.

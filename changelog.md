@@ -690,6 +690,41 @@ answer "is this one player or twelve?".
   back is the worst thing this feature can do to a player. Per-frame state is deliberately left out;
   at 10 Hz a sampler would bury everything else.
 
+#### Network activity in the admin panel
+- **Every server's Big Brother log now reaches the LACORE dashboard**, and staff read all of them in
+  one table: **Admin → Activity**. Bans, kicks, jails and warns with who-did-what-to-whom, anticheat
+  flags, connections, combat, chat, commands, vehicle spawns, MDT actions and profile changes —
+  filterable by category, severity, server, free text and time range, paged, with a Live toggle that
+  follows the newest page.
+
+  The question this exists for is the one that used to need three browser tabs and an SSH session:
+  *who banned that player, on which server, and what happened in the ten minutes before it.*
+
+  > ⚠ **This is not opt-in.** It ships with the licence and has no switch, unlike the anticheat's
+  > dashboard reporting. What leaves a customer's server is written out in plain language at the
+  > bottom of `configs/cfg-bigbrother-sv.lua` and in the docs: category, severity, action, the detail
+  > text, player name and identifier, server id, coordinates and zone where present, a timestamp, the
+  > hostname and the licence key — and for the `chat` and `command` categories the detail text is the
+  > message itself. Server owners with their own privacy obligations need to disclose it.
+  >
+  > What an owner still decides: the reporting rides on `BBLog()` rather than around it, so
+  > `BigBrother.enabled = false` or a category switched off in `BigBrother.categories` is never
+  > logged and therefore never sent. Collecting a category someone explicitly turned off locally
+  > would be a different thing from "the reporting has no off switch".
+
+  Transport is batched (`dashboard.batchSeconds`, default 30 s) and bounded (`dashboard.maxBatch`,
+  default 200 rows, oldest dropped first), so a full chat channel is not an HTTP storm and a server
+  that loses its uplink cannot grow the buffer without limit. Storage is capped per account and
+  trimmed oldest-first on every write — this is an operational feed with a short useful life, not an
+  archive, and one busy server must not fill the database on everyone else's behalf.
+
+- **Fixed: paging in `pb.list` was silently dropped.** Callers were already passing `page`, but the
+  helper never forwarded it, so the loop behind **Admin → Players** re-fetched page 1 every round and
+  only looked correct because the union-find dedup collapsed the repeats.
+
+> **New PocketBase collection to import:** `landing/pocketbase/pocketbase-activity-collection.json`
+> (`lacore_activity`).
+
 #### CAD terminals
 - **A department picks its own CAD design now.** `agencies` in `config.lua` takes a `cad` field —
   `"lapd"`, `"lasd"`, `"agency"`, `"ems"`, `"retro"` or `"penn"` — and that department opens that
