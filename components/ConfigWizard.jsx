@@ -11,6 +11,13 @@ function luaValue(field, v) {
     const n = Number(v)
     return Number.isFinite(n) ? String(n) : '0'
   }
+  // Some options are tri-state in Lua: "auto" is a string, but true/false are
+  // real booleans that the config compares with ==. `literalValues` lists the
+  // options that must therefore be written unquoted — `= "true"` would satisfy
+  // neither branch and silently behave like "auto".
+  if (Array.isArray(field.literalValues) && field.literalValues.includes(String(v))) {
+    return String(v)
+  }
   // text / select → quoted string, escape backslash + quote
   return '"' + String(v ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
 }

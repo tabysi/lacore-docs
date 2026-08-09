@@ -99,7 +99,47 @@ Fingerprint.requireCuffed = true    -- only a cuffed suspect can be scanned (fal
 Fingerprint.range         = 2.5     -- how close the suspect must be (metres)
 Fingerprint.scanSeconds   = 2.2     -- capture animation length in the UI
 Fingerprint.openKey       = ""      -- optional default key for /mobileid (players can bind it themselves)
+
+-- Prints are something you TAKE: an officer enrols a restrained suspect from the
+-- device, and that register is what a crime-scene print is matched against.
+Fingerprint.Register = {
+    required     = false,          -- true = a scan only identifies people whose prints are on file
+    evidenceType = "fingerprint",  -- evidence type used when a latent is matched
+}
+
+-- /liftprint [incident] — lift a print off the nearest vehicle.
+Fingerprint.Latents = {
+    range             = 4.0,   -- how close to the vehicle (metres)
+    touchesPerVehicle = 4,     -- recent occupants a vehicle remembers
+    touchKeepMinutes  = 60,    -- older than this is not usable evidence
+    keepMinutes       = 120,   -- how long an unmatched latent stays listed
+}
 ```
+
+### The investigation loop
+
+The scanner used to answer one question: *who is this person in front of me*. It now supports the
+other one — *whose print is this*:
+
+1. **Lift** — `/liftprint 1042` at the abandoned getaway car. The print is **anonymous**: the server
+   knows who left it and will not tell you. It appears in the device's **Prints** tab as `LP-0001`.
+2. **Run** — hit *Run* on it. If that person has never been printed you get **"not in the register"**,
+   and the latent stays open.
+3. **Enrol** — later, with the suspect detained, scan them and press **Take prints**.
+4. **Run it again** — now it matches, and the match is filed as **evidence on their record**, with a
+   tag, the location, the incident number and a chain of custody.
+
+Who left a print is not guessed: the client reports the plate when a player gets into a vehicle, so a
+latent resolves to the people who actually sat in that car recently. Old touches expire, the list is
+capped per vehicle, and your own touch is excluded — you cannot lift your own print off the cruiser
+you just parked.
+
+<Callout type="info">
+  **`Register.required` ships off.** With it off, a scan identifies from the records profile exactly as
+  before and only *reports* whether prints are on file — so nothing changes for an existing server.
+  Turning it on makes the register mandatory for identification, which is the stricter, more
+  investigative setup, but it means nobody can be identified until they have been printed. Your call.
+</Callout>
 
 <Callout type="info">
   **Fair play** — you can only scan a **cuffed** suspect who's close by, so there's no remote ID of free /
@@ -128,84 +168,6 @@ refuses any identifier banned on it. There is nothing to obtain or configure to 
 ## Radio speech-to-text — `configs/cfg-stt-sh.lua`
 
 Experimental offline push-to-talk transcription. See [Radio STT](/features/radio-stt). Off by default.
-
-## Model library — `configs/cfg-library-sh.lua`
-
-The dashboard's model library shows what **your** server has. `/modelscan` finds and measures the
-models, `/modelcapture` photographs them.
-
-<Callout type="info">
-  You do not have to configure anything. Leave `uploadUrl` empty and LACORE hosts the pictures for
-  you: your server asks for a short-lived upload session with its licence key, the screenshots go to
-  LACORE's image host, and the dashboard shows them.
-</Callout>
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `Library.uploadUrl` | `""` | Your own upload endpoint. Anything screenshot-basic can post to: it sends multipart form data and must get JSON back containing a URL. Discord webhooks work (the response carries `attachments[1].url`), as does any uploader answering `{ "url": "https://…" }`. |
-| `Library.imageHosts` | `{}` | Only needed when your uploader answers with a URL on a *different* CDN domain than it accepts uploads on. The server otherwise only accepts image URLs whose host matches where the run is actually uploading, so a misbehaving client can never inject a foreign image into your dashboard. |
-| `Library.settleTime` | `0.8` | Seconds to let a model settle before the photo is taken. |
-| `Library.maxPerRun` | `150` | Models processed per `/modelcapture` run. |
-
-<Callout type="warning">
-  `uploadUrl` is deliberately **not** remotely editable. Where your data goes must never be something
-  the dashboard can change — the same reason `PhoneCfg.cameraUpload` is refused by the remote-config
-  allowlist. Edit it in the file, or nowhere.
-</Callout>
-
-## Replay & Director's Cut — `configs/cfg-replay-sh.lua`
-
-Records what happens around a player into a compact binary clip (`.lcr`) that can be played back
-later — the raw material for cinematic shots, trailers and highlight videos. A content-creation tool,
-**not** an admin evidence tool (that is the [Big Brother log](/configuration/security)).
-
-`/replay start` samples nearby players and their vehicles into memory; `stop` ends the take, `save
-[name]` encodes and uploads it, `discard` throws it away, and `list` / `play` / `delete` do what they
-say. Clips live on the **server** (`data/replays/<license>/`) because a FiveM client cannot write
-files — which is why the quotas below exist: clips cost your disk. `/replay play <id>` rebuilds the
-scene out of ghost entities only the viewer can see.
-
-<Callout type="warning">
-  FiveM cannot encode video. A director's cut sets up the **shot** — scene, camera, timing — and you
-  record it with OBS or ShadowPlay like any other gameplay. There is no MP4 coming out of this.
-</Callout>
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `Replay.enabled` | `true` | Master switch. Also gated by `Features.replay` — either one off disables the whole thing (no commands, no loops, ~0 ms). |
-| `Replay.command` | `"replay"` | The command. Renaming it renames the `/help` suggestions too. |
-| `Replay.debug` | `false` | Verbose logging to the server console and F8. Worth turning on when a clip won't save or plays with pieces missing — those failures are quiet by nature. `/replay debug` flips it at runtime. |
-| `Replay.sampleHz` | `10` | Samples per second. Playback interpolates, so above ~15 buys almost nothing visually while making clips proportionally bigger; below ~6 fast vehicles start to look like they teleport. Hard range 1–30. |
-| `Replay.radius` | `50.0` | How far from the recorder an entity is picked up, in metres. Anything that walks out simply stops appearing (and reappears if it comes back). Bigger = more entities = bigger file. |
-| `Replay.maxDurationSec` | `180` | Longest single take. |
-| `Replay.maxEntities` | `32` | Most entities recorded in one take. |
-| `Replay.animCandidates` | 4 entries | The animations the recorder watches for (hands up, hand on holster, cuffed, downed). FiveM has no native that asks a ped *which* animation it is playing — only whether it is playing a specific one — so a recorder can only spot poses it was told to look for. Anything unlisted still replays: the ghost falls back to walk/run/idle from how fast it is moving. |
-| `Replay.grades` | 5 entries | How each colour grade in the "Look" tab is achieved. `tint` / `tintAlpha` is a coloured sheet drawn over the game — always works, but can never *remove* colour. `modifier` / `strength` is a GTA timecycle, the only way to desaturate or crush contrast — but it is addressed by asset name, and an unknown name silently does nothing. If `noir` doesn't come out monochrome on your build, try another `phone_cam` number. |
-| `Replay.dofNear` / `dofFar` | `0.45` / `1.9` | Depth-of-field band, as a multiple of the focus distance. |
-| `Replay.dofStrength` | `1.0` | Depth-of-field strength. |
-| `Replay.maxClipsPerPlayer` | `20` | Per-player clip count quota. |
-| `Replay.maxTotalBytesPerPlayer` | `20 MB` | Per-player disk quota. |
-| `Replay.saveCooldownSec` | `20` | Minimum gap between two saves. |
-| `Replay.chunkBytes` | `48 KB` | Upload chunk size. |
-| `Replay.uploadTimeoutSec` | `60` | Upload timeout. |
-
-## Bug reports — `configs/cfg-report-sh.lua`
-
-`/lacorereport` opens a small form any player can use to report a bug **in LACORE itself**. It goes
-to the LACORE team's dashboard over the same relay this resource already uses for telemetry — not
-into your database. It is not a replacement for your own `/report` (reporting a *player*) or your
-support tickets.
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `Report.enabled` | `true` | Master switch. Also gated by `Features.bugreport` — either off disables it. |
-| `Report.command` | `"lacorereport"` | The command. Renaming it also renames the `/help` suggestion and the cooldown message. |
-| `Report.cooldownSec` | `120` | Wait between two reports. Enforced on the **server**; the client only mirrors it for the countdown, so a modified client cannot bypass it. |
-| `Report.maxLength` | `800` | Longest report a player can type. The server enforces the same cap again — a report is a payload from a client, and the client is never the only gate. |
-| `Report.categories` | 5 entries | The category dropdown: Bug, Exploit, Translation, Suggestion, Other. Purely a UI label; nothing branches on it, so rename freely. |
-
-Set `Webhooks.BugReport` in [`cfg-server-sv.lua`](/configuration/discord) to get your own copy in
-Discord as well — local output is never replaced, only added to.
 
 ## Smaller files
 

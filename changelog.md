@@ -690,64 +690,297 @@ answer "is this one player or twelve?".
   back is the worst thing this feature can do to a player. Per-frame state is deliberately left out;
   at 10 Hz a sampler would bury everything else.
 
-#### Network activity in the admin panel
-- **Every server's Big Brother log now reaches the LACORE dashboard**, and staff read all of them in
-  one table: **Admin → Activity**. Bans, kicks, jails and warns with who-did-what-to-whom, anticheat
-  flags, connections, combat, chat, commands, vehicle spawns, MDT actions and profile changes —
-  filterable by category, severity, server, free text and time range, paged, with a Live toggle that
-  follows the newest page.
+#### Settings
 
-  The question this exists for is the one that used to need three browser tabs and an SSH session:
-  *who banned that player, on which server, and what happened in the ten minutes before it.*
+- **The settings menu is a real window now.** It was a NativeUI list: one category per submenu, one
+  setting per row, arrow keys to move, left/right to change a value, and no way to see what you had
+  set without walking through all seven submenus. It is now a proper NUI panel — categories down the
+  left, toggles as switches, short option lists as segmented buttons, longer ones as dropdowns, and a
+  **search box that spans every category**, because "where was the blip toggle again" is the question
+  the old menu answered worst. Each hit shows which category it came from. There is a reset-to-defaults
+  with a confirmation step, and changes save the moment you make them — the old menu did too, but
+  never said so.
 
-  > ⚠ **This is not opt-in.** It ships with the licence and has no switch, unlike the anticheat's
-  > dashboard reporting. What leaves a customer's server is written out in plain language at the
-  > bottom of `configs/cfg-bigbrother-sv.lua` and in the docs: category, severity, action, the detail
-  > text, player name and identifier, server id, coordinates and zone where present, a timestamp, the
-  > hostname and the licence key — and for the `chat` and `command` categories the detail text is the
-  > message itself. Server owners with their own privacy obligations need to disclose it.
+  Nothing moved underneath it. `settingsTemplate` in `client/core-cl.lua` is still the single place a
+  setting is declared, values still live behind `GetUserSettings`/`SetUserSettings` in the
+  `LACORE:SETTINGS` KVP in exactly the same shape, and `onChange` events still fire on every write. So
+  every reader in the resource is untouched, your saved settings carry over, and **adding a setting is
+  still one line in the template** — it now appears in the window with no UI work at all.
+
+  Two things the old menu could not do at all: the labels are translatable (a `lang/<code>.json` key
+  derived from the setting's name, falling back to the template's English), and a reset fires each
+  `onChange` **once, after** everything is written — the old path would have run `RefreshBlips` six
+  times against half-applied state.
+
+  This also removes the settings menu from NativeUI, which is the first step of retiring that library:
+  `CreateSettings` is gone from `client/menus-cl.lua`, and `client/settingsui-cl.lua` replaces it.
+
+#### Fingerprints
+
+- **The scanner never identified anybody.** `fingerprint-sv.lua` resolved the suspect's identifier
+  through a *global* `LicenseOf` — and there is no such global: every module that has one declares it
+  `local`. The call evaluated to nil, the profile lookup found nothing, and the device answered "no
+  match" for every scan since the feature shipped. It now uses a shared helper and actually reads the
+  records store, which is what everything below depends on.
+
+- **Prints are something you take.** A print match should mean "we have this person's prints", not
+  "this person exists in the database". Officers can now enrol a restrained suspect straight from the
+  device — the result screen says whether prints are on file and offers to take them if they are not.
+  The register persists to `data/fp_prints.json`.
+
+- **Latent prints, and a reason to have taken them.** `/liftprint [incident]` lifts a print off the
+  nearest vehicle. The lift is **anonymous**: the server knows who left it and will not say. Run it
+  from the device's new **Prints** tab and it comes back with a name only if that person has been
+  printed — otherwise "not in the register", and it stays open until they are. Book the suspect, take
+  their prints, run the print again: now it matches. That loop is the entire point of taking prints at
+  booking, and it is what the module was missing.
+
+  Who left a print is not guessed. The client reports the plate when a player gets into a vehicle, so
+  a latent resolves to "these people sat in this car recently" — capped per vehicle, aged out (a print
+  from three hours ago is not evidence), and the officer's own touch is excluded, so you cannot lift
+  your own print off the cruiser you just parked.
+
+- **A match becomes evidence, not a chat line.** It is filed on the identified person's record through
+  the same path the MDT's evidence button uses (`LogEvidenceRecord`, refactored out of the net event in
+  `characters-sv.lua` the way `CreateBoloRecord` was), so it lands in the file with a tag, a location,
+  the incident number and a chain of custody.
+
+  > ⚠️ **Config change (`configs/cfg-fingerprint-sh.lua`) — new `Register` and `Latents` blocks.**
+  > `Register.required` ships **false**: a scan still identifies from the records profile as before and
+  > only *reports* whether prints are on file. Turning it on retroactively would make the scanner
+  > useless on a server whose population has never been printed — that call is yours, not ours.
+
+#### Anticheat
+
+- **Every flag now says what the player was doing just before it.** A detection code tells you what
+  tripped, never what led there — and that is usually the whole question. `GOD_HEALTH · hp=300` reads
+  like a cheat until you see the same player was revived twice forty seconds earlier, at which point
+  it reads like a bug in a revive script. Each flag's Discord log now carries a short buffer of what
+  came before it:
+
+  ```
+  **Leading up to it**
+  -42s · duty · on duty as Fire/EMS / AMR
+  -38s · spawn · respawned / revived (immunity window granted)
+  -21s · vehicle · entered a vehicle (model 1171614426)
+  -12s · health · health 100 → 300
+  - 3s · flag · GOD_HEALTH → log (server hp=300)
+  ```
+
+  It records respawns and revives, duty changes, getting in and out of vehicles, weapon switches,
+  health jumps and earlier flags — including the ones that only logged, so a second detection arrives
+  with the first already in its story. The sampler writes **changes only**: a player standing still
+  produces an empty buffer rather than two hundred identical lines. `/lacore accontext <serverId>`
+  reads it for anyone online without waiting for them to trip something.
+
+  The buffer is bounded twice — 40 lines and 90 seconds by default, whichever runs out first — lives
+  in memory, and is dropped the moment the player disconnects.
+
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — new `Anticheat.Context` block.** It ships
+  > **on**, which is a deliberate exception to how new anticheat features arrive here: this one sends
+  > nothing anywhere. It attaches text to a Discord log you were already receiving, and it is
+  > explicitly **not** added to the dashboard report — that payload is documented line by line in the
+  > same config, and widening it silently would be the wrong way to add a feature. Set
+  > `Context.enabled = false` to switch it off.
   >
-  > What an owner still decides: the reporting rides on `BBLog()` rather than around it, so
-  > `BigBrother.enabled = false` or a category switched off in `BigBrother.categories` is never
-  > logged and therefore never sent. Collecting a category someone explicitly turned off locally
-  > would be a different thing from "the reporting has no off switch".
+  > The sampler half needs OneSync (server-side entity natives); without it the event-driven half
+  > still works and the module says so once at startup.
 
-  Transport is batched (`dashboard.batchSeconds`, default 30 s) and bounded (`dashboard.maxBatch`,
-  default 200 rows, oldest dropped first), so a full chat channel is not an HTTP storm and a server
-  that loses its uplink cannot grow the buffer without limit. Storage is capped per account and
-  trimmed oldest-first on every write — this is an operational feed with a short useful life, not an
-  archive, and one busy server must not fill the database on everyone else's behalf.
+#### Player list
 
-- **Fixed: paging in `pb.list` was silently dropped.** Callers were already passing `page`, but the
-  helper never forwarded it, so the loop behind **Admin → Players** re-fetched page 1 every round and
-  only looked correct because the union-find dedup collapsed the repeats.
+- **Players pick their own player list.** The three layouts were a server-wide setting, which is the
+  wrong place for a preference about how much of *your* screen a board covers. **Settings ▸ Player
+  Location Display ▸ Player List Style** now offers *Server default*, *Duty board*, *Minimal card* and
+  *Bar*. It ships on *Server default*, so nothing changes for anyone who does not touch it, and
+  `HudCfg.playerlistStyle` keeps doing exactly what it did — it is now the default rather than the
+  verdict. Adding it was one line in `settingsTemplate`, which is what the settings window was rebuilt
+  for.
 
-> **New PocketBase collection to import:** `landing/pocketbase/pocketbase-activity-collection.json`
-> (`lacore_activity`).
+  Option names in the settings window are translatable now as well (`setopt_<slug>`), because
+  "Server default" is a sentence rather than a proper noun like "Millennium" or "Satellite".
 
-#### CAD terminals
-- **A department picks its own CAD design now.** `agencies` in `config.lua` takes a `cad` field —
-  `"lapd"`, `"lasd"`, `"agency"`, `"ems"`, `"retro"` or `"penn"` — and that department opens that
-  terminal, full stop.
+- **A third layout: `"bar"`.** The duty board and the minimal card are both panels in the middle of
+  the screen — fine for a glance, in the way if you keep the list open. The bar is the other shape:
+  full screen width, three rows deep, pinned to the top edge, so it takes about a seventh of the
+  view instead of most of it. Same roster the minimal card shows, laid out column-first so each
+  column reads top to bottom, with the on-duty callsign in its status colour and the usual role,
+  ping and away shading. `duty` and `minimal` are untouched and `duty` is still the default.
 
-  Until now the terminal was guessed from the department *name*: a `short` containing "lasd",
-  "sheriff" or "bcso" got the Sheriff CAD, "90s" got the retro one, "lapd" got the Mobile Client, and
-  everything else fell through to the Agency MDT. That works for the shipped agencies and nowhere
-  else. An owner adding "Vespucci Sheriff's Office" got the Sheriff CAD by accident; one adding
-  "VSPD" who *wanted* it had no way to ask. It is also why the three sheriff's offices that ship in
-  the config — VCSO, RSO and SBCSD — opened the Agency MDT: their names say nothing about a terminal.
-  **They now ship with `cad = "lasd"`** and open the Sheriff CAD, which is what a sheriff's office
-  wants; delete the line to put one of them back on the Agency MDT.
+  ```lua
+  HudCfg.playerlistStyle = "bar"   -- "duty" (default) · "minimal" · "bar"
+  ```
 
-  The guess is unchanged and still runs, so every existing config routes exactly as it did — `cad` is
-  simply asked first. A terminal that is switched off in `cfg-features-sh.lua`, whose module is not
-  loaded, or which is a locked add-on is skipped and the guess applies instead: a department never
-  ends up with no terminal because of a setting somewhere else. A `cad` value that is not one of the
-  six is named once in the server console and then ignored, because a typo that behaves like "no
-  preference" reads as the setting doing nothing.
+  > ⚠️ **Config note (`configs/cfg-hud-sh.lua`)** — no new key, `playerlistStyle` simply accepts a
+  > third value. Nothing changes unless you set it.
 
-  All six terminals are re-skins of one system — same calls, same units, same incidents — so this is
-  purely which terminal a department sits in front of.
+- **Fixed while adding it: the duty board rendered on top of any style it did not recognise.** Its
+  visibility check read "not minimal" rather than "is duty" — correct while there were exactly two
+  styles, and wrong the moment there were three: the bar and the full board drew at the same time.
+  Both boards, and the NUI message handler, now name the style they mean, and anything unknown falls
+  back to the duty board on both sides.
+
+#### The menu library is gone
+
+- **Every menu in the resource is a NUI window now, and `client/nativelacoreui.lua` has been deleted
+  with them.** The last three followed the settings, vehicle, session and duty windows:
+
+  - **The AOP ballot** shows its own countdown next to the options. The old menu put the remaining
+    time in a text entry elsewhere on screen, so you could never see "what am I voting on" and "how
+    long do I have" at the same time. The vote itself is unchanged — one `SendAOPVote` per ticked area.
+  - **The phone booth** is a searchable directory grouped into services, departments on duty and
+    players, instead of one flat page that grew with the player count.
+  - **The prop spawner** filters by category *and* name in one list. Props are looked for by what
+    they are — "cone", "bollard" — not by remembering whose category they landed in. Its devmode
+    crosshair loop no longer runs at 0ms for the whole session; it idles at 500ms unless the spawner
+    is actually open.
+
+    > ⚠️ **It answers to `/propspawner` now, not `/prop`.** `modules/civilian/civilian-cl.lua`
+    > registers `/prop` as well and loads later, so FiveM had been keeping *its* registration — the
+    > scenery spawner was unreachable, and `/prop` opened the civilian prop radial instead. Renaming
+    > it is what makes the module usable at all; the radial keeps `/prop`.
+
+  With the last menu gone, so is the **per-frame menu pump**: `_menuPool:ProcessMenus()` ran on every
+  single frame for every player, all session, to service menus that were almost never open.
+
+- **A dead command was removed.** `modules/character-cl.lua` registered `/character`, but
+  `modules/mdt/mdt-civilian-cl.lua` registers the same command and loads later, so the older menu had
+  been unreachable — FiveM keeps the last registration. Nothing else in the resource referenced any of
+  its functions. The command still works; it opens the civilian sheet it has been opening all along.
+
+#### Session & duty
+
+- **`/jobmenu` finally opens a job menu.** It never did: `jobMenu` existed, but the entire body of its
+  builder was commented out, so the command quietly opened the *session* menu instead and the "Jobs"
+  page stayed empty. There is a real duty picker now — every agency from `configs/config.lua` as a
+  card with its short code, full name and branch, a search box, a callsign field, and one button. No
+  more remembering that the Highway Patrol answers to `CHP` and typing `/onduty CHP 8-ADAM-21` blind.
+
+- **It shows you which agencies you may actually take.** Agencies the `DutyAccess` gate would refuse
+  are greyed out and marked, instead of letting you pick one and be told no a second later. The list
+  comes from the **server** on open, because that gate lives in a server-only config the client cannot
+  read — and it is a preview, not the decision: `ondutyServer` re-checks every request, so a client
+  that lies to itself gains nothing.
+
+- **The session half is a window too.** Roleplay and personal session as two cards with the current one
+  marked, and the personal-session settings — map, time of day, AI population — inline instead of
+  three levels down a submenu. Time is now an hour you pick (00:00–23:00); the old list was indexed
+  from 1, so "1:00" was entry one and midnight sat at the bottom labelled "0:00".
+
+  Going on duty from the window calls the same `GoOnDuty` the `/onduty` command does — the membership
+  gate, the loadout and the server round-trip are one code path, not two that can drift.
+
+#### Vehicle spawner
+
+- **`/vehicle` is a searchable window instead of a submenu maze.** The old menu had two trees — "by
+  class" and "by manufacturer" — so finding a car meant knowing which branch it sat under, scrolling a
+  NativeUI list of every model the game ships, and having no way to search at all. It is one filtered
+  list now: type a name **or a model code**, narrow by class and manufacturer *together* (the two
+  trees could never be combined), and each card shows the display name, the make, the class and the
+  spawn code — the last of which is half the reason to open a spawner in the first place. The eight
+  cars you spawned most recently sit at the top, kept locally.
+
+- **It can be restricted now — and by default it still isn't.** `/vehicle` has always been open to
+  everyone: any player could put any vehicle in the game in front of themselves, with no check
+  anywhere in the command or the spawn path. `VehicleSpawner.permission` in
+  `configs/cfg-server-sv.lua` closes that when you want it closed. The client asks the **server**
+  before the window opens, because a client-side gate answers to the client; the window only builds
+  its catalogue once the server agrees, and the spawn callback refuses any model that is not in that
+  catalogue, so a player who never got the window has nothing to spawn from. Denials are logged to
+  your admin webhook.
+
+  ```lua
+  VehicleSpawner = { permission = "vehiclespawner" }   -- then in server.cfg:
+  -- add_ace group.admin lacore.vehiclespawner allow
+  ```
+
+  It goes through the same `HasPermission` helper as everything else, so `command.<perm>`,
+  `lacore.<perm>` and a bare `<perm>` all satisfy it, and devmode plus Staff/Dev pass regardless.
+
+  > ⚠️ **Config change (`configs/cfg-server-sv.lua`) — new `VehicleSpawner` block.** It ships **empty**
+  > (`permission = ""`), which means *everyone*, exactly as before. Turning this on silently would
+  > break servers that hand the spawner to their players on purpose.
+  >
+  > This gates the LACORE spawner, not the ability to create vehicles: a client that is already
+  > cheating never needed the menu. That remains the anticheat's entity sweep.
+
+- **It no longer costs every player a slower join.** The catalogue was built during startup: walk every
+  vehicle model in the game, three game-text lookups each, then create a NativeUI submenu and item per
+  entry — paid on every join by everyone, including the players who never type `/vehicle`. It is built
+  on first open now and cached for the session.
+
+#### Duty & permissions
+
+- **One department, one role, one portal — agencies can now be gated by Discord role or ACE.** LACORE
+  already asked for a Discord role before letting anyone go on duty as *Law Enforcement*; what it
+  never asked was *which agency*. So an officer with only the CHP role could still go on duty as LAPD
+  and get the LAPD terminal. `DutyAccess` in `configs/cfg-server-sv.lua` closes that: each agency
+  short code (`LAPD`, `LASD`, `CHP`, …) names what it requires. Because the agency is what `/mdt`
+  routes on, refusing the agency refuses the portal — there is no second gate to keep in sync, and no
+  way to reach a terminal you were not allowed to be a member of.
+
+  Either kind of permission works, and an agency may name both — holding **either one** is enough, so
+  you can move a department from one to the other without a flag day:
+
+  ```lua
+  agencies = {
+      LAPD = { role = "LAPD" },                          -- Discord role, nothing else to set up
+      LASD = { ace  = "lacore.duty.lasd" },              -- ACE object
+      CHP  = { role = "CHP", ace = "lacore.duty.chp" },  -- either one
+      NPS  = { role = { "NPS", "1285460493619953720" } },-- role key from DiscordAuth.roles, or a raw id
+  }
+  ```
+
+  `role` is a key from `DiscordAuth.roles` — the same table the duty whitelist already uses — or a raw
+  Discord role id, so a department role does not have to be registered first. `ace` suits a
+  vMenu-style server that already maps Discord roles to ACE groups: keep the `group.lapd` principals
+  you have and grant them the LACORE ace once in your `server.cfg`, `add_ace group.lapd
+  lacore.duty.lapd allow`. (ACE tests ace *objects*, not groups — that line is what connects the two.)
+
+  The check runs **server-side** in the duty event, so a client cannot talk its way past it, and it is
+  deliberately not waived by the ESX/QBCore bridge — on a server that gates agencies, the gate is the
+  last word. Agencies you do not list stay open unless you set `fallback = "deny"`, which flips it to
+  a strict allowlist. Staff and dev bypass by default (`bypassStaff`), and civilian `/job` names are
+  never touched, so a strict allowlist cannot lock a mechanic out of their own job. A role-only agency
+  on a server whose Discord auth is off or idle cannot be answered either way, so it falls back to
+  your `fallback` and says so in the console once — rather than silently refusing everyone for a
+  reason no one can see.
+
+  Two smaller things came with it, because the feature is unusable without them. `/dutyaccess` prints
+  the caller's agency access as a `+`/`-` list with what each one wants, which is the difference
+  between "my add_ace line has a typo" and "the gate is broken". And a refused duty request now
+  actually *un-does* itself on the client: `/onduty` applies the job and hands out the agency's
+  loadout the instant it is typed, long before the server has had its say, so until now a denied unit
+  kept the weapons and a UI that believed it was on duty. The client is put back to civilian and the
+  loadout that agency handed out is taken back — only those weapons, not everything the player is
+  carrying. That also repairs the older `DutyRoles` refusal, which had the same hole.
+
+  > ⚠️ **Config change (`configs/cfg-server-sv.lua`) — new `DutyAccess` block.** It ships **disabled**
+  > (`enabled = false`), so nothing changes until you turn it on. Existing configs are not rewritten:
+  > if your file predates this update it simply has no `DutyAccess` table, which reads the same as
+  > disabled.
+
+### Removed
+
+#### Loading screen
+
+- **LACORE no longer ships a loading screen.** The module, both designs, the `nui/loading` page, the
+  `cfg-loadingscreen-sh.lua` config, the `loadingscreen` feature toggle and the `loadscreen` entry in
+  the manifest are all gone. A loading screen is the one thing almost every server already has —
+  either a resource they picked deliberately or one that came with their template — and LACORE
+  claiming `loadscreen` meant theirs did not run until they found the toggle. Dropping it removes a
+  collision instead of a feature.
+
+  > ⚠️ **After updating**: if you were using it, install a loading-screen resource of your choice, or
+  > do nothing and the standard GTA screen runs. Nothing else changes; `Features.loadingscreen` is
+  > gone and a leftover entry in your config is simply ignored. Delete
+  > `configs/cfg-loadingscreen-sh.lua` if your install still has it.
+
+#### Dead code
+
+- **`modules/character-cl.lua`** — an old character creator whose `/character` registration had long
+  been overridden by `modules/mdt/mdt-civilian-cl.lua`. Unreachable, and nothing referenced its
+  functions.
+- **`client/nativelacoreui.lua`** — the menu library, now that no menu is left to build (see above).
 
 ### Fixed
 
@@ -801,7 +1034,47 @@ answer "is this one player or twelve?".
   > config, so an existing copy keeps the old `== "true"` behaviour until you take the new one. If you
   > only ever wrote `lacore_devmode "true"`, nothing changes for you and there is nothing to do.
 
+#### Area of Play
+
+- **An AOP vote that nobody answered took the HUD down with it.** When a vote closed with zero votes
+  the server picked `winningAOPs[1]` — nothing — and broadcast that as the new AOP. Clients set
+  `currentAOP = nil`, and the next `string.find` against it threw
+  `bad argument #1 to 'find' (string expected, got nil)`. That check lives in the thread that also
+  resolves the street address and feeds the player location display, so the error stopped all of it
+  until the player reconnected.
+
+  Three changes, so it cannot happen from either end:
+  - An unanswered vote **keeps the AOP it had** and says so once in the console, instead of clearing it.
+  - `updateAOP` ignores a blank AOP whatever sends it — the event is reachable by any resource.
+  - The AOP-covers-this-address check is nil-safe, and matches **plainly**: an AOP name containing a
+    dash or a bracket used to be read as a Lua pattern, which could throw or match the wrong place.
+
 #### CAD & MDT
+
+- **The Pennsylvania CAD could not be moved, and could open half off screen.** It had no drag handle
+  at all — it read its position from the MDT settings that the *other* terminals write, and there was
+  no way to change it from inside the window. Those settings are shared, and the terminals are not the
+  same size: a position that suits the Agency MDT can leave this one, which is far larger, hanging off
+  the edge with nothing left to grab. It now has a title bar you can drag (with full-screen and close
+  buttons on it), and two guards behind that:
+
+  - **Dragging is clamped on all four edges**, not just top and left as it was. A window can no longer
+    be pushed off the right or bottom and *saved* there — which is how the unreachable position got
+    written in the first place, from whichever terminal was dragged last.
+  - **A saved position is pulled back into view** when a terminal opens and when the game window is
+    resized, so at least 200px of it and its title bar are always reachable. That also fixes the case
+    where the position came from a different resolution.
+
+- **Looking someone up in the Agency (CHP) terminal returned a page you could barely read.** The
+  person record — name, physical description, licences, priors, every field value — is one component
+  shared by all the terminals, and it was written for the dark ones: its colours were hardcoded white
+  and pale blue. The Agency terminal deliberately prints results on a light "printout" sheet, so the
+  record arrived as white text on near-white paper. The same component picked up nothing at all from
+  the record styling in the shared stylesheet, which is scoped to the LAPD container and never reached
+  the Agency window, so the criminal-history entries lost their card backgrounds too. Its colours now
+  go through variables whose fallbacks are the original dark values — so the LAPD and LASD terminals
+  are pixel-for-pixel unchanged — and the two light hosts hand it a light palette instead. The
+  Pennsylvania CAD had the same defect on its results pane and is fixed by the same change.
 
 - **Clicking the in-car screen threw a script error instead of clicking.** The DUI handle and the
   size the cursor has to be scaled into came back from one call returning three values, read as
@@ -992,33 +1265,6 @@ answer "is this one player or twelve?".
   where a table needs reading end to end — and the 154 commands filter live by text, by category, and
   by whether they are ACE-gated, job-checked or a dev tool. Every row carries the file and line it
   was read from, so nothing here has to be taken on trust. Linked from the main nav as **Commands**.
-
-#### Documentation
-- **Every config file is in the docs now.** The config file map was missing eight of them entirely —
-  case files, personnel files, the supervisor panel, the Pennsylvania CAD, the in-car screen, the
-  model library, the replay tool and the bug-report form — which meant the only way to find those
-  settings was to open the Lua and read the header. Three new pages carry them: **CAD Terminals &
-  Routing** (which terminal a department gets, `cfg-mdt-sh`, `cfg-penn-sh`, `cfg-vehiclescreen-sh`),
-  **Records, Personnel & Supervisor**, and **HUD & Player List**. The rest were folded into the pages
-  they belong to.
-- **The settings that existed but were never written down.** The anti-cheat page grew a full
-  configuration reference — every detection with its side, default action and what it is actually
-  looking for, plus the trust score, whitelist, evidence capture and dashboard reporting. Thresholds
-  stay out of it on purpose: they live in the obfuscated params file precisely so they are not a
-  printed guide to staying under them. Discord & Duty gained the player-name limits and a table of
-  what each shipped role does — including that **LOA is a connect block**, not a badge, which is the
-  kind of thing that should never have to be discovered.
-- **The agency table is documented as the faction table it is**, with every field, the `type` values,
-  and the new `cad` field.
-
-#### Customer portal
-- **The customer dashboard has the admin dashboard's sidebar now.** Its sections used to sit in a
-  horizontal row inside the header while the admin area carried them in a vertical rail, so staff
-  flipping between the two views watched the navigation jump from the top of the screen to the left
-  of it. Both areas draw the same sidebar from the same component — the customer rail is captioned
-  `// ACCOUNT` instead of `// STAFF AREA`, and the staff-only parts (the ⌘K search, the per-section
-  counts, the BUILD block reporting bot and bridge health) stay where they were. On a narrow screen
-  both still collapse into the same header menu.
 
 > **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
 > (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short
