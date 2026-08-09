@@ -750,6 +750,40 @@ answer "is this one player or twelve?".
   > only *reports* whether prints are on file. Turning it on retroactively would make the scanner
   > useless on a server whose population has never been printed — that call is yours, not ours.
 
+#### Config Editor
+
+- **The editor now covers every config file that has options — 40 of them, up from 18.** It walked you
+  through branding, the world and the CAD and then stopped, which meant the half of LACORE added since
+  it was written had no coverage at all: records and evidence, fingerprints, the supervisor panel,
+  spawn selection, vehicles and the in-car screen, the civilian radial and turf, replay, radio
+  speech-to-text, the retro phone, the audit log, bug reports, and integrations with housing, txAdmin
+  and third-party dispatch. Twelve new steps, 96 new options, each with the same inline explanation of
+  what it actually does.
+
+- **Three defaults in it were wrong, and two options no longer existed.** Verified by generating every
+  line the editor can produce and running it against the real config files: `SyncGameTime` ships
+  `false` not `true`, the eyefind URL had moved, and the anti-cheat has been **on** by default since
+  it gained observe mode — the editor still showed all three the old way, which is worse than showing
+  nothing. The two dead ones were anti-cheat thresholds that moved into
+  `modules/anticheat/anticheat-params-sh.lua`; the editor would have written lines that do nothing.
+  Thresholds stay out on purpose now: that file is obfuscated by the escrow build precisely so the
+  resource does not ship a printed guide to evading its own detections.
+
+- **Five starting points.** The editor opened on a blank slate and asked 199 questions, which is the
+  right depth and the wrong first step. It now offers a template for the shapes of server LACORE
+  actually gets installed on — law-enforcement roleplay, an ESX/QBCore server, a vMenu/ACE-driven one,
+  a small community with no setup, and a large server where performance comes first. Each sets a
+  handful of answers and leaves the rest alone, so it is a head start rather than a different product;
+  picking a second one resets to defaults first, so two templates never stack.
+
+  The two settings added this release — the agency gate and the vehicle-spawner permission — are in
+  the editor too, which is what lets the vMenu template configure them in one click.
+
+- **Tri-state options generate real Lua.** Settings like `Integrations.txAdminBans` accept `"auto"`,
+  `true` or `false` — a string *and* two booleans. The editor quoted all three, so choosing "always"
+  wrote `= "true"`, which the config compares with `== true` and never matches: it silently behaved
+  like "auto". Those options now emit `true` and `false` unquoted.
+
 #### Anticheat
 
 - **Every flag now says what the player was doing just before it.** A detection code tells you what
@@ -801,10 +835,13 @@ answer "is this one player or twelve?".
 
 - **A third layout: `"bar"`.** The duty board and the minimal card are both panels in the middle of
   the screen — fine for a glance, in the way if you keep the list open. The bar is the other shape:
-  full screen width, three rows deep, pinned to the top edge, so it takes about a seventh of the
-  view instead of most of it. Same roster the minimal card shows, laid out column-first so each
-  column reads top to bottom, with the on-duty callsign in its status colour and the usual role,
-  ping and away shading. `duty` and `minimal` are untouched and `duty` is still the default.
+  two surfaces along the top edge, a few rows deep. On the left the roster as a card grid — server
+  ID, account name, and either the character name or the unit's department and callsign in its
+  status colour — laid out column-first so each column reads top to bottom, with the player's role
+  as a coloured underline. On the right a server panel: area of play and how long it has stood, the
+  access state, whether a 911 dispatcher is on, and LEO and Fire/EMS strength. Every value comes
+  from the payload the other two boards already read. `duty` and `minimal` are untouched and `duty`
+  is still the default.
 
   ```lua
   HudCfg.playerlistStyle = "bar"   -- "duty" (default) · "minimal" · "bar"

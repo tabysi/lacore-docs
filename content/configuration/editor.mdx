@@ -11,13 +11,31 @@ Not sure which value goes where? Walk through the LACORE settings step by step �
 inline — then **download the assembled config** and paste it into your files.
 
 <Callout type="info">
-  Covers the scalar/toggle options across every major config file (branding, world, call center,
-  features, access control, notifications, phone, framework bridge, CCTV, corrections, impound, K9, air
-  unit, profile, presence, global-ban, anti-cheat). Large **data lists** — the penal code, emote
+  Covers the scalar and toggle options in **every config file that has any** — 40 files, from branding
+  and the world clock through the CAD, records, fingerprints, spawns, the in-car screen, replay,
+  turf, the audit log and third-party integrations. Large **data lists** — the penal code, emote
   catalogue, camera positions, map blips — are edited directly in their files (see the per-file pages
-  from the [Configuration overview](/configuration)). The editor **never** asks for real secrets: the
-  `server.cfg` block it generates has placeholders you fill in locally.
+  from the [Configuration overview](/configuration)). Anti-cheat *thresholds* are deliberately absent:
+  they live in `modules/anticheat/anticheat-params-sh.lua`, which the escrow build obfuscates so the
+  resource does not ship a guide to evading its own checks. The editor **never** asks for real secrets:
+  the `server.cfg` block it generates has placeholders you fill in locally.
 </Callout>
+
+### Start from a template
+
+Five starting points sit above the wizard, for the shapes of server LACORE actually gets set up on:
+
+| Template | What it assumes |
+| --- | --- |
+| 🚓 **Law-enforcement roleplay** | The CAD is the point — civilian extras off, agency gate on, prints must be taken before they identify anyone. |
+| 🔗 **ESX / QBCore server** | Your framework owns identity, jobs and plates; LACORE's own whitelist and Discord duty roles step aside. |
+| 🔑 **vMenu / ACE-driven server** | Permissions already come from Discord roles mapped to ACE groups, so LACORE takes its answers from ACE — including agencies and the vehicle spawner. |
+| 🌱 **Small community, no setup** | Nothing to configure before people can play: no whitelist, no Discord requirement, no database. |
+| ⚡ **Large server, performance first** | Drops what costs the most per player — a browser per passenger seat, clip recording, speech recognition, turf war. |
+
+A template sets a handful of answers and leaves everything else on its default, so it is a head start
+rather than a different product — you can still walk every step and change any of them afterwards.
+Picking a second template resets to defaults first, so two templates never stack.
 
 <ConfigWizard />
 
