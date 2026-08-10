@@ -32,7 +32,16 @@ way LACORE MDT is the CAD layer for a FiveM server.
   command line, status strip, section rail and incident detail.
   **11-27** looks a person up (online *and* offline players), **10-28** runs a plate. Officers add
   notes to a record and flag someone **WANTED** — persisted, stamped with their callsign.
-- **BOLO board** and a **searchable penal code**, both shared live across every unit.
+- **Citations and arrests** — the penal code doubles as the booking form: tick the charges, then
+  file a citation (fine) or book an arrest (fine and sentence). Booking serves an open want. Every
+  filing persists on the person's record and comes back as their **priors** on the next 11-27.
+- **Jail** — an arrest is something the arrested player feels: they are sent to your cell and serve
+  the sentence, with a countdown banner telling them who booked them and for how long. Sentences
+  survive a rejoin. Bring your own prison instead and one API call hands the whole thing over.
+- **Discord logging** — arrests, citations, BOLOs and shift changes as embeds in the channels you
+  choose.
+- **BOLO board** shared live across every unit — and persisted, so a BOLO is still on the board
+  after a restart until it ages out.
 - **Browser dispatcher** — an optional dispatch console in your LACORE dashboard (see below).
 - **Roblox-native permissions** — departments gate on group ranks, with an admin bypass list.
 - **The LAPD Mobile Client look**, the same terminal design the FiveM core runs — delivered to
@@ -73,7 +82,8 @@ Four files, nothing else:
 | `LacoreShared/Departments` | your departments and which Roblox group ranks may join them |
 | `LacoreShared/Zones` | named areas of your map (an automatic grid postal works until you do) |
 | `LacoreShared/PenalCode` | the charges your officers can file |
-| `LacoreServer/ServerConfig` | license key + dashboard URL (browser dispatcher) |
+| `LacoreShared/Config` → `Jail` | sentence length, and the part your cell is named after |
+| `LacoreServer/ServerConfig` | license key + dashboard URL, Discord webhooks + proxy |
 
 </Steps>
 
@@ -108,6 +118,55 @@ game picks the order up on its next push.
   your FiveM servers with the same license status.
 </Callout>
 
+## Jail
+
+An arrest writes the record either way. What it *does* to the player is up to `LacoreShared/Config`
+under `Jail`:
+
+- Put a part named **`LacoreJailCell`** anywhere in your Workspace — that is where arrested players
+  land. Optionally a **`LacoreJailRelease`** part for where they walk out.
+- `MinutesPerMonth` converts the penal code's sentence into real time; `MinMinutes` / `MaxMinutes`
+  keep a 120-month murder charge from taking someone's evening.
+- `CellRadius` is how far an inmate may stray before they are put back.
+
+If the cell part does not exist, the arrest still files and nobody is teleported — a missing build
+never swallows an officer's paperwork. Set `Enabled = false` and an arrest is purely a record.
+
+Already have a prison? Hand jail over completely:
+
+```lua
+LacoreApi.setJailHandler(function(userId, minutes, months, byCallsign)
+    MyPrison:lockUp(userId, minutes)
+end)
+```
+
+The kit then stops teleporting, timing and storing sentences — every booking calls your function, and
+releasing is yours.
+
+## Discord logging
+
+Put a webhook URL into `LacoreServer/ServerConfig` under `DiscordWebhooks` — per category
+(`arrest`, `citation`, `bolo`, `duty`) or one `default` for all of them. Anything left empty simply
+does not log.
+
+<Callout type="warning">
+  **Discord refuses requests from Roblox's servers.** A webhook posted straight to `discord.com`
+  returns 403 in a published game — but works in Studio, because Studio sends from your own
+  connection. Testing alone will not show you this. Something has to forward.
+</Callout>
+
+**If you already set `RelayUrl` and `LicenseKey`, you are done** — your dashboard forwards for you,
+and there is nothing else to sign up for. The webhook only ever travels server to server, LACORE
+rebuilds the embed rather than passing your payload through, and only real Discord webhook URLs are
+accepted.
+
+Running without the uplink? Set `DiscordProxy` to a forwarding host (the public
+[WebhookProxy](https://webhook.lewisakura.moe/) at `webhook.lewisakura.moe`, or your own) and LACORE
+swaps the host in — paste the webhook URLs exactly as Discord gave them either way.
+
+The startup line tells you which path is live: `Discord logging: via LACORE relay`, `via <proxy>`,
+`direct` (the one that breaks on publish) or `off`.
+
 ## Game integration
 
 Roblox has no built-in vehicle registry, so the plate lookup reads what *your* game tells it. Register
@@ -119,8 +178,22 @@ local LacoreApi = require(game.ServerScriptService.LACORE.LacoreServer.Api)
 LacoreApi.registerVehiclePlate("4ABC123", "John Doe", player.UserId)
 ```
 
-`10-28` on that plate now returns the registered owner. The API surface is deliberately small and
-stable — see the [Developer API](/developer-api) page for the philosophy it follows.
+`10-28` on that plate now returns the registered owner.
+
+Reading back what the terminal decided works the same way — a jail script wants the sentence an
+officer just handed down, an economy script wants the fine:
+
+```lua
+local record = LacoreApi.getRecord(player.UserId)
+
+for _, filing in record.filings do
+    -- filing.kind is "CITATION" or "ARREST"
+    print(filing.kind, filing.fine, filing.months, filing.by)
+end
+```
+
+The API surface is deliberately small and stable — see the [Developer API](/developer-api) page for
+the philosophy it follows.
 
 ## What it does not do
 
@@ -128,8 +201,10 @@ Being straight about the edges, because a CAD that promises the world helps nobo
 
 - **No voice and no radio.** Roblox voice routing is not part of the kit.
 - **No vehicles, map or characters** — that is your game. The kit is the CAD layer on top.
-- **No citations or arrest workflow yet** — records take notes and a WANTED flag today.
 - **Calls are visible to every on-duty unit**; per-agency routing (LEO vs. Fire/EMS) is planned.
+- **No live sync between server instances.** Each instance runs its own roster and call board;
+  BOLOs are merged when they are saved, so nothing is lost, but a BOLO posted next door shows up
+  when that instance restarts, not a second later.
 - **Roblox has no escrow.** Anything you buy on the platform ships as readable source — that is true
   of every Roblox kit, ours included. The kit is licensed per customer, and the dashboard,
   dispatcher, terminal look and updates are what the licence keeps you connected to.
