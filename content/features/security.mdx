@@ -36,22 +36,46 @@ The connect flow validates bans safely (guarded against malformed entries and DB
 record can never leave a player stuck on "Checking bans..."). Bans record who issued them, when, and
 the reason.
 
-## Big Brother (admin logging)
+## Staff panel (`/admin`)
 
-`/bblog` opens an admin log feed. Actions across the core are logged via
-`BBLog(category, src, action, detail, opts)` and can be mirrored to Discord webhooks
-(`lacore_bb_webhook*`). Categories include commands, profile changes, moderation actions and more.
+One window with three views on a rail — **1 Players · 2 Log · 3 Self** — and a selected player in
+the aside that all three share. `/bblog` opens the same window on its log view.
 
-## Admin menu
+### Access tiers
 
-`/admin` opens the staff panel. Player actions are **server-authoritative** (the client only
-requests; the server validates the caller's permission and performs the action):
+The panel shows what you may do rather than failing at the click. Tiers are derived from what you
+already run — there is no new permission system:
 
-| Tab | Actions |
-| --- | --- |
-| **Players** | Kick, ban, revive, heal, freeze, goto, bring, spectate. |
-| **Self** | Noclip, godmode, invisible, heal, repair vehicle, spawn vehicle. |
-| **World** | Weather, time. |
+| Tier | Who | May |
+| --- | --- | --- |
+| **Lead Dev** | the `dev` flag, or devmode | everything |
+| **Admin** | the `staff` flag, or ACE `ban` | everything, including jail and ban |
+| **Moderator** | ACE `kick` | the soft actions and kick, with a reason |
+
+The tier is advisory: **every action re-checks on the server**, because a client can send any event
+it likes. Kick, jail and ban additionally require a reason and a confirmation, and the reason is what
+the log line and the Discord embed carry.
+
+### Players
+
+Search by name, character, id or department, filter by On duty / Civilian / Flagged, and see the
+callsign, ping and the anticheat trust score per row. Selecting a player fills the aside: goto, bring,
+spectate, freeze, unfreeze, revive, heal, mark on map — then kick, jail (via corrections) or ban.
+
+### Activity log (Big Brother)
+
+Everything `BBLog(category, src, action, detail, opts)` records: filter by category, player or free
+text, page through it, or switch the feed **live**. Clicking a row opens that player's **dossier** —
+their 30 days of activity with a per-category breakdown. Logs are written to `lacore_logs` and can be
+mirrored to Discord webhooks (`lacore_bb_webhook*`).
+
+> **Without a database** the log falls back to the memory buffer, and says so in the panel: searching,
+> paging and dossiers are unavailable, while actions still write to the buffer and to Discord.
+
+### Self tools
+
+Noclip, god mode, invisible, heal self, repair vehicle and overhead server ids. All client-side, none
+of it logged — it never leaves your own game.
 
 Noclip and spectate clean up correctly on resource stop, so a restart mid-action can't leave a player
 ghosted or stuck in spectator mode.

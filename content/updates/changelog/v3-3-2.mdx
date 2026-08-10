@@ -1170,6 +1170,42 @@ where it detects and scores but never punishes.
 
 ### Changed
 
+#### The staff panel — the admin menu and Big Brother in one window
+- **`/admin` opens one console instead of two windows.** They were always two halves of one job: the
+  admin menu wrote exactly the lines the log showed, and the way from "this player looks wrong" to
+  "what has he been doing" ran through closing one window and typing another command. Built to the
+  "Staff Panel" design: a rail with three views — **1 Players · 2 Log · 3 Self** — and one selected
+  player in the aside that all three share. `/bblog` opens the same window on its log view.
+- **Access tiers, so the panel shows what you may do.** Lead Dev (the dev flag or devmode), Admin (the
+  staff flag or ACE `ban`) and Moderator (ACE `kick`), derived from what LACORE already has rather
+  than a new permission system. A moderator sees Jail and Ban greyed out with the reason on the badge
+  instead of finding out by clicking.
+  > The tier is **advisory**: every action re-checks on its own server handler, because a client can
+  > send any event it likes. Ban and jail now carry that check too, on top of the permission.
+- **The player list is worth opening on its own.** Search by name, character, id or department, filter
+  by on-duty / civilian / flagged, and read the callsign, the ping and the anticheat **trust score**
+  per row. The old list had four columns and no search at all, which is fine at eight players and
+  useless at eighty.
+- **The log pages properly.** `bb:Query` answers with a total next to the rows, so "page 4 of 7" is a
+  real statement instead of "the last 250 lines". The live feed only prepends while you are on page
+  one — a stream that moves rows out from under a reader is not a feature.
+- **Kick, jail and ban need a reason and a confirmation.** The reason is not decoration: it is what the
+  log line and the Discord embed carry. Jail goes through the corrections module rather than a second
+  sentencing path, so a sentence from the panel looks exactly like one handed down in game.
+- **One gate instead of two.** The admin menu checked the staff flag and ACE; Big Brother checked
+  Discord role names — so a moderator could hold one and not the other. Whoever may open the panel may
+  read the log in it; the role list stays as the second route for servers that grant log access
+  without the panel.
+- **No database is a state, not an empty table.** Without oxmysql the log says so, names what is gone
+  (search, paging, dossiers) and what still works (actions, the buffer, Discord), and offers the lines
+  still in memory.
+- Two smaller things came with it: **Mark on map** puts the target on the admin's waypoint, read from
+  the target's own ped server-side, and **Overhead ids** draws server ids above nearby players — a self
+  tool, so it is client-side and never logged.
+  > **Removed with it:** `AdminMenu.svelte` and `BigBrother.svelte`. Two things the old log panel had
+  > are deliberately not carried over: the **map view** (the dispatch console already draws that map)
+  > and **teleport to a log coordinate**.
+
 #### The player menu, rebuilt from the design
 - **`/profile` is a different screen.** Built to the "Player Menu Final" draft: a sharp-edged
   1240×820 panel, character tabs across the top, a rail of eight sections down the left with a count
