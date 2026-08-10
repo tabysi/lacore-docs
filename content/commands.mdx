@@ -51,7 +51,7 @@ Bind these yourself in *FiveM Settings ▸ Key Bindings ▸ FiveM*:
 
 | Binding | Action |
 |---------|--------|
-| LACORE: Open settings menu | Open the settings menu |
+| LACORE: Open settings menu | Open your profile on its Settings tab |
 | Change Firing Mode | Toggle your weapon's firing mode |
 | Open/Close Front Driver Door | `door 1` |
 | Open/Close Front Passenger Door | `door 2` |
@@ -73,10 +73,10 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 |---------|-----|--------------|
 | `/char [name]` | Everyone | Open your character data sheet. **Saving sets your RP name** and joins you to the session. Supports unlimited presets. |
 | `/character` | Everyone | Alias of `/char`. |
-| `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config). |
+| `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config, **settings**). |
 | `/vreg` | Everyone | Register the vehicle you're currently driving (plate, make, model, colour, owner…). |
 | `/phone` | Everyone | Open / close the LACORE phone (default key **F1**). |
-| `/settings` | Everyone | Open the settings menu. **The name is configurable** — see the note below. |
+| `/settings` | Everyone | Open your **profile on its Settings tab** — the settings live there, not in a window of their own. On an already-open profile it switches to that tab. **The name is configurable** — see the note below. |
 | `/vehicle` | Everyone* | Toggle the vehicle spawner — search by name or model code, filter by class and manufacturer. **\*Restrictable** via `VehicleSpawner.permission` (see below); open to everyone by default. |
 | `/session` | Everyone | Session window — switch between the roleplay session and a personal one, and set that session's map, time and AI population. |
 | `/playerlist` | Everyone | Toggle the player list (default **I**). |
@@ -103,8 +103,8 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 <Callout type="info">
   **`/settings` is renameable.** HUD resources commonly own `/settings` too, and two resources can't
   share a command — so ours would silently shadow theirs. Set `HudCfg.settingsCommand` to another
-  name, or to `''` to drop the command entirely. The window stays reachable either way via the
-  "LACORE: Open settings menu" keybind.
+  name, or to `''` to drop the command entirely. The settings stay reachable either way — via the
+  "LACORE: Open settings menu" keybind, or simply through `/profile` ▸ Settings.
 </Callout>
 
 <Callout type="info">

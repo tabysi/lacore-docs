@@ -37,13 +37,14 @@ where it detects and scores but never punishes.
   doing in the ninety seconds before it.
 - **The menu library is gone** — settings, the job/duty picker, the session menu, the vehicle spawner,
   the AOP ballot, the phone booth and the prop spawner are NUI windows now. `/jobmenu` opens a job
-  menu for the first time, and the settings window has a search box across every category.
+  menu for the first time, and the settings moved onto your profile's Settings tab, with a search box
+  across every category.
 - **Agencies can be gated** — `DutyAccess` asks for a Discord role or an ACE per department, and since
   the agency is what `/mdt` routes on, refusing the agency refuses the terminal.
 - **txAdmin bans land in LACORE's list** — found automatically at every boot and mirrored live from
   then on, so the two lists stop disagreeing by an order of magnitude.
 - **The player list is a duty board** — units on the left grouped by department, with availability per
-  agency; civilians on the right. Three styles, and **players pick their own** in the settings window.
+  agency; civilians on the right. Three styles, and **players pick their own** in their settings.
 - **`/lacorereport`** — a bug report from in game, straight to the LACORE dashboard (and onto your own
   dashboard as well, if you are licensed).
 - **The config editor covers all 40 config files**, up from 18, with five starting templates.
@@ -592,20 +593,29 @@ where it detects and scores but never punishes.
 
 #### Settings
 
-- **The settings menu is a real window now.** It was a NativeUI list: one category per submenu, one
+- **The settings moved into your profile.** They were a NativeUI list: one category per submenu, one
   setting per row, arrow keys to move, left/right to change a value, and no way to see what you had
-  set without walking through all seven submenus. It is now a proper NUI panel — categories down the
-  left, toggles as switches, short option lists as segmented buttons, longer ones as dropdowns, and a
-  **search box that spans every category**, because "where was the blip toggle again" is the question
-  the old menu answered worst. Each hit shows which category it came from. There is a reset-to-defaults
-  with a confirmation step, and changes save the moment you make them — the old menu did too, but
-  never said so.
+  set without walking through all seven submenus. They are now a panel on the **Settings tab of
+  `/profile`** — categories down the left, toggles as switches, short option lists as segmented
+  buttons, longer ones as dropdowns, and a **search box that spans every category**, because "where
+  was the blip toggle again" is the question the old menu answered worst. Each hit shows which
+  category it came from. There is a reset-to-defaults with a confirmation step, and changes save the
+  moment you make them — the old menu did too, but never said so.
+
+  **`/settings` and the settings keybind now open the profile there**, rather than a window of their
+  own. A player has exactly one place for their own things — playtime, characters, vehicles, records,
+  the emote radial — and settings were the one part of that list which opened somewhere else. That
+  tab previously held nothing but a read-only licence table; the licences stay, with the settings
+  above them. On an already-open profile `/settings` **switches to that tab** instead of closing the
+  window, because typing it while looking at your characters means "take me to settings".
 
   Nothing moved underneath it. `settingsTemplate` in `client/core-cl.lua` is still the single place a
   setting is declared, values still live behind `GetUserSettings`/`SetUserSettings` in the
   `LACORE:SETTINGS` KVP in exactly the same shape, and `onChange` events still fire on every write. So
   every reader in the resource is untouched, your saved settings carry over, and **adding a setting is
-  still one line in the template** — it now appears in the window with no UI work at all.
+  still one line in the template** — it now appears in the profile with no UI work at all. The
+  template and the current values travel with every profile payload, so the tab has its data however
+  the profile was opened.
 
   Two things the old menu could not do at all: the labels are translatable (a `lang/<code>.json` key
   derived from the setting's name, falling back to the template's English), and a reset fires each
@@ -613,7 +623,8 @@ where it detects and scores but never punishes.
   times against half-applied state.
 
   This also removes the settings menu from NativeUI, which is the first step of retiring that library:
-  `CreateSettings` is gone from `client/menus-cl.lua`, and `client/settingsui-cl.lua` replaces it.
+  `CreateSettings` is gone from `client/menus-cl.lua`, and `client/settingsui-cl.lua` replaces it —
+  now as the data half only, handing the profile the template and validating what it writes back.
 
 #### Vehicle spawner
 
@@ -747,10 +758,10 @@ where it detects and scores but never punishes.
   Location Display ▸ Player List Style** now offers *Server default*, *Duty board*, *Minimal card* and
   *Bar*. It ships on *Server default*, so nothing changes for anyone who does not touch it, and
   `HudCfg.playerlistStyle` keeps doing exactly what it did — it is now the default rather than the
-  verdict. Adding it was one line in `settingsTemplate`, which is what the settings window was rebuilt
+  verdict. Adding it was one line in `settingsTemplate`, which is what the settings panel was rebuilt
   for.
 
-  Option names in the settings window are translatable now as well (`setopt_<slug>`), because
+  Option names in the settings panel are translatable now as well (`setopt_<slug>`), because
   "Server default" is a sentence rather than a proper noun like "Millennium" or "Satellite".
 
 - **A third layout: `"bar"`.** The duty board and the minimal card are both panels in the middle of
@@ -1158,6 +1169,41 @@ where it detects and scores but never punishes.
   a low error tone.
 
 ### Changed
+
+#### The player menu, rebuilt from the design
+- **`/profile` is a different screen.** Built to the "Player Menu Final" draft: a sharp-edged
+  1240×820 panel, character tabs across the top, a rail of eight sections down the left with a count
+  on each, and one dense grid per section instead of cards floating on a dark sheet. Two border
+  weights carry the whole layout — 2px where the structure changes, a hairline between rows — and
+  every label that is not a sentence is set in mono. Nothing underneath moved: the same store fields,
+  the same actions, the same NUI callbacks.
+- **The character tabs switch what you are looking at.** Vehicles, records, relationships, licences
+  and the overview stats all follow the tab, so you can read a character you are not currently
+  playing — which the old menu could not do at all.
+  > **Reading is not writing.** Every write in this area is server-side scoped to the *active*
+  > character (`characters-sv.lua` resolves through `GetActiveChar`), so the panel offers the new
+  > entry, edit and delete controls only while you are looking at the active one, and says
+  > **"Activate to edit"** where it does not. Showing the buttons and having them write to a
+  > different character would have been the worst of the three options.
+- **Achievements got their own section**, with the secrets grid under them; the overview keeps a
+  two-column preview and an **ALL →** link. Progress reads as a percentage per row, and a done row
+  says so instead of showing a full bar.
+- **Recent activity is real or absent.** The design shows a feed; LACORE keeps no activity log, so
+  the panel builds one from the things that actually carry a timestamp — achievement and secret
+  unlocks, record entries, vehicle registrations — newest six. An account with nothing dated gets
+  the empty state rather than invented rows.
+- **Creating a character is a modal now**, as drawn. It keeps the fields the design's mock does not
+  show — physical description, warrant, notes — because dropping them would have removed working
+  features to match a picture.
+  > **The design's fonts ship with the resource.** Archivo and IBM Plex Mono are bundled as woff2
+  > (156 KB across eight subset files) rather than fetched from Google: a FiveM client has no
+  > guaranteed internet, a blocked request would swap the metric mid-session, and a remote font is a
+  > third party watching every player who opens a menu. Archivo is the variable cut, so one file
+  > covers the six weights the design uses. Both are OFL 1.1, which is what makes shipping them legal.
+  >
+  > Google publishes no Cyrillic cut of Archivo, so on a Russian client Cyrillic text falls back per
+  > glyph to the UI stack while the numerals, codes and callsigns stay in Archivo. IBM Plex Mono
+  > carries its Cyrillic, because the small mono labels are translated.
 
 #### LAPD MDT — the Mobile Client, redrawn as the terminal it plays
 - **A complete visual redesign of the LACORE Mobile Client**, taken 1:1 from the new design draft:
