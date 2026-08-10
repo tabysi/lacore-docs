@@ -143,7 +143,7 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 | `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → LACORE Mobile Client, other LE → Agency MDT, LASD/Sheriff/BCSO → LASD CAD, Fire/EMS → EMS CAD. |
 | `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
 | `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
-| `/penncad` | LEO | Always opens the Pennsylvania CAD. |
+| `/penncad` | LEO | Always opens the [Pennsylvania CAD](/user-guide/pennsylvania-cad) — a paid add-on, unlocked by licence key. |
 | `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
 | `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |
 | `/dispatch [on\|off\|open]` | LEO / Dispatcher | `on`/`off` = dispatcher duty; no arg or `open` = open the dispatch console. |
@@ -311,6 +311,28 @@ resource can switch ours off and avoid every line being posted twice.
 
 Emotes are provided by DPEmotes / RPEmotes (`/e <name>`, `/emotemenu`) — LACORE's civilian radial
 bridges to whichever is installed. See [Civilian Layer](/features/civilian).
+
+## 🎬 Replay & Director's Cut
+
+Content-creation tools — recording and playback are local to whoever runs them. Gated by
+`Features.replay` and `Replay.enabled`; the command name is `Replay.command`.
+
+| Command | What it does |
+|---------|--------------|
+| `/replay` | Open the Director's Cut window on the clip library. |
+| `/replay start` | Start a take. |
+| `/replay stop` | End the take and keep the buffer. |
+| `/replay save [name]` | Store the buffer as a clip. |
+| `/replay discard` | Throw the buffer away. |
+| `/replay list` | List your clips. |
+| `/replay play <id>` | Play a clip (BACKSPACE stops it). |
+| `/replay cancel` | Stop the running playback. |
+| `/replay delete <id>` | Delete a clip. |
+| `/replay debug` 🧪 | Verbose logging — client half immediately, server half needs admin permission. |
+| `/replay help` | Print the list above in chat. |
+
+The keybind **"Replay: start / stop recording"** ships **unbound** — bind it in
+*FiveM Settings ▸ Key Bindings*. See [Replay & Director's Cut](/user-guide/replay).
 
 ## 🧍‍♂️ Civilian layer
 

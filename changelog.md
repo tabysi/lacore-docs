@@ -3,364 +3,53 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.3.2] – Anticheat you can actually review
+## [3.3.2] – Pennsylvania CAD, a replay studio & an anticheat you can review
 
-The anticheat has always had the hard part right — server-authoritative checks, a trust score that
-lets one-off blips fade, whitelisting so admins don't catch themselves. What it did not have was a
-place to *look at* the result. Flags went to a Discord channel, and a channel is a bad place to
-answer "is this one player or twelve?".
+The biggest release LACORE has had. A **sixth terminal** (the Pennsylvania CAD), a **replay and
+Director's Cut** suite for building trailers, the **in-car dashboard screen** grown into a terminal
+you can actually read and click — with one per seat — and the **LAPD Mobile Client redrawn** as the
+in-car terminal it always played.
+
+Underneath that, the parts of LACORE that were showing their age got rebuilt: the **NativeUI menu
+library is gone**, and with it the per-frame menu pump — settings, jobs, session and the vehicle
+spawner are proper windows now. Agencies can be **gated per department** by Discord role or ACE,
+txAdmin's bans finally **land in LACORE's list**, and the **anticheat** got the one thing it was
+missing: a place to look at the result. It ships **on** for the first time, in a new **observe mode**
+where it detects and scores but never punishes.
+
+### Highlights
+
+- **Pennsylvania CAD** — a sixth terminal in the style of a nineties county CAD. A re-skin, not a
+  second dispatch system: same units, same calls, same server. A paid add-on, unlocked by licence key.
+- **Replay & Director's Cut** — record what happens around you, rebuild the scene out of ghosts and
+  cut it with a real camera: four modes, keyframes, a shot list, letterbox, grain, grades and depth
+  of field. Made for trailers, deliberately not an admin tool.
+- **The in-car CAD screen became usable** — legible at last (the terminal is zoomed into its texture
+  rather than shrunk into it), it no longer glows like a lamp, `/cad` leans the camera in and hands
+  you the mouse, `/cad adjust` aims it per vehicle model, and **every seat gets its own terminal**
+  with a shared pointer between partners.
+- **The LAPD Mobile Client, redrawn** — green phosphor on navy, the ribbon down to exactly its nine
+  buttons, records glowing in the rail. Same wiring underneath; only the visuals changed.
+- **An anticheat you can review** — a dashboard page with repeat offenders and false-positive marking,
+  an **observe mode** (and therefore ON by default), a trust score that survives a reconnect, a
+  challenged heartbeat, three new server-side detections, and every flag carrying what the player was
+  doing in the ninety seconds before it.
+- **The menu library is gone** — settings, the job/duty picker, the session menu, the vehicle spawner,
+  the AOP ballot, the phone booth and the prop spawner are NUI windows now. `/jobmenu` opens a job
+  menu for the first time, and the settings window has a search box across every category.
+- **Agencies can be gated** — `DutyAccess` asks for a Discord role or an ACE per department, and since
+  the agency is what `/mdt` routes on, refusing the agency refuses the terminal.
+- **txAdmin bans land in LACORE's list** — found automatically at every boot and mirrored live from
+  then on, so the two lists stop disagreeing by an order of magnitude.
+- **The player list is a duty board** — units on the left grouped by department, with availability per
+  agency; civilians on the right. Three styles, and **players pick their own** in the settings window.
+- **`/lacorereport`** — a bug report from in game, straight to the LACORE dashboard (and onto your own
+  dashboard as well, if you are licensed).
+- **The config editor covers all 40 config files**, up from 18, with five starting templates.
+- **Fingerprints work at all now** — enrol a suspect at booking, lift a latent off a vehicle with
+  `/liftprint`, and a match is filed as evidence rather than printed in chat.
 
 ### Added
-
-#### Anticheat
-- **An Anticheat page in your dashboard.** Every flag as a filterable table: what tripped, what the
-  system did about it, the player's running trust score, and which server it came from. Above it, a
-  **repeat-offenders** panel — because one player with six flags is a case, while six players with one
-  flag each means a threshold wants tuning. Whitelisted hits are shown too, greyed out and labelled:
-  an admin who keeps tripping the aimbot heuristic is the clearest tuning signal there is.
-  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — new `Anticheat.Report` block.** It ships
-  > **disabled**, and deliberately: a flag is an accusation about a named player, so turning this on
-  > sends the detection, the action taken and that player's identifiers out of your server to your
-  > dashboard account. It never *moves* anything — your own database and Discord webhook keep
-  > receiving everything exactly as before, this is strictly an additional copy. Needs an active
-  > licence key, which is what attributes flags to your account.
-  >
-  > Reporting is batched (one upload per interval, so a flag storm is one request), bounded (the
-  > queue drops its oldest entries rather than growing without limit if the uplink is down) and
-  > fire-and-forget — it can never slow down or block a punishment.
-- **Flags carry the trust score.** `AC.trustOf(src)` exposes the running total, so a reviewer can tell
-  a single blip from a player who has been at it all evening without reading the whole log.
-
-- **An observe mode — and the anticheat is now ON by default because of it.** Everything detects, logs
-  and scores; nothing is kicked or banned, and every log line says what it *would* have done. This
-  existed as a gap, not a feature request: the anticheat had exactly two states, off or live, so
-  tuning it meant going live and risking a wrong ban on your own players. Almost nobody did, and an
-  anticheat that is off protects nobody however good it is. Run observe for a week, watch what your
-  own admins and your busiest firefights trip, then set `Mode = "enforce"`.
-  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — `Enabled` now ships `true`, with the new
-  > `Mode = "observe"`.** On update your server starts *detecting* where it did not before, so
-  > expect anticheat lines in your Discord admin log. Nobody is kicked or banned until you switch to
-  > enforce. To go back to silence, set `Enabled = false` — one line, exactly as before.
-- **The trust score survives a reconnect.** It was kept per session and wiped on disconnect, which
-  quietly defeated the escalation design it exists for: the config promises that "only a persistent
-  offender racks up points", but a player who stopped at 7 and rejoined came back at 0 — reconnecting
-  was a full reset, and the one mechanic meant to catch repeat offenders was the easiest to sidestep.
-  Scores are now kept per identifier and decay across the gap exactly as they do during clean play,
-  so someone who earned a few points and stayed away a day still returns clean on their own. Entries
-  that decay to nothing are pruned, so the store does not grow for every player ever seen.
-- **A resource guard.** Stopping LACORE takes the whole anticheat down with it. That is also a
-  perfectly ordinary thing for an owner to do, so this logs and never punishes — but if the resource
-  goes down at 3am with forty players connected and nobody scheduled it, there is now a line saying so.
-- **Observe and whitelist states are visible in the dashboard.** A flag that was decided but not
-  carried out shows the action it *would* have taken next to an `observed` tag, with the row muted and
-  the detail sheet reading "Action decided" rather than "Action taken". Showing `BAN` for a player who
-  was never banned would have been worse than showing nothing.
-
-- **The heartbeat is now proof rather than a formality.** It carried no payload: kill the anticheat
-  thread, start your own loop firing the same bare event, and the server saw a healthy client forever —
-  so the one check meant to catch a disabled client was the easiest thing on the list to defeat. Each
-  beat now answers a fresh challenge, and a wrong or missing answer is its own detection. Reusing the
-  digest the anti-dump handshake already had, so this adds a check rather than a mechanism.
-  > The ceiling is honest and unchanged: someone who has already dumped the client can reimplement the
-  > digest. What stands in their way is the salt being *yours*, which is why the server nags while it
-  > is still the shipped default.
-- **Evidence arrives with the story around it.** A screenshot on its own rarely proves anything. Each
-  one now carries position, health and armour, whether the player was in a vehicle, the trust score,
-  and the last five flags with how long ago each fired — gathered when the picture comes back, so it
-  describes that moment rather than the moment it was requested.
-- **You can tell the anticheat it was wrong.** Any flag in the dashboard can be marked a false positive,
-  and the page turns those marks into the number that matters: the share of each detection you have
-  called wrong. One mislabelled row is noise; `SPEED_HACK` sitting at 40% is a threshold to raise — and
-  there was no way to say that before. Marking is reversible and only ever affects your own account's rows.
-- **Three new server-authoritative detections.** All of them run on the server, so a patched-out client
-  anticheat does not hide them, and all three default to feeding the trust score rather than acting —
-  a new detection is exactly where a false positive is most likely, and observe mode means you will see
-  them before they can do anything anyway.
-  - **On-foot speed, measured server-side.** There was a hole here: the only speed check was the
-    client's, and the server sweep's teleport check needs 700 m in one sample. Anything between a brisk
-    jog and that threshold — up to about 140 m/s — crossed the map unremarked once the client check was
-    gone. The sweep now derives speed from position samples it was already taking, so it needs no new
-    data, and requires two consecutive implausible samples so a player who drives briefly inside one
-    interval cannot be flagged for it.
-  - **Explosions attributed to someone who is nowhere near them.** Catches both blaming another player
-    and scripts detonating at map coordinates. The distance is set far beyond any real throw or launcher
-    flight, so ordinary combat cannot reach it.
-  - **Blacklisted vehicles caught while being driven, not only when spawned.** The existing check fires
-    on entity creation, which misses a vehicle that predates the resource start or arrived by a route
-    that raised no event. The sweep simply asks whether you are sitting in one.
-- **The platform hardening is now checked, not just recommended.** The config has suggested four
-  server.cfg convars for a long time and only ever verified one of them. At boot the server now names
-  which of `sv_scriptHookAllowed`, `sv_pureLevel`, `sv_enforceGameBuild` and `sv_filterRequestControl`
-  are unset — these work below anything a resource can do, and they are worth more than most detections.
-
-#### Playerlist
-- **The "I" board is a duty board now.** It used to be one flat, alphabetically indifferent list of
-  24 players per page, which made the question people actually open it for — *who is on duty and what
-  are they doing* — a paging exercise. The board is now split: **units on the left, grouped by
-  department**, each with callsign, roleplay and account name, status and ping; **civilians on the
-  right** as a dense two-column roster. Units are never paged, because an answer to "who is on duty"
-  that is split across pages is not an answer. The arrow keys page the civilian roster instead.
-  - The header carries the **area of play**, your community name (from `cfg-branding-sh.lua`, so it
-    is your name and not ours), players online, units on duty, units available, and the local time.
-  - **Every department says how many of its units are available**, next to the on-duty total: `LAPD ·
-    4 on duty · 2 available`. "Six units are on" and "six units can take your call" are different
-    answers, and the board was only giving the first one — so a dispatcher had to read every status
-    badge in a column to work out the second. Available means `CLEAR` and nothing else, the same rule
-    the server counts LEO and Fire availability by, so the two can never disagree. A department with
-    nobody clear turns its number red rather than hiding it — zero available is the state most worth
-    seeing.
-  - A **status strip** shows the server alert, whether 911 dispatch is staffed, and who is allowed to
-    connect — the three things that were previously buried in a side column.
-  - Each unit row's left edge carries its **status colour**, the same palette the MDT status buttons
-    use, so a screen full of red or green reads at a glance without anyone reading a word.
-  - Departments are coloured from their **name**, so LSPD is the same blue on every client and does
-    not change colour when another department goes off duty. The colours are now shared with the
-    radio log, which had its own copy — so a department finally looks the same in both places, and
-    an agency the list did not know by name gets a colour of its own instead of the same grey as
-    everyone else.
-- **Two styles, your choice.** The duty board is a lot of screen, and not every server wants it — a
-  mostly-civilian community does not open the list to find out who is on shift. `HudCfg.playerlistStyle`
-  picks between them:
-  - `"duty"` (default) — the full board described above.
-  - `"minimal"` — one compact centred card: server ID, account name, character name, ping, and
-    department plus callsign for anyone on duty. No grouping, no server panel, no split. Its header
-    still carries on-duty **and** available counts for the whole roster, because that number is worth
-    one line even when the layout isn't.
-
-  Both read the same data, honour the same key and the same arrow-key paging; only the drawing differs.
-  The minimal card pages the whole roster as one list rather than splitting it, so the two send
-  different payloads and each ships exactly the rows it draws — nobody pays for the board they did not
-  pick. A value that is neither is reported once in the console and falls back to the duty board,
-  because a typo should not look like a setting that does nothing.
-  > ⚠️ **Config change (`configs/cfg-hud-sh.lua`) — new `HudCfg.playerlistStyle`.** It ships `"duty"`,
-  > so an untouched config keeps the new board. Set it to `"minimal"` for the compact card.
-- **Every row now says server ID, account name and character name — all three, everywhere.** Each
-  board had two of the three and a different two: a unit on the duty board showed both names but no
-  ID, a civilian showed the ID and the account name but never the character behind it, and on the
-  minimal card anyone on duty lost their character name to the department-and-callsign block. So the
-  one thing an admin opens the board for — *which ID is that, and who is playing them* — was never on
-  a single row. It is now.
-  - **Units on the duty board carry their server ID** in front of the callsign. A unit is addressed
-    by callsign in character; every admin command takes the ID, and it was the one number the board
-    would not give you.
-  - **Civilians carry their character name** next to their account name. The two share the row evenly,
-    so a long Steam name cannot push the roleplay name off it, and the roster stays two dense columns
-    — no extra line per player, no fewer players per page.
-  - **The minimal card shows the character name on every row**, on duty or not, and got wider to fit
-    it. The department and callsign next to a unit say which callsign is talking, not who is playing
-    it.
-  - Someone still in the spawn or freeroam session shows the **session** where the character name
-    goes, exactly as before — they have not picked one yet, and that is not an error.
-- **Nothing about either board takes focus.** Both are pure overlays that never swallow a keypress
-  or a click, exactly as before.
-
-#### Bug reports
-- **`/lacorereport` — a bug report straight to the LACORE dashboard.** Reports go over the same relay
-  channel telemetry already uses, not into your own database: this is how a bug in the resource itself
-  reaches the people who fix it, rather than sitting in a Discord channel nobody at LACORE reads. A
-  small form opens with a category and a message; the player's account name, character name if they
-  have one, department, callsign and position travel with it automatically, so "the MDT drops my status"
-  is traceable to an actual unit instead of an anonymous line of text.
-  - **Stored regardless of licensing.** An anticheat flag is only useful with an account to review it
-    against, so that feed drops anything unlicensed. A bug report about the product is useful to us
-    either way — if anything, an unlicensed dev server is exactly where a rough edge is likeliest to
-    show up first. So every report reaches the LACORE team; a server with an active
-    `lacore_license_key` additionally gets its own rows on its own dashboard, under **Bug Reports** —
-    see which of your players is reporting something, without leaving your own admin panel.
-  - **Rate-limited server-side, not just in the form.** `Report.cooldownSec` (120s by default) is
-    enforced by a table the server keeps per source id; the client mirrors it for the countdown label,
-    but a modified client cannot skip the wait because that copy is never what gets checked.
-  - **Your own copy stays optional.** Set `Webhooks.BugReport` (`configs/cfg-server-sv.lua`) to also log
-    every report to your own Discord — the same "additional, never a replacement" rule every webhook in
-    that file already follows.
-  > ⚠️ **New config file (`configs/cfg-report-sh.lua`)** — command name, cooldown, max length and the
-  > category list. Also gated by the new `Features.bugreport` (`configs/cfg-features-sh.lua`), for
-  > owners who prefer one place to switch features off; either setting disables the command entirely.
-
-#### LAPD MDT
-- **Your status follows the call you are on.** The unit-status grid is gone from the Home screen.
-  Status is now set by the things you were already doing: Enroute and Station from the toolbar,
-  Code 6 and Traffic Stop when they create an incident, and **CLEAR** from the status dropdown to
-  hand the call back. Every status is still available directly from the status
-  badge in the command bar — that stays as the deliberate way to reach BUSY and UNAVAILABLE, which
-  belong to no incident at all.
-- **Code 6 while you are already on a call no longer opens a second one.** It set out a fresh
-  incident and moved the unit onto it, quietly abandoning the call being worked — the board then
-  showed an officer attached to something nobody had dispatched. Now it just puts you Code 6 on the
-  call you are on. A traffic stop during another call still creates its own incident, because that
-  genuinely is a separate event and dispatch needs it as one.
-- **Detach was previously not something a unit could do.** The only route was going CLEAR, which is
-  what detaches server-side but says so nowhere on screen; otherwise it took a dispatcher running
-  `/ddetach`. CLEAR in the status dropdown is now the documented detach — it sends exactly that
-  status, so the rule it depends on cannot drift.
-- **Fire/EMS units were missing their own statuses.** The MDT tested for the job label `Fire/EMS`,
-  but the job a medic actually carries in-game is `AMR` — so ON SCENE never appeared in the status
-  list for a real medic, and the Fire/EMS request button never rendered for them. The Lua side had
-  gated on all four spellings all along; this side had drifted from it.
-- **Four buttons that did nothing are gone.** *Edit* called a command registered nowhere in the
-  resource and now opens the incident's Comments, the one part of a call a unit can genuinely edit.
-  *Primary Unit*, *Import to Incident* and *Options* were bound to nothing and have been removed
-  rather than left greyed out. *Locate on Mobile Map* was live but unguarded: with no incident
-  selected it sent a null the server drops, so it looked ready and did nothing — it is now disabled
-  until there is something to locate.
-
-#### In-car CAD screen
-- **The Mobile Client on the dashboard is legible now.** It is the same terminal it always was — same
-  layout, same ribbon, same look — but it was being drawn far too small to read, and the reason is worth
-  stating because it is not the one everybody reaches for. It was never a shortage of resolution. It was
-  three scalings stacked:
-  1. the terminal is drawn at real pixel sizes for a **monitor** — 9px labels, 12px values;
-  2. the browser renders it into a **texture** (864 x 1450 by default);
-  3. that texture is then shown on the screen mesh, which while you are leaned in occupies roughly
-     509 x 854 pixels of a 1080p monitor — so a 9px label arrives as about **5**, before the mipmap and
-     the frame's temporal antialiasing get to it.
-
-  Raising `width`/`height` does not help: it only makes step 3 worse. What helps is laying the terminal
-  out at the size it was *designed* for and spending the surplus texture pixels on scale. So the screen
-  now renders the Mobile Client **zoomed**: `#mdt-container` lays out at ~592 x 994 instead of
-  864 x 1450 — its own window is 28vw x 92vh, about 538 x 994 on a 1080p monitor — and every glyph is
-  drawn 1.46x larger into the same texture. That 9px label now lands at **7.7** monitor pixels, and the
-  12px values at **10.3**, which is what they look like in the window.
-  - **The zoom is worked out from the screen, not hardcoded.** Whichever axis runs out first, so the
-    terminal is never laid out *smaller* than its own window in either direction — and never below 1, so
-    a wide, short dash panel is left exactly as it was rather than being zoomed out into confetti.
-  - **It is a zoom, not a transform.** Zoom is a layout property, so the browser's own hit testing
-    accounts for it and the mouse coordinates `/cad` sends (in texture pixels) still land on what they
-    look like they land on. A transform would have needed the same factor applied by hand on the Lua
-    side, in a second place, forever.
-  - `VehicleScreen.zoom` overrides it — `1` is the old raw behaviour, `2` is twice the size and half the
-    rows on screen. ⚠️ Zoom trades content for legibility: the higher it goes, the fewer call rows fit.
-- **The screen no longer glows like a lamp — and the reason was never the UI.** A vehicle can only offer a
-  render target on a material the engine already knows, and those are **instrument clusters**: the one the
-  shipped model uses is `script_rt_dials_feroci`, GTA's own name for the Feroci dial cluster. Dial
-  clusters are built *self-illuminated* so they glow at night, so whatever is drawn there is treated as a
-  light source — multiplied by the material's emissive factor and then run through bloom. The terminal's
-  own background is `rgb(21,34,50)`, luminance **32 of 255**, all but black, and it still came out as a
-  lit blue panel. Nothing in a resource can reach that emissive factor or the bloom; both live in the
-  model. What can be changed is the input, and since the game *multiplies*, halving what is drawn roughly
-  halves the glow. `VehicleScreen.brightness` does exactly that, and ships at **0.6**.
-  - It is a black sheet at `1 - brightness`, not `filter: brightness()`, because the two are the same
-    arithmetic — `c × b` against `c × (1 − a)` — while the sheet is one composited quad instead of a
-    per-pixel filter pass over the whole document every frame, and it does not turn the page into a
-    containing block for the terminal's own fixed positioning. It takes **no pointer events**, so clicks
-    land exactly as before.
-  - It sits above everything the terminal can draw, modals included — otherwise a dialog would have been
-    the one thing on the screen still glowing.
-  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — new `VehicleScreen.brightness`, shipping
-  > `0.6`.** An existing config file has no such line and stays undimmed, so add it if you are keeping
-  > yours. Set `1.0` to switch it off — worth doing if your model's screen is *not* emissive, where this
-  > would only look dark.
-- **Every button on the screen would have POSTed at the wrong resource.** Callbacks are addressed to the
-  resource by name, and the name comes from `GetParentResourceName()` — which is injected into NUI
-  *frames*. The dashboard is a DUI, a separate browser handed a texture, and it cannot count on that. The
-  fallback was the literal string `lacore`, which is only right on servers running the standalone
-  product; on the core it meant every click on the dashboard quietly went nowhere. The resource name now
-  travels in the DUI's URL, so it is right on both.
-- **A stripped dashboard terminal, for owners who want one.** `VehicleScreen.view = "incar"` swaps the
-  Mobile Client for a much smaller screen: active incident, the call list, who else is out, and a status
-  dock along the bottom that is on every tab. Everything on it is sized for a texture rather than a
-  monitor and no control is smaller than a fingertip. Attach and detach, GPS, Code 6 / On Scene, request
-  backup. Anything needing typed text — a name query, a comment — is deliberately **absent** rather than
-  present and dead, because a DUI has no keyboard channel.
-  - **Attached units on a call were always empty there.** It read `call.attachedUnits`, a field that
-    exists only in the dev mock — the server puts the incident number on the *unit*, not a unit list on
-    the call. Derived from the units list now, so it shows what it always claimed to.
-  > **The default is unchanged: `"mdt"`.** `"compact"` is accepted as the old spelling of `"incar"`.
-- **The Mobile Client on the dashboard screen of your patrol vehicle.** Live, while you drive, rendered
-  into the model's own screen — the same terminal the MDT key opens, not a cut-down copy of it. Display
-  only: it takes no focus, no controls and no keys, so nothing about driving changes.
-  > ⚠️ **New config file (`configs/cfg-vehiclescreen-sh.lua`).** Ships enabled with one entry, for the
-  > 2020 Interceptor Utility. Every other vehicle needs its own entry, because this depends on the
-  > **model**: a screen has to be a surface the game can be told to draw on, and that is decided when
-  > the model is built — a script cannot add one. `/lacore screen target` and `/lacore screen dui` tell
-  > you which of the two routes your vehicle supports; run them once per model before adding it.
-  - **Two routes, per model.** A named render target where the model declares one — that draws on your
-    vehicle only. Otherwise the screen's texture is replaced, which works anywhere but swaps it for
-    every vehicle of that model *on your own screen* (other players still see their own). The render
-    target wins wherever a model offers one.
-  - **It follows the terminal you have open.** Which tab, which incident, light or dark: all of that is
-    decided inside the UI by clicking, never travels through the game, and so was invisible to the
-    screen — it sat on Home while the driver worked in Calls. The open window now reports its view and
-    the screen follows it. One direction only; the screen never argues back.
-  - `VehicleScreen.width`/`height` should match the **shape** of the screen in the model, not just a
-    size — the image is stretched onto whatever the modder built, so a square texture on a portrait
-    tablet arrives squashed. It is also the cost of the feature: this is a real browser rendering
-    continuously.
-  - The screen exists only while you are sitting in a vehicle that has one, and it is released on
-    leaving, on switching vehicle and on resource stop. A browser nobody is looking at is a leak.
-- **`/cad` leans the camera in and hands you the mouse.** The terminal stops being something you read
-  past and becomes something you use: the camera moves to the screen, the cursor maps onto it, and
-  clicks land in the CAD. Run it again or press Escape to lean back out. Bindable to a key under
-  *LACORE: Focus the in-car screen*; rename or disable the command with `VehicleScreen.focusCommand`.
-  - The move starts from wherever you are already looking and eases in and out. A scripted camera that
-    simply switches on jumps, however good its destination is, and a linear interpolation arrives with
-    a jolt because it is still at full speed when it stops.
-  - Looking, shooting and leaving the vehicle are held while the mouse belongs to the terminal —
-    otherwise aiming at a button would swing the camera and clicking would fire the weapon. A held
-    click is released if the pointer leaves the screen, so the UI is never left thinking a button is
-    still down.
-  - `VehicleScreen.cursorRect` says where the terminal ends up on your monitor once the camera has
-    settled, and that is what the pointer is mapped through. If clicks land next to where you pointed,
-    that is the setting to nudge — not the camera.
-  > **No typing.** There is no keyboard channel into a browser rendered this way, so anything that
-  > needs text — a name query — still wants the real terminal. The MDT key is unchanged.
-- **The screen was the wrong shape.** `VehicleScreen.width`/`height` shipped at 768 x 1024 — a ratio of
-  0.75. But the Interceptor's tablet lands on a 16:9 monitor at 0.265 of the width by 0.791 of the height,
-  which is a ratio of **0.596**: the browser was rendering a fifth too wide and being squeezed onto the
-  quad, so every glyph arrived horizontally compressed. Compressed text reads as soft text, which is why
-  this hid behind "the screen is a bit blurry" for so long. The default is now **864 x 1450** — measured
-  off `cursorRect` rather than estimated, and incidentally 60% more pixels.
-  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `VehicleScreen.width`/`height`
-  > re-defaulted.** The new 864 x 1450 only reaches you if you take the new config file — an existing one
-  > keeps its own numbers, so change them by hand if you are keeping it, and redo the ratio against your
-  > own `cursorRect` if you have re-measured it with `/cad adjust`.
-
-#### Bans & playerbase
-- **txAdmin bans and warns now land in LACORE's ban list too.** The two systems each kept their own
-  database and had never heard of each other: `/ban` and `/warn` from the core write
-  `data/banlist.json`, txAdmin writes its own `playersDB.json`. On a team that works in the txAdmin
-  panel — which is most teams — that left the LACORE list nearly empty. It showed up as a number that
-  made no sense (`6 bans · 0 warns` next to 94 and 51 in txAdmin), but the real cost was quieter:
-  `/lacore bans upload` would have reported a cheerful "✓ Shared" after uploading six records while
-  ninety stayed home. Two halves close it:
-  - **A sync that finds txAdmin's database by itself.** On every start LACORE looks for
-    `playersDB.json` beside the server and carries over what it finds. Nothing to copy, nothing to
-    configure, nothing to redo after the server moves. It runs at each boot rather than once because
-    that also covers bans issued in the panel while the server was **down**: those fire no event, so
-    the live bridge alone would never see them. Repeating is free — records keep txAdmin's own action
-    id — and bans an admin already lifted or that have run out are skipped rather than resurrected.
-    The console stays quiet unless something actually came across.
-    > **Where it looks.** A configured data path first, then txAdmin's own; then the artifacts folder,
-    > which is where txAdmin puts `txData` by default and which LACORE derives from the running
-    > `monitor` resource; and finally the folders above its own, plus the ones **beside** them. That
-    > last part matters on the common Linux split where the artifacts and the resources live in
-    > separate trees — `/home/FXServer/server` next to `/home/FXServer/server-data` — because walking
-    > straight up from a resource in the second one never passes a `txData` at all.
-    >
-    > There is no official channel for any of this: txAdmin's history routes want an authenticated
-    > admin session, and its resource-facing token does not cover the database. So the file is read
-    > directly, and since it lives outside the resource, both ways a server script can reach outside
-    > are tried in turn. Some FXServer builds allow neither. When it comes up empty the command says
-    > how many paths it tried and **lists the folders it searched** — a layout nobody guessed looks
-    > exactly like a build that refuses the read, and the list is what tells the two apart. Usually one
-    > line in it is your own path, off by a folder.
-  - **`/lacore bans import`** — the same thing on demand, with the full account: which file it found,
-    how many actions it holds, and what was skipped and why.
-  - **A live bridge** — every future txAdmin ban and warn is mirrored as it happens, so the two lists
-    do not drift apart again. Mirroring is local bookkeeping: nothing leaves your server. Sharing
-    stays the deliberate `/lacore bans upload`.
-  > ⚠️ **Config change (`configs/cfg-integrations-sh.lua`) — new `Integrations.txAdminBans` and
-  > `Integrations.txAdminDataPath`.** The first ships `"auto"`: the bridge is active when txAdmin is
-  > running. Set it to `false` to keep the lists separate. The import is a manual command and runs
-  > regardless. The second ships empty and should stay that way — it is the escape hatch for a layout
-  > the search does not recognise, and `/lacore bans import` tells you when that is the case. Give it
-  > the `txData` folder (the one holding `<profile>/data/`), e.g. `/home/FXServer/server/txData`;
-  > `setr lacore_txdata_path "…"` in `server.cfg` does the same and takes precedence.
-  >
-  > A detail worth knowing if you inspect the file: imported records keep LACORE's own numeric `id`
-  > and carry txAdmin's id in a separate `txId` field. `BanPlayer()` derives the next id by adding one
-  > to the last entry's — a txAdmin id (`ABCD-1234`) sitting in that field would have made the next
-  > `/ban` fail on the arithmetic.
 
 #### Pennsylvania CAD (new terminal)
 
@@ -408,127 +97,6 @@ answer "is this one player or twelve?".
   > coordinates are GTA world units, not degrees. Printing a world coordinate under a "Latitude"
   > header would be a number a player could write down and act on, and it would be wrong. A column
   > that is blank on every server forever is not a column, it is a header.
-
-#### Loading screen
-
-- **LACORE now has a loading screen — two of them, and you pick one.** The first thing anybody sees
-  of your server used to be whatever FiveM draws by default, which is a black screen with a bar. So
-  there are now two finished designs in the box, both 1920×1080, both fed by the game's real
-  progress:
-  - **"Cinematic"** — full-bleed artwork, an enormous headline, and the progress as a wide band
-    across the bottom: a big percentage, the current step, the file the game is actually chewing on,
-    and five step chips. Tips, your rules and the music player stack down the right.
-  - **"Dossier"** — a split screen. Left is a status column: a progress ring, the current step
-    spelled out with a sentence explaining it, and all five steps as rows that tick over from
-    *Waiting* to *Running…* to *Done*. Right is the artwork with the rotating tip laid over it.
-
-  Switching between them is one word in the config and no rebuild. Both read the same data, so
-  nothing is lost by changing your mind later.
-- **Nothing on it is decorative.** The percentage, the bar, the ring and the log line come from the
-  game's own loading events — this is not an animation on a timer that finishes early and leaves the
-  player staring at 100%. The five steps are a readable narration *of* that percentage, not a
-  substitute for it.
-- **The texts are already written.** Headline, six tips and five rules ship **filled in**, so the
-  screen reads like a finished screen the first time you start the server rather than a form waiting
-  to be completed. The tips are about LACORE's own keys and commands — the playerlist, `/mdt`,
-  `/report`, the radio — so they are worth keeping a couple of even after you add yours. The chrome
-  around them (*Core rules*, *Step 2 of 5*, *Running…*) always follows `Language`.
-  > Filled in also means **English**. Clearing a field (`""`) or emptying a list (`{}`) falls back to
-  > LACORE's own wording for it, **translated** — so on a German or Russian server, blanking
-  > `headline`, `tips` and `rules` is the one-step way to a loading screen in your players' language.
-- **It is in the dev launcher.** `Ctrl+K` → **Screens → Loading Screen** opens the real page in an
-  iframe and plays both sides of the conversation it normally has: the game's progress and log
-  lines on a timer, and the config payload the resource sends. Switch design live, scrub the
-  progress, pause it, or hit **Replay** to watch the first second again — including the moment the
-  built-in defaults hand over to your config, which is the one part of this screen you cannot
-  otherwise see without connecting to a server.
-- **A music player, if you bring music.** Title, artist, an equaliser that moves while something is
-  playing, and prev / play / next. It only appears once you have listed at least one track —
-  LACORE ships none, because every track worth playing belongs to someone. Players can also use
-  <kbd>M</kbd> and <kbd>N</kbd>, which work whether or not the cursor is up.
-- **The header tiles are live.** Area of Play and the player count are asked from the server while
-  the screen is still up, and a tile with nothing to show hides itself rather than printing a dash.
-  Queue is there too, but LACORE runs no queue of its own and will not invent one — point
-  `queueExport` at your queue resource's export and it fills in.
-- **Your artwork, not ours.** List one or more 1920×1080 images and they cross-fade with a slow
-  Ken-Burns drift. The placeholder that ships says "replace me" in as many words.
-  > ⚠️ **Config change — new file `configs/cfg-loadingscreen-sh.lua`,** plus a new
-  > `loadingscreen = true` in `configs/cfg-features-sh.lua`. It ships **on**, so after this update
-  > your players see LACORE's loading screen instead of the default one. If you already run a
-  > loading-screen resource, set either switch to `false` — LACORE then takes its own NUI frame
-  > down at runtime and the standard game loading screen shows, exactly as before.
-
-  > **One honest caveat about the first second.** A loading screen is a web page and it opens before
-  > any Lua exists on the connecting client, so it starts on LACORE's built-in defaults and becomes
-  > *your* screen the moment the resource starts on that player. In practice that is the first
-  > moment or two of the load. If you choose "dossier", players may briefly see "cinematic" first —
-  > it cross-fades rather than snapping, but it is there and we would rather write it down than let
-  > you discover it.
-
-#### Remote config
-
-- **The data-list editor is no longer blank.** It only ever showed rows you had typed into it, so
-  changing one fine in the penal code meant first retyping all twenty charges — and until you did,
-  the page looked like your server had no penal code at all. Your servers now report their own
-  tables up (the penal code, the phone directory, the blacklisted and member-only vehicle lists),
-  the same way they already report their settings, and the editor opens on those. Every list says
-  where its rows came from: **from your config** (read off your server's own files), **from all
-  servers** (inherited), or **your rows** (saved here). Saving an empty list gives it back rather
-  than storing an empty table, so there is a way out of an override as well as into one.
-  > The report is a snapshot taken at load, *before* any dashboard list is applied — otherwise a
-  > server would report your own override back to you and the "what my server actually has"
-  > baseline would quietly become a copy of the dashboard.
-- **Servers can now be configured one at a time.** Config was one set of values per account, applied
-  to every server you own — fine with one server, useless with three, because a second server could
-  not have its own penal code without changing the first one too. There is now a picker on the
-  Settings and Data lists pages: **All servers** is the default everything inherits, and each server
-  can override individual settings and whole lists on top of it. A setting you do not override keeps
-  following the default and says so (**INHERITED**), so there is no need to copy shared values into
-  every server just to keep them in step.
-  > Nothing changes for a single-server account: the picker only appears once there is a second
-  > server, the account-wide values keep working exactly as they did, and an override layer that
-  > nobody creates is simply never consulted.
-  >
-  > A server has to have started once with a license key before it can be given its own config —
-  > until it reports its identity there is nothing stable to file an override under, and filing it
-  > under an IP address would hand the config to whoever gets that address next. Those servers are
-  > shown in the picker but cannot be picked, with the reason on hover.
-
-#### In-car CAD screen
-
-- **The passenger gets a terminal too — and you can see each other's pointer.** A two-officer unit is
-  the case the dashboard screen is best at: one drives, the other works the CAD. Until now only the
-  driver had a screen at all.
-
-  Each occupant gets their **own** terminal, signed in as themselves — the passenger runs a plate as
-  the passenger, and their callsign, status and active incident stay theirs. On top of that, everyone
-  in the vehicle now sees where the others are pointing: a named, coloured arrow that follows their
-  mouse across the screen and shows when their button is down.
-  > **Pointers are shared; clicks are not, and not by omission.** Every terminal is signed in as its
-  > own unit, so replaying the passenger's click onto the driver's screen would have the *driver*
-  > self-assign to whatever the passenger tapped. You see where your partner is pointing — you each
-  > still act as yourselves.
-
-  The relay takes nothing on trust: the vehicle is read from the sender's own ped rather than from
-  the message, the name on the arrow is the server's rather than the client's, coordinates are
-  range-checked and the whole thing is rate-limited, so a modified client cannot put its cursor in a
-  car it is not in or turn one into a broadcast channel.
-  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `passengers` now ships `true`,** with a
-  > new `sharedCursor` next to it. A terminal is a full browser and this is one per occupied seat
-  > rather than one per car, so a squad that rides four-up is now four browsers in one vehicle. Set
-  > `passengers = false` for the old driver-only behaviour; `sharedCursor = false` keeps the extra
-  > terminals but drops the arrows.
-- **`/cad adjust` — aim the dashboard terminal without leaving the car.** Whether the in-car screen
-  is usable comes down to two blocks of numbers per vehicle model: where the camera goes
-  (`cam.pos` / `cam.look` / `fov`) and which part of your monitor the screen lands on
-  (`cursorRect`, which is what the mouse is mapped through — get it wrong and your clicks land next
-  to where you pointed, which reads as "the screen doesn't work"). Both shipped as one model's
-  measurements and a comment saying to nudge them, which meant edit, restart, look, edit again.
-
-  Now: the mouse aims the real camera, the arrow keys slide it through the cabin, the wheel raises
-  it (Shift for field of view). Then click the top-left corner of the screen and the bottom-right —
-  the frame is drawn live over your view. The finished config lines are printed to the F8 console,
-  ready to paste. Nothing is written to your config from in game, on purpose.
 
 #### Replay & Director's Cut (new)
 
@@ -690,6 +258,337 @@ answer "is this one player or twelve?".
   back is the worst thing this feature can do to a player. Per-frame state is deliberately left out;
   at 10 Hz a sampler would bury everything else.
 
+#### In-car CAD screen
+- **The Mobile Client on the dashboard is legible now.** It is the same terminal it always was — same
+  layout, same ribbon, same look — but it was being drawn far too small to read, and the reason is worth
+  stating because it is not the one everybody reaches for. It was never a shortage of resolution. It was
+  three scalings stacked:
+  1. the terminal is drawn at real pixel sizes for a **monitor** — 9px labels, 12px values;
+  2. the browser renders it into a **texture** (864 x 1450 by default);
+  3. that texture is then shown on the screen mesh, which while you are leaned in occupies roughly
+     509 x 854 pixels of a 1080p monitor — so a 9px label arrives as about **5**, before the mipmap and
+     the frame's temporal antialiasing get to it.
+
+  Raising `width`/`height` does not help: it only makes step 3 worse. What helps is laying the terminal
+  out at the size it was *designed* for and spending the surplus texture pixels on scale. So the screen
+  now renders the Mobile Client **zoomed**: `#mdt-container` lays out at ~592 x 994 instead of
+  864 x 1450 — its own window is 28vw x 92vh, about 538 x 994 on a 1080p monitor — and every glyph is
+  drawn 1.46x larger into the same texture. That 9px label now lands at **7.7** monitor pixels, and the
+  12px values at **10.3**, which is what they look like in the window.
+  - **The zoom is worked out from the screen, not hardcoded.** Whichever axis runs out first, so the
+    terminal is never laid out *smaller* than its own window in either direction — and never below 1, so
+    a wide, short dash panel is left exactly as it was rather than being zoomed out into confetti.
+  - **It is a zoom, not a transform.** Zoom is a layout property, so the browser's own hit testing
+    accounts for it and the mouse coordinates `/cad` sends (in texture pixels) still land on what they
+    look like they land on. A transform would have needed the same factor applied by hand on the Lua
+    side, in a second place, forever.
+  - `VehicleScreen.zoom` overrides it — `1` is the old raw behaviour, `2` is twice the size and half the
+    rows on screen. ⚠️ Zoom trades content for legibility: the higher it goes, the fewer call rows fit.
+- **The screen no longer glows like a lamp — and the reason was never the UI.** A vehicle can only offer a
+  render target on a material the engine already knows, and those are **instrument clusters**: the one the
+  shipped model uses is `script_rt_dials_feroci`, GTA's own name for the Feroci dial cluster. Dial
+  clusters are built *self-illuminated* so they glow at night, so whatever is drawn there is treated as a
+  light source — multiplied by the material's emissive factor and then run through bloom. The terminal's
+  own background is `rgb(21,34,50)`, luminance **32 of 255**, all but black, and it still came out as a
+  lit blue panel. Nothing in a resource can reach that emissive factor or the bloom; both live in the
+  model. What can be changed is the input, and since the game *multiplies*, halving what is drawn roughly
+  halves the glow. `VehicleScreen.brightness` does exactly that, and ships at **0.6**.
+  - It is a black sheet at `1 - brightness`, not `filter: brightness()`, because the two are the same
+    arithmetic — `c × b` against `c × (1 − a)` — while the sheet is one composited quad instead of a
+    per-pixel filter pass over the whole document every frame, and it does not turn the page into a
+    containing block for the terminal's own fixed positioning. It takes **no pointer events**, so clicks
+    land exactly as before.
+  - It sits above everything the terminal can draw, modals included — otherwise a dialog would have been
+    the one thing on the screen still glowing.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — new `VehicleScreen.brightness`, shipping
+  > `0.6`.** An existing config file has no such line and stays undimmed, so add it if you are keeping
+  > yours. Set `1.0` to switch it off — worth doing if your model's screen is *not* emissive, where this
+  > would only look dark.
+- **Every button on the screen would have POSTed at the wrong resource.** Callbacks are addressed to the
+  resource by name, and the name comes from `GetParentResourceName()` — which is injected into NUI
+  *frames*. The dashboard is a DUI, a separate browser handed a texture, and it cannot count on that. The
+  fallback was the literal string `lacore`, which is only right on servers running the standalone
+  product; on the core it meant every click on the dashboard quietly went nowhere. The resource name now
+  travels in the DUI's URL, so it is right on both.
+- **A stripped dashboard terminal, for owners who want one.** `VehicleScreen.view = "incar"` swaps the
+  Mobile Client for a much smaller screen: active incident, the call list, who else is out, and a status
+  dock along the bottom that is on every tab. Everything on it is sized for a texture rather than a
+  monitor and no control is smaller than a fingertip. Attach and detach, GPS, Code 6 / On Scene, request
+  backup. Anything needing typed text — a name query, a comment — is deliberately **absent** rather than
+  present and dead, because a DUI has no keyboard channel.
+  - **Attached units on a call were always empty there.** It read `call.attachedUnits`, a field that
+    exists only in the dev mock — the server puts the incident number on the *unit*, not a unit list on
+    the call. Derived from the units list now, so it shows what it always claimed to.
+  > **The default is unchanged: `"mdt"`.** `"compact"` is accepted as the old spelling of `"incar"`.
+- **The Mobile Client on the dashboard screen of your patrol vehicle.** Live, while you drive, rendered
+  into the model's own screen — the same terminal the MDT key opens, not a cut-down copy of it. Display
+  only: it takes no focus, no controls and no keys, so nothing about driving changes.
+  > ⚠️ **New config file (`configs/cfg-vehiclescreen-sh.lua`).** Ships enabled with one entry, for the
+  > 2020 Interceptor Utility. Every other vehicle needs its own entry, because this depends on the
+  > **model**: a screen has to be a surface the game can be told to draw on, and that is decided when
+  > the model is built — a script cannot add one. `/lacore screen target` and `/lacore screen dui` tell
+  > you which of the two routes your vehicle supports; run them once per model before adding it.
+  - **Two routes, per model.** A named render target where the model declares one — that draws on your
+    vehicle only. Otherwise the screen's texture is replaced, which works anywhere but swaps it for
+    every vehicle of that model *on your own screen* (other players still see their own). The render
+    target wins wherever a model offers one.
+  - **It follows the terminal you have open.** Which tab, which incident, light or dark: all of that is
+    decided inside the UI by clicking, never travels through the game, and so was invisible to the
+    screen — it sat on Home while the driver worked in Calls. The open window now reports its view and
+    the screen follows it. One direction only; the screen never argues back.
+  - `VehicleScreen.width`/`height` should match the **shape** of the screen in the model, not just a
+    size — the image is stretched onto whatever the modder built, so a square texture on a portrait
+    tablet arrives squashed. It is also the cost of the feature: this is a real browser rendering
+    continuously.
+  - The screen exists only while you are sitting in a vehicle that has one, and it is released on
+    leaving, on switching vehicle and on resource stop. A browser nobody is looking at is a leak.
+- **`/cad` leans the camera in and hands you the mouse.** The terminal stops being something you read
+  past and becomes something you use: the camera moves to the screen, the cursor maps onto it, and
+  clicks land in the CAD. Run it again or press Escape to lean back out. Bindable to a key under
+  *LACORE: Focus the in-car screen*; rename or disable the command with `VehicleScreen.focusCommand`.
+  - The move starts from wherever you are already looking and eases in and out. A scripted camera that
+    simply switches on jumps, however good its destination is, and a linear interpolation arrives with
+    a jolt because it is still at full speed when it stops.
+  - Looking, shooting and leaving the vehicle are held while the mouse belongs to the terminal —
+    otherwise aiming at a button would swing the camera and clicking would fire the weapon. A held
+    click is released if the pointer leaves the screen, so the UI is never left thinking a button is
+    still down.
+  - `VehicleScreen.cursorRect` says where the terminal ends up on your monitor once the camera has
+    settled, and that is what the pointer is mapped through. If clicks land next to where you pointed,
+    that is the setting to nudge — not the camera.
+  > **No typing.** There is no keyboard channel into a browser rendered this way, so anything that
+  > needs text — a name query — still wants the real terminal. The MDT key is unchanged.
+- **The screen was the wrong shape.** `VehicleScreen.width`/`height` shipped at 768 x 1024 — a ratio of
+  0.75. But the Interceptor's tablet lands on a 16:9 monitor at 0.265 of the width by 0.791 of the height,
+  which is a ratio of **0.596**: the browser was rendering a fifth too wide and being squeezed onto the
+  quad, so every glyph arrived horizontally compressed. Compressed text reads as soft text, which is why
+  this hid behind "the screen is a bit blurry" for so long. The default is now **864 x 1450** — measured
+  off `cursorRect` rather than estimated, and incidentally 60% more pixels.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `VehicleScreen.width`/`height`
+  > re-defaulted.** The new 864 x 1450 only reaches you if you take the new config file — an existing one
+  > keeps its own numbers, so change them by hand if you are keeping it, and redo the ratio against your
+  > own `cursorRect` if you have re-measured it with `/cad adjust`.
+- **The passenger gets a terminal too — and you can see each other's pointer.** A two-officer unit is
+  the case the dashboard screen is best at: one drives, the other works the CAD. Until now only the
+  driver had a screen at all.
+
+  Each occupant gets their **own** terminal, signed in as themselves — the passenger runs a plate as
+  the passenger, and their callsign, status and active incident stay theirs. On top of that, everyone
+  in the vehicle now sees where the others are pointing: a named, coloured arrow that follows their
+  mouse across the screen and shows when their button is down.
+  > **Pointers are shared; clicks are not, and not by omission.** Every terminal is signed in as its
+  > own unit, so replaying the passenger's click onto the driver's screen would have the *driver*
+  > self-assign to whatever the passenger tapped. You see where your partner is pointing — you each
+  > still act as yourselves.
+
+  The relay takes nothing on trust: the vehicle is read from the sender's own ped rather than from
+  the message, the name on the arrow is the server's rather than the client's, coordinates are
+  range-checked and the whole thing is rate-limited, so a modified client cannot put its cursor in a
+  car it is not in or turn one into a broadcast channel.
+  > ⚠️ **Config change (`configs/cfg-vehiclescreen-sh.lua`) — `passengers` now ships `true`,** with a
+  > new `sharedCursor` next to it. A terminal is a full browser and this is one per occupied seat
+  > rather than one per car, so a squad that rides four-up is now four browsers in one vehicle. Set
+  > `passengers = false` for the old driver-only behaviour; `sharedCursor = false` keeps the extra
+  > terminals but drops the arrows.
+- **`/cad adjust` — aim the dashboard terminal without leaving the car.** Whether the in-car screen
+  is usable comes down to two blocks of numbers per vehicle model: where the camera goes
+  (`cam.pos` / `cam.look` / `fov`) and which part of your monitor the screen lands on
+  (`cursorRect`, which is what the mouse is mapped through — get it wrong and your clicks land next
+  to where you pointed, which reads as "the screen doesn't work"). Both shipped as one model's
+  measurements and a comment saying to nudge them, which meant edit, restart, look, edit again.
+
+  Now: the mouse aims the real camera, the arrow keys slide it through the cabin, the wheel raises
+  it (Shift for field of view). Then click the top-left corner of the screen and the bottom-right —
+  the frame is drawn live over your view. The finished config lines are printed to the F8 console,
+  ready to paste. Nothing is written to your config from in game, on purpose.
+
+#### Anticheat
+- **An Anticheat page in your dashboard.** Every flag as a filterable table: what tripped, what the
+  system did about it, the player's running trust score, and which server it came from. Above it, a
+  **repeat-offenders** panel — because one player with six flags is a case, while six players with one
+  flag each means a threshold wants tuning. Whitelisted hits are shown too, greyed out and labelled:
+  an admin who keeps tripping the aimbot heuristic is the clearest tuning signal there is.
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — new `Anticheat.Report` block.** It ships
+  > **disabled**, and deliberately: a flag is an accusation about a named player, so turning this on
+  > sends the detection, the action taken and that player's identifiers out of your server to your
+  > dashboard account. It never *moves* anything — your own database and Discord webhook keep
+  > receiving everything exactly as before, this is strictly an additional copy. Needs an active
+  > licence key, which is what attributes flags to your account.
+  >
+  > Reporting is batched (one upload per interval, so a flag storm is one request), bounded (the
+  > queue drops its oldest entries rather than growing without limit if the uplink is down) and
+  > fire-and-forget — it can never slow down or block a punishment.
+- **Flags carry the trust score.** `AC.trustOf(src)` exposes the running total, so a reviewer can tell
+  a single blip from a player who has been at it all evening without reading the whole log.
+
+- **An observe mode — and the anticheat is now ON by default because of it.** Everything detects, logs
+  and scores; nothing is kicked or banned, and every log line says what it *would* have done. This
+  existed as a gap, not a feature request: the anticheat had exactly two states, off or live, so
+  tuning it meant going live and risking a wrong ban on your own players. Almost nobody did, and an
+  anticheat that is off protects nobody however good it is. Run observe for a week, watch what your
+  own admins and your busiest firefights trip, then set `Mode = "enforce"`.
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — `Enabled` now ships `true`, with the new
+  > `Mode = "observe"`.** On update your server starts *detecting* where it did not before, so
+  > expect anticheat lines in your Discord admin log. Nobody is kicked or banned until you switch to
+  > enforce. To go back to silence, set `Enabled = false` — one line, exactly as before.
+- **The trust score survives a reconnect.** It was kept per session and wiped on disconnect, which
+  quietly defeated the escalation design it exists for: the config promises that "only a persistent
+  offender racks up points", but a player who stopped at 7 and rejoined came back at 0 — reconnecting
+  was a full reset, and the one mechanic meant to catch repeat offenders was the easiest to sidestep.
+  Scores are now kept per identifier and decay across the gap exactly as they do during clean play,
+  so someone who earned a few points and stayed away a day still returns clean on their own. Entries
+  that decay to nothing are pruned, so the store does not grow for every player ever seen.
+- **A resource guard.** Stopping LACORE takes the whole anticheat down with it. That is also a
+  perfectly ordinary thing for an owner to do, so this logs and never punishes — but if the resource
+  goes down at 3am with forty players connected and nobody scheduled it, there is now a line saying so.
+- **Observe and whitelist states are visible in the dashboard.** A flag that was decided but not
+  carried out shows the action it *would* have taken next to an `observed` tag, with the row muted and
+  the detail sheet reading "Action decided" rather than "Action taken". Showing `BAN` for a player who
+  was never banned would have been worse than showing nothing.
+
+- **The heartbeat is now proof rather than a formality.** It carried no payload: kill the anticheat
+  thread, start your own loop firing the same bare event, and the server saw a healthy client forever —
+  so the one check meant to catch a disabled client was the easiest thing on the list to defeat. Each
+  beat now answers a fresh challenge, and a wrong or missing answer is its own detection. Reusing the
+  digest the anti-dump handshake already had, so this adds a check rather than a mechanism.
+  > The ceiling is honest and unchanged: someone who has already dumped the client can reimplement the
+  > digest. What stands in their way is the salt being *yours*, which is why the server nags while it
+  > is still the shipped default.
+- **Evidence arrives with the story around it.** A screenshot on its own rarely proves anything. Each
+  one now carries position, health and armour, whether the player was in a vehicle, the trust score,
+  and the last five flags with how long ago each fired — gathered when the picture comes back, so it
+  describes that moment rather than the moment it was requested.
+- **You can tell the anticheat it was wrong.** Any flag in the dashboard can be marked a false positive,
+  and the page turns those marks into the number that matters: the share of each detection you have
+  called wrong. One mislabelled row is noise; `SPEED_HACK` sitting at 40% is a threshold to raise — and
+  there was no way to say that before. Marking is reversible and only ever affects your own account's rows.
+- **Three new server-authoritative detections.** All of them run on the server, so a patched-out client
+  anticheat does not hide them, and all three default to feeding the trust score rather than acting —
+  a new detection is exactly where a false positive is most likely, and observe mode means you will see
+  them before they can do anything anyway.
+  - **On-foot speed, measured server-side.** There was a hole here: the only speed check was the
+    client's, and the server sweep's teleport check needs 700 m in one sample. Anything between a brisk
+    jog and that threshold — up to about 140 m/s — crossed the map unremarked once the client check was
+    gone. The sweep now derives speed from position samples it was already taking, so it needs no new
+    data, and requires two consecutive implausible samples so a player who drives briefly inside one
+    interval cannot be flagged for it.
+  - **Explosions attributed to someone who is nowhere near them.** Catches both blaming another player
+    and scripts detonating at map coordinates. The distance is set far beyond any real throw or launcher
+    flight, so ordinary combat cannot reach it.
+  - **Blacklisted vehicles caught while being driven, not only when spawned.** The existing check fires
+    on entity creation, which misses a vehicle that predates the resource start or arrived by a route
+    that raised no event. The sweep simply asks whether you are sitting in one.
+- **The platform hardening is now checked, not just recommended.** The config has suggested four
+  server.cfg convars for a long time and only ever verified one of them. At boot the server now names
+  which of `sv_scriptHookAllowed`, `sv_pureLevel`, `sv_enforceGameBuild` and `sv_filterRequestControl`
+  are unset — these work below anything a resource can do, and they are worth more than most detections.
+- **Every flag now says what the player was doing just before it.** A detection code tells you what
+  tripped, never what led there — and that is usually the whole question. `GOD_HEALTH · hp=300` reads
+  like a cheat until you see the same player was revived twice forty seconds earlier, at which point
+  it reads like a bug in a revive script. Each flag's Discord log now carries a short buffer of what
+  came before it:
+
+  ```
+  **Leading up to it**
+  -42s · duty · on duty as Fire/EMS / AMR
+  -38s · spawn · respawned / revived (immunity window granted)
+  -21s · vehicle · entered a vehicle (model 1171614426)
+  -12s · health · health 100 → 300
+  - 3s · flag · GOD_HEALTH → log (server hp=300)
+  ```
+
+  It records respawns and revives, duty changes, getting in and out of vehicles, weapon switches,
+  health jumps and earlier flags — including the ones that only logged, so a second detection arrives
+  with the first already in its story. The sampler writes **changes only**: a player standing still
+  produces an empty buffer rather than two hundred identical lines. `/lacore accontext <serverId>`
+  reads it for anyone online without waiting for them to trip something.
+
+  The buffer is bounded twice — 40 lines and 90 seconds by default, whichever runs out first — lives
+  in memory, and is dropped the moment the player disconnects.
+
+  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — new `Anticheat.Context` block.** It ships
+  > **on**, which is a deliberate exception to how new anticheat features arrive here: this one sends
+  > nothing anywhere. It attaches text to a Discord log you were already receiving, and it is
+  > explicitly **not** added to the dashboard report — that payload is documented line by line in the
+  > same config, and widening it silently would be the wrong way to add a feature. Set
+  > `Context.enabled = false` to switch it off.
+  >
+  > The sampler half needs OneSync (server-side entity natives); without it the event-driven half
+  > still works and the module says so once at startup.
+
+#### Duty & permissions
+
+- **One department, one role, one portal — agencies can now be gated by Discord role or ACE.** LACORE
+  already asked for a Discord role before letting anyone go on duty as *Law Enforcement*; what it
+  never asked was *which agency*. So an officer with only the CHP role could still go on duty as LAPD
+  and get the LAPD terminal. `DutyAccess` in `configs/cfg-server-sv.lua` closes that: each agency
+  short code (`LAPD`, `LASD`, `CHP`, …) names what it requires. Because the agency is what `/mdt`
+  routes on, refusing the agency refuses the portal — there is no second gate to keep in sync, and no
+  way to reach a terminal you were not allowed to be a member of.
+
+  Either kind of permission works, and an agency may name both — holding **either one** is enough, so
+  you can move a department from one to the other without a flag day:
+
+  ```lua
+  agencies = {
+      LAPD = { role = "LAPD" },                          -- Discord role, nothing else to set up
+      LASD = { ace  = "lacore.duty.lasd" },              -- ACE object
+      CHP  = { role = "CHP", ace = "lacore.duty.chp" },  -- either one
+      NPS  = { role = { "NPS", "1285460493619953720" } },-- role key from DiscordAuth.roles, or a raw id
+  }
+  ```
+
+  `role` is a key from `DiscordAuth.roles` — the same table the duty whitelist already uses — or a raw
+  Discord role id, so a department role does not have to be registered first. `ace` suits a
+  vMenu-style server that already maps Discord roles to ACE groups: keep the `group.lapd` principals
+  you have and grant them the LACORE ace once in your `server.cfg`, `add_ace group.lapd
+  lacore.duty.lapd allow`. (ACE tests ace *objects*, not groups — that line is what connects the two.)
+
+  The check runs **server-side** in the duty event, so a client cannot talk its way past it, and it is
+  deliberately not waived by the ESX/QBCore bridge — on a server that gates agencies, the gate is the
+  last word. Agencies you do not list stay open unless you set `fallback = "deny"`, which flips it to
+  a strict allowlist. Staff and dev bypass by default (`bypassStaff`), and civilian `/job` names are
+  never touched, so a strict allowlist cannot lock a mechanic out of their own job. A role-only agency
+  on a server whose Discord auth is off or idle cannot be answered either way, so it falls back to
+  your `fallback` and says so in the console once — rather than silently refusing everyone for a
+  reason no one can see.
+
+  Two smaller things came with it, because the feature is unusable without them. `/dutyaccess` prints
+  the caller's agency access as a `+`/`-` list with what each one wants, which is the difference
+  between "my add_ace line has a typo" and "the gate is broken". And a refused duty request now
+  actually *un-does* itself on the client: `/onduty` applies the job and hands out the agency's
+  loadout the instant it is typed, long before the server has had its say, so until now a denied unit
+  kept the weapons and a UI that believed it was on duty. The client is put back to civilian and the
+  loadout that agency handed out is taken back — only those weapons, not everything the player is
+  carrying. That also repairs the older `DutyRoles` refusal, which had the same hole.
+
+  > ⚠️ **Config change (`configs/cfg-server-sv.lua`) — new `DutyAccess` block.** It ships **disabled**
+  > (`enabled = false`), so nothing changes until you turn it on. Existing configs are not rewritten:
+  > if your file predates this update it simply has no `DutyAccess` table, which reads the same as
+  > disabled.
+
+#### Session & duty
+
+- **`/jobmenu` finally opens a job menu.** It never did: `jobMenu` existed, but the entire body of its
+  builder was commented out, so the command quietly opened the *session* menu instead and the "Jobs"
+  page stayed empty. There is a real duty picker now — every agency from `configs/config.lua` as a
+  card with its short code, full name and branch, a search box, a callsign field, and one button. No
+  more remembering that the Highway Patrol answers to `CHP` and typing `/onduty CHP 8-ADAM-21` blind.
+
+- **It shows you which agencies you may actually take.** Agencies the `DutyAccess` gate would refuse
+  are greyed out and marked, instead of letting you pick one and be told no a second later. The list
+  comes from the **server** on open, because that gate lives in a server-only config the client cannot
+  read — and it is a preview, not the decision: `ondutyServer` re-checks every request, so a client
+  that lies to itself gains nothing.
+
+- **The session half is a window too.** Roleplay and personal session as two cards with the current one
+  marked, and the personal-session settings — map, time of day, AI population — inline instead of
+  three levels down a submenu. Time is now an hour you pick (00:00–23:00); the old list was indexed
+  from 1, so "1:00" was entry one and midnight sat at the bottom labelled "0:00".
+
+  Going on duty from the window calls the same `GoOnDuty` the `/onduty` command does — the membership
+  gate, the loadout and the server round-trip are one code path, not two that can drift.
+
 #### Settings
 
 - **The settings menu is a real window now.** It was a NativeUI list: one category per submenu, one
@@ -714,6 +613,237 @@ answer "is this one player or twelve?".
 
   This also removes the settings menu from NativeUI, which is the first step of retiring that library:
   `CreateSettings` is gone from `client/menus-cl.lua`, and `client/settingsui-cl.lua` replaces it.
+
+#### Vehicle spawner
+
+- **`/vehicle` is a searchable window instead of a submenu maze.** The old menu had two trees — "by
+  class" and "by manufacturer" — so finding a car meant knowing which branch it sat under, scrolling a
+  NativeUI list of every model the game ships, and having no way to search at all. It is one filtered
+  list now: type a name **or a model code**, narrow by class and manufacturer *together* (the two
+  trees could never be combined), and each card shows the display name, the make, the class and the
+  spawn code — the last of which is half the reason to open a spawner in the first place. The eight
+  cars you spawned most recently sit at the top, kept locally.
+
+- **It can be restricted now — and by default it still isn't.** `/vehicle` has always been open to
+  everyone: any player could put any vehicle in the game in front of themselves, with no check
+  anywhere in the command or the spawn path. `VehicleSpawner.permission` in
+  `configs/cfg-server-sv.lua` closes that when you want it closed. The client asks the **server**
+  before the window opens, because a client-side gate answers to the client; the window only builds
+  its catalogue once the server agrees, and the spawn callback refuses any model that is not in that
+  catalogue, so a player who never got the window has nothing to spawn from. Denials are logged to
+  your admin webhook.
+
+  ```lua
+  VehicleSpawner = { permission = "vehiclespawner" }   -- then in server.cfg:
+  -- add_ace group.admin lacore.vehiclespawner allow
+  ```
+
+  It goes through the same `HasPermission` helper as everything else, so `command.<perm>`,
+  `lacore.<perm>` and a bare `<perm>` all satisfy it, and devmode plus Staff/Dev pass regardless.
+
+  > ⚠️ **Config change (`configs/cfg-server-sv.lua`) — new `VehicleSpawner` block.** It ships **empty**
+  > (`permission = ""`), which means *everyone*, exactly as before. Turning this on silently would
+  > break servers that hand the spawner to their players on purpose.
+  >
+  > This gates the LACORE spawner, not the ability to create vehicles: a client that is already
+  > cheating never needed the menu. That remains the anticheat's entity sweep.
+
+- **It no longer costs every player a slower join.** The catalogue was built during startup: walk every
+  vehicle model in the game, three game-text lookups each, then create a NativeUI submenu and item per
+  entry — paid on every join by everyone, including the players who never type `/vehicle`. It is built
+  on first open now and cached for the session.
+
+#### The menu library is gone
+
+- **Every menu in the resource is a NUI window now, and `client/nativelacoreui.lua` has been deleted
+  with them.** The last three followed the settings, vehicle, session and duty windows:
+
+  - **The AOP ballot** shows its own countdown next to the options. The old menu put the remaining
+    time in a text entry elsewhere on screen, so you could never see "what am I voting on" and "how
+    long do I have" at the same time. The vote itself is unchanged — one `SendAOPVote` per ticked area.
+  - **The phone booth** is a searchable directory grouped into services, departments on duty and
+    players, instead of one flat page that grew with the player count.
+  - **The prop spawner** filters by category *and* name in one list. Props are looked for by what
+    they are — "cone", "bollard" — not by remembering whose category they landed in. Its devmode
+    crosshair loop no longer runs at 0ms for the whole session; it idles at 500ms unless the spawner
+    is actually open.
+
+    > ⚠️ **It answers to `/propspawner` now, not `/prop`.** `modules/civilian/civilian-cl.lua`
+    > registers `/prop` as well and loads later, so FiveM had been keeping *its* registration — the
+    > scenery spawner was unreachable, and `/prop` opened the civilian prop radial instead. Renaming
+    > it is what makes the module usable at all; the radial keeps `/prop`.
+
+  With the last menu gone, so is the **per-frame menu pump**: `_menuPool:ProcessMenus()` ran on every
+  single frame for every player, all session, to service menus that were almost never open.
+
+- **A dead command was removed.** `modules/character-cl.lua` registered `/character`, but
+  `modules/mdt/mdt-civilian-cl.lua` registers the same command and loads later, so the older menu had
+  been unreachable — FiveM keeps the last registration. Nothing else in the resource referenced any of
+  its functions. The command still works; it opens the civilian sheet it has been opening all along.
+
+#### Player list
+- **The "I" board is a duty board now.** It used to be one flat, alphabetically indifferent list of
+  24 players per page, which made the question people actually open it for — *who is on duty and what
+  are they doing* — a paging exercise. The board is now split: **units on the left, grouped by
+  department**, each with callsign, roleplay and account name, status and ping; **civilians on the
+  right** as a dense two-column roster. Units are never paged, because an answer to "who is on duty"
+  that is split across pages is not an answer. The arrow keys page the civilian roster instead.
+  - The header carries the **area of play**, your community name (from `cfg-branding-sh.lua`, so it
+    is your name and not ours), players online, units on duty, units available, and the local time.
+  - **Every department says how many of its units are available**, next to the on-duty total: `LAPD ·
+    4 on duty · 2 available`. "Six units are on" and "six units can take your call" are different
+    answers, and the board was only giving the first one — so a dispatcher had to read every status
+    badge in a column to work out the second. Available means `CLEAR` and nothing else, the same rule
+    the server counts LEO and Fire availability by, so the two can never disagree. A department with
+    nobody clear turns its number red rather than hiding it — zero available is the state most worth
+    seeing.
+  - A **status strip** shows the server alert, whether 911 dispatch is staffed, and who is allowed to
+    connect — the three things that were previously buried in a side column.
+  - Each unit row's left edge carries its **status colour**, the same palette the MDT status buttons
+    use, so a screen full of red or green reads at a glance without anyone reading a word.
+  - Departments are coloured from their **name**, so LSPD is the same blue on every client and does
+    not change colour when another department goes off duty. The colours are now shared with the
+    radio log, which had its own copy — so a department finally looks the same in both places, and
+    an agency the list did not know by name gets a colour of its own instead of the same grey as
+    everyone else.
+- **Two styles, your choice.** The duty board is a lot of screen, and not every server wants it — a
+  mostly-civilian community does not open the list to find out who is on shift. `HudCfg.playerlistStyle`
+  picks between them:
+  - `"duty"` (default) — the full board described above.
+  - `"minimal"` — one compact centred card: server ID, account name, character name, ping, and
+    department plus callsign for anyone on duty. No grouping, no server panel, no split. Its header
+    still carries on-duty **and** available counts for the whole roster, because that number is worth
+    one line even when the layout isn't.
+
+  Both read the same data, honour the same key and the same arrow-key paging; only the drawing differs.
+  The minimal card pages the whole roster as one list rather than splitting it, so the two send
+  different payloads and each ships exactly the rows it draws — nobody pays for the board they did not
+  pick. A value that is neither is reported once in the console and falls back to the duty board,
+  because a typo should not look like a setting that does nothing.
+  > ⚠️ **Config change (`configs/cfg-hud-sh.lua`) — new `HudCfg.playerlistStyle`.** It ships `"duty"`,
+  > so an untouched config keeps the new board. Set it to `"minimal"` for the compact card.
+- **Every row now says server ID, account name and character name — all three, everywhere.** Each
+  board had two of the three and a different two: a unit on the duty board showed both names but no
+  ID, a civilian showed the ID and the account name but never the character behind it, and on the
+  minimal card anyone on duty lost their character name to the department-and-callsign block. So the
+  one thing an admin opens the board for — *which ID is that, and who is playing them* — was never on
+  a single row. It is now.
+  - **Units on the duty board carry their server ID** in front of the callsign. A unit is addressed
+    by callsign in character; every admin command takes the ID, and it was the one number the board
+    would not give you.
+  - **Civilians carry their character name** next to their account name. The two share the row evenly,
+    so a long Steam name cannot push the roleplay name off it, and the roster stays two dense columns
+    — no extra line per player, no fewer players per page.
+  - **The minimal card shows the character name on every row**, on duty or not, and got wider to fit
+    it. The department and callsign next to a unit say which callsign is talking, not who is playing
+    it.
+  - Someone still in the spawn or freeroam session shows the **session** where the character name
+    goes, exactly as before — they have not picked one yet, and that is not an error.
+- **Nothing about either board takes focus.** Both are pure overlays that never swallow a keypress
+  or a click, exactly as before.
+- **Players pick their own player list.** The three layouts were a server-wide setting, which is the
+  wrong place for a preference about how much of *your* screen a board covers. **Settings ▸ Player
+  Location Display ▸ Player List Style** now offers *Server default*, *Duty board*, *Minimal card* and
+  *Bar*. It ships on *Server default*, so nothing changes for anyone who does not touch it, and
+  `HudCfg.playerlistStyle` keeps doing exactly what it did — it is now the default rather than the
+  verdict. Adding it was one line in `settingsTemplate`, which is what the settings window was rebuilt
+  for.
+
+  Option names in the settings window are translatable now as well (`setopt_<slug>`), because
+  "Server default" is a sentence rather than a proper noun like "Millennium" or "Satellite".
+
+- **A third layout: `"bar"`.** The duty board and the minimal card are both panels in the middle of
+  the screen — fine for a glance, in the way if you keep the list open. The bar is the other shape:
+  two surfaces along the top edge, a few rows deep. On the left the roster as a card grid — server
+  ID, account name, and either the character name or the unit's department and callsign in its
+  status colour — laid out column-first so each column reads top to bottom, with the player's role
+  as a coloured underline. On the right a server panel: area of play and how long it has stood, the
+  access state, whether a 911 dispatcher is on, and LEO and Fire/EMS strength. Every value comes
+  from the payload the other two boards already read. `duty` and `minimal` are untouched and `duty`
+  is still the default.
+
+  ```lua
+  HudCfg.playerlistStyle = "bar"   -- "duty" (default) · "minimal" · "bar"
+  ```
+
+  > ⚠️ **Config note (`configs/cfg-hud-sh.lua`)** — no new key, `playerlistStyle` simply accepts a
+  > third value. Nothing changes unless you set it.
+
+- **Fixed while adding it: the duty board rendered on top of any style it did not recognise.** Its
+  visibility check read "not minimal" rather than "is duty" — correct while there were exactly two
+  styles, and wrong the moment there were three: the bar and the full board drew at the same time.
+  Both boards, and the NUI message handler, now name the style they mean, and anything unknown falls
+  back to the duty board on both sides.
+
+#### Bug reports
+- **`/lacorereport` — a bug report straight to the LACORE dashboard.** Reports go over the same relay
+  channel telemetry already uses, not into your own database: this is how a bug in the resource itself
+  reaches the people who fix it, rather than sitting in a Discord channel nobody at LACORE reads. A
+  small form opens with a category and a message; the player's account name, character name if they
+  have one, department, callsign and position travel with it automatically, so "the MDT drops my status"
+  is traceable to an actual unit instead of an anonymous line of text.
+  - **Stored regardless of licensing.** An anticheat flag is only useful with an account to review it
+    against, so that feed drops anything unlicensed. A bug report about the product is useful to us
+    either way — if anything, an unlicensed dev server is exactly where a rough edge is likeliest to
+    show up first. So every report reaches the LACORE team; a server with an active
+    `lacore_license_key` additionally gets its own rows on its own dashboard, under **Bug Reports** —
+    see which of your players is reporting something, without leaving your own admin panel.
+  - **Rate-limited server-side, not just in the form.** `Report.cooldownSec` (120s by default) is
+    enforced by a table the server keeps per source id; the client mirrors it for the countdown label,
+    but a modified client cannot skip the wait because that copy is never what gets checked.
+  - **Your own copy stays optional.** Set `Webhooks.BugReport` (`configs/cfg-server-sv.lua`) to also log
+    every report to your own Discord — the same "additional, never a replacement" rule every webhook in
+    that file already follows.
+  > ⚠️ **New config file (`configs/cfg-report-sh.lua`)** — command name, cooldown, max length and the
+  > category list. Also gated by the new `Features.bugreport` (`configs/cfg-features-sh.lua`), for
+  > owners who prefer one place to switch features off; either setting disables the command entirely.
+
+#### Bans & playerbase
+- **txAdmin bans and warns now land in LACORE's ban list too.** The two systems each kept their own
+  database and had never heard of each other: `/ban` and `/warn` from the core write
+  `data/banlist.json`, txAdmin writes its own `playersDB.json`. On a team that works in the txAdmin
+  panel — which is most teams — that left the LACORE list nearly empty. It showed up as a number that
+  made no sense (`6 bans · 0 warns` next to 94 and 51 in txAdmin), but the real cost was quieter:
+  `/lacore bans upload` would have reported a cheerful "✓ Shared" after uploading six records while
+  ninety stayed home. Two halves close it:
+  - **A sync that finds txAdmin's database by itself.** On every start LACORE looks for
+    `playersDB.json` beside the server and carries over what it finds. Nothing to copy, nothing to
+    configure, nothing to redo after the server moves. It runs at each boot rather than once because
+    that also covers bans issued in the panel while the server was **down**: those fire no event, so
+    the live bridge alone would never see them. Repeating is free — records keep txAdmin's own action
+    id — and bans an admin already lifted or that have run out are skipped rather than resurrected.
+    The console stays quiet unless something actually came across.
+    > **Where it looks.** A configured data path first, then txAdmin's own; then the artifacts folder,
+    > which is where txAdmin puts `txData` by default and which LACORE derives from the running
+    > `monitor` resource; and finally the folders above its own, plus the ones **beside** them. That
+    > last part matters on the common Linux split where the artifacts and the resources live in
+    > separate trees — `/home/FXServer/server` next to `/home/FXServer/server-data` — because walking
+    > straight up from a resource in the second one never passes a `txData` at all.
+    >
+    > There is no official channel for any of this: txAdmin's history routes want an authenticated
+    > admin session, and its resource-facing token does not cover the database. So the file is read
+    > directly, and since it lives outside the resource, both ways a server script can reach outside
+    > are tried in turn. Some FXServer builds allow neither. When it comes up empty the command says
+    > how many paths it tried and **lists the folders it searched** — a layout nobody guessed looks
+    > exactly like a build that refuses the read, and the list is what tells the two apart. Usually one
+    > line in it is your own path, off by a folder.
+  - **`/lacore bans import`** — the same thing on demand, with the full account: which file it found,
+    how many actions it holds, and what was skipped and why.
+  - **A live bridge** — every future txAdmin ban and warn is mirrored as it happens, so the two lists
+    do not drift apart again. Mirroring is local bookkeeping: nothing leaves your server. Sharing
+    stays the deliberate `/lacore bans upload`.
+  > ⚠️ **Config change (`configs/cfg-integrations-sh.lua`) — new `Integrations.txAdminBans` and
+  > `Integrations.txAdminDataPath`.** The first ships `"auto"`: the bridge is active when txAdmin is
+  > running. Set it to `false` to keep the lists separate. The import is a manual command and runs
+  > regardless. The second ships empty and should stay that way — it is the escape hatch for a layout
+  > the search does not recognise, and `/lacore bans import` tells you when that is the case. Give it
+  > the `txData` folder (the one holding `<profile>/data/`), e.g. `/home/FXServer/server/txData`;
+  > `setr lacore_txdata_path "…"` in `server.cfg` does the same and takes precedence.
+  >
+  > A detail worth knowing if you inspect the file: imported records keep LACORE's own numeric `id`
+  > and carry txAdmin's id in a separate `txId` field. `BanPlayer()` derives the next id by adding one
+  > to the last entry's — a txAdmin id (`ABCD-1234`) sitting in that field would have made the next
+  > `/ban` fail on the arithmetic.
 
 #### Fingerprints
 
@@ -784,233 +914,72 @@ answer "is this one player or twelve?".
   wrote `= "true"`, which the config compares with `== true` and never matches: it silently behaved
   like "auto". Those options now emit `true` and `false` unquoted.
 
-#### Anticheat
+#### LAPD MDT
+- **Your status follows the call you are on.** The unit-status grid is gone from the Home screen.
+  Status is now set by the things you were already doing: Enroute and Station from the toolbar,
+  Code 6 and Traffic Stop when they create an incident, and **CLEAR** from the status dropdown to
+  hand the call back. Every status is still available directly from the status
+  badge in the command bar — that stays as the deliberate way to reach BUSY and UNAVAILABLE, which
+  belong to no incident at all.
+- **Code 6 while you are already on a call no longer opens a second one.** It set out a fresh
+  incident and moved the unit onto it, quietly abandoning the call being worked — the board then
+  showed an officer attached to something nobody had dispatched. Now it just puts you Code 6 on the
+  call you are on. A traffic stop during another call still creates its own incident, because that
+  genuinely is a separate event and dispatch needs it as one.
+- **Detach was previously not something a unit could do.** The only route was going CLEAR, which is
+  what detaches server-side but says so nowhere on screen; otherwise it took a dispatcher running
+  `/ddetach`. CLEAR in the status dropdown is now the documented detach — it sends exactly that
+  status, so the rule it depends on cannot drift.
+- **Fire/EMS units were missing their own statuses.** The MDT tested for the job label `Fire/EMS`,
+  but the job a medic actually carries in-game is `AMR` — so ON SCENE never appeared in the status
+  list for a real medic, and the Fire/EMS request button never rendered for them. The Lua side had
+  gated on all four spellings all along; this side had drifted from it.
+- **Four buttons that did nothing are gone.** *Edit* called a command registered nowhere in the
+  resource and now opens the incident's Comments, the one part of a call a unit can genuinely edit.
+  *Primary Unit*, *Import to Incident* and *Options* were bound to nothing and have been removed
+  rather than left greyed out. *Locate on Mobile Map* was live but unguarded: with no incident
+  selected it sent a null the server drops, so it looked ready and did nothing — it is now disabled
+  until there is something to locate.
 
-- **Every flag now says what the player was doing just before it.** A detection code tells you what
-  tripped, never what led there — and that is usually the whole question. `GOD_HEALTH · hp=300` reads
-  like a cheat until you see the same player was revived twice forty seconds earlier, at which point
-  it reads like a bug in a revive script. Each flag's Discord log now carries a short buffer of what
-  came before it:
+#### Remote config
 
-  ```
-  **Leading up to it**
-  -42s · duty · on duty as Fire/EMS / AMR
-  -38s · spawn · respawned / revived (immunity window granted)
-  -21s · vehicle · entered a vehicle (model 1171614426)
-  -12s · health · health 100 → 300
-  - 3s · flag · GOD_HEALTH → log (server hp=300)
-  ```
-
-  It records respawns and revives, duty changes, getting in and out of vehicles, weapon switches,
-  health jumps and earlier flags — including the ones that only logged, so a second detection arrives
-  with the first already in its story. The sampler writes **changes only**: a player standing still
-  produces an empty buffer rather than two hundred identical lines. `/lacore accontext <serverId>`
-  reads it for anyone online without waiting for them to trip something.
-
-  The buffer is bounded twice — 40 lines and 90 seconds by default, whichever runs out first — lives
-  in memory, and is dropped the moment the player disconnects.
-
-  > ⚠️ **Config change (`configs/cfg-anticheat-sh.lua`) — new `Anticheat.Context` block.** It ships
-  > **on**, which is a deliberate exception to how new anticheat features arrive here: this one sends
-  > nothing anywhere. It attaches text to a Discord log you were already receiving, and it is
-  > explicitly **not** added to the dashboard report — that payload is documented line by line in the
-  > same config, and widening it silently would be the wrong way to add a feature. Set
-  > `Context.enabled = false` to switch it off.
+- **The data-list editor is no longer blank.** It only ever showed rows you had typed into it, so
+  changing one fine in the penal code meant first retyping all twenty charges — and until you did,
+  the page looked like your server had no penal code at all. Your servers now report their own
+  tables up (the penal code, the phone directory, the blacklisted and member-only vehicle lists),
+  the same way they already report their settings, and the editor opens on those. Every list says
+  where its rows came from: **from your config** (read off your server's own files), **from all
+  servers** (inherited), or **your rows** (saved here). Saving an empty list gives it back rather
+  than storing an empty table, so there is a way out of an override as well as into one.
+  > The report is a snapshot taken at load, *before* any dashboard list is applied — otherwise a
+  > server would report your own override back to you and the "what my server actually has"
+  > baseline would quietly become a copy of the dashboard.
+- **Servers can now be configured one at a time.** Config was one set of values per account, applied
+  to every server you own — fine with one server, useless with three, because a second server could
+  not have its own penal code without changing the first one too. There is now a picker on the
+  Settings and Data lists pages: **All servers** is the default everything inherits, and each server
+  can override individual settings and whole lists on top of it. A setting you do not override keeps
+  following the default and says so (**INHERITED**), so there is no need to copy shared values into
+  every server just to keep them in step.
+  > Nothing changes for a single-server account: the picker only appears once there is a second
+  > server, the account-wide values keep working exactly as they did, and an override layer that
+  > nobody creates is simply never consulted.
   >
-  > The sampler half needs OneSync (server-side entity natives); without it the event-driven half
-  > still works and the module says so once at startup.
-
-#### Player list
-
-- **Players pick their own player list.** The three layouts were a server-wide setting, which is the
-  wrong place for a preference about how much of *your* screen a board covers. **Settings ▸ Player
-  Location Display ▸ Player List Style** now offers *Server default*, *Duty board*, *Minimal card* and
-  *Bar*. It ships on *Server default*, so nothing changes for anyone who does not touch it, and
-  `HudCfg.playerlistStyle` keeps doing exactly what it did — it is now the default rather than the
-  verdict. Adding it was one line in `settingsTemplate`, which is what the settings window was rebuilt
-  for.
-
-  Option names in the settings window are translatable now as well (`setopt_<slug>`), because
-  "Server default" is a sentence rather than a proper noun like "Millennium" or "Satellite".
-
-- **A third layout: `"bar"`.** The duty board and the minimal card are both panels in the middle of
-  the screen — fine for a glance, in the way if you keep the list open. The bar is the other shape:
-  two surfaces along the top edge, a few rows deep. On the left the roster as a card grid — server
-  ID, account name, and either the character name or the unit's department and callsign in its
-  status colour — laid out column-first so each column reads top to bottom, with the player's role
-  as a coloured underline. On the right a server panel: area of play and how long it has stood, the
-  access state, whether a 911 dispatcher is on, and LEO and Fire/EMS strength. Every value comes
-  from the payload the other two boards already read. `duty` and `minimal` are untouched and `duty`
-  is still the default.
-
-  ```lua
-  HudCfg.playerlistStyle = "bar"   -- "duty" (default) · "minimal" · "bar"
-  ```
-
-  > ⚠️ **Config note (`configs/cfg-hud-sh.lua`)** — no new key, `playerlistStyle` simply accepts a
-  > third value. Nothing changes unless you set it.
-
-- **Fixed while adding it: the duty board rendered on top of any style it did not recognise.** Its
-  visibility check read "not minimal" rather than "is duty" — correct while there were exactly two
-  styles, and wrong the moment there were three: the bar and the full board drew at the same time.
-  Both boards, and the NUI message handler, now name the style they mean, and anything unknown falls
-  back to the duty board on both sides.
-
-#### The menu library is gone
-
-- **Every menu in the resource is a NUI window now, and `client/nativelacoreui.lua` has been deleted
-  with them.** The last three followed the settings, vehicle, session and duty windows:
-
-  - **The AOP ballot** shows its own countdown next to the options. The old menu put the remaining
-    time in a text entry elsewhere on screen, so you could never see "what am I voting on" and "how
-    long do I have" at the same time. The vote itself is unchanged — one `SendAOPVote` per ticked area.
-  - **The phone booth** is a searchable directory grouped into services, departments on duty and
-    players, instead of one flat page that grew with the player count.
-  - **The prop spawner** filters by category *and* name in one list. Props are looked for by what
-    they are — "cone", "bollard" — not by remembering whose category they landed in. Its devmode
-    crosshair loop no longer runs at 0ms for the whole session; it idles at 500ms unless the spawner
-    is actually open.
-
-    > ⚠️ **It answers to `/propspawner` now, not `/prop`.** `modules/civilian/civilian-cl.lua`
-    > registers `/prop` as well and loads later, so FiveM had been keeping *its* registration — the
-    > scenery spawner was unreachable, and `/prop` opened the civilian prop radial instead. Renaming
-    > it is what makes the module usable at all; the radial keeps `/prop`.
-
-  With the last menu gone, so is the **per-frame menu pump**: `_menuPool:ProcessMenus()` ran on every
-  single frame for every player, all session, to service menus that were almost never open.
-
-- **A dead command was removed.** `modules/character-cl.lua` registered `/character`, but
-  `modules/mdt/mdt-civilian-cl.lua` registers the same command and loads later, so the older menu had
-  been unreachable — FiveM keeps the last registration. Nothing else in the resource referenced any of
-  its functions. The command still works; it opens the civilian sheet it has been opening all along.
-
-#### Session & duty
-
-- **`/jobmenu` finally opens a job menu.** It never did: `jobMenu` existed, but the entire body of its
-  builder was commented out, so the command quietly opened the *session* menu instead and the "Jobs"
-  page stayed empty. There is a real duty picker now — every agency from `configs/config.lua` as a
-  card with its short code, full name and branch, a search box, a callsign field, and one button. No
-  more remembering that the Highway Patrol answers to `CHP` and typing `/onduty CHP 8-ADAM-21` blind.
-
-- **It shows you which agencies you may actually take.** Agencies the `DutyAccess` gate would refuse
-  are greyed out and marked, instead of letting you pick one and be told no a second later. The list
-  comes from the **server** on open, because that gate lives in a server-only config the client cannot
-  read — and it is a preview, not the decision: `ondutyServer` re-checks every request, so a client
-  that lies to itself gains nothing.
-
-- **The session half is a window too.** Roleplay and personal session as two cards with the current one
-  marked, and the personal-session settings — map, time of day, AI population — inline instead of
-  three levels down a submenu. Time is now an hour you pick (00:00–23:00); the old list was indexed
-  from 1, so "1:00" was entry one and midnight sat at the bottom labelled "0:00".
-
-  Going on duty from the window calls the same `GoOnDuty` the `/onduty` command does — the membership
-  gate, the loadout and the server round-trip are one code path, not two that can drift.
-
-#### Vehicle spawner
-
-- **`/vehicle` is a searchable window instead of a submenu maze.** The old menu had two trees — "by
-  class" and "by manufacturer" — so finding a car meant knowing which branch it sat under, scrolling a
-  NativeUI list of every model the game ships, and having no way to search at all. It is one filtered
-  list now: type a name **or a model code**, narrow by class and manufacturer *together* (the two
-  trees could never be combined), and each card shows the display name, the make, the class and the
-  spawn code — the last of which is half the reason to open a spawner in the first place. The eight
-  cars you spawned most recently sit at the top, kept locally.
-
-- **It can be restricted now — and by default it still isn't.** `/vehicle` has always been open to
-  everyone: any player could put any vehicle in the game in front of themselves, with no check
-  anywhere in the command or the spawn path. `VehicleSpawner.permission` in
-  `configs/cfg-server-sv.lua` closes that when you want it closed. The client asks the **server**
-  before the window opens, because a client-side gate answers to the client; the window only builds
-  its catalogue once the server agrees, and the spawn callback refuses any model that is not in that
-  catalogue, so a player who never got the window has nothing to spawn from. Denials are logged to
-  your admin webhook.
-
-  ```lua
-  VehicleSpawner = { permission = "vehiclespawner" }   -- then in server.cfg:
-  -- add_ace group.admin lacore.vehiclespawner allow
-  ```
-
-  It goes through the same `HasPermission` helper as everything else, so `command.<perm>`,
-  `lacore.<perm>` and a bare `<perm>` all satisfy it, and devmode plus Staff/Dev pass regardless.
-
-  > ⚠️ **Config change (`configs/cfg-server-sv.lua`) — new `VehicleSpawner` block.** It ships **empty**
-  > (`permission = ""`), which means *everyone*, exactly as before. Turning this on silently would
-  > break servers that hand the spawner to their players on purpose.
-  >
-  > This gates the LACORE spawner, not the ability to create vehicles: a client that is already
-  > cheating never needed the menu. That remains the anticheat's entity sweep.
-
-- **It no longer costs every player a slower join.** The catalogue was built during startup: walk every
-  vehicle model in the game, three game-text lookups each, then create a NativeUI submenu and item per
-  entry — paid on every join by everyone, including the players who never type `/vehicle`. It is built
-  on first open now and cached for the session.
-
-#### Duty & permissions
-
-- **One department, one role, one portal — agencies can now be gated by Discord role or ACE.** LACORE
-  already asked for a Discord role before letting anyone go on duty as *Law Enforcement*; what it
-  never asked was *which agency*. So an officer with only the CHP role could still go on duty as LAPD
-  and get the LAPD terminal. `DutyAccess` in `configs/cfg-server-sv.lua` closes that: each agency
-  short code (`LAPD`, `LASD`, `CHP`, …) names what it requires. Because the agency is what `/mdt`
-  routes on, refusing the agency refuses the portal — there is no second gate to keep in sync, and no
-  way to reach a terminal you were not allowed to be a member of.
-
-  Either kind of permission works, and an agency may name both — holding **either one** is enough, so
-  you can move a department from one to the other without a flag day:
-
-  ```lua
-  agencies = {
-      LAPD = { role = "LAPD" },                          -- Discord role, nothing else to set up
-      LASD = { ace  = "lacore.duty.lasd" },              -- ACE object
-      CHP  = { role = "CHP", ace = "lacore.duty.chp" },  -- either one
-      NPS  = { role = { "NPS", "1285460493619953720" } },-- role key from DiscordAuth.roles, or a raw id
-  }
-  ```
-
-  `role` is a key from `DiscordAuth.roles` — the same table the duty whitelist already uses — or a raw
-  Discord role id, so a department role does not have to be registered first. `ace` suits a
-  vMenu-style server that already maps Discord roles to ACE groups: keep the `group.lapd` principals
-  you have and grant them the LACORE ace once in your `server.cfg`, `add_ace group.lapd
-  lacore.duty.lapd allow`. (ACE tests ace *objects*, not groups — that line is what connects the two.)
-
-  The check runs **server-side** in the duty event, so a client cannot talk its way past it, and it is
-  deliberately not waived by the ESX/QBCore bridge — on a server that gates agencies, the gate is the
-  last word. Agencies you do not list stay open unless you set `fallback = "deny"`, which flips it to
-  a strict allowlist. Staff and dev bypass by default (`bypassStaff`), and civilian `/job` names are
-  never touched, so a strict allowlist cannot lock a mechanic out of their own job. A role-only agency
-  on a server whose Discord auth is off or idle cannot be answered either way, so it falls back to
-  your `fallback` and says so in the console once — rather than silently refusing everyone for a
-  reason no one can see.
-
-  Two smaller things came with it, because the feature is unusable without them. `/dutyaccess` prints
-  the caller's agency access as a `+`/`-` list with what each one wants, which is the difference
-  between "my add_ace line has a typo" and "the gate is broken". And a refused duty request now
-  actually *un-does* itself on the client: `/onduty` applies the job and hands out the agency's
-  loadout the instant it is typed, long before the server has had its say, so until now a denied unit
-  kept the weapons and a UI that believed it was on duty. The client is put back to civilian and the
-  loadout that agency handed out is taken back — only those weapons, not everything the player is
-  carrying. That also repairs the older `DutyRoles` refusal, which had the same hole.
-
-  > ⚠️ **Config change (`configs/cfg-server-sv.lua`) — new `DutyAccess` block.** It ships **disabled**
-  > (`enabled = false`), so nothing changes until you turn it on. Existing configs are not rewritten:
-  > if your file predates this update it simply has no `DutyAccess` table, which reads the same as
-  > disabled.
+  > A server has to have started once with a license key before it can be given its own config —
+  > until it reports its identity there is nothing stable to file an override under, and filing it
+  > under an IP address would hand the config to whoever gets that address next. Those servers are
+  > shown in the picker but cannot be picked, with the reason on hover.
 
 ### Removed
 
 #### Loading screen
 
-- **LACORE no longer ships a loading screen.** The module, both designs, the `nui/loading` page, the
-  `cfg-loadingscreen-sh.lua` config, the `loadingscreen` feature toggle and the `loadscreen` entry in
-  the manifest are all gone. A loading screen is the one thing almost every server already has —
-  either a resource they picked deliberately or one that came with their template — and LACORE
-  claiming `loadscreen` meant theirs did not run until they found the toggle. Dropping it removes a
-  collision instead of a feature.
-
-  > ⚠️ **After updating**: if you were using it, install a loading-screen resource of your choice, or
-  > do nothing and the standard GTA screen runs. Nothing else changes; `Features.loadingscreen` is
-  > gone and a leftover entry in your config is simply ignored. Delete
-  > `configs/cfg-loadingscreen-sh.lua` if your install still has it.
+- **The loading screen built during this release was cut before it shipped.** LACORE claims no
+  `loadscreen` at all: almost every server already has one — picked deliberately or inherited from a
+  template — and taking that slot would have stopped theirs from running. Dropping it removes a
+  collision rather than a feature.
+  > Only relevant if you ran a development build: delete `configs/cfg-loadingscreen-sh.lua` if your
+  > install still has it. A leftover `Features.loadingscreen` entry is simply ignored.
 
 #### Dead code
 
@@ -1140,23 +1109,6 @@ answer "is this one player or twelve?".
 - **A call raised from a non-LAPD terminal is no longer filed under LAPD.** Unit-created incidents
   (traffic stop, Code 6, self-created) hardcoded `LAPD` into the Agency column regardless of who
   made them. They now carry the creating unit's own department.
-
-#### Loading screen
-
-- **The loading screen was blank for most of the join.** Headline, tips, rules and the phase readout
-  were held back until the server's config arrived, and that config is sent from client Lua — which
-  does not run until the game has finished its own init functions, most of the way through the load.
-  So the screen a player actually spent their join looking at was a logo, a percentage and a lot of
-  empty space, and the finished screen only appeared at the very end. The page now ships LACORE's own
-  headline, tips, rules and phase hints compiled in, and draws a complete screen from the first frame;
-  the config still replaces every word of it the moment it lands. On a default install the two are
-  identical, so there is nothing to see when the swap happens.
-  > The built-in copy is a verbatim mirror of the `ls_*` keys in `lang/en.lua` and is **English only** —
-  > it exists before any locale can be loaded. Translated wording is part of the config and arrives
-  > with it, exactly as before.
-- **Nothing that belongs to you is guessed at.** Only LACORE's own copy is defaulted. Your community
-  name, Discord invite, support channel, player count and area of play stay empty until the config
-  arrives, and their tiles stay hidden rather than briefly showing somebody else's invite.
 
 #### Paid add-ons
 
@@ -1303,10 +1255,11 @@ answer "is this one player or twelve?".
   by whether they are ACE-gated, job-checked or a dev tool. Every row carries the file and line it
   was read from, so nothing here has to be taken on trust. Linked from the main nav as **Commands**.
 
-> **New PocketBase collection to import:** `landing/pocketbase-acflags-collection.json`
-> (`lacore_ac_flags`). Storage is capped per account — these are operational signals with a short
-> useful life, not an archive, and one noisy server must not fill the database on everyone else's
-> behalf.
+> **Two new PocketBase collections to import**, both in `landing/pocketbase/`:
+> - `pocketbase-acflags-collection.json` (`lacore_ac_flags`) — the anticheat feed behind the new
+>   dashboard page. Storage is capped per account: these are operational signals with a short useful
+>   life, not an archive, and one noisy server must not fill the database on everyone else's behalf.
+> - `pocketbase-reports-collection.json` (`lacore_reports`) — what `/lacorereport` writes into.
 
 ## [3.3.1] – Dashboards grow up: admin, customer & partner tooling
 

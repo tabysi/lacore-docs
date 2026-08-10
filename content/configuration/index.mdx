@@ -40,6 +40,7 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-spawns-sh.lua` | shared | [World, blips & props](/configuration/world) — map-based spawn picker (capture points with `/spawnpoint`) |
 | `configs/cfg-emojis-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat |
 | `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
+| `configs/cfg-report-sh.lua` | shared | [Bug Reports](/user-guide/bug-reports) — `/lacorereport`: command name, cooldown, max length, categories |
 
 ### Law enforcement & CAD
 
@@ -47,6 +48,7 @@ self-documented by the comment header at the top of the file.
 | --- | --- | --- |
 | `configs/cfg-mdt-sh.lua` | shared | *(in-file)* — MDT options (e.g. only open the MDT while in a vehicle) |
 | `configs/cfg-mdt-labels-sh.lua` | shared | [MDT & Dispatch](/features/mdt-and-dispatch) — whitelabel: rename any MDT/CAD label |
+| `configs/cfg-penn-sh.lua` | shared | [Pennsylvania CAD](/user-guide/pennsylvania-cad) — department tags, call types, dispositions (paid add-on) |
 | `configs/cfg-licenses-sh.lua` | shared | [Penal code & evidence](/configuration/law-enforcement) — import ESX licences into the MDT slots |
 | `configs/cfg-fingerprint-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — mobile fingerprint ID scanner |
 | `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
@@ -57,6 +59,10 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-impound-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — impound lot + fees |
 | `configs/cfg-k9-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — K9 unit behaviour |
 | `configs/cfg-stt-sh.lua` | shared | [Radio STT](/features/radio-stt) — offline speech-to-text (experimental, off by default) |
+| `configs/cfg-supervisor-sh.lua` | shared | [Supervisor panel](/features/supervisor) — `/supervisor`: who counts as a supervisor (job grade or allowlist), panel options |
+| `configs/cfg-cases-sh.lua` | shared | [Supervisor panel](/features/supervisor) — case files: number prefix, case types, narrative sections |
+| `configs/cfg-personnel-sh.lua` | shared | [Supervisor panel](/features/supervisor) — personnel files: the higher write bar (`lacore.personnel.write` or job grade), entry types |
+| `configs/cfg-vehiclescreen-sh.lua` | shared | [In-Car Screen](/user-guide/in-car-screen) — per-model screen setup, audience, `mdt`/`incar` view, texture size, zoom, brightness, passengers |
 
 ### Player, civilian & phone
 
@@ -71,6 +77,7 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-turf-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — turf / gang war |
 | `configs/cfg-props-cl.lua` | client | [Civilian & emotes](/configuration/civilian) — placeable props |
 | `configs/cfg-weapons-cl.lua` | client | [World, blips & props](/configuration/world) — member-only weapons |
+| `configs/cfg-replay-sh.lua` | shared | [Replay & Director's Cut](/user-guide/replay) — sampling, storage quotas, colour grades, depth of field |
 
 ### Integrations & security
 
@@ -85,6 +92,7 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-remoteconfig-sh.lua` | server | [Anticheat & security](/configuration/security) — dashboard remote-config consent gate |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
 | `configs/cfg-presence-sh.lua` | shared | [Discord & Duty](/configuration/discord) — Discord Rich Presence |
+| `configs/cfg-library-sh.lua` | shared | *(in-file)* — model library: where `/modelcapture` screenshots are uploaded. Empty = LACORE hosts them for you; set `uploadUrl` to keep them on your own infrastructure. **Not** remotely editable |
 
 ## Start here
 
