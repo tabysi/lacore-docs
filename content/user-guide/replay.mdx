@@ -8,6 +8,8 @@ title: "Replay & Director's Cut"
 
 This is the raw material for trailers and highlight videos. It is deliberately **not an admin tool**: playback is local to whoever started it, nobody else on the server sees it, and nothing in it is real. (For an evidence trail, see the [Big Brother log](/features/security).)
 
+> ⚠️ **It ships off.** `Replay.enabled = false` in `configs/cfg-replay-sh.lua` — clips live on **your** disk and every player gets a recorder, so having it is a decision you make. Set it to `true` and restart; nothing else needs changing.
+
 > 📑 **Related:** [Command Reference](/commands) · [Anti-Cheat & Security](/anticheat)
 
 > 🎬 **There is no video file at the end.** FiveM cannot encode video. This sets up the **shot** — the scene, the framing, the timing — and you capture it with OBS or ShadowPlay like any other gameplay.
@@ -161,7 +163,7 @@ Everything lives in **`configs/cfg-replay-sh.lua`**, and the whole feature is ad
 
 | Setting | Default | What it does |
 |---------|---------|--------------|
-| `Replay.enabled` | `true` | Master switch |
+| `Replay.enabled` | `false` | Master switch — **ships off**, set it to `true` to have the replay system |
 | `Replay.command` | `"replay"` | The command name |
 | `Replay.sampleHz` | `10` | Samples per second (range 1–30) |
 | `Replay.radius` | `50.0` | Recording radius in metres |
