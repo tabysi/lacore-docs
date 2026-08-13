@@ -3,7 +3,50 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.3.2] – Pennsylvania CAD, a replay studio & an anticheat you can review
+## [3.3.2a] – 2026-08-13 — The web dispatcher is a page you just open
+
+### Added
+
+#### The web dispatcher became a page you just open
+
+The browser dispatcher used to mean hosting a Node bridge on your own VPS, wiring Discord OAuth and
+pointing a domain at it. Now it is two lines in `server.cfg` and a button in the dashboard.
+
+- **A hosted portal at `/server/<id>`.** Your server pushes its CAD state — calls, units, the 911/311
+  queue — to LACORE every two seconds over the same licence-key channel the dashboard already uses,
+  and reads the dispatcher's actions straight out of the reply. Nothing listens on your server, no
+  second machine, no certificate. **Off by default:** the shift's call data leaves your server only
+  once you set `setr lacore_webdispatch "true"`.
+- **A desktop, not a dashboard page.** Dispatch, Map, Units and Radio are windows you drag, snap,
+  maximise and minimise, with a taskbar and a start menu — one dispatcher can watch the map on one
+  half and the call list on the other. Under 1280px it collapses to one program at a time.
+- **The real map.** The Map window draws the game's own atlas tiles on the same calibration the
+  in-game dispatch console uses, so a unit sits on the same street on both screens. It opens on
+  where the shift actually is — the median of the units and calls, not the middle of the island —
+  and fills the pane instead of letterboxing it.
+- **The windows are looking at the same shift.** Clicking a marker on the map selects that call in
+  Dispatch; the right-click menu in Units writes into the radio box; picking a callsign in Units is
+  what ASSIGN acts on.
+- **Actions are real.** Status changes (ER / CODE SIX / CLEAR), assigning a unit, creating a call and
+  closing one with a disposition all run through the same functions the in-game MDT uses, and land in
+  Big Brother with the dispatcher's Discord identity, marked as source `web`.
+- **It never pretends to be live.** Five honest states, decided by the age of the last snapshot and
+  what your account may do: **live**, **stale** (>10s — the windows dim and actions are held),
+  **offline** (>60s — you are looking at the last state that arrived), **read only** (the acting
+  controls are absent, not greyed out) and **no access**.
+- **One button to get there.** Dashboard → Servers → **DISPATCH** opens the portal for that server.
+  The id in the URL is the server's own id, so two servers on one account never mix.
+- **Your own bridge still works.** `lacore_bridge_url` / `lacore_bridge_token` are untouched, inbound
+  endpoint included, and both paths may run at the same time.
+
+### Known limits
+
+- Access is per **account**, not per server: anyone who can reach your servers in the dashboard can
+  dispatch on all of them. Granting web dispatch to individual Discord roles is not built yet.
+- The Radio window is local to your browser — the in-game dispatch chat is a separate channel and is
+  not carried in the snapshot yet.
+
+## [3.3.2] – 2026-08-11 — Pennsylvania CAD, a replay studio & an anticheat you can review
 
 The biggest release LACORE has had. A **sixth terminal** (the Pennsylvania CAD), a **replay and
 Director's Cut** suite for building trailers, the **in-car dashboard screen** grown into a terminal
