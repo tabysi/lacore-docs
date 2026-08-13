@@ -1,5 +1,6 @@
 export default {
   index: 'All Releases',
+  'v3-3-2b': '3.3.2b',
   'v3-3-2a': '3.3.2a',
   'v3-3-2': '3.3.2',
   'v3-3-1': '3.3.1',

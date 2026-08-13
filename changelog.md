@@ -3,6 +3,35 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.3.2b] – 2026-08-13 — Web dispatch per Discord role
+
+### Added
+
+#### Web dispatch is granted per server, by Discord role
+
+Access used to be per **account**: anyone who could reach your servers in the dashboard could
+dispatch on all of them, and there was no way to hand a seat to a dispatcher who is not on your
+dashboard. Now there is.
+
+- **A role list per server**, in `configs/cfg-server-sv.lua`: `WebDispatchAccess.dispatch` may act,
+  `WebDispatchAccess.view` may only watch. Role NAMES from `DiscordAuth.roles`, so a role ID is
+  written once and reused by the in-game checks.
+- **Both lists empty by default** — nobody but you and your dashboard team. Granting web dispatch
+  stays a decision somebody makes on purpose.
+- **The check runs on YOUR server, with your own bot token.** The portal asks "may this Discord id
+  dispatch?" and gets back yes, read-only or no; the token, the guild and the roles never leave the
+  machine. The question and the verdict ride along with the CAD snapshot that was already flowing —
+  no new connection, nothing new to configure.
+- **Refusals fail closed.** Roles that cannot be read — not in the guild, Discord unreachable, no
+  token — are a no, never a yes.
+- **Read-only is a rule, not a hidden button.** The acting controls disappear for a viewer *and* the
+  server refuses the action if one is sent anyway.
+- **"Checking your access" is its own screen**, because the answer takes one push to arrive and
+  refusing somebody for those two seconds would read as a permanent no.
+
+⚠️ **Config change:** `configs/cfg-server-sv.lua` gains `WebDispatchAccess`. Existing configs keep
+working unchanged — a missing block means the same thing as the default: nobody but the owner.
+
 ## [3.3.2a] – 2026-08-13 — The web dispatcher is a page you just open
 
 ### Added

@@ -69,13 +69,35 @@ the last snapshot is and what your account is allowed to do:
 | **LIVE** | A snapshot arrived in the last ten seconds. Everything works. |
 | **STALE** | Nothing for more than ten seconds. The windows dim, actions are held. |
 | **OFFLINE** | Nothing for more than a minute. You are looking at the last state that arrived. |
-| **READ ONLY** | You may look at everything and change nothing — the acting controls are gone, not greyed out. |
-| **NO ACCESS** | You are signed in, but this server is not yours to dispatch. |
+| **READ ONLY** | You may look at everything and change nothing — the acting controls are gone, not greyed out. Refused server-side too, not just hidden. |
+| **NO ACCESS** | You are signed in, but no role of yours grants dispatch here (or none has been granted to anybody). |
 
-<Callout type="warning">
-  Access is currently per **account**: anyone who can reach your servers in the dashboard can
-  dispatch on them. Granting web dispatch to individual Discord roles is not built yet — until it is,
-  only hand out dashboard access you would also hand out a dispatch seat to.
+### Who may open it
+
+Two ways in, and the second one is how you give a seat to somebody who is not on your dashboard:
+
+1. **You**, and anyone on your dashboard team with the *servers* scope. Always, no Discord needed.
+2. **A Discord role you name**, per server, in `configs/cfg-server-sv.lua`:
+
+```lua
+WebDispatchAccess = {
+    dispatch = { "Staff", "Dispatch" },  -- may act: status, assign, create, close
+    view     = { "Member" },             -- may watch, cannot act
+}
+```
+
+Both lists are **empty by default**, which means nobody but you. The names come from
+`DiscordAuth.roles` — the same table the in-game role checks use, so a role ID is written once.
+
+The check runs **on your server**, with your own bot token. The portal only ever asks *"may this
+Discord id dispatch?"* and gets back yes, read-only or no; your token, your guild and the roles
+themselves never leave the machine. Anyone whose roles cannot be read — not in the guild, Discord
+unreachable, no token configured — is refused rather than let through.
+
+<Callout type="info">
+  Because the answer comes from the game server, the first visit shows a short **"checking your
+  access"** screen while the question rides along with the next snapshot, and a server that is
+  offline cannot let anybody new in. Verdicts are remembered for five minutes.
 </Callout>
 
 ## The self-hosted bridge
