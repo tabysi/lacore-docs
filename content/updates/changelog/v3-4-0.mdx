@@ -1,0 +1,41 @@
+---
+title: "3.4.0"
+---
+
+![LACORE 3.4.0](/changelog/v3-4-0.svg)
+
+# [3.4.0] – 2026-08-14 — A supervisor group, not a list of names
+
+### Added
+
+#### The supervisor panel takes an ACE permission
+
+Until now the panel had two doors: a framework job grade, or an allowlist of license identifiers and
+callsigns. Neither survives a real department. Collecting the license of every supervisor across three
+departments and keeping `server.cfg` in sync by hand is a job nobody wants, and the callsign entry was
+worse than inconvenient — a callsign is just text a player types, so anyone willing to put on a
+supervisor's callsign got the panel with it.
+
+So there is a third door, and it is the one to use: an **ACE object**. Allow it on a group once, and
+every member of that group has the panel.
+
+```cfg
+add_ace group.lapd_supervisor lacore.supervisor allow
+add_principal identifier.discord:123456789012345678 group.lapd_supervisor
+```
+
+Any identifier works as the principal (`discord:`, `license:`, `fivem:`, `steam:`). If you run a
+Discord→ACE bridge, point your supervisor roles at those groups and the membership keeps itself in
+sync — a role change is the whole workflow. ACE objects are hierarchical, so a group allowed plain
+`lacore` gets it too, which is why `group.lacore_dev` already had it.
+
+Departments that want to be gated separately get their own object via `aceByDept`
+(`["LSPD"] = "lacore.supervisor.lspd"`), checked before the general one. `leoOnly` still applies: an
+ACE holder must be an on-duty LEO unit. And `/myperms` now ends with `supervisor=true|false`, so
+"did my ACE land?" is one command instead of a guess.
+
+The grade path and the allowlist are untouched — a server that adds nothing behaves exactly as before.
+
+⚠️ **Config change:** `configs/cfg-supervisor-sh.lua` gains `ace` (default `"lacore.supervisor"`) and
+`aceByDept`. The default grants nobody anything until you allow the object somewhere, so an existing
+install notices no difference.
