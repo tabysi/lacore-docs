@@ -1,0 +1,34 @@
+---
+title: "3.4.6"
+---
+
+![LACORE 3.4.6](/changelog/v3-4-6.svg)
+
+# [3.4.6] – 2026-08-15 — A custom prison is actually custom
+
+### Fixed
+
+#### Custom jail coordinates are honoured everywhere
+
+`Corrections.jailCoords` / `releaseCoords` promised "set these to run a custom prison" — but only
+the timer-expiry path read them. The initial teleport into jail (`jailPlayer`), the release
+(`unjailPlayer`) and the coroner hold reused **hardcoded** Bolingbroke coordinates, so a custom
+prison teleported inmates into the default jail anyway. All of these now read the config, with the
+old literals only as fallback for a missing file.
+
+The keep-in-prison loop had the same blind spot the other way round: it checked the game's `JAIL`
+zone, so an inmate held at a custom prison **outside** that zone was snapped back to the exact jail
+coordinate every second — pinned to one spot instead of roaming the grounds. The check now also
+counts "within `Corrections.jailRadius` of `jailCoords`" (new setting, default 150 m) as inside.
+Inside the default Bolingbroke zone nothing changes.
+
+#### The impound lot is an LEO panel, not a public lookup
+
+`/impounds` opened for everyone: the client command had no job check and the server answered the
+list request unconditionally ("public lookup"). The lot lists **officer names and impound
+reasons**, so it is not public data — the command now carries the same LEO gate as `/impound`, and
+the server refuses the list to non-LEO regardless of what the client asks (release was already
+gated).
+
+⚠️ **Config change:** `configs/cfg-corrections-sh.lua` gains `jailRadius` (default `150.0`) — only
+relevant for custom prisons outside the game's JAIL zone; existing installs notice no difference.
