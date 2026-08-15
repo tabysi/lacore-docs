@@ -1,0 +1,58 @@
+---
+title: "3.4.7"
+---
+
+![LACORE 3.4.7](/changelog/v3-4-7.svg)
+
+# [3.4.7] – 2026-08-15 — Bullets that actually land
+
+### Fixed
+
+#### Players stuck unkillable after joining through the session menu
+
+Shots landed but barely hurt: a hit player took almost no damage from any weapon, and a headshot
+only ragdolled them instead of killing them. The impulse of the shot still applied — the damage did
+not.
+
+Cause: the spawn lobby deliberately turns player-vs-player damage off
+(`NetworkSetFriendlyFireOption(false)` + `SetCanAttackFriendly(ped, false, false)`) while a player
+still sits in session 0, and turned it back on **only** inside the spawn loop's own exit path in
+`client/vehicle-cl.lua`. Joining the session any other way — the session menu's "roleplay" or
+"personal" button in `client/sessionui-cl.lua` — set `player.session` directly, so the loop ended
+without ever lifting the block. That client then spent the whole session unable to take (or deal)
+bullet damage.
+
+Two further holes are closed with it:
+
+- `SetCanAttackFriendly` is stored **on the ped**, so every respawn and every model change dropped
+  it. It is now re-asserted whenever the ped handle changes, from the session the player is
+  actually in.
+- Both natives now move together through one helper, `SetFriendlyFire(on)` in `client/util-cl.lua`,
+  so a future exit path cannot flip one and forget the other.
+
+No config change; nothing to do beyond restarting the resource.
+
+#### "Down" meant "slightly wounded"
+
+The third-eye grief gate `IsDowned()` counted anyone below `150` HP as unconscious. Players start at
+`200`, so a fully conscious, walking player at half health could be **carried, revived and zipped
+into a body bag**. The magic number is gone — `IsPedFatallyInjured` already asks the same question
+against the ped's real death threshold instead of an invented one.
+
+`ems:Revive` gained a matching check on the patient's own client. Reviving someone who is not down
+was a full heal on any player of the medic's choosing; healing the merely wounded is what the
+separate medic option is for.
+
+#### Third-eye actions could be fired across the map
+
+`target:Carry`, `ems:Revive` and `target:DeadBag` accepted any server ID. The eye options only show
+up within 2–3 m, but nothing stopped a modified client from sending the event for a player on the
+other side of the map. The server now checks the distance itself (5 m, with headroom over the
+largest option) and refuses the player's own ID. Servers running without OneSync keep working — the
+check skips itself rather than blocking everything, since server-side entity natives need OneSync.
+
+#### `CEventNetworkEntityDamage` was misspelled
+
+`client/vehicle-cl.lua` listened for `CEventNetworkEntityDamange`, so the only damage-event listener
+in the resource never fired. Its body is devmode-only debug output, so nothing behaved differently —
+but it was dead code pretending to be a hook.
