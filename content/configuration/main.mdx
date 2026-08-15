@@ -8,6 +8,14 @@ import { Callout } from 'nextra/components'
 
 The central gameplay/world config. Escrow-ignored — edit freely.
 
+<Callout type="info">
+  Since 3.5.0 `config.lua` holds only the core settings below. The data tables it used to carry
+  moved into their own files (backward compatible — an old `config.lua` that still defines them
+  wins): `agencies` → `cfg-agencies-sh.lua`, `BusStops`/`BusRoutes` → `cfg-busroutes-cl.lua`,
+  `textEntries` → `cfg-gametext-cl.lua`, `customIcon` → `cfg-phoneicons-cl.lua`,
+  `indestructibleProps` → `cfg-props-cl.lua`, `initialAOPs` → `cfg-server-sv.lua`.
+</Callout>
+
 ## General settings
 
 | Setting | Default | Description |
@@ -46,10 +54,11 @@ CallCenter = {
   with other pma-voice usage.
 </Callout>
 
-## Agencies
+## Agencies (`cfg-agencies-sh.lua`)
 
-`agencies` is the master list of departments used across the CAD/MDT. Each entry defines the
-department shown on duty and its loadout:
+`agencies` is the master list of departments used across the CAD/MDT — since 3.5.0 in its own
+file, `configs/cfg-agencies-sh.lua`. Each entry defines the department shown on duty and its
+loadout:
 
 ```lua
 agencies = {
@@ -84,17 +93,17 @@ The `type` field controls which terminal a member gets and how dispatch treats t
 `equipment` entries support `components`, `tint`, and `rack` (weapon on a station rack). `wallpaper`
 is the MDT background (texture names or an RGB triple).
 
-## Other lists in `config.lua`
+## The other data lists (own files since 3.5.0)
 
-| List | Purpose |
-| --- | --- |
-| `textEntries` | Custom GTA text labels (advertisement titles, session messages, restriction notices). |
-| `customIcon` | Phone/contact icons (name → Discord-style handle + GTA icon). |
-| `BusStops` / `BusRoutes` | Public transit stops and routes. |
-| `RegisterPrices` | Store register item prices. |
-| `initialAOPs` | Starting Areas of Patrol for the AOP voting system. |
-| `indestructibleProps` | Props made indestructible (traffic signs, hydrants, streetlights …). |
-| `SpeedLimits` | Per-road speed limits (with directional overrides). |
+| List | File | Purpose |
+| --- | --- | --- |
+| `textEntries` | `cfg-gametext-cl.lua` | Custom GTA text labels (advertisement titles, session messages, restriction notices). |
+| `customIcon` | `cfg-phoneicons-cl.lua` | Phone/contact icons (name → Discord-style handle + GTA icon). |
+| `BusStops` / `BusRoutes` | `cfg-busroutes-cl.lua` | Public transit stops and routes. |
+| `initialAOPs` | `cfg-server-sv.lua` | Starting Areas of Patrol for the AOP voting system. |
+| `indestructibleProps` | `cfg-props-cl.lua` | Props made indestructible (traffic signs, hydrants, streetlights …). |
+
+`RegisterPrices` and `SpeedLimits` were removed in 3.5.0 — nothing in the code ever read them.
 
 <Callout type="info">
   Coordinates in these lists are placeholders tuned for a specific map — adjust them to your server.

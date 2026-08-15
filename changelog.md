@@ -3,6 +3,45 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.0] – 2026-08-15 — config.lua on a diet
+
+### Changed
+
+#### The main config is settings again, not a thousand lines of data
+
+`config.lua` was 1118 lines, and about 1000 of them were data tables: the full agency roster
+(~750 lines alone), bus stops and routes, GTA text overrides, phone icons, the indestructible-prop
+list, the AOP pool. A customer who only wanted to switch the language scrolled past all of it.
+
+The settings part (~100 lines) stays exactly where it was. The data moved into topic files, each
+loaded only on the side that reads it:
+
+| Table | New home |
+| --- | --- |
+| `agencies` | `configs/cfg-agencies-sh.lua` (client + server) |
+| `BusStops`, `BusRoutes` | `configs/cfg-busroutes-cl.lua` (client only) |
+| `textEntries` | `configs/cfg-gametext-cl.lua` (client only) |
+| `customIcon` | `configs/cfg-phoneicons-cl.lua` (client only) |
+| `indestructibleProps` | `configs/cfg-props-cl.lua` (joined the prop spawner config) |
+| `initialAOPs` | `configs/cfg-server-sv.lua` (server only) |
+
+All entries were split off 1:1 by line range and verified by count — 54 agencies, 48 bus stops,
+39 icons, 16 text entries. A comment block at the end of `config.lua` points to every new home.
+
+**Backward compatible by design:** `config.lua` still loads first, and every moved table is
+defined as `X = X or { … }`. If you kept an old, edited `config.lua` that still contains one of
+these tables, **your table wins** and the new file's defaults simply don't apply. You can migrate
+your edits into the new files whenever convenient — no rush, nothing breaks.
+
+### Removed
+
+`RegisterPrices` and `SpeedLimits` are gone: nothing in the code ever read either of them — they
+were documentation-only ballast. If you edited them, the edits never had an effect.
+
+⚠️ **Config change:** `configs/config.lua` shrank to its settings; six data tables moved to the
+files above (old edited copies keep working, see the compatibility note). `cfg-props-cl.lua` and
+`cfg-server-sv.lua` each gained a section at the end.
+
 ## [3.4.3] – 2026-08-15 — Data is not configuration
 
 ### Changed
