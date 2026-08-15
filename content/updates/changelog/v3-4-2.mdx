@@ -1,0 +1,25 @@
+---
+title: "3.4.2"
+---
+
+![LACORE 3.4.2](/changelog/v3-4-2.svg)
+
+# [3.4.2] – 2026-08-15 — Fifty-two config files, one map
+
+### Added
+
+#### The configs folder now explains itself
+
+`configs/` has grown to 52 editable files — one per feature, which keeps each file small, but
+finding *which* file holds a setting meant opening them one by one. The folder now ships its own
+map: **`configs/CONFIG-INDEX.md`** — one line per file, grouped by topic (start here → MDT/CAD →
+LEO tools → civilian → presentation → integrations → security), each line naming the Lua table the
+file defines (`PenalCode`, `HudCfg`, …) so you know what to search for in your editor.
+
+The page also explains the `-sh` / `-cl` / `-sv` naming, points at the `.defaults/` +
+`/lacoreconfig restore` safety net, and tells standalone-product owners (lacore-mdt) that a listed
+file missing from their download is a feature their product simply doesn't include — not an error.
+
+It is deliberately **not** called `README.md`: that name is stripped from customer builds, so the
+index would never have arrived. `CONFIG-INDEX.md` ships in the core and in every product, as plain
+text. No code was changed — this release is documentation only.
