@@ -54,6 +54,8 @@ Everything lives in `configs/cfg-supervisor-sh.lua`.
 | `minGradeByDept` | *(empty)* | Per-department override, e.g. `["LSPD"] = 4`. Falls back to `minGrade`. |
 | `ace` | `"lacore.supervisor"` | ACE object that grants the panel. `false` or `""` switches the ACE path off. |
 | `aceByDept` | *(empty)* | Per-department ACE object, e.g. `["LSPD"] = "lacore.supervisor.lspd"`. Checked before `ace`. |
+| `roles` | *(empty)* | Discord role **names** from `DiscordAuth.roles`. Holding any of them grants the panel. |
+| `rolesByDept` | *(empty)* | Per-department role list, e.g. `["LSPD"] = { "LAPDSupervisor" }`. Checked in addition to `roles`. |
 | `allow` | *(empty)* | Allowlist keyed by **license identifier** (`license:…`) **or exact callsign** (`"1-L-30"`), value `true`. |
 | `leoOnly` | `true` | Only on-duty LEO units are ever eligible. Set `false` to allow any job that clears the checks. |
 
@@ -69,6 +71,11 @@ SupervisorConfig = {
     ace = "lacore.supervisor",
     aceByDept = {
         ["LSPD"] = "lacore.supervisor.lspd",
+    },
+
+    roles = { "LAPDSupervisor", "BCSOSupervisor", "SAHPSupervisor" },
+    rolesByDept = {
+        ["LSPD"] = { "LAPDSupervisor" },
     },
 
     allow = {
@@ -115,6 +122,48 @@ add_ace group.lapd_supervisor lacore.supervisor.lspd allow
 `leoOnly` still applies: an ACE holder must be an on-duty LEO unit to open the panel. Check who the
 server thinks you are with **`/myperms`** — it reports `supervisor=true|false`.
 </Callout>
+
+### Granting the panel with a Discord role
+
+If your departments already live in Discord, the roles can **be** the permission — nothing goes into
+`server.cfg` at all. Put your supervisor roles into `DiscordAuth.roles`
+(`configs/cfg-server-sv.lua`) with their role IDs, then name them in `roles`:
+
+```lua filename="configs/cfg-server-sv.lua"
+DiscordAuth = {
+    roles = {
+        LAPDSupervisor = "1234567890123456789",
+        BCSOSupervisor = "2345678901234567890",
+        SAHPSupervisor = "3456789012345678901",
+    },
+}
+```
+
+```lua filename="configs/cfg-supervisor-sh.lua"
+roles = { "LAPDSupervisor", "BCSOSupervisor", "SAHPSupervisor" },
+```
+
+Give someone the role in Discord and they have the panel; take it away and they don't. Use
+`rolesByDept` if a role should only count for units of one department.
+
+<Callout type="warning">
+This path needs a Discord **bot token** (`lacore_discord_token`) and your guild id
+(`lacore_discord_guild`). Without them the role check never matches — the ACE, grade and allowlist
+paths keep working regardless. Roles are cached for `DiscordAuth.cacheSeconds` (5 minutes by
+default), so a role change can take that long to reach a player who is already connected.
+</Callout>
+
+### Which path should I use?
+
+| Situation | Use |
+| --- | --- |
+| Departments are managed in Discord, no bridge in place | **Discord role** — `roles` |
+| You already run a Discord→ACE bridge | **ACE** — map the role to a group, allow `lacore.supervisor` on it |
+| ESX / QBCore / QBox with real job grades | **Grade** — `minGrade` / `minGradeByDept` |
+| A handful of people, no framework, no bot | **Allowlist** — `allow` with license identifiers |
+
+The paths are checked independently and any one of them is enough, so mixing them is fine — a
+framework server can still hand the panel to one guest supervisor by ACE.
 
 ### Personnel & cases
 
@@ -238,7 +287,8 @@ says so. Reads are audited too, and a file containing discipline entries is logg
 
 | Symptom | Cause |
 | --- | --- |
-| `/supervisor` says you're not a supervisor | Grade below `minGrade`, no supervisor ACE **and** not in `allow`. On standalone servers the grade is always `0` — use the ACE path. Run `/myperms` to see what the server thinks. |
+| `/supervisor` says you're not a supervisor | None of the four paths matched. On standalone servers the grade is always `0` — use the ACE or Discord-role path. Run `/myperms` to see what the server thinks. |
+| The Discord role is there but the panel is not | No bot token / guild id set, the role is missing from `DiscordAuth.roles`, or the 5-minute role cache hasn't caught up yet. |
 | You want to test it without setting ranks up | Enable **devmode** (`setr lacore_devmode "true"`) — it opens the gate for everyone, exactly like the dispatch and officer checks. Never leave it on in production. |
 | Nobody can open it | Standalone server with an empty `allow` list. |
 | A supervisor can't assign or set status | They opened the panel, then it was closed — the elevated access only lasts while it is open. |

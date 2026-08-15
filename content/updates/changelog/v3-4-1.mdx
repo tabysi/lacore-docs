@@ -1,0 +1,32 @@
+---
+title: "3.4.1"
+---
+
+![LACORE 3.4.1](/changelog/v3-4-1.svg)
+
+# [3.4.1] – 2026-08-15 — The Discord role is the permission
+
+### Added
+
+#### A supervisor role in Discord now opens the panel
+
+The ACE path from 3.4.0 assumes you have somewhere to put a principal. If your departments are run
+out of Discord and you have no role→ACE bridge, that still meant maintaining a second list by hand.
+
+So the roles can now **be** the permission. Name your supervisor roles in `DiscordAuth.roles` with
+their role IDs, list the names in the supervisor config, and you are done:
+
+```lua
+roles = { "LAPDSupervisor", "BCSOSupervisor", "SAHPSupervisor" },
+```
+
+Give someone the role in Discord and they have the panel; take it away and they don't. Nothing goes
+into `server.cfg`, nothing needs a restart. `rolesByDept` limits a role to units of one department.
+
+The check is the same one the BigBrother panel uses, so it needs your Discord bot token
+(`lacore_discord_token`) and guild id. Without them it simply never matches, and the ACE, grade and
+allowlist paths are unaffected. Roles are cached for `DiscordAuth.cacheSeconds` (5 minutes), so a
+role change reaches a connected player within that window.
+
+⚠️ **Config change:** `configs/cfg-supervisor-sh.lua` gains `roles` and `rolesByDept`, both empty by
+default — an existing install notices no difference.
