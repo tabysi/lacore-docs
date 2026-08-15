@@ -79,13 +79,9 @@ K9.searchWalk     = 6.0              -- how far ahead it trots to sniff
 K9.blip = { enabled = true, sprite = 442, color = 5, scale = 0.85 }  -- map blip
 ```
 
-**Commands** (also listed in-game via `/k9 help`): `/k9` deploy/recall · `heel` (follow) · `stay` ·
-`sit` · `lay` (platz) · `bark` · `search` (sniffs the area ahead, alerts on an armed subject) · `engage`
-(charges the aimed/nearest target) · `car` (loads into the nearest vehicle).
-
-Every action is **also a keybindable command** — players can bind them in **FiveM Settings → Key
-Bindings → FiveM** (`lacore_k9`, `lacore_k9_heel`, `lacore_k9_sit`, `lacore_k9_bark`, … — all unbound by
-default).
+Commands, orders and the handler workflow are in the
+[LEO Field Tools guide](/user-guide/leo-field-tools#-k9); every order is also a keybindable command
+(all unbound by default).
 
 ## Mobile Fingerprint ID — `configs/cfg-fingerprint-sh.lua`
 
@@ -117,23 +113,11 @@ Fingerprint.Latents = {
 }
 ```
 
-### The investigation loop
-
-The scanner used to answer one question: *who is this person in front of me*. It now supports the
-other one — *whose print is this*:
-
-1. **Lift** — `/liftprint 1042` at the abandoned getaway car. The print is **anonymous**: the server
-   knows who left it and will not tell you. It appears in the device's **Prints** tab as `LP-0001`.
-2. **Run** — hit *Run* on it. If that person has never been printed you get **"not in the register"**,
-   and the latent stays open.
-3. **Enrol** — later, with the suspect detained, scan them and press **Take prints**.
-4. **Run it again** — now it matches, and the match is filed as **evidence on their record**, with a
-   tag, the location, the incident number and a chain of custody.
-
-Who left a print is not guessed: the client reports the plate when a player gets into a vehicle, so a
-latent resolves to the people who actually sat in that car recently. Old touches expire, the list is
-capped per vehicle, and your own touch is excluded — you cannot lift your own print off the cruiser
-you just parked.
+The full lift → run → enrol → match workflow (with what players see at each step) is in the
+[LEO Field Tools guide](/user-guide/leo-field-tools#-fingerprint-scanner--latent-prints). Who left a
+print is not guessed: the client reports the plate when a player gets into a vehicle, so a latent
+resolves to the people who actually sat in that car recently — old touches expire, the list is
+capped per vehicle, and your own touch is excluded.
 
 <Callout type="info">
   **`Register.required` ships off.** With it off, a scan identifies from the records profile exactly as
