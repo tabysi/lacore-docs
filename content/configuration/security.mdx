@@ -8,16 +8,19 @@ import { Callout } from 'nextra/components'
 
 ## Anticheat — `configs/cfg-anticheat-sh.lua`
 
-<Callout type="error">
-  **Do not enable without configuring it first.** `Anticheat.Enabled = false` by default. Read every
-  threshold below and tune it to your server before switching it on.
+<Callout type="info">
+  **Ships enabled, in observe mode.** `Anticheat.Enabled = true` + `Mode = "observe"` by default:
+  every check runs and logs what it *would* have done, but nothing is kicked or banned. That is safe
+  to run untouched from day one. Run observe for a week, watch the log — when it stops surprising
+  you, switch `Mode` to `"enforce"`.
 </Callout>
 
-Per-detection action:
+Per-detection action (in observe mode, all four behave as `"log"`):
 
 | Action | Effect |
 | --- | --- |
 | `"log"` | Discord webhook (`Webhooks.AdminLog`) only. |
+| `"trust"` | Webhook + trust points — escalates to kick/ban only if the player keeps at it. |
 | `"kick"` | Webhook + kick. |
 | `"ban"` | Webhook + permanent ban (via `BanPlayer`). |
 
@@ -26,34 +29,30 @@ the `lacore.ac.bypass` ACE permission (`Anticheat.Whitelist`), are never punishe
 
 ```lua
 Anticheat = {
-    Enabled = false,
+    Enabled = true,       -- ships ON …
+    Mode    = "observe",  -- … but in observe mode: log-only until you switch to "enforce"
 
-    Explosions = {
-        action = "ban",
-        blocked = {          -- explosion types a client can never legitimately trigger
-            [30] = true,     -- buried mine
-            [59] = true,     -- orbital cannon
-            [72] = true,     -- script missile
-            -- …
-        },
-        ratePer10s = 8,      -- more than X explosions in 10s → punish
-    },
+    -- Server-side checks
+    Explosions   = { action = "ban" },
+    WeaponDamage = { action = "kick" },
+    EntitySpam   = { action = "kick", skipOnFramework = true },  -- ESX/QBCore garages spawn server-side
 
-    WeaponDamage = {
-        action    = "kick",
-        maxDamage = 250,     -- above this = damage modifier (sniper headshot ≈ 200)
-    },
-
-    EntitySpam = {
-        action       = "kick",
-        maxPerMinute = 20,   -- max client-spawned entities per minute
-    },
-    -- … excerpt only — the file also carries GodMode, SpeedHack, Teleport, NoClip, Invisible, SuperJump,
-    -- BlacklistedWeapons, BlacklistedVehicles (delete = true), AntiDump, Honeypots, EventRateLimit, a Trust
-    -- escalation model (kickAt 8 / banAt 20), the server-authoritative ServerSweep + Combat checks, and a
-    -- recommended FXServer convar block (sv_scriptHookAllowed 0, sv_pureLevel 2, sv_enforceGameBuild, …).
+    -- Client-side detections (bypassable, so default actions are milder)
+    GodMode            = { enabled = true, action = "kick" },
+    BlacklistedWeapons = { enabled = true, action = "ban" },
+    -- … excerpt only — the file also carries SpeedHack, Teleport, NoClip, Invisible, SuperJump,
+    -- BlacklistedVehicles, AntiDump, Honeypots, EventRateLimit, the Trust escalation model and the
+    -- server-authoritative ServerSweep + Combat checks.
 }
 ```
+
+<Callout type="warning">
+  The **thresholds, honeypot names and blacklists are not in this file** — they live in the escrowed
+  `modules/anticheat/` so cheaters can't read the exact numbers to stay under. Anything you set in
+  `cfg-anticheat-sh.lua` overrides the shipped default; whatever you leave out keeps the default.
+  See [Anti-Cheat & Security](/anticheat) for the full feature overview and the recommended
+  `server.cfg` hardening block.
+</Callout>
 
 ## Member-only vehicles — `configs/cfg-blacklist-sh.lua`
 

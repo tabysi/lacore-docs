@@ -9,6 +9,7 @@ export default {
   notifications: 'Notifications',
   phone: 'Phone',
   'law-enforcement': 'Penal Code & Evidence',
+  supervisor: 'Supervisor Panel',
   'gameplay-modules': 'Gameplay & Misc Modules',
   civilian: 'Civilian & Emotes',
   security: 'Anticheat & Security',

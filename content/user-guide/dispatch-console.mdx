@@ -6,7 +6,7 @@ title: "Dispatch Console"
 
 A separate **full-screen CAD** for whoever is working **dispatch**. It's distinct from the in-car MDT and gives a live map of the area, every active incident, every on-duty unit, a chat channel between dispatch and units, and tools to manage zone boundaries that drive the region detection across the whole CAD.
 
-> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [Working with Incidents](/user-guide/mdt-incidents) · [Status labels](/support)
+> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [Working with Incidents](/user-guide/mdt-incidents) · [Status labels](/user-guide/statuses)
 
 ---
 
@@ -73,7 +73,7 @@ The console is **separate** from the MDT — when you open it, the MDT auto-clos
 
 | Element | Purpose |
 |---|---|
-| **DISPATCH CONSOLE** | Title (the old "LOS ANGELES COUNTY" tag is gone in 3.0.4 — region is detected automatically now) |
+| **DISPATCH CONSOLE** | Title — the region is detected automatically |
 | **Map Style dropdown** | Switch between **Atlas** (road map, default) · **Grid** (clean grid) · **Satellite** (real terrain). Live swap, no reload. The choice is remembered per client (`localStorage`). |
 | **⛬ Zones button** | Open the **Zone Editor** (per-zone region overrides) — see [Zone Editor](#-zone-editor) below |
 | **⚠ ATTENTION ALL UNITS** | Plays the alert tone (`3beep.ogg`) to **every on-duty LEO**, shows a "DISPATCH: Attention all units" notification, and logs the event |
@@ -357,7 +357,7 @@ In `configs/config.lua`:
 | `DispatchMapStyle` | Default map style (`"styleAtlas"`, `"styleGrid"`, `"styleSatelite"`) — overridable per client via the dropdown |
 | `DispatchTileBase` | Empty = use the `lacore-maps` resource. Set to a full URL (with trailing slash) to serve tiles from your own CDN (e.g. `"https://maps.yourdomain.com/mdt/map/"`) |
 | `CallRetentionDays` | How long resolved incidents stay in the store (default: 7) |
-| `ShowIncidentBlips` | Whether on-duty units see GTA map blips for active incidents (default: `true`) |
+| `ShowIncidentBlips` | Whether on-duty units see GTA map blips for active incidents (default: `false`) |
 
 ---
 
@@ -385,5 +385,5 @@ In `configs/config.lua`:
 
 - [Using the MDT](/user-guide/mdt) — the in-car CAD
 - [Working with Incidents](/user-guide/mdt-incidents) — what a unit does after being assigned
-- [Status labels](/support) — what the colour-coded badges across the CAD mean
+- [Status labels](/user-guide/statuses) — what the colour-coded badges across the CAD mean
 

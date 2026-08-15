@@ -2,6 +2,7 @@ export default {
   index: 'Overview',
   mdt: 'Using the MDT',
   'mdt-toolbar': 'MDT Toolbar & Status',
+  statuses: 'Status Labels',
   'mdt-incidents': 'Working with Incidents',
   'mdt-query': 'Query: People & Plates',
   bolo: 'BOLO',

@@ -23,13 +23,18 @@ LACORE is configured in three layers:
 ## Config file map
 
 Every config file, what it controls, and where it's documented. Files marked *(in-file)* are
-self-documented by the comment header at the top of the file.
+self-documented by the comment header at the top of the file. The same map also ships with the
+resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 
 ### Core & world
 
 | File | Scope | Controls |
 | --- | --- | --- |
-| `config.lua` | shared | [Main config](/configuration/main) — agencies, call center, time (`SyncGameTime`), transit, AOPs |
+| `config.lua` | shared | [Main config](/configuration/main) — general settings, call center, time (`SyncGameTime`), vehicles (since 3.4.4 the big data tables live in their own files below) |
+| `configs/cfg-agencies-sh.lua` | shared | *(in-file)* — every department the duty window and CAD/MDT know: tag, name, loadout, wallpaper |
+| `configs/cfg-regions-sh.lua` | shared | [World, blips & props](/configuration/world) — dispatch districts: regions, map colours, GTA-zone mapping |
+| `configs/cfg-gametext-cl.lua` | client | *(in-file)* — GTA text overrides: key hints, session/AOP notices, member-restriction messages |
+| `configs/cfg-busroutes-cl.lua` | client | *(in-file)* — public-transport bus stops + the routes chaining them |
 | `configs/cfg-features-sh.lua` | shared | [Feature Toggles](/configuration/features) — enable/disable any component (e.g. run only the MDT/CAD) |
 | `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, agency whitelist, vehicle-spawner permission, webhooks |
 | `configs/cfg-branding-sh.lua` | shared | [Branding & Backup](/configuration/branding) — your community/server name everywhere |
@@ -59,10 +64,11 @@ self-documented by the comment header at the top of the file.
 | `configs/cfg-impound-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — impound lot + fees |
 | `configs/cfg-k9-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — K9 unit behaviour |
 | `configs/cfg-stt-sh.lua` | shared | [Radio STT](/features/radio-stt) — offline speech-to-text (experimental, off by default) |
-| `configs/cfg-supervisor-sh.lua` | shared | [Supervisor panel](/features/supervisor) — `/supervisor`: who counts as a supervisor (job grade or allowlist), panel options |
-| `configs/cfg-cases-sh.lua` | shared | [Supervisor panel](/features/supervisor) — case files: number prefix, case types, narrative sections |
-| `configs/cfg-personnel-sh.lua` | shared | [Supervisor panel](/features/supervisor) — personnel files: the higher write bar (`lacore.personnel.write` or job grade), entry types |
+| `configs/cfg-supervisor-sh.lua` | shared | [Supervisor panel](/configuration/supervisor) — `/supervisor`: who counts as a supervisor (job grade or allowlist), panel options |
+| `configs/cfg-cases-sh.lua` | shared | [Supervisor panel](/configuration/supervisor) — case files: number prefix, case types, narrative sections |
+| `configs/cfg-personnel-sh.lua` | shared | [Supervisor panel](/configuration/supervisor) — personnel files: the higher write bar (`lacore.personnel.write` or job grade), entry types |
 | `configs/cfg-vehiclescreen-sh.lua` | shared | [In-Car Screen](/user-guide/in-car-screen) — per-model screen setup, audience, `mdt`/`incar` view, texture size, zoom, brightness, passengers |
+| `configs/cfg-cuffs-cl.lua` | client | *(in-file)* — which EUP accessory component a cuffed suspect wears |
 
 ### Player, civilian & phone
 
@@ -70,6 +76,7 @@ self-documented by the comment header at the top of the file.
 | --- | --- | --- |
 | `configs/cfg-phone-sh.lua` | shared | [Phone](/configuration/phone) — NUI phone: apps, ringtones, directory, prop hold |
 | `configs/cfg-retro-sh.lua` | shared | [Phone](/configuration/phone) — retro / 90s phone skin (year, model, prop, carrier) |
+| `configs/cfg-phoneicons-cl.lua` | client | *(in-file)* — contact/company → icon texture for the legacy phone and Bleeter |
 | `configs/cfg-vehicles-sh.lua` | shared | [Registering a vehicle](/user-guide/civilian-vehicles) — plate formatting, insured-by-default, `/vreg`-or-stolen window |
 | `configs/cfg-profile-sh.lua` | shared | [Profile & achievements](/configuration/profile) — the `/profile` UI |
 | `configs/cfg-achievements-sh.lua` | shared | [Profile & achievements](/configuration/profile) — XP / easter eggs |

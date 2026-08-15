@@ -110,6 +110,34 @@ if owner then print('Registered to ' .. owner.name) end
   active BOLO flags, not for pulling someone's rap sheet into a third-party script.
 </Callout>
 
+## Insurance
+
+Read/write the insurance flag officers see when they run a plate — so a mechanic job, insurance
+shop or payment webhook can drive it without touching the core.
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetInsurance(plate)` | `true` \| `false` \| `nil` | `nil` = unknown plate |
+| `SetInsurance(plate, insured)` | `bool` | success; emits `insuranceChanged` |
+
+## Personnel files
+
+Read-only by design: promotions, certifications and discipline sit behind a higher in-game
+permission bar, and an export cannot prove who is asking.
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetPersonnelFile(license)` | `file` \| `nil` | `{ license, name, badge, dept, job, callsign, rank, status, counters, duty, firstSeenUnix, lastSeenUnix }` |
+| `GetDutyLog(license [, limit])` | `entry[]` | newest first, `limit` 1–500 (default 100); empty `license` = all units |
+
+## Case files
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetCase(caseNumber)` | `case` \| `nil` | the full case file |
+| `GetCases(filter)` | `case[]` | summaries; `filter = { status, q }`, max 200 |
+| `CreateCase(opts)` | `caseNumber` \| `nil` | opens a case owned by the calling resource — `opts = { title, ctype, dept, location, postal, occurredAtUnix, incidentNumber }` |
+
 ## BOLOs
 
 | Export | Returns | Notes |

@@ -19,6 +19,36 @@ See the [`lacore_devmode` convar](/configuration/convars#dev-mode). When on, it 
 bypasses **all** connect checks, and grants every player full staff/dev permissions. Never on in
 production.
 
+## External chat
+
+```lua
+ExternalChat = false
+```
+
+LACORE ships a lightweight OOC chat: it takes over the stock `chat` message, re-posts it as
+"OOC | Name", logs it to Discord and runs a name anti-spoof + slur filter. If you run a
+**third-party chat resource** (cc-chat / cc-rpchat, …), every line shows twice and their RP names
+can trip the anti-spoof kick — set `ExternalChat = true` so the other chat owns the display. The
+Discord OOC log and the slur filter stay active.
+
+## Entity lockdown (anti-cheat vs. NPC traffic)
+
+```lua
+EntityLockdown = "strict"
+```
+
+LACORE locks the default routing bucket so clients can't spawn arbitrary networked entities — a
+common cheat/griefing vector. The catch: ambient NPC traffic and pedestrians are **also**
+client-spawned, so a locked bucket means empty streets.
+
+| Value | Behaviour |
+| --- | --- |
+| `"strict"` *(default)* | Max protection, but **no** ambient NPC traffic / peds. |
+| `"inactive"` | Vanilla: NPC traffic + peds come back, but clients may spawn any entity again (other anti-cheat checks still run). |
+| `"relaxed"` | Middle ground; may or may not restore ambient traffic — test it on your build. |
+
+Want NPC cars back? Set `"inactive"`.
+
 ## Access control (whitelist & Discord on/off)
 
 Framework servers (ESX / QBCore / QBox) usually handle identity and permissions themselves and don't
@@ -118,6 +148,22 @@ DutyRoles = {
 - An empty value (`""`) means no restriction — anyone may take that job.
 - Values are role names from `DiscordAuth.roles`.
 
+## Web dispatcher access
+
+Who may use the [hosted web dispatcher](/features/webdispatch) for **your** server:
+
+```lua
+WebDispatchAccess = {
+    dispatch = {},  -- e.g. { "Staff", "Dispatch" } — may act: status, assign, create, close
+    view     = {},  -- e.g. { "Member" }            — may watch, cannot act
+}
+```
+
+**Both lists empty = nobody but you** — that is the default on purpose. You (the license-key owner)
+and your dashboard team always have access without appearing here. Role **names** come from
+`DiscordAuth.roles`; the check runs on your server with your own bot token — the website only asks
+"may this Discord id dispatch?" and gets yes/no/read-only back.
+
 ## Agency whitelist
 
 `DutyRoles` above gates the **job** ("Law Enforcement"). `DutyAccess` in `configs/cfg-server-sv.lua`
@@ -139,7 +185,7 @@ enough — they are alternatives, so you can move a department from one to the o
 
 ```lua
 DutyAccess = {
-    enabled     = true,      -- false (default) = no agency gate at all
+    enabled     = true,      -- ships false (no agency gate); set true to turn it on
     bypassStaff = true,      -- let Staff/Dev take any agency; false = strict
 
     agencies = {
@@ -222,6 +268,23 @@ LACORE  Agency access (DutyAccess) — + allowed, - denied:
   - LASD  [ace lacore.duty.lasd]
 ```
 
+## Vehicle spawner permission
+
+The `/vehicle` spawner menu is open to everyone by default. Gate it behind an ACE permission:
+
+```lua
+VehicleSpawner = {
+    permission = "",   -- "" = everyone; e.g. "vehiclespawner" = requires the ACE below
+}
+```
+
+```cfg
+add_ace group.admin lacore.vehiclespawner allow
+```
+
+Checked server-side via the shared `HasPermission` helper — `devmode` and Staff/Dev always pass.
+This gates LACORE's spawner menu, not entity creation as such (that is the anticheat's job).
+
 ## Webhooks
 
 Webhook URLs are read from convars so they never live in the code. Any left empty disables that
@@ -234,6 +297,7 @@ Webhooks = {
     AdminLog        = GetConvar("lacore_webhook_adminlog", ""),
     DispatchLog     = GetConvar("lacore_webhook_dispatch", ""),
     UserReports     = GetConvar("lacore_webhook_reports", ""),
+    BugReport       = GetConvar("lacore_webhook_bugreport", ""),  -- your own copy of /lacorereport reports
     PrisonLog       = GetConvar("lacore_webhook_prison", ""),
     BleeterLog      = GetConvar("lacore_webhook_bleeter", ""),
     txAdminAdminLog = GetConvar("lacore_webhook_txadmin", ""),

@@ -1,7 +1,6 @@
 export default {
   index: 'Overview',
+  'lacore-mdt': 'LACORE MDT (Standalone)',
   'pennsylvania-cad': 'Pennsylvania CAD',
-  farming: 'Farming',
-  robbery: 'Robbery',
-  heists: 'Heists',
+  'lacore-roblox': 'LACORE for Roblox (in dev)',
 }

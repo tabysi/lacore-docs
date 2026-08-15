@@ -247,15 +247,10 @@ fs.mkdirSync(THUMBS, { recursive: true })
 fs.mkdirSync(OGDIR, { recursive: true })
 
 const meta = { index: "'All Releases'" }
-const unreleased = []
-let unreleasedPlaced = false
 
 for (const sec of sections) {
-  if (/^unreleased$/i.test(sec.bracket)) {
-    unreleased.push('## ' + sec.headerLine + '\n\n' + sec.body)
-    if (!unreleasedPlaced) { meta['unreleased'] = "'Unreleased / Dev'"; unreleasedPlaced = true }
-    continue
-  }
+  // [Unreleased] blocks are internal development notes — never published.
+  if (/^unreleased$/i.test(sec.bracket)) continue
   const slug = slugFor(sec.bracket)
   meta[slug] = "'" + sec.bracket + "'"
   const { title: secTitle, date: secDate } = parseHeader(sec.headerLine)
@@ -278,11 +273,6 @@ for (const sec of sections) {
   if (callouts) parts.push(callouts)
   if (rest.trim()) parts.push(sanitize(rest))
   fs.writeFileSync(path.join(OUT, slug + '.mdx'), parts.join('\n\n') + '\n')
-}
-
-if (unreleased.length) {
-  const page = `---\ntitle: "Unreleased / Development"\n---\n\n# Unreleased & Development Notes\n\nPre-release development history (multiple \`Unreleased\` blocks from the changelog).\n\n${sanitize(unreleased.join('\n\n---\n\n'))}\n`
-  fs.writeFileSync(path.join(OUT, 'unreleased.mdx'), page)
 }
 
 // _meta.js
@@ -311,12 +301,10 @@ Every LACORE release has its own page with the complete notes. Pick a version be
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '18px', marginTop: '28px' }}>
 ${cards}
 </div>
-
-Development history lives on the [Unreleased / Dev](/updates/changelog/unreleased) page.
 `
 fs.writeFileSync(path.join(OUT, 'index.mdx'), idx)
 
 // Site-wide default share card (shown for every non-version page).
 await renderPNG(defaultCardSVG(), path.join(OGDIR, 'default.png'))
 
-console.log(`Generated ${Object.keys(meta).length - 1} pages + ${sections.length - (unreleased.length ? 1 : 0)} PNG cards + default OG from changelog.md`)
+console.log(`Generated ${Object.keys(meta).length - 1} pages + PNG cards + default OG from changelog.md`)
