@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.5.1] – 2026-08-15 — Three dependencies, honestly
+## [3.4.5] – 2026-08-15 — Three dependencies, honestly
 
 ### Changed
 
@@ -35,7 +35,7 @@ What remains — and is now documented as such in `fxmanifest.lua`, the docs and
 `server.cfg.example` gained a commented optional-resources block, and the requirements table in
 `START-HERE.md` now separates required from optional.
 
-## [3.5.0] – 2026-08-15 — config.lua on a diet
+## [3.4.4] – 2026-08-15 — config.lua on a diet
 
 ### Changed
 
