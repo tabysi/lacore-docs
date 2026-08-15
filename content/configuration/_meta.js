@@ -3,6 +3,7 @@ export default {
   editor: 'Config Editor',
   features: 'Feature Toggles',
   branding: 'Branding & Backup',
+  localisation: 'Localisation',
   convars: 'Server Convars',
   main: 'Main Config (config.lua)',
   discord: 'Discord & Duty',

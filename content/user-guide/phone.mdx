@@ -1,0 +1,68 @@
+---
+title: "Phone"
+---
+
+import { Callout } from 'nextra/components'
+
+# Using the Phone
+
+Press **F1** (rebindable) or type `/phone`. You can keep **walking and driving** with the phone
+open — attack and camera controls are suppressed so clicking doesn't shoot, and only while a text
+field is focused does the phone take the keyboard. Other players see you holding a phone prop with
+the matching animation.
+
+<Callout type="info">
+  The phone needs a set **RP nick/character** (`/char`) before it opens. Your number is assigned
+  automatically (`555-XXXX`) — find it under **Settings → My number**.
+</Callout>
+
+The home screen works like a modern smartphone: app grid, a dock (**Phone · Messages · Camera ·
+Settings**), and a **search pill** that filters and launches any app by name. Incoming SMS show a
+banner at the top — tap it to jump into the thread. An incoming call opens the phone by itself.
+
+## The apps
+
+| App | What you do with it |
+|---|---|
+| **Phone** | Keypad + Recents. Dial `555-XXXX` (dashes optional). Calls connect **real voice** via pma-voice — accept, talk, hang up. |
+| **Messages** | SMS threads with unread badges (300 chars per message). |
+| **Contacts** | Address book — add, edit, call straight from a contact. |
+| **Emergency** | **911** (emergency) or **311** (non-emergency): describe what's happening and send — it lands in dispatch as a real call, **with your location attached automatically**. |
+| **Camera** | Take photos (needs `screenshot-basic` on the server), browse the gallery (last 12), view full-screen, delete, or **post to Bleeter**. |
+| **Bleeter** | The public feed — post (300 chars, optional photo), like/unlike. Server-wide, live on every open phone. |
+| **Groups** | Group chats: create with a name + member phone numbers, chat, leave (the group dissolves when the last member leaves). |
+| **Notes** | A persistent notepad (up to 40 notes). |
+| **Garage** | Read-only list of the vehicles registered to your character. |
+| **Wallet** | Your digital ID — name, DOB, address, driver licences. |
+| **Weather / Calculator / Flashlight** | What it says — the flashlight toggles straight from the grid. |
+| **Directory** | Business numbers (hospital, LS Customs, taxi, LSPD non-emergency 311, plus whatever your server adds). |
+| **Settings** | Your number, wallpaper, ringtone (with preview), notification sound, **Do Not Disturb**, airplane mode. |
+
+There is deliberately **no banking or money app** — LACORE is RP-only, no economy.
+
+<Callout type="info">
+  Contacts, threads, call log, gallery and notes are saved per **account** and survive restarts.
+  Do Not Disturb silences ringing and SMS banners; airplane mode takes you off the air entirely.
+</Callout>
+
+## The retro 90s phone
+
+If your server enables the retro skin (`Retro.enabled` — see [Phone config](/configuration/phone)),
+the modern smartphone is replaced by a **green-LCD brick phone** (default model "NT-3100"): softkey
+menus, **T9 multi-tap texting**, a call register, a ringtone melody — and **Snake** under Games.
+Calls, SMS and contacts use the same backend; the modern-only apps (Bleeter, camera, groups,
+Emergency, notes, wallet …) don't exist on the brick.
+
+<Callout type="warning">
+  The retro phone has **no Emergency app** — on a retro server, reach dispatch by voice (`/911`
+  caller flow) or however your server handles it.
+</Callout>
+
+## Quirks worth knowing
+
+- Voice on calls silently does nothing if the server doesn't run **pma-voice** (a hard dependency
+  of LACORE anyway).
+- The camera does nothing without **`screenshot-basic`** installed server-side.
+- The gallery keeps the last **12** photos, the call log the last **40** entries, Bleeter the last
+  **60** posts server-wide — the oldest silently drop off.
+- Bleeter identity and groups follow your **account**, not the individual character.

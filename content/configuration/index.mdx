@@ -115,11 +115,7 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 
 ## Localisation
 
-All user-facing strings are localised:
-
-- **Lua** (server/client): `T("key")` → `lang/en.lua` (+ `de.lua`, `ru.lua`).
-- **NUI**: `t("key")` → `lang/en.json` (+ `de.json`, `ru.json`).
-
-The active language is set by `Language` in `config.lua`; the MDT/NUI can use a separate language via
-`MdtLanguage`. To add a language, copy the `en` files, translate, and register the code in
-`configs/locale-sh.lua`.
+All user-facing strings are localised (`en` / `de` / `ru`). The active language is `Language` in
+`config.lua`; the MDT/NUI can use a separate one via `MdtLanguage`. Editing strings, adding a
+language and the whitelabel system are covered on the
+[Localisation page](/configuration/localisation).
