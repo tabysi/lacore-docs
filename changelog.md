@@ -3,9 +3,122 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.4.9] – 2026-08-16 — QBox servers get their names and jobs through
+
+### Added
+
+#### QBCore and QBox characters are imported like ESX ones
+
+Framework characters were an ESX-only feature: on QB and QBox the bridge took the name and the job,
+but everything else — date of birth, gender, phone, registered vehicles, licences — had to be typed
+into LACORE a second time, and the CAD person query found nobody who was not currently online.
+
+QB and QBox now have the same import ESX has. Identity is read from the loaded player
+(`PlayerData.charinfo`), not from the database: QB keeps the character in memory and writes it back
+on save, so the player object is the fresher source and a fork that renamed a column still imports.
+`citizenid` keys the LACORE character, which makes multicharacter work without any extra handling —
+one LACORE character per QB character, re-synced on switch and on every job change.
+
+| Pulled from QB / QBox | Source |
+| --- | --- |
+| Name, date of birth, gender, phone, job | `charinfo` of the loaded player |
+| Registered vehicles (plates in the CAD query) | `player_vehicles` for that `citizenid` |
+| MDT licences | `metadata.licences` |
+
+The MDT person and plate queries fall back to `players` / `player_vehicles` as well, so an offline
+character or a car bought in the framework's shop is found. QB has no height on the character, so
+that one field stays empty. `oxmysql` is only needed for the vehicle half — the identity import runs
+without it.
+
+> ⚠️ **Config changed:** `configs/cfg-licenses-sh.lua` gained `Licenses.qb`, the map from QB's
+> `metadata.licences` keys onto the six MDT licence slots. It ships covering stock QB
+> (`driver`, `business`, `weapon`); add your own licence names there if you use custom ones.
+> `configs/cfg-bridge-sh.lua` is unchanged apart from its comments — `Bridge.useFrameworkCharacters`
+> now applies to QB/QBox too, at its existing default of `true`.
+
+### Fixed
+
+#### The QBox bridge never reached the framework at all
+
+On a QBox server (`qbx_core`) the bridge detected the framework correctly and then went silent:
+no character names, no job → agency mapping, so `/onduty` still demanded a Discord duty role and
+the MDT opened for nobody. ESX and plain QBCore were unaffected.
+
+The bridge asked QBox for a core object (`exports.qbx_core:GetCoreObject`). QBox does not have one —
+it dropped the QBCore core-object pattern and answers only under its QB compatibility layer or
+through its own exports. The call therefore failed on every lookup, `Bridge.GetName` and
+`Bridge.GetJob` returned `nil`, and LACORE behaved as if the player had no job.
+
+Player lookups now go through QBox's native `exports.qbx_core:GetPlayer(source)` first and fall
+back to the QB bridge layer's core object, so both a pure QBox install and one running the QB
+compatibility layer resolve. QBox's `QBCore:Server:OnPlayerLoaded` event (QBCore fires
+`PlayerLoaded` and passes the player, QBox fires `OnPlayerLoaded` with none) is handled as well, so
+the job arrives on join instead of up to five seconds later. Job grades are read as a number
+whether the fork stores `job.grade.level` or a bare `job.grade`.
+
+> ⚠️ Nothing to configure — this needs no config change. On a QBox server the framework must still
+> be `ensure`d **before** LACORE (see `configs/cfg-bridge-sh.lua`); the server console prints
+> `[bridge] Framework detected: qbox` when it worked.
+
+## [3.4.8] – 2026-08-15 — Anticheat logs reach the database again
+
+### Fixed
+
+#### `lacore_logs` batch insert failed with a SQL syntax error
+
+With the anticheat active, oxmysql threw on every log flush:
+`You have an error in your SQL syntax … near '?)'`. Nothing from BigBrother made it into
+`lacore_logs`, so the dashboard and the log view stayed empty exactly when they mattered.
+
+The batch INSERT builds one placeholder group per row and one flat parameter list. Rows without
+coordinates or without a `zone` leave a `nil` in that list. A hole in the middle still survives the
+transfer as NULL, but a `nil` at the *end* — and `zone` is the last column and is unset for
+practically every row — simply shortens the list: Lua has no trailing `nil`, so the statement asked
+for 48 parameters and received 47. MySQL then choked on the last, unfilled `?`.
+
+Nil values are no longer passed as parameters at all. They are written into the statement as a
+literal `NULL`, which keeps the parameter list gapless and the columns correctly aligned.
+
+### Added
+
+#### Log rows now carry the locality again
+
+The `zone` column of `lacore_logs` was never filled — it existed, but every row wrote NULL.
+`GetNameOfZone` is a client native, so the server cannot resolve a coordinate into a locality on
+its own. Each client now reports its own locality whenever it changes (a 3-second check, one event
+per zone change), the server caches it per player and stamps it onto the log rows whose coordinates
+come from that player. Rows written for an explicit coordinate elsewhere in the world keep an empty
+zone rather than a wrong one.
+
 ## [3.4.7] – 2026-08-15 — Bullets that actually land
 
 ### Fixed
+
+#### Headshots did not kill — the anticheat was cancelling them
+
+The one that was actually reported: a headshot ragdolled the victim and left them alive, with every
+weapon, anywhere on the map. Body shots were unaffected. Stopping LACORE made it disappear.
+
+`weaponDamageEvent` flags a hit as a damage modifier above `WeaponDamage.maxDamage` and cancels it.
+That ceiling was `250`, chosen from the weapon's *listed* damage ("a sniper headshot lands around
+200") — but the engine reports the **amplified** value for a headshot, which is far higher. So every
+legitimate headshot tripped the check, the damage event was cancelled server-side, and the victim
+survived with only the hit reaction. The ceiling now sits clear of any single legitimate hit; a real
+damage modifier is not a subtle thing and is still caught.
+
+#### Observe mode was not observing
+
+Worse, and the reason nobody could see what was happening: `CancelEvent()` ran regardless of
+`Anticheat.Mode`. Observe mode promises "everything detects, nothing punishes" and is the default —
+but the blocking half fired anyway. A false positive in the mode meant for *watching* silently
+deleted the game action: no kick, no ban, no message, the shot just did nothing.
+
+Blocking is enforcement, so it now waits for `Mode = "enforce"`. Detection, logging, trust scoring
+and the dashboard are unchanged in observe mode. This covers all three blocking checks — weapon
+damage, blocked explosion types and server-side blacklisted weapons.
+
+If you run `Mode = "observe"` (the default), the anticheat can no longer alter gameplay at all —
+which is what it always said it did.
 
 #### Players stuck unkillable after joining through the session menu
 
@@ -55,6 +168,74 @@ check skips itself rather than blocking everything, since server-side entity nat
 `client/vehicle-cl.lua` listened for `CEventNetworkEntityDamange`, so the only damage-event listener
 in the resource never fired. Its body is devmode-only debug output, so nothing behaved differently —
 but it was dead code pretending to be a hook.
+
+### Customer portal
+
+Nur die Weboberfläche auf `lacore.netica.dev` — keine Änderung an der Resource.
+
+#### Teammitglieder kommen jetzt tatsächlich rein
+
+Wer auf `/dashboard/team/` hinzugefügt wurde, bekam beim Login trotzdem „That Discord account has no
+LACORE customer or staff role" — der Login prüfte nur Discord-Rollen und nie die Team-Tabelle. Ein
+externer Server-Entwickler hat aber weder gekauft noch eine Rolle. **Das Hinzufügen ist ab sofort
+selbst die Berechtigung:** hat der Login keine Rolle, wird geprüft, ob die Discord-ID auf irgendeiner
+Kundenliste steht — wenn ja, Login als `developer`. Zugriff bleibt komplett scope-gesteuert.
+
+#### Account-Switcher in der Sidebar
+
+Der Kontext-Wechsler saß in der Kopfzeile und tauchte erst ab zwei Konten auf. Er sitzt jetzt in der
+**Sidebar** über der Navigation, die er umschaltet, mit den erteilten Scopes darunter. Ein Entwickler
+ohne eigenes Konto landet beim Login direkt im ersten Kundenkonto, statt in einem leeren Kontext, in
+dem jede Anfrage mit 403 endete.
+
+#### Activity log — wer hat was geändert
+
+Neue Seite `/dashboard/logs/`: jede Änderung am Konto mit Zeitpunkt, Person und Detail. Config-Saves
+zeigen die einzelnen Einstellungen als vorher/nachher-Diff. Erfasst werden Config, Config-Listen,
+Lizenzschlüssel, Server, Team, Playerbase und Share-Keys. **Nur der Kontoinhaber sieht die Liste** —
+Teammitglieder nie. ⚠️ Neue PocketBase-Collection `lacore_audit` nötig
+(`landing/pocketbase/pocketbase-audit-collection.json`), plus das neue Feld `ownerName` in
+`lacore_team`.
+
+#### Community Resources — neue Sammelstelle unter `/resources/`
+
+Die öffentlichen Referenzseiten lagen verstreut: die Keybind-Referenz auf einer eigenen Top-Level-URL,
+die Script-Map versteckt am Fuß der Kunden-Team-Seite — dort findet sie niemand, der sie sucht, und
+sie sagt nichts über dein Konto aus. Beides hängt jetzt unter **`lacore.netica.dev/resources/`**:
+
+- `/resources/keybinds/` — Command- & Keybind-Referenz (unverändert, nur umgezogen)
+- `/resources/script-map/` — die Script-Map als eigene Seite
+- `/keybinds/` leitet weiter, damit die Links in Docs und Discord weiter funktionieren
+
+Der Menüpunkt „Commands" auf der Startseite heißt jetzt „Resources" und zeigt auf die Übersicht.
+
+Dazu neu: **`/resources/config/`** — die Config-Referenz. 178 Einstellungen, die sich über das
+Dashboard setzen lassen, mit Typ, erlaubtem Wertebereich, Beispielwert und der Angabe, ob sie **live**
+greifen oder erst beim nächsten Serverneustart. Filterbar nach Tab und durchsuchbar über Key, Name und
+Beschreibung. Die Seite wird zur Build-Zeit aus `landing/lib/configschema.mjs` erzeugt — derselben
+Allowlist, gegen die Editor und Resource validieren —, kann also nicht von dem abweichen, was LACORE
+tatsächlich akzeptiert.
+
+Der **Sensitive-Tab bleibt auf der öffentlichen Seite ausgespart**: Anticheat-Schwellwerte,
+Upload-Ziele und die Discord-Rollen für Staff-Zugriff. Wer die Schwellwerte samt tunbarem Band
+veröffentlicht, sagt Cheatern genau, worunter sie bleiben müssen. Die 77 Einstellungen werden beim
+Build entfernt und landen gar nicht erst im Bundle; die Seite benennt die ausgesparten Gruppen, damit
+die Lücke sichtbar ist statt stillschweigend. **Im Dashboard-Editor ändert sich nichts** — der liest
+das vollständige Schema über die API.
+
+#### `k9.name` und `k9.maxDistance` waren doppelt deklariert
+
+Beim Bau der Config-Referenz aufgefallen: beide Keys standen zweimal in der Allowlist — einmal im
+K9-Block, einmal weiter unten nach dem Retro-Block. `BY_KEY` löst das still auf (der letzte gewinnt),
+also galt die spätere, knappere Variante ohne Hilfetext und mit `min = 0` statt `5`. Im **Config-Editor**
+brach das die K9-Gruppe: doppelte Keys in einer keyed-Liste sind ein harter Svelte-Fehler, die Gruppe
+und alles davor wurde nicht gerendert.
+
+Die Duplikate sind raus — in `configschema.mjs` **und** in der spiegelnden Lua-Allowlist
+`modules/remoteconfig/remoteconfig-sh.lua`, wo derselbe Wert dadurch zweimal angewandt wurde. Behalten
+wurde die ausführliche Definition mit Hilfetext; `min` bleibt bei `0`, damit gespeicherte Werte unter 5
+weiter gültig sind. Die Referenzseite dedupliziert zusätzlich beim Build und warnt, falls so etwas
+wieder passiert.
 
 ## [3.4.6] – 2026-08-15 — A custom prison is actually custom
 

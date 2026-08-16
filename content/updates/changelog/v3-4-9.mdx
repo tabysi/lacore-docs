@@ -1,0 +1,68 @@
+---
+title: "3.4.9"
+---
+
+import { Callout } from 'nextra/components'
+
+![LACORE 3.4.9](/changelog/v3-4-9.svg)
+
+# [3.4.9] – 2026-08-16 — QBox servers get their names and jobs through
+
+### Added
+
+<Callout type="warning">
+**Config changed:** `configs/cfg-licenses-sh.lua` gained `Licenses.qb`, the map from QB's
+`metadata.licences` keys onto the six MDT licence slots. It ships covering stock QB
+(`driver`, `business`, `weapon`); add your own licence names there if you use custom ones.
+`configs/cfg-bridge-sh.lua` is unchanged apart from its comments — `Bridge.useFrameworkCharacters`
+now applies to QB/QBox too, at its existing default of `true`.
+</Callout>
+
+<Callout type="warning">
+Nothing to configure — this needs no config change. On a QBox server the framework must still
+be `ensure`d **before** LACORE (see `configs/cfg-bridge-sh.lua`); the server console prints
+`[bridge] Framework detected: qbox` when it worked.
+</Callout>
+
+#### QBCore and QBox characters are imported like ESX ones
+
+Framework characters were an ESX-only feature: on QB and QBox the bridge took the name and the job,
+but everything else — date of birth, gender, phone, registered vehicles, licences — had to be typed
+into LACORE a second time, and the CAD person query found nobody who was not currently online.
+
+QB and QBox now have the same import ESX has. Identity is read from the loaded player
+(`PlayerData.charinfo`), not from the database: QB keeps the character in memory and writes it back
+on save, so the player object is the fresher source and a fork that renamed a column still imports.
+`citizenid` keys the LACORE character, which makes multicharacter work without any extra handling —
+one LACORE character per QB character, re-synced on switch and on every job change.
+
+| Pulled from QB / QBox | Source |
+| --- | --- |
+| Name, date of birth, gender, phone, job | `charinfo` of the loaded player |
+| Registered vehicles (plates in the CAD query) | `player_vehicles` for that `citizenid` |
+| MDT licences | `metadata.licences` |
+
+The MDT person and plate queries fall back to `players` / `player_vehicles` as well, so an offline
+character or a car bought in the framework's shop is found. QB has no height on the character, so
+that one field stays empty. `oxmysql` is only needed for the vehicle half — the identity import runs
+without it.
+
+### Fixed
+
+#### The QBox bridge never reached the framework at all
+
+On a QBox server (`qbx_core`) the bridge detected the framework correctly and then went silent:
+no character names, no job → agency mapping, so `/onduty` still demanded a Discord duty role and
+the MDT opened for nobody. ESX and plain QBCore were unaffected.
+
+The bridge asked QBox for a core object (`exports.qbx_core:GetCoreObject`). QBox does not have one —
+it dropped the QBCore core-object pattern and answers only under its QB compatibility layer or
+through its own exports. The call therefore failed on every lookup, `Bridge.GetName` and
+`Bridge.GetJob` returned `nil`, and LACORE behaved as if the player had no job.
+
+Player lookups now go through QBox's native `exports.qbx_core:GetPlayer(source)` first and fall
+back to the QB bridge layer's core object, so both a pure QBox install and one running the QB
+compatibility layer resolve. QBox's `QBCore:Server:OnPlayerLoaded` event (QBCore fires
+`PlayerLoaded` and passes the player, QBox fires `OnPlayerLoaded` with none) is handled as well, so
+the job arrives on join instead of up to five seconds later. Job grades are read as a number
+whether the fork stores `job.grade.level` or a bare `job.grade`.

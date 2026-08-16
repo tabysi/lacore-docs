@@ -1,0 +1,35 @@
+---
+title: "3.4.8"
+---
+
+![LACORE 3.4.8](/changelog/v3-4-8.svg)
+
+# [3.4.8] – 2026-08-15 — Anticheat logs reach the database again
+
+### Fixed
+
+#### `lacore_logs` batch insert failed with a SQL syntax error
+
+With the anticheat active, oxmysql threw on every log flush:
+`You have an error in your SQL syntax … near '?)'`. Nothing from BigBrother made it into
+`lacore_logs`, so the dashboard and the log view stayed empty exactly when they mattered.
+
+The batch INSERT builds one placeholder group per row and one flat parameter list. Rows without
+coordinates or without a `zone` leave a `nil` in that list. A hole in the middle still survives the
+transfer as NULL, but a `nil` at the *end* — and `zone` is the last column and is unset for
+practically every row — simply shortens the list: Lua has no trailing `nil`, so the statement asked
+for 48 parameters and received 47. MySQL then choked on the last, unfilled `?`.
+
+Nil values are no longer passed as parameters at all. They are written into the statement as a
+literal `NULL`, which keeps the parameter list gapless and the columns correctly aligned.
+
+### Added
+
+#### Log rows now carry the locality again
+
+The `zone` column of `lacore_logs` was never filled — it existed, but every row wrote NULL.
+`GetNameOfZone` is a client native, so the server cannot resolve a coordinate into a locality on
+its own. Each client now reports its own locality whenever it changes (a 3-second check, one event
+per zone change), the server caches it per player and stamps it onto the log rows whose coordinates
+come from that player. Rows written for an explicit coordinate elsewhere in the world keep an empty
+zone rather than a wrong one.
