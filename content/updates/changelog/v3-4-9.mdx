@@ -19,6 +19,11 @@ now applies to QB/QBox too, at its existing default of `true`.
 </Callout>
 
 <Callout type="warning">
+Nothing to configure. The `sv_licenseKey` hint above is the *recommended* fix — with it, the
+match is exact even if several of your servers share one public IP.
+</Callout>
+
+<Callout type="warning">
 Nothing to configure — this needs no config change. On a QBox server the framework must still
 be `ensure`d **before** LACORE (see `configs/cfg-bridge-sh.lua`); the server console prints
 `[bridge] Framework detected: qbox` when it worked.
@@ -48,6 +53,65 @@ that one field stays empty. `oxmysql` is only needed for the vehicle half — th
 without it.
 
 ### Fixed
+
+#### RP-WEB stayed "offline" on a server that was plainly running
+
+`https://lacore.netica.dev/server/<id>` showed the desktop but never any data, on a server with both
+`lacore_license_key` and `lacore_webdispatch` set and pushing every two seconds.
+
+The push arrives with the account's license key and a `serverKey` — the Cfx `sv_licenseKey` — which
+the portal translates into the dashboard row id, because that id is what `/server/<id>` addresses and
+the secret key must never appear in a URL. When that translation found nothing, the snapshot was
+filed under a shared `default` slot instead. No `/server/<id>` address points at that slot, so the
+desktop could never find the snapshot no matter how long it waited — and every side of the chain
+reported success: the game logged a good push, the portal answered `200`, the page said "offline".
+
+Three changes, because the failure was as much about being undiagnosable as about being wrong:
+
+- **The lookup has a second way in.** Telemetry registers the server row by `serverKey` **or**, when
+  the server has none, by IP. The dispatch push now follows the same rule, so a server whose
+  `sv_licenseKey` is empty or not readable — hosted panels do not always expose it — is matched by
+  the address it is pushing from, exactly like its own row was created.
+- **The game server says when it is unmatched.** The reply now carries whether the snapshot could be
+  filed against a real dashboard entry, and `webdispatch` prints once on the server console when it
+  could not, naming the convar that fixes it. It prints again when the match recovers.
+- **The page says which kind of offline it is.** "Never received a snapshot at this address" and "the
+  server went quiet" looked identical. The banner now separates them and, when another server on the
+  account is pushing right now, names it.
+
+#### The player list covered the LAPD MDT and looked like a locked terminal
+
+With the MDT open, pressing **I** painted the player-list board over it. The board is a fullscreen,
+near-opaque overlay and the LAPD window had no stacking order of its own, so the terminal simply
+disappeared — while it was still open, still holding the NUI focus and still holding the mouse
+cursor. From the officer's side that reads as an MDT that will not let go. The Agency MDT and the
+LASD terminal were unaffected: both already draw above the board.
+
+The board and a terminal no longer share the screen. **I** is refused while any CAD window is open
+and says why, and a board that is already up closes by itself the moment a terminal opens. Nothing
+else about the board changed — it still takes no NUI focus and still pages on the arrow keys.
+
+#### CHP MDT: the close button, the status menu and the whole action rail were off screen
+
+On the Agency (CHP) MDT the buttons on the right-hand side did nothing, because they were not on
+the screen at all. All terminals share one saved window position, and the Agency window is about
+twice as wide as the LAPD one that usually saved it. Dragging clamps only far enough to keep a title
+bar grabbable, so a position inherited from the narrow window left several hundred pixels of the
+wide one — the ✕, the gear, the status dropdown and the entire right action rail (SELF ASSIGN,
+BACKUP, EMS, TOW, BOARD, HISTORY, CODE 6) — hanging past the edge of the screen, out of reach of any
+click. The gear being off screen too meant there was no way to fix it from inside the terminal.
+
+Every terminal now pulls an inherited position back into view when it opens and when the game window
+resizes, and the rescue is stricter than the drag clamp: a window that FITS on screen is placed fully
+on screen instead of merely leaving a grabbable corner. Deliberately dragging a window half out of
+view still works — that rule is unchanged.
+
+The Pennsylvania CAD already did this; the Agency MDT, the LAPD Mobile Client and the 9100-T did not.
+The same pass closed the other half of the loop: the LAPD window stopped only at the top and left
+edge while being dragged and the 9100-T chassis did not stop at all, so both could be pushed off the
+screen and **saved** there — and that saved position is the one every other terminal inherits. All
+four now clamp on all four edges. The in-car dashboard screen is left alone: there the terminal is
+stretched over the whole texture, so "is it on screen" is not a question that applies to it.
 
 #### The QBox bridge never reached the framework at all
 
