@@ -50,15 +50,21 @@ filed under a shared `default` slot instead. No `/server/<id>` address points at
 desktop could never find the snapshot no matter how long it waited — and every side of the chain
 reported success: the game logged a good push, the portal answered `200`, the page said "offline".
 
-Three changes, because the failure was as much about being undiagnosable as about being wrong:
+Four changes, because the failure was as much about being undiagnosable as about being wrong:
 
-- **The lookup has a second way in.** Telemetry registers the server row by `serverKey` **or**, when
-  the server has none, by IP. The dispatch push now follows the same rule, so a server whose
-  `sv_licenseKey` is empty or not readable — hosted panels do not always expose it — is matched by
-  the address it is pushing from, exactly like its own row was created.
-- **The game server says when it is unmatched.** The reply now carries whether the snapshot could be
+- **The server is told its own id, so nothing has to be derived.** `/ingest/server` — the telemetry
+  beat that creates and refreshes the dashboard row — now answers with that row's id, the very id
+  `/server/<id>` is built from. The core keeps it and sends it back on every web-dispatch push, so
+  the portal knows which server it is hearing from by construction. This is the path that works
+  without any Cfx key at all.
+- **Two fallbacks behind it.** If the id has not arrived yet (the first ~15 seconds after start, or
+  telemetry switched off), the Cfx `sv_licenseKey` is used as before, and failing that the address
+  the push arrives from — the same key telemetry upserts the row by when a server has no Cfx key to
+  give. Deriving identity from an IP is a guess and is now the last resort rather than the plan.
+- **The game server says when it is unmatched.** The reply carries whether the snapshot could be
   filed against a real dashboard entry, and `webdispatch` prints once on the server console when it
-  could not, naming the convar that fixes it. It prints again when the match recovers.
+  could not — stating plainly that `lacore_license_key` is *not* the problem, and reporting the state
+  of both identifiers it has. It prints again when the match recovers.
 - **The page says which kind of offline it is.** "Never received a snapshot at this address" and "the
   server went quiet" looked identical. The banner now separates them and, when another server on the
   account is pushing right now, names it.
