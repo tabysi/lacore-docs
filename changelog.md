@@ -55,10 +55,11 @@ version's price becomes the order price. 90s CAD ships as the first one: *Encryp
 
 #### New in the catalogue
 
-**LACORE ROBLOX** at 50€ and **90s CAD** at 30€ / 60€ join the products. Server setup, config &
-installation and performance & optimisation join the services; custom scripts and script improvement
-join custom work. The five new ones are all set to **price on request** — no invented price is shown
-until you set one.
+**LACORE ROBLOX** at 50€ and **90s CAD** at 30€ / 60€ join the products. The services start at
+**25€** (server setup), **15€** (config & installation) and **30€** (performance & optimisation) —
+a starting price that says what the job is worth, with the real one quoted once the brief is in.
+Custom scripts and script improvement are **price on request**: any starting price there is either
+too low or scares off the job it was meant to attract.
 
 ### Changed
 
