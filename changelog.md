@@ -68,6 +68,11 @@ too low or scares off the job it was meant to attract.
 - `/shop pricing <entry> <fixed|from|quote> [price]` — a final price, a `from …` starting price, or
   **price on request**. Both `from` and `quote` route the order through the quote step.
 - `/shop variant add|remove` — the versions a buyer picks from.
+- `/shop seed [preview]` — pull in the built-in entries the shop is missing. The catalogue is written
+  to `data/state.json` the first time anything is edited, and from that moment the shipped defaults
+  are dead to that shop: everything new in this release would have had to be typed in by hand. This
+  adds them in one go and **never touches an entry that already exists**, so a price edited months
+  ago survives an update — a shop that resets an edited price is worse than one missing an entry.
 - `/shop add` and `/shop edit` take a **category**, and `/shop list` groups by it.
 - A fixed price of 0 is refused with the reason (it renders as *free*), and changing a price that is
   never shown — on a quoted entry, or one whose versions carry their own — now says so instead of
