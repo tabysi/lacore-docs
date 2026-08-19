@@ -57,8 +57,9 @@ There are **two** ways to reach dispatch, and they are not the same thing:
 
 Dialling **911** or **311** puts you in the dispatcher's call queue exactly like `/911` would, but as
 the voice call the queue was built for. Hanging up takes you back out of the queue — the dispatcher
-sees you drop off. If **no dispatcher is online**, your call is logged as an incident automatically
-and the phone stops ringing.
+sees you drop off. `/hangup` does the same thing and closes the call screen with it, so it does not
+matter which one you reach for. If **no dispatcher is online**, your call is logged as an incident
+automatically and the phone stops ringing.
 
 <Callout type="info">
   Which numbers do this is a server setting (`PhoneCfg.emergencyNumbers` — see
