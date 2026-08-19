@@ -20,15 +20,20 @@ Open it with **`/supervisor`** (configurable). **Escape** closes it.
 
 ## Who can open it
 
-Access is **decided by the server**, never by the client. A unit qualifies if **either** check passes:
+Access is **decided by the server**, never by the client. There are **four** ways to qualify, and they
+are checked independently — **any single one is enough**:
 
 <Steps>
 
-### Framework job grade
+### ACE permission
 
-On an ESX / QBCore / QBox server the unit's **job grade** is compared against a minimum
-(`minGrade`, with an optional per-department override). This is the natural path if your ranks already
-live in the framework.
+The unit is allowed the configured ACE object (`ace`, or `aceByDept`). Grant it to a *group* once and
+every member inherits it — no identifiers to collect per person.
+
+### Discord role
+
+The unit holds one of the roles named in `roles` (or `rolesByDept`). Needs a bot token; the roles
+themselves *are* the permission, so nothing goes into `server.cfg` at all.
 
 ### Config allowlist
 
@@ -36,7 +41,23 @@ The unit's **license identifier** or **exact callsign** is listed in `allow`. Th
 path — it works with no framework at all, and it's also how you grant the panel to specific people
 regardless of their grade.
 
+### Framework job grade
+
+On an ESX / QBCore / QBox server the unit's **job grade** is compared against a minimum
+(`minGrade`, with an optional per-department override). This is the natural path if your ranks already
+live in the framework.
+
 </Steps>
+
+Before any of them, `leoOnly` applies: with its default `true` a civilian is never a supervisor, no
+matter what else checks out.
+
+<Callout type="warning">
+  **The four paths are OR, not AND.** Adding a Discord role does not *replace* the other checks — it
+  adds one more way in. On a framework server `minGrade` defaults to **3**, so every unit at grade 3
+  or above keeps the panel whatever their Discord roles say. To gate on one path alone, switch the
+  others off — see [Only Discord roles, nothing else](#only-discord-roles-nothing-else).
+</Callout>
 
 <Callout type="warning">
   On a **standalone** server there is no job grade, so every grade is `0` and the grade check never
@@ -123,35 +144,105 @@ add_ace group.lapd_supervisor lacore.supervisor.lspd allow
 server thinks you are with **`/myperms`** — it reports `supervisor=true|false`.
 </Callout>
 
-### Granting the panel with a Discord role
+### How-to: gate the panel on a Discord role
 
-If your departments already live in Discord, the roles can **be** the permission — nothing goes into
-`server.cfg` at all. Put your supervisor roles into `DiscordAuth.roles`
-(`configs/cfg-server-sv.lua`) with their role IDs, then name them in `roles`:
+The roles can **be** the permission — nothing goes into `server.cfg`, and handing out or taking away
+the panel is a role change in Discord. Four steps.
+
+<Steps>
+
+### Check the prerequisites
+
+The role path needs a Discord bot. Set both convars in your `server.cfg`:
+
+```cfg filename="server.cfg"
+set lacore_discord_token "YOUR_BOT_TOKEN"
+set lacore_discord_guild "YOUR_GUILD_ID"
+```
+
+The bot must be **a member of your guild** and have **Server Members Intent** enabled
+(Discord Developer Portal ▸ your app ▸ Bot ▸ Privileged Gateway Intents). Without the intent Discord
+returns no member data, the role check silently never matches, and you are left wondering why the
+panel does not open. `/lacore doctor` reports whether the token and guild are set.
+
+### Name your roles
+
+Copy each role's ID in Discord (right-click the role ▸ **Copy Role ID**; Developer Mode must be on in
+Discord ▸ Settings ▸ Advanced) and add it to `DiscordAuth.roles` under a name of your choosing. That
+name is what the rest of LACORE refers to:
 
 ```lua filename="configs/cfg-server-sv.lua"
 DiscordAuth = {
     roles = {
+        -- … your existing roles …
         LAPDSupervisor = "1234567890123456789",
         BCSOSupervisor = "2345678901234567890",
-        SAHPSupervisor = "3456789012345678901",
     },
 }
 ```
 
+### Make those roles supervisors
+
+List the **names** — not the IDs — in `roles`:
+
 ```lua filename="configs/cfg-supervisor-sh.lua"
-roles = { "LAPDSupervisor", "BCSOSupervisor", "SAHPSupervisor" },
+roles = { "LAPDSupervisor", "BCSOSupervisor" },
 ```
 
-Give someone the role in Discord and they have the panel; take it away and they don't. Use
-`rolesByDept` if a role should only count for units of one department.
+Should a role only count for units of one department, use `rolesByDept` instead (or as well — both
+lists are checked):
+
+```lua filename="configs/cfg-supervisor-sh.lua"
+rolesByDept = {
+    ["LAPD"] = { "LAPDSupervisor" },
+    ["BCSO"] = { "BCSOSupervisor" },
+},
+```
+
+The key is the department's `short` from `configs/cfg-agencies-sh.lua`.
+
+### Restart and verify
+
+Restart the resource, go on duty as a LEO unit and run **`/myperms`** — it prints
+`supervisor=true|false`, which is the same server-side answer the panel gate uses. `true` means
+`/supervisor` will open.
+
+</Steps>
 
 <Callout type="warning">
-This path needs a Discord **bot token** (`lacore_discord_token`) and your guild id
-(`lacore_discord_guild`). Without them the role check never matches — the ACE, grade and allowlist
-paths keep working regardless. Roles are cached for `DiscordAuth.cacheSeconds` (5 minutes by
-default), so a role change can take that long to reach a player who is already connected.
+Roles are cached for `DiscordAuth.cacheSeconds` (**5 minutes** by default). A role you just granted
+can take that long to reach a player who is already connected — a reconnect applies it immediately.
 </Callout>
+
+### Only Discord roles, nothing else
+
+Adding roles does **not** turn the other paths off. This matters most on a framework server: `minGrade`
+defaults to `3`, so every unit at grade 3+ keeps the panel regardless of their Discord roles. If the
+role is supposed to be the *only* thing that decides, close the other three doors:
+
+```lua filename="configs/cfg-supervisor-sh.lua"
+roles    = { "LAPDSupervisor", "BCSOSupervisor" },
+minGrade = 999,     -- no job grade ever reaches this → framework path off
+ace      = false,   -- ACE path off (leaving it unset means the default lacore.supervisor applies)
+allow    = {},      -- no manual entries
+```
+
+<Callout type="info">
+  **Consider keeping `ace`.** It is your way back in when Discord is unreachable or the bot token
+  expires — `group.lacore_dev` inherits `lacore.supervisor` through its blanket `lacore` ACE, so an
+  owner can still open the panel. If you would rather keep that safety net, leave `ace` alone and only
+  raise `minGrade`; that already removes the path that hands the panel out in bulk.
+</Callout>
+
+### It doesn't work — what to check
+
+| Symptom | Likely cause |
+| --- | --- |
+| `/supervisor` does nothing, `/myperms` says `supervisor=false` | Role not in `DiscordAuth.roles`, a typo between the two files (the name must match exactly, case-sensitive), or an empty role ID. |
+| Nobody gets the panel, no matter the role | Missing bot token/guild, or **Server Members Intent** off. Every role check then answers "no". |
+| The role was just granted and still nothing | The 5-minute role cache. Reconnect, or wait it out. |
+| Someone has the panel who should not | Another path is letting them in — most likely `minGrade` (default 3), or an inherited ACE. See above. |
+| A role holder who is off duty or civilian can't open it | Working as intended: `leoOnly` requires an on-duty LEO unit. |
 
 ### Which path should I use?
 
