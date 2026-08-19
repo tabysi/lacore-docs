@@ -63,8 +63,9 @@ loadout:
 ```lua
 agencies = {
   {
-    type = "Law Enforcement",           -- routes the MDT (see below)
+    type = "Law Enforcement",           -- duty-window group (see below)
     short = "LAPD",
+    cad = "lapd",                       -- which CAD/MDT /mdt opens (see below)
     long = "Los Angeles Police Department",
     motto = "To Protect and Serve",
     equipment = {
@@ -89,6 +90,27 @@ The `type` field controls which terminal a member gets and how dispatch treats t
 | `Tow Truck` | Tow contacts. |
 | `Private Security` | CCTV `security` access + limited tools. |
 | `Animal Control` / `Public Works` | Utility departments. |
+
+### `cad` — the terminal a department opens (since 3.4.9.2)
+
+Without a `cad` field LACORE guesses the terminal from the department name: a `short` containing
+`lapd` gets the LACORE Mobile Client, `lasd`/`sheriff`/`bcso` the LASD CAD/PCMS, any other Law
+Enforcement department the Agency MDT, and Fire/EMS/Coroner the EMS CAD. Set `cad` on an entry to
+decide it yourself — the explicit value always wins over the guess **and** over the `type`:
+
+| `cad` | Terminal |
+| --- | --- |
+| `"lapd"` | LACORE Mobile Client (LAPD PremierOne look) |
+| `"lasd"` | LASD CAD/PCMS terminal |
+| `"agency"` | Agency MDT (CHP style) — the all-round LEO terminal |
+| `"ems"` | EMS / Fire CAD |
+| `"90s"` | 9100-T retro terminal |
+| `"penn"` | Pennsylvania CAD (add-on; falls back to the Agency MDT when the add-on is not unlocked) |
+| `"none"` | this department gets no terminal at all |
+
+Aliases are accepted (`"pcms"` → `lasd`, `"chp"` → `agency`, `"fire"` → `ems`, `"retro"` → `90s`,
+`"off"` → `none`, …). An unknown value prints a console warning and falls back to the automatic
+routing, as does leaving the field out.
 
 `equipment` entries support `components`, `tint`, and `rack` (weapon on a station rack). `wallpaper`
 is the MDT background (texture names or an RGB triple).
