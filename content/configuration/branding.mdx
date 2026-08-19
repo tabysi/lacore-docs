@@ -61,6 +61,18 @@ This snapshots every `configs/*.lua` into the DB store.
 It writes your saved configs back to disk (and first snapshots the current on-disk configs so a
 restore can be rolled back). **Restart the resource** for the restored config to take effect.
 
+Nothing is written that does not compile: every merged file goes through Lua's parser first, and one
+that fails is left untouched on disk and named in the output.
+
+### Not what you wanted? Undo
+
+```
+/lacoreconfig undo
+```
+
+Puts every config back exactly as it was before the last `restore` — that is what the pre-restore
+snapshot is for. **Restart the resource** afterwards.
+
 ### Check status
 
 ```

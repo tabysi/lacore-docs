@@ -24,10 +24,10 @@ banner at the top — tap it to jump into the thread. An incoming call opens the
 
 | App | What you do with it |
 |---|---|
-| **Phone** | Keypad + Recents. Dial `555-XXXX` (dashes optional). Calls connect **real voice** via pma-voice — accept, talk, hang up. |
+| **Phone** | Keypad + Recents. Dial `555-XXXX` (dashes optional). Calls connect **real voice** via pma-voice — accept, talk, hang up. Dialling **911** or **311** reaches dispatch instead of a player (see below). |
 | **Messages** | SMS threads with unread badges (300 chars per message). |
 | **Contacts** | Address book — add, edit, call straight from a contact. |
-| **Emergency** | **911** (emergency) or **311** (non-emergency): describe what's happening and send — it lands in dispatch as a real call, **with your location attached automatically**. |
+| **Emergency** | **911** (emergency) or **311** (non-emergency): describe what's happening and send — it lands in dispatch as a *written* report, **with your location attached automatically**. |
 | **Camera** | Take photos (needs `screenshot-basic` on the server), browse the gallery (last 12), view full-screen, delete, or **post to Bleeter**. |
 | **Bleeter** | The public feed — post (300 chars, optional photo), like/unlike. Server-wide, live on every open phone. |
 | **Groups** | Group chats: create with a name + member phone numbers, chat, leave (the group dissolves when the last member leaves). |
@@ -45,6 +45,28 @@ There is deliberately **no banking or money app** — LACORE is RP-only, no econ
   Do Not Disturb silences ringing and SMS banners; airplane mode takes you off the air entirely.
 </Callout>
 
+## Calling 911 / 311
+
+There are **two** ways to reach dispatch, and they are not the same thing:
+
+| | Emergency app | Dialling 911 / 311 on the keypad |
+|---|---|---|
+| What the dispatcher gets | Your typed report | A **voice call** — you are on the line |
+| Where you see it | Sent and done | The call screen: *Calling…*, then the operator's name and a running timer |
+| Available on the retro brick | No (no app) | **Yes** |
+
+Dialling **911** or **311** puts you in the dispatcher's call queue exactly like `/911` would, but as
+the voice call the queue was built for. Hanging up takes you back out of the queue — the dispatcher
+sees you drop off. If **no dispatcher is online**, your call is logged as an incident automatically
+and the phone stops ringing.
+
+<Callout type="info">
+  Which numbers do this is a server setting (`PhoneCfg.emergencyNumbers` — see
+  [Phone config](/configuration/phone)), so a community that dials **112** or **999** can add it.
+  `/911` in chat still works, but it is blocked while a dispatcher is on duty — then you are told to
+  use your phone, which is what the keypad is for.
+</Callout>
+
 ## The retro 90s phone
 
 If your server enables the retro skin (`Retro.enabled` — see [Phone config](/configuration/phone)),
@@ -53,9 +75,10 @@ menus, **T9 multi-tap texting**, a call register, a ringtone melody — and **Sn
 Calls, SMS and contacts use the same backend; the modern-only apps (Bleeter, camera, groups,
 Emergency, notes, wallet …) don't exist on the brick.
 
-<Callout type="warning">
-  The retro phone has **no Emergency app** — on a retro server, reach dispatch by voice (`/911`
-  caller flow) or however your server handles it.
+<Callout type="info">
+  The retro phone has **no Emergency app** — dial **911** or **311** on the keypad instead. That is a
+  real voice call to the dispatcher, so nothing is missing: the brick reaches dispatch the way a
+  phone from 1998 would.
 </Callout>
 
 ## Quirks worth knowing

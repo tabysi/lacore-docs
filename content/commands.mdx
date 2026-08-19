@@ -62,10 +62,11 @@ Bind these yourself in *FiveM Settings ▸ Key Bindings ▸ FiveM*:
 | Mobile fingerprint ID (LEO) | `/mobileid` (`Fingerprint.openKey`) |
 | Radio: hold to transcribe | Speech-to-text push-to-talk |
 | Put dragged person in nearest vehicle | `/putin` |
+| Replay: start / stop recording | Start / stop a [Director's Cut](/user-guide/replay) take |
 | LACORE: Focus the in-car screen | `/cad` (`VehicleScreen.focusCommand`) |
 | K9 — deploy, heel, stay, sit, lay, bark, search, engage, car | 9 separate bindings, one per K9 order |
 
-That's **32 bindings** in total: 11 with a default key, 21 unbound.
+That's **33 bindings** in total: 11 with a default key, 22 unbound.
 
 ## 🧍 Character & session
 
@@ -135,12 +136,13 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 | `/job [name]` 🔒 | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
 | `/jobmenu` | Everyone | Duty picker — pick an agency from a searchable list, set a callsign, go on duty. Agencies your [`DutyAccess`](/configuration/discord#agency-whitelist) permissions refuse are shown locked. |
 | `/canceljob` | Everyone | Cancel your current civilian activity. |
+| `/dutyaccess` | Everyone | Print which agencies you may go on duty for, and what each one wants (role or ACE). Also runs in the server console. `/dutyaces` is an older alias of the same command. |
 
 ## 🚓 MDT & CAD
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → LACORE Mobile Client, other LE → Agency MDT, LASD/Sheriff/BCSO → LASD CAD, Fire/EMS → EMS CAD. |
+| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Which terminal you get is the department's [`cad` setting](/configuration/main); without one it is guessed from the name: LAPD → LACORE Mobile Client, LASD/Sheriff/BCSO → LASD CAD, other LE → Agency MDT, Fire/EMS → EMS CAD. |
 | `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
 | `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
 | `/penncad` | LEO | Always opens the [Pennsylvania CAD](/user-guide/pennsylvania-cad) — a paid add-on, unlocked by licence key. |
@@ -164,9 +166,15 @@ See [Using the MDT](/user-guide/mdt), [Dispatch Console](/user-guide/dispatch-co
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/911 [message]` | Everyone | Emergency call to dispatch — opens the caller form and creates a live incident. |
-| `/311 [message]` | Everyone | Non-emergency call to dispatch. |
+| `/911 [message]` | Everyone | Emergency call to dispatch — opens the caller form and creates a live incident. **Blocked while a dispatcher is on duty**: you are told to call 911 on your phone instead, so the dispatcher gets a voice call rather than a text line. |
+| `/311 [message]` | Everyone | Non-emergency call to dispatch. Same rule as `/911`. |
 | `/hangup` | Everyone | End the current dispatch call. |
+
+<Callout type="info">
+  You can also **dial `911` / `311` on the phone keypad** — that places the voice call directly, works
+  on the retro brick too, and is the intended route whenever a dispatcher is online. The numbers are
+  configurable (`PhoneCfg.emergencyNumbers`). See [the phone](/user-guide/phone).
+</Callout>
 
 ## 📡 Dispatcher text commands
 
@@ -372,7 +380,7 @@ Discord roles. See [Anti-Cheat & Security](/anticheat) and [Discord setup](/conf
 | `/time <h> [m]` 🔒 · `/freezetime` 🔒 · `/ft` · `/rft` | World time control / freeze helpers. |
 | `/deleteentity` | Delete the entity you're aiming at. |
 | `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
-| `/lacoreconfig` | Back up / restore LACORE configs across reinstalls. |
+| `/lacoreconfig <backup\|restore\|undo\|status>` | Back up / restore LACORE configs across reinstalls. `undo` reverses the last restore. |
 
 ### 🗺️ NADS — worldbuilding (staff)
 
@@ -410,7 +418,6 @@ Not meant for players — these exist for development, content creation and trou
 |---------|--------------|
 | `/dev` | Toggle dev mode. |
 | `/citydebug` | Print city / zone debug info. |
-| `/menutest` | Test harness for the native menu library. |
 | `/spawnpoint` | Capture a spawn point where you stand and print a config line for it. |
 | `/preview <model>` | Look at a model in 3D, in game. |
 | `/capturetest` | Test the model renderer. |
