@@ -1,0 +1,32 @@
+---
+title: "3.4.9.6"
+---
+
+![LACORE 3.4.9.6](/changelog/v3-4-9-6.svg)
+
+# [3.4.9.6] – 2026-08-20 — Das 90er-CAD gibt es jetzt einzeln
+
+### Added
+
+#### Der 9100-T als eigenes Produkt
+
+Das 9100-T Mobile Data Terminal — das 90er-Jahre-CRT-Terminal mit fotorealistischem Gehäuse,
+klickbaren Tasten und Tastatur-Klacken — lässt sich ab sofort als eigenständige Resource
+ausliefern: `node Products/build-90s.mjs` baut `Products/lacore-90s-cad` (plus ZIP) aus dem Core,
+ohne den Core anzufassen.
+
+Mitgeliefert wird genau ein Terminal und das CAD-Backend, das es bedient: laufende Einsätze,
+Unit-Status, Self-Assign, Dispositionen, Personen- und Fahrzeugabfragen, Charges, Citations,
+Haftbefehle und BOLOs. Alles andere bleibt draußen — das LAPD PremierOne MDT, LASD PCMS, das
+Agency MDT, das EMS/Fire CAD, das Pennsylvania CAD, die Dispatch-Konsole und sämtliche
+Nicht-CAD-Module.
+
+Anders als beim MDT-Produkt wird dafür auch die **NUI neu gebaut**, nicht bloß kopiert: Der Core
+bündelt alle Terminals in eine einzige JavaScript-Datei, also entsteht für dieses Produkt ein
+eigener Einstiegspunkt, der nur den 9100-T mountet. Die anderen Terminals liegen damit auch nicht
+mehr im ausgelieferten Bundle (350 kB statt 1,2 MB).
+
+Damit im Produkt nichts anderes aufgehen kann, öffnet `/mdt` dort immer den 9100-T — unabhängig
+vom Department — und `/dispatch` meldet, dass es keine Konsole gibt. Beide Befehle werden in einer
+produkteigenen Datei neu registriert, statt den Core-Code umzuschreiben: `modules/mdt/mdt-nui-cl.lua`
+bleibt Byte für Byte identisch mit dem Core und übersteht damit jedes Core-Update.
