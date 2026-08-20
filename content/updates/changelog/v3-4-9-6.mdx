@@ -4,29 +4,27 @@ title: "3.4.9.6"
 
 ![LACORE 3.4.9.6](/changelog/v3-4-9-6.svg)
 
-# [3.4.9.6] – 2026-08-20 — Das 90er-CAD gibt es jetzt einzeln
+# [3.4.9.6] – 2026-08-20 — The 90s CAD ships on its own
 
 ### Added
 
-#### Der 9100-T als eigenes Produkt
+#### The 9100-T as a standalone product
 
-Das 9100-T Mobile Data Terminal — das 90er-Jahre-CRT-Terminal mit fotorealistischem Gehäuse,
-klickbaren Tasten und Tastatur-Klacken — lässt sich ab sofort als eigenständige Resource
-ausliefern: `node Products/build-90s.mjs` baut `Products/lacore-90s-cad` (plus ZIP) aus dem Core,
-ohne den Core anzufassen.
+The 9100-T Mobile Data Terminal — the 1990s CRT terminal with the photo-real chassis, the clickable
+keys and the keyboard clack — can now be shipped as a resource of its own. `node Products/build-90s.mjs`
+assembles `Products/lacore-90s-cad` (and a zip) out of the core without touching the core.
 
-Mitgeliefert wird genau ein Terminal und das CAD-Backend, das es bedient: laufende Einsätze,
-Unit-Status, Self-Assign, Dispositionen, Personen- und Fahrzeugabfragen, Charges, Citations,
-Haftbefehle und BOLOs. Alles andere bleibt draußen — das LAPD PremierOne MDT, LASD PCMS, das
-Agency MDT, das EMS/Fire CAD, das Pennsylvania CAD, die Dispatch-Konsole und sämtliche
-Nicht-CAD-Module.
+What ships is one terminal and the CAD backend behind it: active calls, unit status, self-assign,
+dispositions, person and vehicle lookups, charges, citations, warrants and BOLOs. Everything else
+stays out — the LAPD PremierOne MDT, the LASD PCMS, the Agency MDT, the EMS/Fire CAD, the
+Pennsylvania CAD, the dispatch console and every non-CAD module.
 
-Anders als beim MDT-Produkt wird dafür auch die **NUI neu gebaut**, nicht bloß kopiert: Der Core
-bündelt alle Terminals in eine einzige JavaScript-Datei, also entsteht für dieses Produkt ein
-eigener Einstiegspunkt, der nur den 9100-T mountet. Die anderen Terminals liegen damit auch nicht
-mehr im ausgelieferten Bundle (350 kB statt 1,2 MB).
+Unlike the MDT product, this one **rebuilds the NUI** instead of copying it. The core bundles every
+terminal into a single JavaScript file, so copying `nui/dist` would have shipped all of them; the
+build generates its own entry point that mounts the 9100-T alone. The other terminals are therefore
+not in the shipped bundle either — 350 kB instead of 1.2 MB.
 
-Damit im Produkt nichts anderes aufgehen kann, öffnet `/mdt` dort immer den 9100-T — unabhängig
-vom Department — und `/dispatch` meldet, dass es keine Konsole gibt. Beide Befehle werden in einer
-produkteigenen Datei neu registriert, statt den Core-Code umzuschreiben: `modules/mdt/mdt-nui-cl.lua`
-bleibt Byte für Byte identisch mit dem Core und übersteht damit jedes Core-Update.
+So that nothing else can open inside the product, `/mdt` there always opens the 9100-T regardless of
+department, and `/dispatch` reports that there is no console. Both commands are re-registered in a
+product-only file rather than edited out of the core: `modules/mdt/mdt-nui-cl.lua` stays byte for byte
+identical to the core, and survives every core update.
