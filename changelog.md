@@ -3,6 +3,33 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.4.9.7] – 2026-08-21 — Two servers, two rows in the portal
+
+### Fixed
+
+#### The portal showed one server when the account had two
+
+An account with two licensed servers could end up seeing only one of them under **My servers** — and
+which one it was changed by itself, because the two were taking turns overwriting the same row.
+
+Every server reports itself to the web service on start and on every heartbeat, and that report is
+an upsert: find this server's row, refresh it, or create it. What identified a row was the Cfx
+server key (`sv_licenseKey`) and, when that was not readable, the public IP. Neither is unique to a
+server. A Cfx key is issued per machine, so two servers on the same box legitimately share one — and
+sharing the box, they share the public IP as well. Both reports matched the same row, so the second
+server never got one of its own, and each heartbeat replaced the other server's hostname, player
+count and version with its own.
+
+The LACORE license key is now part of that identity. It is the one value that genuinely differs
+between two servers of the same account, because it is generated per server in the dashboard. A
+server that had already registered before its key was set adopts its existing row rather than
+leaving an orphan behind, so nothing has to be cleaned up by hand: after the update each server
+claims or creates its own row on its next heartbeat, and both appear in the portal.
+
+This is a web-service fix. The resource itself is unchanged — servers already send everything the
+fix needs, so there is nothing to install and no config to touch. Two servers sharing a single
+license key still share a row, as they should: one key is one server.
+
 ## [3.4.9.6] – 2026-08-20 — The 90s CAD ships on its own
 
 ### Added
