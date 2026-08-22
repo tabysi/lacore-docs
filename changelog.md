@@ -3,6 +3,90 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item
+
+### Added
+
+#### LACORE features as inventory items
+
+A phone you carry. An MDT tablet that belongs to your department, not to every department. An ID
+card in your pocket, a breathalyser in the trunk, a lead for the dog. LACORE features can now be
+**inventory items** — with **ox_inventory**, **qb-inventory** (QBCore / QBox) or **ESX**.
+
+It works in both directions. Use the item in your inventory and the feature opens — the phone comes
+up, the MDT boots, the ID card is shown. And a feature can be told it *needs* its item: without the
+tablet in your pocket, `/mdt` does nothing. Which item that is depends on who you are — the `mdt`
+entry carries a per-department list, so an LAPD unit needs `mdt_lapd` and a deputy needs
+`mdt_lasd`, out of one config and one command.
+
+Ownership is decided on the **server**, never on the client, so a modified client cannot talk its
+way into a terminal it has no tablet for. Closing is never gated: an already-open phone, MDT or
+camera tool always toggles shut, so nobody is ever stuck in a UI because they dropped something.
+
+Shipped feature keys: `phone`, `mdt` (per department), `idcard`, `fingerprint`, `breathalyser`,
+`drugtest`, `fieldcamera`, `k9`. The ID card also gained the `/myid` command it never had — until
+now it only existed in the civilian radial, which an item cannot press.
+
+LACORE does not create items; it only asks your inventory about them. For ox_inventory, the server
+console prints a ready-made `data/items.lua` snippet built from exactly your config:
+
+```
+lacoreitems
+```
+
+On a server with **no** inventory at all nothing changes — every feature stays on its command, and
+gates always pass rather than locking people out of a UI they have no way to unlock.
+
+Other resources get the same layer through the [Developer API](https://tabysi.github.io/lacore-docs/developer-api):
+`GetInventory()`, `HasFeatureItem(src, key)`, `GetFeatureItem(src, key)`, `UseFeature(src, key)` and
+`GetFeatureItems()` on the server, `UseFeature(key)` on the client.
+
+⚠️ **New config file:** `configs/cfg-items-sh.lua` — the item names, which command each one runs, and
+whether it is required. **Nothing is required by default**, so dropping this update onto a running
+server changes no behaviour until you switch a feature's `require` on. The layer as a whole is gated
+by `Features.items` in `configs/cfg-features-sh.lua`.
+
+## [3.4.9.8] – 2026-08-21 — A framework that starts late is still a framework
+
+### Fixed
+
+#### LACORE before ESX in the load order broke half the server
+
+The framework bridge decided once, at resource start, whether an ESX/QBCore/QBox
+server was underneath it — by asking whether `es_extended` (or `qbx_core`, or `qb-core`) had
+already started. Put `ensure lacore` above the framework in `server.cfg` and the answer was no, and
+it stayed no for the rest of the server's uptime.
+
+The consequences did not look like a load-order problem, which is what made this expensive. A core
+that believes it is standalone runs its entity-spam guard, so vehicles and props the framework
+spawned server-side were deleted a moment after appearing. It arms the `esx:*` / `qb-*` honeypots,
+which exist to catch injected scripts on a standalone server and which ban on sight — so ordinary
+framework events became bans. It takes character spawning away from the framework, so players got
+LACORE's spawn selector and LACORE's coordinates. And it enforces the member-only vehicle
+restriction, cutting the engine on job cars. Four unrelated-looking faults, no error in the console,
+one cause.
+
+The detection is now corrected when the framework turns up late: a framework resource starting
+re-runs it, and everything reading the result does so at call time, so the entity guard, the spawn
+handover and the vehicle restriction all fall into line the moment it fires. The console says what
+happened and names the fix:
+
+```
+[bridge] es_extended started after LACORE — framework re-detected: esx
+[bridge] Put `ensure es_extended` BEFORE lacore in server.cfg so this is right from the start.
+```
+
+The honeypots are the exception, because FiveM cannot unregister an event handler once it exists.
+Those now re-check whether the event belongs to a running framework at the moment they fire rather
+than only when they were armed, so ones armed during the brief no-framework window go quiet instead
+of banning for the rest of the uptime.
+
+The client half made the same one-shot guess a second after starting and now corrects it the same
+way.
+
+The load order is still worth getting right — `ensure lacore` belongs after the framework — but
+getting it wrong is no longer a broken server.
+
 ## [3.4.9.7] – 2026-08-21 — Two servers, two rows in the portal
 
 ### Fixed

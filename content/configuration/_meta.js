@@ -9,6 +9,7 @@ export default {
   discord: 'Discord & Duty',
   notifications: 'Notifications',
   phone: 'Phone',
+  items: 'Inventory Items',
   'law-enforcement': 'Penal Code & Evidence',
   supervisor: 'Supervisor Panel',
   'gameplay-modules': 'Gameplay & Misc Modules',

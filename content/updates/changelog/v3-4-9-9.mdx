@@ -1,0 +1,48 @@
+---
+title: "3.4.9.9"
+---
+
+![LACORE 3.4.9.9](/changelog/v3-4-9-9.svg)
+
+# [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item
+
+### Added
+
+#### LACORE features as inventory items
+
+A phone you carry. An MDT tablet that belongs to your department, not to every department. An ID
+card in your pocket, a breathalyser in the trunk, a lead for the dog. LACORE features can now be
+**inventory items** — with **ox_inventory**, **qb-inventory** (QBCore / QBox) or **ESX**.
+
+It works in both directions. Use the item in your inventory and the feature opens — the phone comes
+up, the MDT boots, the ID card is shown. And a feature can be told it *needs* its item: without the
+tablet in your pocket, `/mdt` does nothing. Which item that is depends on who you are — the `mdt`
+entry carries a per-department list, so an LAPD unit needs `mdt_lapd` and a deputy needs
+`mdt_lasd`, out of one config and one command.
+
+Ownership is decided on the **server**, never on the client, so a modified client cannot talk its
+way into a terminal it has no tablet for. Closing is never gated: an already-open phone, MDT or
+camera tool always toggles shut, so nobody is ever stuck in a UI because they dropped something.
+
+Shipped feature keys: `phone`, `mdt` (per department), `idcard`, `fingerprint`, `breathalyser`,
+`drugtest`, `fieldcamera`, `k9`. The ID card also gained the `/myid` command it never had — until
+now it only existed in the civilian radial, which an item cannot press.
+
+LACORE does not create items; it only asks your inventory about them. For ox_inventory, the server
+console prints a ready-made `data/items.lua` snippet built from exactly your config:
+
+```
+lacoreitems
+```
+
+On a server with **no** inventory at all nothing changes — every feature stays on its command, and
+gates always pass rather than locking people out of a UI they have no way to unlock.
+
+Other resources get the same layer through the [Developer API](https://tabysi.github.io/lacore-docs/developer-api):
+`GetInventory()`, `HasFeatureItem(src, key)`, `GetFeatureItem(src, key)`, `UseFeature(src, key)` and
+`GetFeatureItems()` on the server, `UseFeature(key)` on the client.
+
+⚠️ **New config file:** `configs/cfg-items-sh.lua` — the item names, which command each one runs, and
+whether it is required. **Nothing is required by default**, so dropping this update onto a running
+server changes no behaviour until you switch a feature's `require` on. The layer as a whole is gated
+by `Features.items` in `configs/cfg-features-sh.lua`.

@@ -156,6 +156,29 @@ exports['lacore']:CreateBolo({
 })
 ```
 
+## Inventory items
+
+The item layer ([Inventory Items](/configuration/items)) is readable and drivable from outside.
+
+| Export | Returns | Notes |
+|--------|---------|-------|
+| `GetInventory()` | `"ox"` \| `"qb"` \| `"esx"` \| `"none"` | which inventory LACORE detected |
+| `HasFeatureItem(src, key)` | `bool` | does the player carry the item that feature needs? |
+| `GetFeatureItem(src, key)` | `string` \| `nil` | which item that is *for this player* — the MDT is per department |
+| `UseFeature(src, key)` | `bool` | run a feature on that player's client, as if the item had been used |
+| `GetFeatureItems()` | `{item,key,label}[]` | every item the config defines |
+
+```lua
+-- Hand a new LAPD recruit their tablet, but only if they don't already carry one.
+if not exports['lacore']:HasFeatureItem(src, 'mdt') then
+    local item = exports['lacore']:GetFeatureItem(src, 'mdt')   -- e.g. "mdt_lapd"
+    exports.ox_inventory:AddItem(src, item, 1)
+end
+```
+
+Feature keys: `phone`, `mdt`, `idcard`, `fingerprint`, `breathalyser`, `drugtest`, `fieldcamera`,
+`k9` — plus whatever you add to `configs/cfg-items-sh.lua`.
+
 <Callout type="info">
   Need an export that isn't here yet? Ask in our [Discord](https://discord.gg/b6YbvVEvYp) — if it maps
   to an existing internal function it's usually a quick add.

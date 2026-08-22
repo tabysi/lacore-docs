@@ -1,0 +1,129 @@
+---
+title: Inventory Items
+---
+
+import { Callout } from 'nextra/components'
+
+# Inventory Items — `configs/cfg-items-sh.lua`
+
+Turns LACORE features into **inventory items**: a phone you carry, an **MDT tablet per department**,
+an ID card in your pocket, a breathalyser in the trunk. Using the item in your inventory opens the
+feature — and if you want, *not* carrying the item means the command doesn't work either.
+
+Works with **ox_inventory**, **qb-inventory** (QBCore / QBox) and **ESX**. On a server with no
+inventory at all nothing changes: every feature stays on its command exactly as before.
+
+<Callout type="info">
+  The whole layer is gated by the [feature toggles](/configuration/features) (`Features.items`).
+</Callout>
+
+## The two halves
+
+| | What it does |
+|---|---|
+| **Use** | The player uses the item in their inventory → LACORE runs that feature's command (open the phone, open the MDT, show the ID card). |
+| **Gate** | `require = true` on a feature means the command **only works while the player carries the item**. Ownership is checked on the **server**, so a modified client can't fake it. |
+
+`require` is **off by default everywhere**. Adding this config to an existing server changes nothing
+until you decide a feature needs its item.
+
+## Core options
+
+```lua
+ItemsCfg.inventory        = "auto"   -- "auto" | "ox" | "qb" | "esx" | "none"
+ItemsCfg.requireByDefault = false    -- true = every feature needs its item unless it says otherwise
+ItemsCfg.notifyMissing    = true     -- tell the player which item they are missing
+```
+
+`auto` picks `ox_inventory` when it is running, otherwise the detected framework's inventory,
+otherwise `none`.
+
+## Features and their items
+
+Each entry names the item, the command it runs, and whether it is required:
+
+```lua
+ItemsCfg.features = {
+    phone = {
+        item    = "phone",     -- the item name in YOUR inventory
+        command = "phone",     -- the LACORE command it runs / protects
+        label   = "phone",     -- what the player is told they are missing
+        require = false,       -- nil = follow requireByDefault
+        consume = false,       -- true removes one per use (tools stay false)
+    },
+    ...
+}
+```
+
+Shipped out of the box: `phone`, `mdt`, `idcard`, `fingerprint`, `breathalyser`, `drugtest`,
+`fieldcamera`, `k9`.
+
+### One MDT per department
+
+The `mdt` entry carries a `byDept` list, so an LAPD tablet is not an LASD one. The player's LACORE
+department is matched as a lowercase fragment — `"lapd"` matches both `LAPD` and `LAPD Metro` — and
+the first match wins. Departments that match nothing fall back to the entry's own `item`:
+
+```lua
+mdt = {
+    item    = "mdt",           -- fallback for every other department
+    command = "mdt",
+    label   = "MDT",
+    require = false,
+    byDept  = {
+        { match = "lapd",    item = "mdt_lapd" },
+        { match = "lasd",    item = "mdt_lasd" },
+        { match = "sheriff", item = "mdt_lasd" },
+        { match = "bcso",    item = "mdt_lasd" },
+        { match = "chp",     item = "mdt_chp"  },
+        { match = "amr",     item = "mdt_ems"  },
+        { match = "ems",     item = "mdt_ems"  },
+        { match = "fire",    item = "mdt_ems"  },
+    },
+},
+```
+
+## Your inventory still has to know the items
+
+LACORE never creates items — it only asks your inventory about them. For **ox_inventory**, run this
+in the server console and paste the output into `ox_inventory/data/items.lua`:
+
+```
+lacoreitems
+```
+
+It prints one line per item defined in your config, for example:
+
+```lua
+['mdt_lapd'] = { label = 'MDT', weight = 200, stack = false, close = true, consume = 0, description = 'LACORE — mdt' },
+```
+
+`consume = 0` keeps ox from destroying the item when it is used — a tablet is a tool, not a sandwich.
+For **QBCore / QBox** and **ESX** the items go in that framework's own item list; LACORE registers
+them as usable automatically at start-up.
+
+<Callout type="warning">
+  Item names must match **exactly** between this config and your inventory's item list. A gate whose
+  item does not exist in the inventory can never be satisfied, and the feature stays shut.
+</Callout>
+
+## Closing is never gated
+
+Only *opening* costs an item. An already-open phone, MDT or camera tool always toggles closed, so no
+one is ever stuck in a UI because they dropped something.
+
+## Exports
+
+Other resources can read and drive the same layer — see the [Developer API](/developer-api):
+
+```lua
+-- server
+exports['lacore']:GetInventory()               -- "ox" | "qb" | "esx" | "none"
+exports['lacore']:HasFeatureItem(src, 'mdt')   -- does this player carry their department's MDT?
+exports['lacore']:GetFeatureItem(src, 'mdt')   -- which item that is for them
+exports['lacore']:UseFeature(src, 'phone')     -- open a feature for a player
+exports['lacore']:GetFeatureItems()            -- every item this config defines
+
+-- client
+exports['lacore']:UseFeature('phone')
+```
