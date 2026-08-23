@@ -7,6 +7,7 @@ export default {
   convars: 'Server Convars',
   main: 'Main Config (config.lua)',
   discord: 'Discord & Duty',
+  permissions: 'Permissions & ACE',
   notifications: 'Notifications',
   phone: 'Phone',
   items: 'Inventory Items',
