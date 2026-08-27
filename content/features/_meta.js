@@ -1,6 +1,5 @@
 export default {
   'mdt-and-dispatch': 'MDT & Dispatch',
-  supervisor: 'Supervisor Panel',
   'radio-stt': 'Radio Transcript (STT)',
   cctv: 'CCTV Surveillance',
   'evidence-reports': 'Evidence & Reports',

@@ -1,0 +1,21 @@
+---
+title: "3.3.2c"
+---
+
+![LACORE 3.3.2c](/changelog/v3-3-2c.svg)
+
+# [3.3.2c] – 2026-08-13 — An empty server still answers
+
+### Fixed
+
+- **A server with nobody on it went silent, and the web dispatcher read that as offline.** The push
+  loop only ran while players were connected — a saving inherited from the self-hosted bridge, and
+  three bugs at once for the hosted portal: a running server showed as **offline**, a queued action
+  waited for somebody to join, and — worst — an **access question could never be answered**, so a
+  dispatcher granted by Discord role sat in "checking your access" forever on a quiet server.
+
+  An empty server now pushes every **6 seconds** (still every 2 with players on it). Six because the
+  page calls a snapshot stale at ten; an empty snapshot is a few bytes.
+
+  Found on the first real run against a live server, which is exactly the class of thing that only
+  shows up there: every part worked, and the part that decides *when* to speak did not.

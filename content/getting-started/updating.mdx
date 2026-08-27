@@ -1,0 +1,75 @@
+---
+title: "Updating LACORE"
+---
+
+import { Steps, Callout } from 'nextra/components'
+
+# Updating LACORE
+
+How to move a running server to a new LACORE build without losing your configuration.
+
+<Callout type="info">
+  **Before every update**, skim the release's page in the [Changelog](/updates/changelog). Entries
+  marked **⚠️ Config change** tell you exactly which config files gained, lost or moved keys.
+  SemVer applies: a patch (3.4.**x**) is fixes and small additions, a minor (3.**y**.0) brings
+  features.
+</Callout>
+
+<Steps>
+
+### Back up your configs
+
+On the running server (console or as staff):
+
+```
+/lacoreconfig backup
+```
+
+This snapshots every `configs/*.lua` into the database store — your edits are now safe regardless
+of what the update ships.
+
+### Replace the resource
+
+Download the new build and replace the **whole** `resources/lacore` folder with it. Don't try to
+merge folders by hand — the escrow-protected files must stay the matching set from one build.
+
+### Restore your configs
+
+Start the server once, then:
+
+```
+/lacoreconfig restore
+```
+
+Restore is a **3-way merge**: only your changes are re-applied onto the new build's config files,
+so new keys and blocks the update added stay in place. If an update changed the exact spot you also
+edited, the new default wins and the conflict is reported in the console — review those lines.
+
+### Restart & verify
+
+Restart the resource, then check:
+
+```
+/lacore version    # the new version number
+/lacore doctor     # full health check
+```
+
+</Steps>
+
+## What you never have to migrate by hand
+
+- **Database** — tables are created and migrated automatically on start (including the old
+  `pvp_*` → `lacore_*` migration for very old installs). No SQL to run.
+- **Runtime data** (`data/*.json` — zones, map config, placed cameras, bulletin board …) is
+  DB-persisted on its own and survives a reinstall when oxmysql is configured.
+- **Old edited `config.lua`** — since the 3.4.4 split, every table moved out of `config.lua` is
+  defined as `X = X or { … }`: if your old copy still contains a moved table, **your table wins**
+  and nothing breaks. Migrate your edits into the new topic files whenever convenient.
+- **License & entitlements** — `setr lacore_license_key` lives in `server.cfg`, which an update
+  never touches. Paid add-ons re-unlock automatically at the first start after the update.
+
+<Callout type="warning">
+  The one thing that does **not** survive on its own is an edited config **without a backup** — the
+  new build ships default `configs/*.lua`. `/lacoreconfig backup` before you replace the folder is
+  the whole trick. Check `/lacoreconfig status` if you're unsure when the last backup was taken.
+</Callout>

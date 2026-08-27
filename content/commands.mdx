@@ -51,7 +51,7 @@ Bind these yourself in *FiveM Settings ▸ Key Bindings ▸ FiveM*:
 
 | Binding | Action |
 |---------|--------|
-| LACORE: Open settings menu | Open the settings menu |
+| LACORE: Open settings menu | Open your profile on its Settings tab |
 | Change Firing Mode | Toggle your weapon's firing mode |
 | Open/Close Front Driver Door | `door 1` |
 | Open/Close Front Passenger Door | `door 2` |
@@ -62,10 +62,11 @@ Bind these yourself in *FiveM Settings ▸ Key Bindings ▸ FiveM*:
 | Mobile fingerprint ID (LEO) | `/mobileid` (`Fingerprint.openKey`) |
 | Radio: hold to transcribe | Speech-to-text push-to-talk |
 | Put dragged person in nearest vehicle | `/putin` |
+| Replay: start / stop recording | Start / stop a [Director's Cut](/user-guide/replay) take |
 | LACORE: Focus the in-car screen | `/cad` (`VehicleScreen.focusCommand`) |
 | K9 — deploy, heel, stay, sit, lay, bark, search, engage, car | 9 separate bindings, one per K9 order |
 
-That's **32 bindings** in total: 11 with a default key, 21 unbound.
+That's **33 bindings** in total: 11 with a default key, 22 unbound.
 
 ## 🧍 Character & session
 
@@ -73,22 +74,57 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 |---------|-----|--------------|
 | `/char [name]` | Everyone | Open your character data sheet. **Saving sets your RP name** and joins you to the session. Supports unlimited presets. |
 | `/character` | Everyone | Alias of `/char`. |
-| `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config). |
+| `/profile` | Everyone | Open your player profile (playtime, characters, achievements, emote radial config, **settings**). |
 | `/vreg` | Everyone | Register the vehicle you're currently driving (plate, make, model, colour, owner…). |
 | `/phone` | Everyone | Open / close the LACORE phone (default key **F1**). |
-| `/settings` | Everyone | Open the settings menu. **The name is configurable** — see the note below. |
-| `/vehicle` | Everyone | Toggle the vehicle menu. |
-| `/session` | Everyone | Toggle the session menu. |
+| `/settings` | Everyone | Open your **profile on its Settings tab** — the settings live there, not in a window of their own. On an already-open profile it switches to that tab. **The name is configurable** — see the note below. |
+| `/vehicle` | Everyone* | Toggle the vehicle spawner — search by name or model code, filter by class and manufacturer. **\*Restrictable** via `VehicleSpawner.permission` (see below); open to everyone by default. |
+| `/session` | Everyone | Session window — switch between the roleplay session and a personal one, and set that session's map, time and AI population. |
 | `/playerlist` | Everyone | Toggle the player list (default **I**). |
 | `/lacorereport` | Everyone | Report a bug straight to the [LACORE dashboard](/user-guide/bug-reports) — not your own server database. Renameable via `Report.command`. |
 | `/playtime` 🔒 | — | Show your playtime. |
 | `/showid` | Everyone | Show your server ID. |
 
+<Callout type="warning">
+  **The vehicle spawner is open to everyone by default.** Any player can spawn any vehicle in the
+  game. To restrict it, set a permission in `configs/cfg-server-sv.lua` and grant it in `server.cfg`:
+
+  ```lua
+  VehicleSpawner = { permission = "vehiclespawner" }
+  ```
+  ```cfg
+  add_ace group.admin lacore.vehiclespawner allow
+  ```
+
+  The check runs server-side before the window opens, and `devmode` / Staff / Dev always pass. It
+  gates *this tool* — stopping a cheat client from creating vehicles is the
+  [anticheat](/anticheat)'s job, not a menu's.
+</Callout>
+
 <Callout type="info">
   **`/settings` is renameable.** HUD resources commonly own `/settings` too, and two resources can't
   share a command — so ours would silently shadow theirs. Set `HudCfg.settingsCommand` to another
-  name, or to `''` to drop the command entirely. The menu stays reachable either way via the
-  "LACORE: Open settings menu" keybind.
+  name, or to `''` to drop the command entirely. The settings stay reachable either way — via the
+  "LACORE: Open settings menu" keybind, or simply through `/profile` ▸ Settings.
+</Callout>
+
+<Callout type="info">
+  **Adding your own setting** is one line in `settingsTemplate` (`client/core-cl.lua`) — the window
+  renders that table, so a new entry appears with no UI work:
+
+  ```lua
+  { name = "Show Time", description = "Show a clock next to the minimap",
+    options = "checkbox", default = true },                      -- a toggle
+  { name = "Map Style", description = "The style used by the pause menu map.",
+    options = { "Eyefind Maps", "Satellite" }, default = 1 },    -- a choice
+  ```
+
+  `options = "checkbox"` stores a boolean; a list stores the **1-based index** of the chosen entry.
+  Read it back with `GetUserSettings("Show Time", true)` — always pass a default, since the table is
+  empty until init finishes. Add `onChange = "SomeEvent"` to have that event fire whenever the value
+  changes. Labels are translated when `lang/<code>.json` carries a matching key (the window derives it
+  from the name: `Show Time` → `set_show_time`, description `set_show_time_d`); without one it falls
+  back to the English text in the template.
 </Callout>
 
 ## 👮 Duty & jobs
@@ -98,17 +134,18 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 | `/onduty <agency> <callsign>` 🔒 | Member | Go on duty for an agency with a callsign (e.g. `/onduty LAPD 1A-12`). Sets dept, motto and loadout. |
 | `/offduty` 🔒 | On-duty | Go off duty, clear weapons & callsign. |
 | `/job [name]` 🔒 | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
-| `/jobmenu` | Everyone | Toggle the job / session menu. |
+| `/jobmenu` | Everyone | Duty picker — pick an agency from a searchable list, set a callsign, go on duty. Agencies your [`DutyAccess`](/configuration/discord#agency-whitelist) permissions refuse are shown locked. |
 | `/canceljob` | Everyone | Cancel your current civilian activity. |
+| `/dutyaccess` | Everyone | Print which agencies you may go on duty for, and what each one wants (role or ACE). Also runs in the server console. `/dutyaces` is an older alias of the same command. |
 
 ## 🚓 MDT & CAD
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Routed by department: LAPD → LACORE Mobile Client, other LE → Agency MDT, LASD/Sheriff/BCSO → LASD CAD, Fire/EMS → EMS CAD. |
+| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Which terminal you get is the department's [`cad` setting](/configuration/main); without one it is guessed from the name: LAPD → LACORE Mobile Client, LASD/Sheriff/BCSO → LASD CAD, other LE → Agency MDT, Fire/EMS → EMS CAD. |
 | `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
 | `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
-| `/penncad` | LEO | Always opens the Pennsylvania CAD. |
+| `/penncad` | LEO | Always opens the [Pennsylvania CAD](/user-guide/pennsylvania-cad) — a paid add-on, unlocked by licence key. |
 | `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
 | `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |
 | `/dispatch [on\|off\|open]` | LEO / Dispatcher | `on`/`off` = dispatcher duty; no arg or `open` = open the dispatch console. |
@@ -123,15 +160,21 @@ That's **32 bindings** in total: 11 with a default key, 21 unbound.
 </Callout>
 
 See [Using the MDT](/user-guide/mdt), [Dispatch Console](/user-guide/dispatch-console) and
-[Supervisor panel](/features/supervisor).
+[Supervisor panel](/configuration/supervisor).
 
 ## 📞 Emergency & non-emergency calls
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/911 [message]` | Everyone | Emergency call to dispatch — opens the caller form and creates a live incident. |
-| `/311 [message]` | Everyone | Non-emergency call to dispatch. |
+| `/911 [message]` | Everyone | Emergency call to dispatch — opens the caller form and creates a live incident. **Blocked while a dispatcher is on duty**: you are told to call 911 on your phone instead, so the dispatcher gets a voice call rather than a text line. |
+| `/311 [message]` | Everyone | Non-emergency call to dispatch. Same rule as `/911`. |
 | `/hangup` | Everyone | End the current dispatch call. |
+
+<Callout type="info">
+  You can also **dial `911` / `311` on the phone keypad** — that places the voice call directly, works
+  on the retro brick too, and is the intended route whenever a dispatcher is online. The numbers are
+  configurable (`PhoneCfg.emergencyNumbers`). See [the phone](/user-guide/phone).
+</Callout>
 
 ## 📡 Dispatcher text commands
 
@@ -161,7 +204,8 @@ See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).
 | `/leoreq <unit>` | On-duty | Request a unit to your scene (RP, unit "arrives" after 20–120 s). |
 | `/release` · `/uncuff` | LEO | Put down a carried person / uncuff the nearest cuffed person (default key **X**). |
 | `/putin` | LEO | Put the person you're dragging into the nearest vehicle. |
-| `/mobileid` | LEO | Scan a restrained suspect's fingerprint and return their identity. See [Mobile Fingerprint ID](/configuration/gameplay-modules). |
+| `/mobileid` | LEO | Scan a restrained suspect's fingerprint and return their identity; also takes their prints and lists open crime-scene prints. See [Mobile Fingerprint ID](/configuration/gameplay-modules). |
+| `/liftprint [incident]` | LEO | Lift a latent print off the nearest vehicle. Anonymous until you run it against the print register. |
 | `/breath [µg]` · `/breatha` | LEO | Breathalyzer test on the nearest person (`/breath` logs a reading, `/breatha` targets the nearest player). |
 | `/saliva [cannabis] [cocaine]` · `/druga` | LEO | Drug swab test on the nearest person. |
 | `/impound [reason]` | LEO | Impound the nearest vehicle. |
@@ -170,7 +214,7 @@ See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).
 | `/releaseinmate <id>` | LEO | Release an inmate. |
 | `/lpr` | LEO (LASD) | Scan the plate of the vehicle in front of you (Licence-Plate Reader). |
 | `/grabstretcher` | Fire-EMS | Grab / deploy a stretcher. |
-| `/jail <id> <minutes> [reason]` | LEO | Jail a player. |
+| `/jail <id> <seconds> [reason]` | LEO | Jail a player — the value is **seconds** (clamped 30–1200). |
 | `/unjail <id> [reason]` | LEO | Release a jailed player. |
 | `/hospital <id> <minutes>` | LEO / Fire-EMS | Send a player to hospital. |
 | `/unhospital <id>` | LEO / Fire-EMS | Release from hospital. |
@@ -276,11 +320,34 @@ resource can switch ours off and avoid every line being posted twice.
 Emotes are provided by DPEmotes / RPEmotes (`/e <name>`, `/emotemenu`) — LACORE's civilian radial
 bridges to whichever is installed. See [Civilian Layer](/features/civilian).
 
+## 🎬 Replay & Director's Cut
+
+Content-creation tools — recording and playback are local to whoever runs them. Gated by
+`Features.replay` and `Replay.enabled`; the command name is `Replay.command`.
+
+| Command | What it does |
+|---------|--------------|
+| `/replay` | Open the Director's Cut window on the clip library. |
+| `/replay start` | Start a take. |
+| `/replay stop` | End the take and keep the buffer. |
+| `/replay save [name]` | Store the buffer as a clip. |
+| `/replay discard` | Throw the buffer away. |
+| `/replay list` | List your clips. |
+| `/replay play <id>` | Play a clip (BACKSPACE stops it). |
+| `/replay cancel` | Stop the running playback. |
+| `/replay delete <id>` | Delete a clip. |
+| `/replay debug` 🧪 | Verbose logging — client half immediately, server half needs admin permission. |
+| `/replay help` | Print the list above in chat. |
+
+The keybind **"Replay: start / stop recording"** ships **unbound** — bind it in
+*FiveM Settings ▸ Key Bindings*. See [Replay & Director's Cut](/user-guide/replay).
+
 ## 🧍‍♂️ Civilian layer
 
 | Command | What it does |
 |---------|--------------|
-| `/prop [id\|pickup]` | Place a prop by id, `/prop pickup` removes the nearest, no arg opens the prop menu. |
+| `/prop [id\|pickup]` | Place a prop by id, `/prop pickup` removes the nearest, no arg opens the civilian prop radial. |
+| `/propspawner` 🧪 | Open the scenery prop spawner (`configs/cfg-props-cl.lua`) — search by name, filter by category, delete the nearest. Was `/prop` until that name was taken by the radial above. |
 | `/orgaccept` | Accept a pending organisation invite. |
 | `/turf` | Show turf / territory ownership and your organisation's influence. |
 
@@ -295,10 +362,11 @@ Discord roles. See [Anti-Cheat & Security](/anticheat) and [Discord setup](/conf
 
 | Command | What it does |
 |---------|--------------|
-| `/admin` | Open the admin GUI menu (players / self / world). |
-| `/bblog` | Open the Big Brother admin-log panel. |
+| `/admin` | Open the **staff panel** — players, the activity log and the self tools in one window. Keys: 1 / 2 / 3 switch view, Esc closes. |
+| `/bblog` | The same window, opened on its **Activity log** view. |
 | `/calllog` 🔒 | Print the MDT call/audit log. |
-| `/myperms` | Show your own ACE permissions. |
+| `/myperms` | Show your own group, flags and resolved ACE permissions. |
+| `/lacoreperms` 🔒 | Every permission LACORE checks, who holds it, and ready-made `add_ace` lines. |
 | `/staff` 🔒 | Toggle staff mode. |
 | `/wl` 🔒 | Toggle the server whitelist on / off. |
 | `/aop <text>` 🔒 | Set the Area of Play. |
@@ -313,7 +381,7 @@ Discord roles. See [Anti-Cheat & Security](/anticheat) and [Discord setup](/conf
 | `/time <h> [m]` 🔒 · `/freezetime` 🔒 · `/ft` · `/rft` | World time control / freeze helpers. |
 | `/deleteentity` | Delete the entity you're aiming at. |
 | `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
-| `/lacoreconfig` | Back up / restore LACORE configs across reinstalls. |
+| `/lacoreconfig <backup\|restore\|undo\|status>` | Back up / restore LACORE configs across reinstalls. `undo` reverses the last restore. |
 
 ### 🗺️ NADS — worldbuilding (staff)
 
@@ -351,7 +419,6 @@ Not meant for players — these exist for development, content creation and trou
 |---------|--------------|
 | `/dev` | Toggle dev mode. |
 | `/citydebug` | Print city / zone debug info. |
-| `/menutest` | Test harness for the native menu library. |
 | `/spawnpoint` | Capture a spawn point where you stand and print a config line for it. |
 | `/preview <model>` | Look at a model in 3D, in game. |
 | `/capturetest` | Test the model renderer. |
@@ -372,9 +439,10 @@ these break anything, but they're worth knowing when something behaves unexpecte
   `Features.chat.actions` off if you don't want the RP line.
 - **`/settings` is claimed by many HUD resources** — rename ours via `HudCfg.settingsCommand`, or
   set it to `''` and use the keybind.
-- **`/prop`, `/char`, `/character` and `/hangup` are each registered by more than one LACORE file.**
+- **`/char`, `/character` and `/hangup` are each registered by more than one LACORE file.**
   The one that loads last wins, which is the intended one in a stock install — worth remembering if
-  you reorder `fxmanifest.lua`.
+  you reorder `fxmanifest.lua`. (`/prop` used to be on this list too; the scenery spawner that lost
+  the name is now `/propspawner`.)
 - **Turning a module off removes its commands entirely**, which is the point: the name is then free
   for whichever resource you'd rather have own it. See
   [Feature toggles](/configuration/features).

@@ -1,0 +1,138 @@
+---
+title: "3.4.9"
+---
+
+import { Callout } from 'nextra/components'
+
+![LACORE 3.4.9](/changelog/v3-4-9.svg)
+
+# [3.4.9] – 2026-08-16 — QBox servers get their names and jobs through
+
+### Added
+
+<Callout type="warning">
+**Config changed:** `configs/cfg-licenses-sh.lua` gained `Licenses.qb`, the map from QB's
+`metadata.licences` keys onto the six MDT licence slots. It ships covering stock QB
+(`driver`, `business`, `weapon`); add your own licence names there if you use custom ones.
+`configs/cfg-bridge-sh.lua` is unchanged apart from its comments — `Bridge.useFrameworkCharacters`
+now applies to QB/QBox too, at its existing default of `true`.
+</Callout>
+
+<Callout type="warning">
+Nothing to configure. The `sv_licenseKey` hint above is the *recommended* fix — with it, the
+match is exact even if several of your servers share one public IP.
+</Callout>
+
+<Callout type="warning">
+Nothing to configure — this needs no config change. On a QBox server the framework must still
+be `ensure`d **before** LACORE (see `configs/cfg-bridge-sh.lua`); the server console prints
+`[bridge] Framework detected: qbox` when it worked.
+</Callout>
+
+#### QBCore and QBox characters are imported like ESX ones
+
+Framework characters were an ESX-only feature: on QB and QBox the bridge took the name and the job,
+but everything else — date of birth, gender, phone, registered vehicles, licences — had to be typed
+into LACORE a second time, and the CAD person query found nobody who was not currently online.
+
+QB and QBox now have the same import ESX has. Identity is read from the loaded player
+(`PlayerData.charinfo`), not from the database: QB keeps the character in memory and writes it back
+on save, so the player object is the fresher source and a fork that renamed a column still imports.
+`citizenid` keys the LACORE character, which makes multicharacter work without any extra handling —
+one LACORE character per QB character, re-synced on switch and on every job change.
+
+| Pulled from QB / QBox | Source |
+| --- | --- |
+| Name, date of birth, gender, phone, job | `charinfo` of the loaded player |
+| Registered vehicles (plates in the CAD query) | `player_vehicles` for that `citizenid` |
+| MDT licences | `metadata.licences` |
+
+The MDT person and plate queries fall back to `players` / `player_vehicles` as well, so an offline
+character or a car bought in the framework's shop is found. QB has no height on the character, so
+that one field stays empty. `oxmysql` is only needed for the vehicle half — the identity import runs
+without it.
+
+### Fixed
+
+#### RP-WEB stayed "offline" on a server that was plainly running
+
+`https://lacore.netica.dev/server/<id>` showed the desktop but never any data, on a server with both
+`lacore_license_key` and `lacore_webdispatch` set and pushing every two seconds.
+
+The push arrives with the account's license key and a `serverKey` — the Cfx `sv_licenseKey` — which
+the portal translates into the dashboard row id, because that id is what `/server/<id>` addresses and
+the secret key must never appear in a URL. When that translation found nothing, the snapshot was
+filed under a shared `default` slot instead. No `/server/<id>` address points at that slot, so the
+desktop could never find the snapshot no matter how long it waited — and every side of the chain
+reported success: the game logged a good push, the portal answered `200`, the page said "offline".
+
+Four changes, because the failure was as much about being undiagnosable as about being wrong:
+
+- **The server is told its own id, so nothing has to be derived.** `/ingest/server` — the telemetry
+  beat that creates and refreshes the dashboard row — now answers with that row's id, the very id
+  `/server/<id>` is built from. The core keeps it and sends it back on every web-dispatch push, so
+  the portal knows which server it is hearing from by construction. This is the path that works
+  without any Cfx key at all.
+- **Two fallbacks behind it.** If the id has not arrived yet (the first ~15 seconds after start, or
+  telemetry switched off), the Cfx `sv_licenseKey` is used as before, and failing that the address
+  the push arrives from — the same key telemetry upserts the row by when a server has no Cfx key to
+  give. Deriving identity from an IP is a guess and is now the last resort rather than the plan.
+- **The game server says when it is unmatched.** The reply carries whether the snapshot could be
+  filed against a real dashboard entry, and `webdispatch` prints once on the server console when it
+  could not — stating plainly that `lacore_license_key` is *not* the problem, and reporting the state
+  of both identifiers it has. It prints again when the match recovers.
+- **The page says which kind of offline it is.** "Never received a snapshot at this address" and "the
+  server went quiet" looked identical. The banner now separates them and, when another server on the
+  account is pushing right now, names it.
+
+#### The player list covered the LAPD MDT and looked like a locked terminal
+
+With the MDT open, pressing **I** painted the player-list board over it. The board is a fullscreen,
+near-opaque overlay and the LAPD window had no stacking order of its own, so the terminal simply
+disappeared — while it was still open, still holding the NUI focus and still holding the mouse
+cursor. From the officer's side that reads as an MDT that will not let go. The Agency MDT and the
+LASD terminal were unaffected: both already draw above the board.
+
+The board and a terminal no longer share the screen. **I** is refused while any CAD window is open
+and says why, and a board that is already up closes by itself the moment a terminal opens. Nothing
+else about the board changed — it still takes no NUI focus and still pages on the arrow keys.
+
+#### CHP MDT: the close button, the status menu and the whole action rail were off screen
+
+On the Agency (CHP) MDT the buttons on the right-hand side did nothing, because they were not on
+the screen at all. All terminals share one saved window position, and the Agency window is about
+twice as wide as the LAPD one that usually saved it. Dragging clamps only far enough to keep a title
+bar grabbable, so a position inherited from the narrow window left several hundred pixels of the
+wide one — the ✕, the gear, the status dropdown and the entire right action rail (SELF ASSIGN,
+BACKUP, EMS, TOW, BOARD, HISTORY, CODE 6) — hanging past the edge of the screen, out of reach of any
+click. The gear being off screen too meant there was no way to fix it from inside the terminal.
+
+Every terminal now pulls an inherited position back into view when it opens and when the game window
+resizes, and the rescue is stricter than the drag clamp: a window that FITS on screen is placed fully
+on screen instead of merely leaving a grabbable corner. Deliberately dragging a window half out of
+view still works — that rule is unchanged.
+
+The Pennsylvania CAD already did this; the Agency MDT, the LAPD Mobile Client and the 9100-T did not.
+The same pass closed the other half of the loop: the LAPD window stopped only at the top and left
+edge while being dragged and the 9100-T chassis did not stop at all, so both could be pushed off the
+screen and **saved** there — and that saved position is the one every other terminal inherits. All
+four now clamp on all four edges. The in-car dashboard screen is left alone: there the terminal is
+stretched over the whole texture, so "is it on screen" is not a question that applies to it.
+
+#### The QBox bridge never reached the framework at all
+
+On a QBox server (`qbx_core`) the bridge detected the framework correctly and then went silent:
+no character names, no job → agency mapping, so `/onduty` still demanded a Discord duty role and
+the MDT opened for nobody. ESX and plain QBCore were unaffected.
+
+The bridge asked QBox for a core object (`exports.qbx_core:GetCoreObject`). QBox does not have one —
+it dropped the QBCore core-object pattern and answers only under its QB compatibility layer or
+through its own exports. The call therefore failed on every lookup, `Bridge.GetName` and
+`Bridge.GetJob` returned `nil`, and LACORE behaved as if the player had no job.
+
+Player lookups now go through QBox's native `exports.qbx_core:GetPlayer(source)` first and fall
+back to the QB bridge layer's core object, so both a pure QBox install and one running the QB
+compatibility layer resolve. QBox's `QBCore:Server:OnPlayerLoaded` event (QBCore fires
+`PlayerLoaded` and passes the player, QBox fires `OnPlayerLoaded` with none) is handled as well, so
+the job arrives on join instead of up to five seconds later. Job grades are read as a number
+whether the fork stores `job.grade.level` or a bare `job.grade`.

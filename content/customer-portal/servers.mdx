@@ -7,24 +7,31 @@ import { Callout } from 'nextra/components'
 # Servers
 
 Every server linked to your account (via a [license key](/customer-portal/license-keys)) appears on
-**Dashboard → Servers**, with live status refreshed automatically.
+**Dashboard → Servers** as a card. The list refreshes itself every 30 seconds while the page is
+open, and the header shows how many of your servers are online.
 
-## What you see
+## What a server card shows
 
 | Field | Meaning |
 |-------|---------|
-| **Status** | Online / offline — green when the server reported in recently |
-| **Players** | Current players / slots |
-| **Version** | The LACORE version the server is running |
-| **Last seen** | When the server last checked in |
+| **Status** | Online / Offline. A server counts as offline once its last heartbeat is more than **3 hours** old. |
+| **Players** | Current players / slots. |
+| **Version** | The LACORE version that server is running. |
+| **Last seen** | When it last checked in. |
+| **LICENSED / UNVERIFIED** pill | `LICENSED` means an active key of yours matched at the last heartbeat. `UNVERIFIED` means it reported in but no active key matched. |
 
-## Managing a server
+If you gave the server a custom name, its raw `sv_hostname` is shown underneath.
 
-- **Rename** — give a server a friendly name (separate from its in-game hostname).
-- **Remove** — take a server off your list. If it's still running with a valid key it re-appears on its
-  next heartbeat, so this is mainly for clearing out old / offline entries.
+## What you can do
+
+- **Rename** — a friendly name (up to 80 characters) that replaces the hostname in your dashboard.
+  It changes nothing in-game.
+- **Remove** — takes the server off your list. If it is still running with a valid key it
+  **re-appears on its next heartbeat**, so this is mainly for clearing out old entries.
+- **Dispatch** — opens the [web dispatcher](/features/webdispatch) for that server.
 
 <Callout type="info">
-  A server only appears here once it's **verified** by a license key. If you don't see your server,
-  check that `setr lacore_license_key "…"` is set in its `server.cfg` and the key is active.
+  Server missing? Check that `setr lacore_license_key "…"` is in its `server.cfg`, that the key is
+  still active, and that the server has actually started — registration happens on its first
+  heartbeat, not at purchase.
 </Callout>

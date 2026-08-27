@@ -1,0 +1,49 @@
+---
+title: "3.4.9.3"
+---
+
+import { Callout } from 'nextra/components'
+
+![LACORE 3.4.9.3](/changelog/v3-4-9-3.svg)
+
+# [3.4.9.3] – 2026-08-19 — 911 works from the keypad
+
+### Fixed
+
+<Callout type="warning">
+**Config change:** `configs/cfg-phone-sh.lua` gained `PhoneCfg.emergencyNumbers`. If you keep
+your own copy, the shipped default (911 + 311) applies when the table is missing — copy it in only
+if you want different numbers.
+</Callout>
+
+#### Dialling 911 or 311 on the phone said "call failed"
+
+Reported in support: *"the retro phone isn't allowing calls to go through, ie 911, 311 or anything —
+it just keeps saying an error on the phone."*
+
+Dialling a number on the phone asks the server which player owns it. Nobody owns 911, so the answer
+was "no such number" and the phone played its failure tone — every time, for everyone. The modern
+phone hid the problem behind its **Report** app, which posts a written 911/311 report through a
+different path. The retro brick has no apps: the keypad is the only way it can reach anyone, so on
+the retro phone emergency services were simply unreachable. The services directory even listed 311
+as a number you could call.
+
+Emergency numbers now go to the CAD call centre instead of being looked up as a player phone —
+exactly what `/911` does, but with the voice call the queue was built for:
+
+- Dial **911** or **311** → the call enters the dispatcher queue, and the phone shows *Calling…*,
+  then the operator's name once a dispatcher answers, with the call timer running.
+- **Hanging up** leaves the queue. Before, a phone call that could not connect left nothing to hang
+  up; now the caller disappears from the dispatcher's screen when they end the call, as they should.
+- No dispatcher online → the call still becomes an incident automatically, as it always did, and the
+  phone stops ringing instead of waiting forever.
+- Call centre switched off (or the CAD gated out entirely) → the phone says so straight away rather
+  than dialling into nothing.
+
+Which numbers count is configurable — `PhoneCfg.emergencyNumbers` in `configs/cfg-phone-sh.lua` maps
+a dialled number to a call type, so a community that dials 112 or 999 can add it, and removing an
+entry makes that number an ordinary call again. Numbers are matched on digits, so "9-1-1" works too.
+
+A dispatcher looking at a call placed this way sees no typed message — the caller is on the line
+instead. That placeholder was also the last hardcoded German string on this path (`(keine Details)`)
+and is now a proper locale entry.

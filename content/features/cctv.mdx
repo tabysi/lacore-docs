@@ -81,26 +81,6 @@ Each placed field camera spawns a **real CCTV prop** in the world at that spot (
 visible to **every** player — not just operators. Pick the model while placing (scroll through dome / wall
 / bullet / bank / pole cams). The prop despawns when the camera is removed.
 
-```lua
-CCTV.placeProps  = true              -- false = invisible cameras (coordinates only, the old behaviour)
-CCTV.defaultProp = "prop_cctv_cam_02a"
-CCTV.props = {                        -- the models you can cycle through (only these may be spawned)
-  { model = "prop_cctv_cam_02a", label = "Dome cam" },
-  { model = "prop_cctv_pole_02", label = "Cam pole 2", camZ = 2.7, camFwd = 0.6 },
-  -- … add / remove freely
-}
-```
-
-For **poles** the live `/cctv` view is rendered from the lens on top of the post: `camZ` is the lens
-height above the base, and `camFwd` pushes the viewpoint that far **in front** of the base (along the
-aimed direction) so it isn't stuck inside the pole shaft. Wall / dome cams *are* the lens, so both are 0.
-Tune `camZ` / `camFwd` per model if a view sits too low / high or clips the post.
-
-<Callout type="info">
-  Only models listed in `CCTV.props` can be spawned — the server rejects anything else, so a client can't
-  make everyone load an arbitrary model.
-</Callout>
-
 ### Camera groups (by locality)
 
 Placed field cameras are **auto-grouped by the in-game locality** they sit in — *Vinewood*,
@@ -114,23 +94,19 @@ own section in the `/cameras` manager, so a long camera list stays organised.
   operator has to open CCTV, and no job is required — resolving a locality from coordinates isn't
   privileged). Every open viewer / manager / map updates the moment it's done.
 
-Turn grouping off (one flat "Field Cameras" network) or rename the prefix in
-`configs/cfg-cctv-sh.lua`:
-
-```lua
-CCTV.autoGroupField  = true     -- false = one flat "Field Cameras" network
-CCTV.fieldGroupPrefix = "Field"  -- label prefix, e.g. "Field · Vinewood"
-```
-
 ## Dispatch map
 
 `/dispatch open` shows every camera you may access as 📹 markers. Click one → **"view this
 camera?"** → the console closes, the live CCTV view opens in front, and the console reopens
 automatically when you leave the camera.
 
-## Configuration
+---
 
-Cameras and controls live in `configs/cfg-cctv-sh.lua`:
+## For server owners — `configs/cfg-cctv-sh.lua`
+
+Everything below is configuration; players never touch it.
+
+### Fixed networks & tuning
 
 ```lua
 CCTV.networks = {
@@ -152,3 +128,32 @@ CCTV.zoomMax  = 70.0
 <Callout type="warning">
   The sample cameras are placeholders — move `pos` / `look` to real locations on your map.
 </Callout>
+
+### Field-camera props
+
+```lua
+CCTV.placeProps  = true              -- false = invisible cameras (coordinates only, the old behaviour)
+CCTV.defaultProp = "prop_cctv_cam_02a"
+CCTV.props = {                        -- the models you can cycle through (only these may be spawned)
+  { model = "prop_cctv_cam_02a", label = "Dome cam" },
+  { model = "prop_cctv_pole_02", label = "Cam pole 2", camZ = 2.7, camFwd = 0.6 },
+  -- … add / remove freely
+}
+```
+
+For **poles** the live `/cctv` view is rendered from the lens on top of the post: `camZ` is the lens
+height above the base, and `camFwd` pushes the viewpoint that far **in front** of the base (along the
+aimed direction) so it isn't stuck inside the pole shaft. Wall / dome cams *are* the lens, so both are 0.
+Tune `camZ` / `camFwd` per model if a view sits too low / high or clips the post.
+
+<Callout type="info">
+  Only models listed in `CCTV.props` can be spawned — the server rejects anything else, so a client can't
+  make everyone load an arbitrary model.
+</Callout>
+
+### Camera grouping
+
+```lua
+CCTV.autoGroupField  = true     -- false = one flat "Field Cameras" network
+CCTV.fieldGroupPrefix = "Field"  -- label prefix, e.g. "Field · Vinewood"
+```

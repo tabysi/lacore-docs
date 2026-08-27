@@ -1,0 +1,103 @@
+---
+title: "3.4.9.9"
+---
+
+![LACORE 3.4.9.9](/changelog/v3-4-9-9.svg)
+
+# [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item
+
+### Added
+
+#### LACORE features as inventory items
+
+A phone you carry. An MDT tablet that belongs to your department, not to every department. An ID
+card in your pocket, a breathalyser in the trunk, a lead for the dog. LACORE features can now be
+**inventory items** — with **ox_inventory**, **qb-inventory** (QBCore / QBox) or **ESX**.
+
+It works in both directions. Use the item in your inventory and the feature opens — the phone comes
+up, the MDT boots, the ID card is shown. And a feature can be told it *needs* its item: without the
+tablet in your pocket, `/mdt` does nothing. Which item that is depends on who you are — the `mdt`
+entry carries a per-department list, so an LAPD unit needs `mdt_lapd` and a deputy needs
+`mdt_lasd`, out of one config and one command.
+
+Ownership is decided on the **server**, never on the client, so a modified client cannot talk its
+way into a terminal it has no tablet for. Closing is never gated: an already-open phone, MDT or
+camera tool always toggles shut, so nobody is ever stuck in a UI because they dropped something.
+
+Shipped feature keys: `phone`, `mdt` (per department), `idcard`, `fingerprint`, `breathalyser`,
+`drugtest`, `fieldcamera`, `k9`. The ID card also gained the `/myid` command it never had — until
+now it only existed in the civilian radial, which an item cannot press.
+
+LACORE does not create items; it only asks your inventory about them. For ox_inventory, the server
+console prints a ready-made `data/items.lua` snippet built from exactly your config:
+
+```
+lacoreitems
+```
+
+On a server with **no** inventory at all nothing changes — every feature stays on its command, and
+gates always pass rather than locking people out of a UI they have no way to unlock.
+
+Other resources get the same layer through the [Developer API](https://tabysi.github.io/lacore-docs/developer-api):
+`GetInventory()`, `HasFeatureItem(src, key)`, `GetFeatureItem(src, key)`, `UseFeature(src, key)` and
+`GetFeatureItems()` on the server, `UseFeature(key)` on the client.
+
+⚠️ **New config file:** `configs/cfg-items-sh.lua` — the item names, which command each one runs, and
+whether it is required. **Nothing is required by default**, so dropping this update onto a running
+server changes no behaviour until you switch a feature's `require` on. The layer as a whole is gated
+by `Features.items` in `configs/cfg-features-sh.lua`.
+
+#### The permission system is configurable again
+
+Every LACORE right — ban, kick, the owner commands, the anticheat whitelist, personnel writes —
+runs through one helper, `HasPermission`. What that helper says used to be decided by a block at
+the top of `modules/security/permissions-sv.lua` under a heading that called itself configurable.
+That module is obfuscated in the escrow build, so on a real install it was the one thing you could
+not configure. It lives in a config file now, in plain text, like everything else.
+
+**`/lacoreperms`** is the new starting point: run it and it prints every permission LACORE knows,
+whether you hold it, which group ships with it, and the `add_ace` line to grant it. The keys only
+ever existed scattered across fourteen modules, so until now an ungranted permission and a bug
+looked exactly the same from the outside.
+
+The Discord → ACE bridge got the same treatment. `roleGroups` decides which Discord flag becomes
+which ACE group, `groups` decides what each group holds, and `bypass` decides whether a flag skips
+the ACE check at all. That last one is worth a look: with `bypass.staff` on — which is how it has
+always behaved, and still ships — the Staff role passes *every* check, the owner commands and the
+config restore included. Set it to `false` and Staff is held to the rights its group actually has.
+
+Also fixed along the way:
+
+- **A lost role now takes its rights with it.** Revoking someone's Staff role in Discord only
+  reached ACE when they disconnected, so the rights outlived the role for the rest of the session.
+  The bridge re-checks every player instead of only the ungranted ones.
+- **Recycled server slots no longer inherit.** Principals were tracked by server id alone. Those ids
+  are reused after a disconnect, so the next player on that slot could pick up their predecessor's
+  entry — or leave it behind uncleaned. Each entry now remembers whose identifier it was.
+- **`lacore.`-prefixed keys are no longer prefixed twice.** `lacore.ac.bypass` was being looked up as
+  `lacore.lacore.ac.bypass` and only ever matched through the bare-name fallback.
+- **`HasPermission(src)` with no key returns false.** It used to return `true` for anyone with a
+  Staff flag, which would have turned a forgotten argument into a silent "may do anything".
+- **`group.lacore_mod` is reachable.** It was given rights but nothing ever put a player in it.
+- **Bare ACE names can be switched off.** LACORE accepts `admin` as well as `lacore.admin`, which is
+  how it has always worked and stays on by default — but a generic word can collide with another
+  resource that uses the same one. `acceptBareAce = false` once your `server.cfg` uses the prefixed
+  names.
+
+Nothing here takes a right away from a server that updates without touching the new file: the old
+ACE names, the bare names and the Staff bypass all still answer the way they did.
+
+⚠️ **New config file:** `configs/cfg-permissions-sv.lua` — the Discord→ACE bridge, the groups and
+their rights, and the blanket bypass. Ships with exactly the behaviour that was hard-coded before,
+so dropping this update onto a running server changes nothing until you edit it.
+
+### Fixed
+
+- **The HUD location line named the wrong district for anyone who never opened a terminal.** The
+  zone → region overrides drawn in the dispatch console's Zone Editor were only requested when a
+  terminal or the dispatch console opened. Every other player kept an empty override table, so the
+  location readout printed the configured default region — "Los Angeles" — no matter which district
+  they were standing in, and only started telling the truth on a client that had run
+  `/dispatch open` at least once. The overrides and the drawn polygons are now pulled once on join,
+  for every player, and pushed again once the server has finished loading them so a resource restart
+  cannot leave clients holding an empty map.

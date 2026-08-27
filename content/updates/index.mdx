@@ -6,18 +6,82 @@ import { Callout, Cards } from 'nextra/components'
 
 # What's New
 
-The latest LACORE release at a glance. Every version has its own page under the
-[Changelog](/updates/changelog).
+The latest LACORE releases at a glance — current version: **3.4.5**. Every version has its own page
+under the [Changelog](/updates/changelog).
 
 <Callout type="info">
   The authoritative, line-by-line changelog also ships with the resource in `changelog.md`.
 </Callout>
 
-## 📣 New: the LACORE Customer Portal
+## 3.4.x — Config & dependency housekeeping
 
-Manage everything about your LACORE licence from one place at
+A cleanup series that makes LACORE easier to own:
+
+- **Three dependencies, honestly** (3.4.5) — the dependency story now matches the code. Hard
+  requirements are exactly **oxmysql**, **pma-voice** and **spawnmanager**; `blip_info` and
+  `bob74_ipl` became optional and auto-detected, and the long-dead `NativeUILua_Reloaded` is gone
+  from every install doc.
+- **config.lua on a diet** (3.4.4) — ~1000 lines of data tables (agencies, bus routes, game text,
+  phone icons) moved out of `config.lua` into topic files. Backward compatible: an old edited
+  `config.lua` keeps winning.
+- **`configs/CONFIG-INDEX.md`** (3.4.2) — the 52-file configs folder now ships its own map, one
+  line per file, grouped by topic.
+- **The Discord role is the permission** (3.4.1) / **a supervisor group, not a list of names**
+  (3.4.0) — the supervisor panel is now gated by an **ACE object** or directly by a **Discord
+  role**, instead of hand-maintained license allowlists.
+
+<Cards>
+  <Cards.Card title="Full 3.4.5 changelog" href="/updates/changelog/v3-4-5" arrow />
+  <Cards.Card title="Configuration overview" href="/configuration" arrow />
+</Cards>
+
+## 3.3.2 — Pennsylvania CAD, a replay studio & an anticheat you can review
+
+The biggest release LACORE has had:
+
+- **Pennsylvania CAD** — a sixth terminal in the style of a nineties county CAD. A re-skin, not a
+  second dispatch system. Paid add-on, unlocked by license key.
+- **Replay & Director's Cut** — record what happens around you, rebuild the scene and cut it with
+  a real camera: four modes, keyframes, shot list, letterbox, grain, grades and depth of field.
+  Made for trailers.
+- **The in-car CAD screen became usable** — legible, per-seat terminals, `/cad` leans the camera
+  in and hands you the mouse.
+- **An anticheat you can review** — ships **on** for the first time, in a new **observe mode**:
+  it detects, scores and logs what it *would* have done, but never punishes until you switch to
+  enforce. Plus a dashboard review page with false-positive marking.
+- **The menu library is gone** — settings, job picker, session menu, vehicle spawner and more are
+  proper NUI windows now.
+- **Agencies can be gated** per department by Discord role or ACE (`DutyAccess`), and txAdmin bans
+  finally land in LACORE's ban list.
+
+<Cards>
+  <Cards.Card title="Full 3.3.2 changelog" href="/updates/changelog/v3-3-2" arrow />
+  <Cards.Card title="Pennsylvania CAD" href="/user-guide/pennsylvania-cad" arrow />
+  <Cards.Card title="Replay & Director's Cut" href="/user-guide/replay" arrow />
+</Cards>
+
+## 3.3.0 / 3.3.1 — Config editor, model library & grown-up dashboards
+
+- **Config editor 2.0** (3.3.0) — dashboard settings are real controls now: sliders, colour
+  swatches, keybinds, searchable model pickers and coordinate fields, validated on both sides.
+- **Model library** — `/modelscan` inventories your server, `/modelcapture` photographs it,
+  `/preview` shows any model in 3D in-game.
+- **Rebuilt player list** — the list behind **I** became a real interface (a duty board grouped
+  by department).
+- **Dashboards grew up** (3.3.1) — admin Products / Player-database / Customer-database pages, a
+  partner payout ledger with analytics, support-ticket overhaul, and the **paid add-on** system
+  that unlocks features per license key.
+
+<Cards>
+  <Cards.Card title="Full 3.3.1 changelog" href="/updates/changelog/v3-3-1" arrow />
+  <Cards.Card title="Config Editor" href="/configuration/editor" arrow />
+</Cards>
+
+## The LACORE Customer Portal
+
+Manage everything about your LACORE license from one place at
 **[lacore.netica.dev/dashboard](https://lacore.netica.dev/dashboard/)** — sign in with the Discord
-account that owns your licence, no separate password needed.
+account that owns your license, no separate password needed.
 
 - **License keys** — generate a key, drop `setr lacore_license_key "…"` into your `server.cfg`, and your
   server links to your account automatically.
@@ -32,79 +96,5 @@ account that owns your licence, no separate password needed.
 <Cards>
   <Cards.Card title="Open the Customer Portal docs" href="/customer-portal" arrow />
   <Cards.Card title="Set up a license key" href="/customer-portal/license-keys" arrow />
-</Cards>
-
-## 3.2.1 — ESX / framework compatibility & fixes
-
-A compatibility pass for framework servers — LACORE no longer fights an ESX / QBCore / QBox
-server over spawning or vehicle plates.
-
-- **Framework owns spawning** — when ESX / QBCore / QBox is detected, LACORE no longer sets its
-  own auto-spawn or teleports the player, so garage vehicles (e.g. the police garage) spawn
-  correctly.
-- **Garage plates kept** — plate re-formatting is now `Vehicles.plateFormatting = "auto"`
-  (off automatically on a framework server), so external garages keep their own plate.
-- **ESX licence import** — a player's `user_licenses` show up in the MDT person record, mapped
-  onto the six licence slots via the new `configs/cfg-licenses-sh.lua`.
-- Fixes a vehicle-spawn `nil` error and moves the network endpoints out of the editable config.
-
-<Cards>
-  <Cards.Card title="Full 3.2.1 changelog" href="/updates/changelog/v3-2-1" arrow />
   <Cards.Card title="All Releases" href="/updates/changelog" arrow />
 </Cards>
-
-## 3.2.0 — New NUI Phone, Feature Toggles, Air Unit, Corrections & more
-
-Our biggest release yet — a brand-new phone, a fourth MDT skin, real framework
-support, four new gameplay systems and a full security overhaul.
-
-- **📱 All-new NUI Phone** — built from scratch: calls, SMS, **911/311**, camera,
-  Bleeter feed, messenger groups, ringtones and 7+ apps.
-- **🖥️ CAD / MDT** — a new **9100-T Retro Terminal** (a 1990s green-CRT MDT with a
-  clickable on-screen keyboard, now four terminal skins), the person record
-  redesigned as an **RMS-style folder** with registered vehicles, a mobile
-  **fingerprint scanner**, a darker CAD theme and an unread-message badge.
-- **🔗 Real framework integration** — an **ESX / QBCore / QBox** bridge: name, job,
-  characters, vehicles and **licences** sync automatically, and framework jobs go
-  on duty without running a second identity system.
-- **🚔 New gameplay systems** — **Corrections / Jail**, **Impound / Tow**,
-  **Air Unit** (heli-cam) and a full **K9** overhaul.
-- **🛡️ Security & core** — a server-authoritative **anti-cheat overhaul** with
-  near-zero false positives, **global-ban network** protection, per-module
-  **feature toggles**, an own **NativeLacoreUI** (NativeUI dependency dropped),
-  config backup/restore and **EN / DE / RU** localisation.
-
-Plus dozens of fixes — framework garage-plate compatibility, a vehicle-spawn crash
-fix, CCTV improvements and more. See the full page for the complete list.
-
-<Cards>
-  <Cards.Card title="Full 3.2.0 changelog" href="/updates/changelog/v3-2-0" arrow />
-  <Cards.Card title="9100-T Retro Terminal" href="/user-guide/retro-mdt" arrow />
-  <Cards.Card title="All Releases" href="/updates/changelog" arrow />
-</Cards>
-
-## 3.1.5 — CCTV Surveillance Suite, Scanner & Field Cameras
-
-The CCTV system became a full surveillance suite.
-
-- **CCTV camera viewer** (`/cctv`) — fixed-position POV camera with real area streaming, gated by
-  network + job.
-- **Targeting scanner** — click-to-scan people and vehicles with an animated scan sequence, a
-  compact **mugshot** and an **MDT summary** (priors / BOLO / recent records).
-- **Field cameras** — `/camtool` places cameras at runtime, `/cameras` manages them; they persist
-  and show up in `/cctv` and on the dispatch map.
-- **Dispatch-map cameras** — 📹 markers with a "view this camera?" modal that opens the live view
-  in front of the console and reopens the console on exit.
-- **Turf is now opt-in** (`Turf.enabled = false` by default).
-- Fixes: no firing while operating a camera, dispatch console foreground handling, tighter map
-  position tracking.
-
-<Cards>
-  <Cards.Card title="All Releases" href="/updates/changelog" arrow />
-  <Cards.Card title="CCTV Surveillance" href="/features/cctv" arrow />
-</Cards>
-
-## 3.1.3 — Rebranding to LACORE + release-ready
-
-- Resource / convar / ACE / command rename `pvp-corev3` → `lacore`, with automatic DB migration.
-- Connect-hang fix, post-launch security hardening, complete docs + EULA.

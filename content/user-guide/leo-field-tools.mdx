@@ -1,0 +1,102 @@
+---
+title: "LEO Field Tools"
+---
+
+import { Callout } from 'nextra/components'
+
+# LEO Field Tools
+
+The on-scene toolkit: **K9**, **Air Unit**, **Impound**, **Corrections/Jail**, the **fingerprint
+scanner** and the **breathalyser/drug swab**. All are LEO-gated and individually removable via
+[Feature Toggles](/configuration/features) (`k9`, `airunit`, `impound`, `corrections`,
+`fingerprint`, `field`).
+
+## 🐕 K9
+
+`/k9` deploys (and recalls) your dog; orders go by subcommand or by the nine bindable keys
+(*FiveM Settings ▸ Key Bindings*, all unbound by default):
+
+| Order | Does |
+|---|---|
+| `/k9 heel` | Follow you |
+| `/k9 stay` · `sit` · `lay` | Hold position / pose |
+| `/k9 bark` | Bark once |
+| `/k9 search` | Trot ahead and sweep the area — alerts on an **armed** person nearby, otherwise reports clear |
+| `/k9 engage` | Attack the ped you're aiming at (or the nearest) |
+| `/k9 car` | Jump into your (or the nearest) vehicle |
+
+Owner tuning (model, name, follow distance, leash, search radius, blip): `configs/cfg-k9-sh.lua`.
+
+<Callout type="info">
+  **Fairness rule:** if the handler goes down while the dog is engaged, the dog disengages
+  automatically — no unattended attack dog.
+</Callout>
+
+## 🚁 Air Unit
+
+In a helicopter: **F5** toggles the **heli cam**, **F6** the **auto-orbit** (pilot seat only),
+**F7** the **spotlight**. Inside the cam: mouse pans the gimbal, scroll zooms, **E** cycles
+normal → night → **thermal**, **Space/L** locks the aimed point, **Backspace** exits.
+
+Hold the crosshair on a vehicle or person for ~2.5 s and the cam **locks on and auto-tracks** —
+the overlay shows street names and driving direction, but deliberately **no license plate** (run
+plates through the [MDT query](/user-guide/mdt-query) like everyone else). Auto-orbit circles the
+locked target (else the locked point, else your waypoint) so a **solo pilot** can fly and watch at
+once — exiting the cam keeps the orbit flying. Tuning: `configs/cfg-airunit-sh.lua`.
+
+## 🚔 Impound
+
+- `/impound [reason]` — impounds the vehicle you're in or the nearest one: it disappears from the
+  world and lands in the lot record (plate, model, reason, officer). Logged to the dispatch
+  Discord webhook.
+- `/impounds` — the lot panel (LEO): browse records and **release**. Release clears the record;
+  handing the car back is roleplay. The shown fee is display-only — LACORE has no economy.
+
+Tuning (fee, range, persistence): `configs/cfg-impound-sh.lua`.
+
+## ⛓️ Corrections / Jail
+
+Two ways in:
+
+1. **Auto-booking** (default): an MDT **arrest** report with jail months files the sentence
+   automatically — months become seconds (`secondsPerMonth`, default 30). Citations never jail.
+2. **Manual**: `/jail <id> <seconds> [reason]` — the value is **seconds**, clamped to 30–1200.
+
+The inmate is teleported to jail, sees a live countdown on the HUD, and is released automatically
+at zero. Time only ticks **while the inmate is online**, and a relog restores the remaining
+sentence — reconnecting is not an escape. `/unjail <id>` releases early; `/inmates` opens the
+roster panel (name, remaining, reason, booking officer) with a release button. Bookings can target
+an **offline** player — the sentence applies on reconnect. Sentences post to the `PrisonLog`
+Discord webhook. Tuning: `configs/cfg-corrections-sh.lua`.
+
+## 🔎 Fingerprint scanner & latent prints
+
+**Scan a suspect:** the subject must be **cuffed** and within reach. `/mobileid` (bindable) opens
+the ID device — a short capture, then the identity card: name, DOB, licence, warrant flag, mugshot,
+BOLO hit. If the person's prints aren't on file, the device offers **Take prints** (enrolment).
+
+**Work a scene:** everyone who enters a vehicle leaves a latent (the last 4 occupants).
+`/liftprint [incident]` lifts one from the nearest vehicle — the result is **deliberately
+anonymous** (just an id + plate). Run it later against the print register from the device: a match
+returns the name and files itself as **evidence** on that person's record, with chain of custody.
+
+Every scan, enrolment, lift and match is written to the Big Brother log. Tuning
+(`requireCuffed`, ranges, register mode): `configs/cfg-fingerprint-sh.lua`.
+
+<Callout type="warning">
+  The cuff check is provided by the field-essentials module — turning **`Features.field` off**
+  makes every scan fail with "not restrained" while `Fingerprint.requireCuffed` is on.
+</Callout>
+
+## 🍺 Breathalyser & drug swab
+
+An honesty-based RP system — the **subject supplies their own reading**:
+
+1. Officer: `/breatha` (or third-eye) on the nearest person → the subject gets a prompt.
+2. Subject answers `/breath <µg>` — over **35 µg/100 ml** reads as over the limit; both sides see
+   the result. Answering without a value counts as an explicit **refusal** (both are notified).
+3. Drug swab: officer `/druga`, subject `/saliva <cannabis> [cocaine]` (`true`/`false`) → THC/COC
+   or NEG.
+
+Both tests are logged to Big Brother. `Features.field` toggles the whole module (which also owns
+cuff tracking — see above).

@@ -1,0 +1,196 @@
+---
+title: "Pennsylvania CAD"
+---
+
+# Pennsylvania CAD
+
+The **Pennsylvania CAD** is the terminal that has been bolted into a cruiser since the nineties: a left rail of F-key buttons, two stacked tables — **Current Units** over **Current Incidents** — a command line along the bottom and a `WAITING FOR RESPONSE` strip that lights up while the server is answering.
+
+It is a **re-skin, not a second dispatch system.** The units and incidents on it are the same ones the [LAPD Mobile Client](/user-guide/mdt), the [dispatch console](/user-guide/dispatch-console) and every other terminal see. A call raised here shows up everywhere, and a call cleared here is cleared for everyone. Nothing is duplicated and nothing is hidden from the rest of the server.
+
+> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [LASD CAD / PCMS](/user-guide/lasd-cad) · [9100-T Retro Terminal](/user-guide/retro-mdt) · [Dispatch Console](/user-guide/dispatch-console) · [Command Reference](/commands)
+
+> 💳 **This terminal is a paid add-on.** It is listed in the dashboard as its own product ("Pennsylvania CAD") and unlocks per **licence key** — there is nothing to install, it ships inside the resource and turns itself on once your key carries the entitlement. Until then a department tagged for it simply keeps whatever terminal it had, so tagging a department early is harmless.
+
+---
+
+## 🚔 Opening it
+
+A department opts in **by its name**. Any department whose name contains one of the `Penn.deptTags` substrings gets this terminal instead of the LAPD one — the defaults are `pennsylvania`, `penn cad` and `mobilecom`, matched case-insensitively as substrings, so "Pennsylvania State Police" matches on `pennsylvania`.
+
+```
+/onduty PSP 4-ADAM-12     # a department whose name matches a Penn tag
+/mdt                      # opens the Pennsylvania CAD for that department
+/penncad                  # the same terminal, directly (toggles)
+```
+
+The player still needs one of the CAD jobs (Law Enforcement, Fire/EMS, AMR, Coroner) — the department name only decides **which** terminal opens.
+
+The window has a **title bar you can drag**, with full-screen and close buttons on it. A saved position is pulled back into view when the terminal opens and when the game window is resized, so it can never end up unreachable off the edge of your screen.
+
+---
+
+## 🖥 The CAD Viewer
+
+The main screen is the **CAD Viewer**: two tables, always both on screen.
+
+### Current Units
+
+Everyone on duty, with an agency filter above the table (`All agencies` or one department).
+
+| Column | What it says |
+|--------|--------------|
+| **Unit** | Callsign |
+| **Status** | Current status |
+| **Call#** | The incident the unit is attached to |
+| **Location** | Where the unit is |
+| **Time** | **How long** the unit has been on this status — `00h 17m` |
+| **Agency / Service / DArea** | Department and service fields |
+
+Units that are **assigned to a call read warm (orange)**, so who is committed and who is free is a glance rather than a comparison.
+
+### Current Incidents
+
+Every active incident, newest work first.
+
+| Column | What it says |
+|--------|--------------|
+| **Call#** | Incident number (with the optional cosmetic prefix) |
+| **Call Type** | The type, using the short code when the dispatch config gives it one |
+| **Call Location** | Where it is |
+| **Priority** | Priority / code |
+| **Time** | **How long since the call came in** — `01h 08m` |
+
+> ⏱ **Elapsed time, not a clock.** Both tables count *since*, not *at*. That is the number that tells a supervisor a unit has been sitting on the same status for an hour — a timestamp makes you do that subtraction in your head.
+
+### Edit Columns
+
+Each table has an **Edit Columns** button. Switch individual columns off and the choice is kept **per user**, not per server — two officers on the same terminal can run different columns.
+
+---
+
+## ⌨️ The F-key rail
+
+Every button in the left rail is a **real F-key**: press it on the keyboard or click it. The button matching your **current status greys out**, so you can see what you are without reading anything.
+
+F-keys are suppressed while a text field has focus, so typing into a comment never also fires a rail button.
+
+The rail changes with the tab you are on.
+
+### My Call Info (the CAD Viewer)
+
+| Key | Action |
+|-----|--------|
+| **F1** | Update your location — fills the command bar with the `LOC` verb |
+| **F2** | **Assign** — attach yourself to the selected incident |
+| **F3** | En Route |
+| **F4** | On Scene |
+| **F5** | Code 6 |
+| **F6** | Transport |
+| **F7** | Book / Custody — jumps to the charges sheet |
+| **F8** | **Backup** — requests LEO backup, with whatever is in the command bar as the note |
+| **F9** | Case # — opens a field case |
+| **F10** | Add Comments — fills the command bar with the `COMMENT` verb |
+| **F11** | **Clear** — opens the disposition grid |
+| **F12** | Day / Night |
+
+### Create a Call
+
+| Key | Action |
+|-----|--------|
+| **F1** | Submit |
+| **F2** | Clear Form |
+| **F11** | Back to CAD Viewer |
+| **F12** | Day / Night |
+
+### Query
+
+| Key | Action |
+|-----|--------|
+| **F1** | Query Person |
+| **F2** | Query Vehicle |
+| **F3** | Call History |
+| **F4** | BOLO |
+| **F12** | Day / Night |
+
+### Messaging
+
+| Key | Action |
+|-----|--------|
+| **F1** | Send |
+| **F2** | Clear Form |
+| **F12** | Day / Night |
+
+### Admin
+
+| Key | Action |
+|-----|--------|
+| **F1** | Exit |
+| **F2** | Clear Form |
+| **F3** | Mute Sounds |
+| **F4** | Appearance |
+| **F12** | Day / Night |
+
+---
+
+## ⌨️ The command bar
+
+The line along the bottom is a verb plus a field. Pick the verb from the dropdown — or let an F-key pick it for you — type, and press **Enter**.
+
+| Verb | What it does |
+|------|--------------|
+| **Person query** | Runs a person by name or server ID |
+| **Plate query** | Runs a plate (the button's label is `Penn.plateLabel`, `SA Plate` by default) |
+| **Update location** | Sets your location on the units table |
+| **Add comment** | Adds a comment to the selected incident |
+
+While the server is answering, the **`WAITING FOR RESPONSE`** strip lights up — the terminal never pretends a request already came back.
+
+Query results are drawn on the shared records sheet, so a person run comes back with the same physical description, licences, priors and warrant flags every other terminal shows. [BOLOs](/user-guide/bolo) and [citations & charges](/user-guide/citations-charges) are the same records too.
+
+---
+
+## 📞 Create a Call
+
+**Create a Call** raises an incident from the terminal itself: a grid of call-type tiles, a free-text detail box, then **F1 · Submit**. The tiles are entirely your server owner's list (`Penn.callTypes`) — the defaults run from *Animal Complaint* and *Check Welfare* to *Assist Other Agency* and *Directed Patrol*.
+
+The call it raises is a normal LACORE incident. It appears in the dispatch console, in every other terminal, and it carries **your own department** — not LAPD.
+
+---
+
+## ✅ Clearing a call (dispositions)
+
+**F11 · Clear** opens the disposition grid. Pick a code, and the incident is resolved with that code in its log. The list is config (`Penn.dispositions`); the defaults:
+
+| Code | Meaning | Code | Meaning |
+|------|---------|------|---------|
+| `ADV` | Advised | `UTL` | Unable to Locate |
+| `ARR` | Arrest Made | `NAR` | No Action Required |
+| `CIT` | Citation Issued | `TOW` | Vehicle Towed |
+| `WRN` | Warning Issued | `MED` | Medical Transport |
+| `RPT` | Report Taken | `REF` | Referred to Agency |
+| `GOA` | Gone on Arrival | `CAN` | Cancelled |
+
+---
+
+## 🚨 The panic button
+
+Pinned to the bottom of the rail is a red **EMERGENCY** button. It is **hold-to-fire** — you have to keep it pressed for about three quarters of a second, because a stray click must never broadcast a panic. It fires straight through to dispatch without the on-screen keyboard the other backup buttons open, and letting go early (or closing the terminal mid-hold) cancels it.
+
+---
+
+## ⚙️ Configuration
+
+Everything on this page that is a list or a label lives in **`configs/cfg-penn-sh.lua`**. The terminal works untouched — edit it to opt your own departments in or to change the call-type list.
+
+| Setting | What it does |
+|---------|--------------|
+| `Penn.deptTags` | Department name substrings that route a player here. Lowercase, matched as substrings. |
+| `Penn.callPrefix` | Cosmetic prefix in front of the call number (`"P26"` → `P261042`). Display only — the real incident number is unchanged everywhere else. |
+| `Penn.plateLabel` | Label on the plate button in the command bar. Defaults to `SA Plate`. |
+| `Penn.callTypes` | The Create-a-Call tile grid, in order. |
+| `Penn.dispositions` | The disposition codes offered on **Clear**: `code` goes into the incident log, `label` is what the unit reads. |
+
+The terminal is also gated by the `penncad` feature in `configs/cfg-features-sh.lua` — and by your licence entitlement, which is the switch that actually decides whether it opens.
+
+> ℹ️ **Two columns from the reference terminal are deliberately absent: Site/District and Latitude.** LACORE has no station, beat or district concept to fill the first, and no latitude at all — call coordinates are GTA world units, not degrees. A column that is blank on every server forever is not a column, it is a header.

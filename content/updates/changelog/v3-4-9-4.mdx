@@ -1,0 +1,58 @@
+---
+title: "3.4.9.4"
+---
+
+![LACORE 3.4.9.4](/changelog/v3-4-9-4.svg)
+
+# [3.4.9.4] – 2026-08-19 — A config restore can no longer break your configs
+
+### Fixed
+
+#### `/lacoreconfig restore` wrote unreadable files over every config
+
+Reported from a live server: after `/lacoreconfig restore` the resource came back with
+
+```
+Error parsing script @lacore/configs/config.lua: syntax error near '<>'
+```
+
+— once for **every** config file, followed by an empty penal code, no agencies and a database that
+looked unreachable. Nothing was wrong with the backup; the restore had written binary into the files.
+
+The restore is a three-way merge: your backed-up config, the pristine default it was edited from,
+and the *current* default from `configs/.defaults/`. That last one is the problem. `escrow_ignore`
+listed `configs/*.lua`, and that pattern does not reach into a subfolder — so on an escrowed build
+the `.defaults` copies were encrypted, and reading one back handed the merge a block of cipher text
+instead of Lua. The merge dutifully compared your config against noise, found every line in conflict,
+kept "the newer default" as designed — and that default was the cipher text. It went straight to
+disk, all 29 files, with the restore reporting success.
+
+Three things changed, each of which alone would have prevented it:
+
+- **`configs/.defaults/*.lua` is now escrow-ignored**, so the baselines stay readable and the merge
+  works on an escrowed build the way it always did on a local one.
+- **A baseline that isn't readable text is treated as missing.** Instead of merging against it, the
+  restore falls back to writing your backed-up file whole — the outcome you wanted anyway.
+- **Nothing is written that does not compile.** Every merged result goes through Lua's own parser
+  first. A file that fails is left exactly as it is on disk and named in the output, so a bad merge
+  can affect one file and never the whole server.
+
+#### `/lacoreconfig undo` — the rollback that existed but had no command
+
+`restore` has always snapshotted your on-disk configs first, precisely so a bad restore could be
+reversed. There was no way to *use* that snapshot. There is now:
+
+```
+/lacoreconfig undo
+```
+
+It writes the files back exactly as they were before the last restore, and the restore itself now
+points at it when it finishes. If you are sitting on configs a restore already damaged, this is the
+way back — run it, then restart the resource.
+
+#### Backups were all stamped "vadamant"
+
+The version recorded with a backup was read with a pattern that matched `fx_version 'adamant'` before
+it ever reached the real `version` line, so `status` and the restore message showed `vadamant` for
+every backup no matter when it was taken — and you could not tell an old backup from a new one. The
+lookup is anchored to the start of a line now.

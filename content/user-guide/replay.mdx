@@ -1,0 +1,193 @@
+---
+title: "Replay & Director's Cut"
+---
+
+# Replay & Director's Cut
+
+**`/replay`** records what happens around you and plays it back. A take samples every nearby player — plus whatever vehicle they are sitting in — ten times a second into a clip; playback rebuilds the scene out of **ghost entities** and watches it through a camera you direct.
+
+This is the raw material for trailers and highlight videos. It is deliberately **not an admin tool**: playback is local to whoever started it, nobody else on the server sees it, and nothing in it is real. (For an evidence trail, see the [Big Brother log](/features/security).)
+
+> ⚠️ **It ships off.** `Replay.enabled = false` in `configs/cfg-replay-sh.lua` — clips live on **your** disk and every player gets a recorder, so having it is a decision you make. Set it to `true` and restart; nothing else needs changing.
+
+> 📑 **Related:** [Command Reference](/commands) · [Anti-Cheat & Security](/anticheat)
+
+> 🎬 **There is no video file at the end.** FiveM cannot encode video. This sets up the **shot** — the scene, the framing, the timing — and you capture it with OBS or ShadowPlay like any other gameplay.
+
+---
+
+## ⌨️ Commands
+
+| Command | What it does |
+|---------|--------------|
+| `/replay` | Opens the **Director's Cut** window on the clip library |
+| `/replay start` | Starts a take |
+| `/replay stop` | Ends the take and **keeps the buffer** |
+| `/replay save [name]` | Encodes the buffer into a clip and stores it |
+| `/replay discard` | Throws the buffer away |
+| `/replay list` | Lists your clips |
+| `/replay play <id>` | Plays a clip |
+| `/replay cancel` | Stops the playback that is running |
+| `/replay delete <id>` | Deletes a clip |
+| `/replay debug` | Flips verbose logging without a restart |
+| `/replay help` | Prints the list above in chat |
+
+There is also a **keybind** — *Replay: start / stop recording* — which toggles a take without opening anything. It ships **unbound** on purpose so FiveM never re-applies a default over your own choice; bind it under **FiveM → Settings → Keybinds**.
+
+> The command name is `Replay.command` in the config. Renaming it there renames the chat suggestions too — nothing else hardcodes `replay`.
+
+---
+
+## ⏺ Recording
+
+`/replay start` (or the keybind) begins sampling. A **recording HUD** appears in the corner with the take's elapsed time against the maximum, the frame count, how many entities are in shot (peds and vehicles separately), the size so far, and the sample rate and radius it is running at.
+
+The HUD **does not take focus**: someone mid-take is still playing, so the keyboard and mouse stay with the game.
+
+What is captured:
+
+- Every **player** within `Replay.radius` (50 m by default) and the **vehicle** they are in. Anyone who walks out of that ball simply stops appearing, and reappears if they come back.
+- At most `Replay.maxEntities` (32) at a time — nearest first, so a busy street records the people around you rather than a random selection.
+- Positions, rotation, and whether a ped is riding in a vehicle (it is put back in its seat on playback, not positioned on its own).
+
+A take stops itself at `Replay.maxDurationSec` (180 s) and **keeps what it has**, so a forgotten `/replay stop` never costs you the footage.
+
+`/replay stop` ends the take but holds the buffer, which is the normal way a take ends — decide afterwards whether to `save` it or `discard` it.
+
+---
+
+## 🎞 The clip library
+
+Bare `/replay` opens the **Director's Cut** window on your clip library. This screen *is* a window: it owns the cursor.
+
+Each clip shows its name, length and size. Along the top sits your **live storage quota** — clips used of the maximum, bytes used of the maximum — because clips live on the server's disk, not yours.
+
+From here you can **start a recording**, **play** a clip, **open one in the cutting room**, **delete** one, or refresh the list.
+
+**Escape** closes the library. In the cutting room, Escape goes back to the library first.
+
+---
+
+## ▶️ Playback
+
+`/replay play <id>` — or **Play** in the library — rebuilds the scene and runs it through a scripted camera. The playback overlay shows the clip id, the position in the clip and a progress track, with **BACKSPACE** to stop.
+
+The playback HUD deliberately **does not take focus** either: BACKSPACE has to reach the game, not a browser that swallowed the keyboard.
+
+Positions are **interpolated** between samples (Catmull-Rom), because at 10 Hz a car covers about three metres between samples and joining those in straight lines makes a smooth drive read as a series of corners.
+
+---
+
+## 🎬 The cutting room
+
+**Edit** on a clip opens the cutting room: a scene list on the left, the shot playing in the middle, an inspector on the right and a timeline along the bottom. Opening a clip parks it on frame one with a real camera in it, so the middle of the window is the shot rather than a picture of one.
+
+### Scene
+
+Every entity in the clip as a row: an **ON/OFF** visibility toggle, the model name, a kind tag, and either a **`CAM`** badge (this is what the camera is filming) or a **`SET`** button to make it the subject. Hiding an entity removes it from the shot.
+
+### Camera
+
+Four modes:
+
+| Mode | What it does |
+|------|--------------|
+| **Follow** | Sits behind the subject |
+| **Orbit** | Circles the subject |
+| **Fixed** | Stays put and keeps looking at the subject |
+| **Free** | Flown by hand |
+
+**FLY** takes the mouse and hands you the camera: **mouse** aims, **WASD** moves, **E/Q** raise and lower, **shift** hurries, **alt** creeps. The panels stay on screen but go click-through while you fly; **ESC** or **BACKSPACE** gives the cursor back.
+
+Field of view, roll, distance to target and height offset are all live — drag them and the camera moves.
+
+### Keys (keyframes)
+
+Adding a key captures **where the camera actually is** — position, aim and focal length — not just a number. A clip with two such keys flies the path between them instead of tracking anything; keys without a pose still ease the field of view. Curves: linear, ease-in, ease-out, ease-in-out.
+
+### Shots
+
+A shot owns a stretch of the clip and dictates the **mode and its subject** while the playhead is inside it. Shots **cut** at their boundaries rather than gliding between them — movement *within* a shot is what keyframes are for.
+
+- **+ Add at playhead** *is* a cut: the new shot runs to whatever starts next, and a shot already covering that moment is trimmed to end there.
+- **IN / OUT** pull a shot's start or end to the playhead.
+- **CAM** tells a shot to adopt whatever the camera is set to right now — frame it first, then say "this shot looks like that".
+- Rename any row.
+
+The list is kept sorted and non-overlapping, and an edit that would leave a sliver behind is **refused with a reason** rather than quietly producing a third-of-a-second shot or deleting a neighbour as a side effect.
+
+> The viewport's mode readout reports what is **actually in effect** — the covering shot's mode, not the inspector's. Those two legitimately disagree while you are setting up the next shot.
+
+### Look
+
+| Control | Options |
+|---------|---------|
+| **Letterbox** | 2.39:1 · 1.85:1 · off |
+| **Colour grade** | Neutral · Noir · Warm · Cold · Vintage |
+| **Film grain** | 0–100 |
+| **Vignette** | 0–100 |
+| **Depth of field** | On, with a focus distance in metres |
+
+All of it is applied **to the picture**, not to a preview of it, so it lands in whatever you capture.
+
+**Clean render** suppresses everything of ours — the HUD, the flight banner, the busy strip, the viewport labels — so a capture has only the bars and the grade in it.
+
+> ⚠️ **Two kinds of colour grade, and the difference matters.** A **tint** is a coloured sheet the UI draws over the game: it works on every build and can warm or cool a shot, but it can never *remove* colour. A **timecycle modifier** is the game's own post-processing and the only way to desaturate or crush contrast — but it is addressed by asset name, so a name your build does not have does nothing, silently. Grades that lean on a game filter say so in the Look tab. If **Noir** does not come out monochrome on your server, point it at a different modifier in `cfg-replay-sh.lua`.
+
+### Timeline
+
+Scrub the ruler and the ghosts move with it. **0.25× · 0.5× · 1× · 2×** re-time them, pause parks them. The ruler carries four stacked lanes: a time scale, **SHOTS**, **KEYS** and **DATA** — where the DATA bars dip, entities were out of recording range.
+
+---
+
+## 💾 Where clips live
+
+Clips are stored **on your server** (`data/replays/<license>/`), because a FiveM client cannot write files. That is why the quotas exist: clips cost the owner's disk.
+
+| Setting | Default | What it bounds |
+|---------|---------|----------------|
+| `Replay.maxDurationSec` | `180` | One take |
+| `Replay.maxClipsPerPlayer` | `20` | Clips one player may keep |
+| `Replay.maxTotalBytesPerPlayer` | `20 MB` | Bytes one player's clips may occupy |
+| `Replay.saveCooldownSec` | `20` | Shortest gap between saves |
+
+All four are enforced **server-side**. A save past a quota is **refused** — nothing is ever silently pruned, you are told to delete a clip first.
+
+For scale: a 3-minute take with about 20 people in shot is roughly 0.9 MB of frame data and lands on disk at about 1.2 MB, so the defaults budget somewhere around sixteen such clips per player.
+
+---
+
+## ⚙️ Configuration
+
+Everything lives in **`configs/cfg-replay-sh.lua`**, and the whole feature is additionally gated by `Features.replay` in `configs/cfg-features-sh.lua` — either switch off means no commands and no loops.
+
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| `Replay.enabled` | `false` | Master switch — **ships off**, set it to `true` to have the replay system |
+| `Replay.command` | `"replay"` | The command name |
+| `Replay.sampleHz` | `10` | Samples per second (range 1–30) |
+| `Replay.radius` | `50.0` | Recording radius in metres |
+| `Replay.maxEntities` | `32` | Most entities tracked in one clip, nearest first |
+| `Replay.animCandidates` | 4 poses | Animations the recorder can recognise |
+| `Replay.grades` | 5 grades | How each colour grade is achieved (tint and/or timecycle modifier) |
+| `Replay.dofNear` / `dofFar` / `dofStrength` | `0.45` / `1.9` / `1.0` | Width of the in-focus band, as a multiple of the focus distance |
+| `Replay.chunkBytes` | `48 KB` | Chunk size while a clip moves between client and server |
+| `Replay.uploadTimeoutSec` | `60` | How long a half-finished upload is kept |
+| `Replay.debug` | `false` | Verbose logging |
+
+### Debug logging
+
+`Replay.debug`, or `/replay debug` to flip it without a restart — the client half immediately, the server half only if you have admin permission, because verbose console output is not something a player should be able to inflict on an owner.
+
+It logs the things that fail *quietly*: the path a clip resolved to and whether the write landed, chunk-by-chunk transfer with byte counts on both ends, quota and cooldown verdicts with the actual numbers, encode and decode results, models that would not load into a ghost, the timecycle name a grade resolved to, and every focus change.
+
+---
+
+## ⚠️ Known limits
+
+Stated plainly rather than discovered later:
+
+- **There is no video file at the end.** Capture with OBS or ShadowPlay.
+- **Only the poses in `Replay.animCandidates` are recognised.** FiveM has no native that asks a ped which animation it is playing, only one that checks a dict + clip you already name. Everything else replays as walk / run / idle chosen from how fast the ghost is actually moving.
+- **Ambient NPCs and traffic are not recorded** — only players and their vehicles. The clip format already has room for them.
+- **Ghost vehicles' wheels do not turn**, because they are positioned by hand rather than driven.

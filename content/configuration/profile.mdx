@@ -64,35 +64,6 @@ ProfileConfig = {
   ([Discord & Duty](/configuration/discord)). Add Supporter / Donator / VIP badges by adding entries.
 </Callout>
 
-## The Player Menu
-
-`/profile` opens the Player Menu. The title bar carries one tab per character — those tabs switch
-which character you are **looking at**, not which one you are playing; activating a character stays
-on the Characters page, because it respawns the ped. The name in the top-left corner is
-`Branding.label` from `configs/cfg-branding-sh.lua`, not a hardcoded string.
-
-Its **Settings** page holds preferences that belong to the player, not to you:
-
-| Setting | Scope | Notes |
-| --- | --- | --- |
-| Language | Every LACORE panel, persisted per client | `AUTO` follows your server's `Language`; EN/DE/RU override it for that player only. Lua-side messages still use the server language. |
-| Interface scale / Opacity | The Player Menu only | Client-local. |
-| Notification corner | The notification stack | Client-local. |
-| Achievement sound | Game side | Mirrored to Lua, so it also silences `PlaySoundFrontend`. Persisted per client via KVP. |
-| Unlock popup | The unlock toast | Mirrored to Lua. Your `Achievements.notify = false` still wins — this can only turn it further off. |
-| Hide warrant banner | The Player Menu only | Cosmetic; the warrant itself is unaffected. |
-| New records visible to faction | Default for new record entries | Only the default in the form; the value is still stored per entry. |
-
-<Callout type="info">
-  Everything on that page is a *player* preference stored on their client — none of it is a server
-  setting and none of it can weaken anything you configured. The two achievement toggles are the only
-  ones the game side ever sees.
-</Callout>
-
-The Player Menu ships **Archivo** and **IBM Plex Mono** as bundled woff2 files (SIL Open Font License
-1.1), so it renders the same on a client with no outbound network access. Nothing is fetched from a
-CDN at runtime.
-
 ## Achievements & easter eggs — `configs/cfg-achievements-sh.lua`
 
 The "normal" achievements (Veteran, Garage …) are computed live in the UI from player data and need

@@ -99,14 +99,18 @@ end
 -- forwards each call verbatim to whichever edition is live.
 local SERVER_EXPORTS = {
     'GetApiVersion', 'GetOfficer', 'IsOnDuty', 'GetCallsign', 'GetDepartment',
-    'GetOnDutyUnits', 'HasPermission', 'CreateCall', 'ResolveCall',
-    'GetActiveCalls', 'GetCall', 'QueryPerson', 'QueryPlate', 'GetBolos', 'CreateBolo',
+    'GetOnDutyUnits', 'HasPermission', 'CreateCall', 'ResolveCall', 'AddCallNote',
+    'GetActiveCalls', 'GetCall', 'SetUnitStatus', 'SetUnitCallsign', 'AttachUnit',
+    'GetCallByUnit', 'QueryPerson', 'QueryPlate', 'GetInsurance', 'SetInsurance',
+    'GetPersonnelFile', 'GetDutyLog', 'GetCase', 'GetCases', 'CreateCase',
+    'GetBolos', 'CreateBolo',
 }
 
 -- List-returning exports get an empty table when LACORE is absent (never nil),
 -- so `for _, x in ipairs(...)` stays safe.
 local LIST_DEFAULT = {
-    GetOnDutyUnits = true, GetActiveCalls = true, QueryPerson = true, GetBolos = true,
+    GetOnDutyUnits = true, GetActiveCalls = true, QueryPerson = true,
+    GetDutyLog = true, GetCases = true, GetBolos = true,
 }
 
 exports('IsAvailable', function() return (LacoreCore()) ~= nil end)
@@ -121,7 +125,12 @@ end
 
 -- Re-broadcast the LACORE API events under a stable namespace, so consumers
 -- listen to `lacore_bridge:*` no matter which edition fired them.
-for _, ev in ipairs({ 'callCreated', 'callResolved', 'dutyChanged', 'boloCreated' }) do
+for _, ev in ipairs({
+    'callCreated', 'callUpdated', 'callResolved', 'panic', 'dutyChanged',
+    'unitStatusChanged', 'unitCallsignChanged', 'incidentAttached',
+    'reportFiled', 'chargesIssued', 'evidenceLogged', 'recordAdded',
+    'warrantChanged', 'insuranceChanged', 'boloCreated', 'boloCancelled',
+}) do
     AddEventHandler('lacore:api:' .. ev, function(...)
         TriggerEvent('lacore_bridge:' .. ev, ...)
     end)
@@ -132,7 +141,7 @@ end
 <Tabs.Tab>
 ```lua
 -- client.lua — forwards the client (UI) exports.
-local CLIENT_EXPORTS = { 'GetApiVersion', 'OpenMDT', 'CloseMDT', 'IsMDTOpen' }
+local CLIENT_EXPORTS = { 'GetApiVersion', 'OpenMDT', 'CloseMDT', 'IsMDTOpen', 'GetDutyInfo' }
 
 exports('IsAvailable', function() return (LacoreCore()) ~= nil end)
 

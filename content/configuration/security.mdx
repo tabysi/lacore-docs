@@ -8,16 +8,19 @@ import { Callout } from 'nextra/components'
 
 ## Anticheat — `configs/cfg-anticheat-sh.lua`
 
-<Callout type="error">
-  **Do not enable without configuring it first.** `Anticheat.Enabled = false` by default. Read every
-  threshold below and tune it to your server before switching it on.
+<Callout type="info">
+  **Ships enabled, in observe mode.** `Anticheat.Enabled = true` + `Mode = "observe"` by default:
+  every check runs and logs what it *would* have done, but nothing is kicked or banned. That is safe
+  to run untouched from day one. Run observe for a week, watch the log — when it stops surprising
+  you, switch `Mode` to `"enforce"`.
 </Callout>
 
-Per-detection action:
+Per-detection action (in observe mode, all four behave as `"log"`):
 
 | Action | Effect |
 | --- | --- |
 | `"log"` | Discord webhook (`Webhooks.AdminLog`) only. |
+| `"trust"` | Webhook + trust points — escalates to kick/ban only if the player keeps at it. |
 | `"kick"` | Webhook + kick. |
 | `"ban"` | Webhook + permanent ban (via `BanPlayer`). |
 
@@ -26,34 +29,30 @@ the `lacore.ac.bypass` ACE permission (`Anticheat.Whitelist`), are never punishe
 
 ```lua
 Anticheat = {
-    Enabled = false,
+    Enabled = true,       -- ships ON …
+    Mode    = "observe",  -- … but in observe mode: log-only until you switch to "enforce"
 
-    Explosions = {
-        action = "ban",
-        blocked = {          -- explosion types a client can never legitimately trigger
-            [30] = true,     -- buried mine
-            [59] = true,     -- orbital cannon
-            [72] = true,     -- script missile
-            -- …
-        },
-        ratePer10s = 8,      -- more than X explosions in 10s → punish
-    },
+    -- Server-side checks
+    Explosions   = { action = "ban" },
+    WeaponDamage = { action = "kick" },
+    EntitySpam   = { action = "kick", skipOnFramework = true },  -- ESX/QBCore garages spawn server-side
 
-    WeaponDamage = {
-        action    = "kick",
-        maxDamage = 250,     -- above this = damage modifier (sniper headshot ≈ 200)
-    },
-
-    EntitySpam = {
-        action       = "kick",
-        maxPerMinute = 20,   -- max client-spawned entities per minute
-    },
-    -- … excerpt only — the file also carries GodMode, SpeedHack, Teleport, NoClip, Invisible, SuperJump,
-    -- BlacklistedWeapons, BlacklistedVehicles (delete = true), AntiDump, Honeypots, EventRateLimit, a Trust
-    -- escalation model (kickAt 8 / banAt 20), the server-authoritative ServerSweep + Combat checks, and a
-    -- recommended FXServer convar block (sv_scriptHookAllowed 0, sv_pureLevel 2, sv_enforceGameBuild, …).
+    -- Client-side detections (bypassable, so default actions are milder)
+    GodMode            = { enabled = true, action = "kick" },
+    BlacklistedWeapons = { enabled = true, action = "ban" },
+    -- … excerpt only — the file also carries SpeedHack, Teleport, NoClip, Invisible, SuperJump,
+    -- BlacklistedVehicles, AntiDump, Honeypots, EventRateLimit, the Trust escalation model and the
+    -- server-authoritative ServerSweep + Combat checks.
 }
 ```
+
+<Callout type="warning">
+  The **thresholds, honeypot names and blacklists are not in this file** — they live in the escrowed
+  `modules/anticheat/` so cheaters can't read the exact numbers to stay under. Anything you set in
+  `cfg-anticheat-sh.lua` overrides the shipped default; whatever you leave out keeps the default.
+  See [Anti-Cheat & Security](/anticheat) for the full feature overview and the recommended
+  `server.cfg` hardening block.
+</Callout>
 
 ## Member-only vehicles — `configs/cfg-blacklist-sh.lua`
 
@@ -143,44 +142,6 @@ BigBrother = {
 
 Discord mirroring uses the `lacore_bb_webhook*` convars — see
 [Server Convars](/configuration/convars#big-brother-admin-logging).
-
-### What Big Brother sends to LACORE
-
-<Callout type="warning">
-  **Every line Big Brother logs is also copied to the LACORE dashboard.** This is part of the licence
-  and has no off switch — unlike the anticheat's dashboard reporting (`Anticheat.Report`), which is
-  opt-in. If you run a server with your own privacy obligations, this is the section you need to
-  disclose to your players.
-</Callout>
-
-Per line, what leaves your server is: the **category**, **severity**, **action**, the **detail text**,
-the **player name and identifier**, the in-game **server id**, **coordinates and zone** where the event
-carries them, a **timestamp**, plus your server's **hostname** and **licence key**.
-
-For the `chat` and `command` categories, "detail text" is **the message or command itself**.
-
-What does not change: the local database table and your Discord webhooks keep working exactly as
-before. This is an additional copy, never a move.
-
-What you still control, because the reporting rides on `BBLog()` rather than around it:
-
-| You set | Effect on reporting |
-| --- | --- |
-| `enabled = false` | Nothing is logged at all, so nothing is sent. |
-| `categories.chat = false` (any category) | That category is never logged, so it is never sent. |
-| `retentionDays` | Your local table only. The dashboard copy has its own retention. |
-
-Transport is batched and bounded, so a busy server is not an HTTP storm and an offline uplink cannot
-grow a buffer without limit:
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `dashboard.batchSeconds` | `30` | Seconds between uploads. |
-| `dashboard.maxBatch` | `200` | Rows per upload. Anything over is dropped, **oldest first**. |
-
-Reporting needs an active licence key (`setr lacore_license_key`) — that is what attributes rows to a
-dashboard account. Without one the module stays inert and says so once in the console; local logging
-is unaffected.
 
 ## Discord Rich Presence — `configs/cfg-presence-sh.lua`
 

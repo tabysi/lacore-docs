@@ -4,60 +4,127 @@ title: Web Dispatcher
 
 import { Callout, Steps } from 'nextra/components'
 
-# Web Dispatcher (external portal)
+# Web Dispatcher (browser portal)
 
-Beyond the in-game console, LACORE can feed an **external browser dispatcher** so a dispatcher can
-work from a second screen — or entirely off the game server.
+Beyond the in-game console, LACORE can feed a **browser dispatcher** so a dispatcher can work from a
+second screen — or entirely off the game server.
 
-## Architecture
+There are two ways to get one. The **hosted portal** needs nothing but a licence key and a line in
+your `server.cfg`; the **self-hosted bridge** is the original path and still works unchanged.
+
+## The hosted portal (recommended)
+
+Your server pushes its CAD state to LACORE every two seconds and reads the dispatcher's actions out
+of the reply. Nothing listens on your server, and there is no second machine to run.
 
 ```
-FiveM (lacore)  ──▶  Node bridge  ──▶  Web app (browser)
-      ▲                                     │
-      └──────────  actions relayed  ◀───────┘
+FiveM (lacore)  ──push every 2s──▶  lacore.netica.dev  ──▶  /server/<id> (browser)
+      ▲                                                          │
+      └────────── actions ride back in the reply ◀───────────────┘
 ```
-
-- The FiveM resource **pushes** live incident / unit / caller data to a **Node bridge**.
-- The bridge **broadcasts over WebSocket** to the web app and serves the app + map tiles from a
-  single origin (same-origin, no CORS headaches).
-- Dispatcher **actions** performed in the browser are relayed back into FiveM and executed there.
-
-## Authentication
-
-The portal is gated by **Discord OAuth + role checks** — only members with an authorised role can log
-in. Actors from the web are audited the same way as in-game dispatchers.
-
-## Setup
 
 <Steps>
 
-### Configure the FiveM side
+### Set a licence key
 
-Point LACORE at your bridge with convars:
+The same key the dashboard uses. Generate it under **Dashboard → Licence keys** and put it in your
+`server.cfg`:
 
 ```ini
-set lacore_bridge_url "https://dispatch.example.com"
+setr lacore_license_key "LACORE-XXXXX-XXXXX-XXXXX"
+```
+
+### Turn the web dispatcher on
+
+It is **off by default** — call data leaves your server only once you say so:
+
+```ini
+setr lacore_webdispatch "true"
+```
+
+Restart the resource. The console prints `[webdispatch] hosted portal enabled`.
+
+### Open it
+
+Go to **Dashboard → Servers** and press **DISPATCH** on the server you want. That opens
+`lacore.netica.dev/server/<id>` — the desktop with Dispatch, Map, Units and Radio.
+
+</Steps>
+
+### The map
+
+The Map window draws the **game's own atlas tiles**, on the same calibration the in-game dispatch
+console uses — a unit sits on the same street on both screens. Units are round and coloured by
+status, calls are square, and clicking a call marker selects it in the Dispatch window. It opens
+where the shift actually is rather than in the middle of the island; from there it is yours to pan
+and zoom.
+
+### What the page tells you
+
+The portal never pretends to be live when it is not. It shows one of five states, decided by how old
+the last snapshot is and what your account is allowed to do:
+
+| State | What it means |
+| --- | --- |
+| **LIVE** | A snapshot arrived in the last ten seconds. Everything works. |
+| **STALE** | Nothing for more than ten seconds. The windows dim, actions are held. |
+| **OFFLINE** | Nothing for more than a minute. You are looking at the last state that arrived. |
+| **READ ONLY** | You may look at everything and change nothing — the acting controls are gone, not greyed out. Refused server-side too, not just hidden. |
+| **NO ACCESS** | You are signed in, but no role of yours grants dispatch here (or none has been granted to anybody). |
+
+### Who may open it
+
+Two ways in, and the second one is how you give a seat to somebody who is not on your dashboard:
+
+1. **You**, and anyone on your dashboard team with the *servers* scope. Always, no Discord needed.
+2. **A Discord role you name**, per server, in `configs/cfg-server-sv.lua`:
+
+```lua
+WebDispatchAccess = {
+    dispatch = { "Staff", "Dispatch" },  -- may act: status, assign, create, close
+    view     = { "Member" },             -- may watch, cannot act
+}
+```
+
+Both lists are **empty by default**, which means nobody but you. The names come from
+`DiscordAuth.roles` — the same table the in-game role checks use, so a role ID is written once.
+
+The check runs **on your server**, with your own bot token. The portal only ever asks *"may this
+Discord id dispatch?"* and gets back yes, read-only or no; your token, your guild and the roles
+themselves never leave the machine. Anyone whose roles cannot be read — not in the guild, Discord
+unreachable, no token configured — is refused rather than let through.
+
+<Callout type="info">
+  Because the answer comes from the game server, the first visit shows a short **"checking your
+  access"** screen while the question rides along with the next snapshot, and a server that is
+  offline cannot let anybody new in. Verdicts are remembered for five minutes.
+</Callout>
+
+## The self-hosted bridge
+
+If you would rather run the whole thing yourself, LACORE still pushes to your own Node bridge and
+accepts actions back through a token-gated endpoint.
+
+```ini
+set lacore_bridge_url   "https://dispatch.example.com"
 set lacore_bridge_token "SHARED_SECRET"
 ```
 
-### Deploy the bridge
+The bridge broadcasts over WebSocket to your web app and relays dispatcher actions back into FiveM.
+Both paths can run at the same time.
 
-The bridge ships with a **Docker Compose + Caddy** setup (automatic HTTPS). Run it on any host with a
-domain pointed at it; Caddy provisions the certificate and serves the web app + tiles.
+<Callout type="info">
+  Because either portal accepts actions that affect the live server, keep `lacore_bridge_token`
+  secret and expose the bridge over HTTPS only.
+</Callout>
 
-### Set up Discord OAuth
+## What is audited
 
-Create a Discord application, add the OAuth redirect for your domain, and configure the allowed
-role(s). Dispatchers sign in with Discord and are gated by role.
-
-</Steps>
+Every action a web dispatcher takes — status change, assignment, new call, disposition — runs through
+the same functions the in-game MDT uses and is logged in **Big Brother** with the dispatcher's
+Discord identity, marked as source `web`.
 
 <Callout type="warning">
   The web dispatcher is **optional**. The in-game `/dispatch` console works fully on its own — the
   portal is for teams that want an out-of-game dispatcher on a separate machine.
-</Callout>
-
-<Callout type="info">
-  Because the portal accepts actions that affect the live server, keep the `lacore_bridge_token`
-  secret and only expose the bridge over HTTPS.
 </Callout>

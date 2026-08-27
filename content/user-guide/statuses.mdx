@@ -1,0 +1,48 @@
+---
+title: "Status Labels"
+---
+
+import { Callout } from 'nextra/components'
+
+# Status Labels — Calls & Units
+
+Every terminal and the dispatch console use the same two sets of colour-coded badges: the **state of
+a call** and the **status of a unit**. This page is the glossary both link to.
+
+## Call / incident states
+
+A call moves through four states; the badge next to the incident number shows where it stands.
+
+| State | Meaning |
+|---|---|
+| `Outstanding` | Created, no unit attached yet — waiting for assignment or self-assign. |
+| `Assigned` | At least one unit is attached (attaching a unit raises the call to Assigned automatically). |
+| `On Scene` | An attached unit has arrived (CODE 6 / ON SCENE). |
+| `Resolved` | Closed with a disposition — it leaves the active board and moves to the Incident History. |
+
+## Unit statuses
+
+Set your own status via the status grid in the MDT (or the toolbar buttons). The grid auto-adapts to
+your role: LEO sees **CODE 6**, Fire/EMS sees **ON SCENE**.
+
+| Status | ST code | When to use |
+|---|---|---|
+| `CLEAR` | `CL` | Available for assignment. **Also detaches you from your incident.** |
+| `ENROUTE` | `EN` | Heading to a call — set automatically when you're attached/assigned. |
+| `CODE SIX` | `C6` | *(LEO)* Investigating / out on a scene. |
+| `ON SCENE` | `AS` | *(Fire/EMS)* Arrived at the incident. |
+| `BUSY` | `BY` | Currently occupied, can't take calls. |
+| `UNAVAILABLE` | `UA` | Off the air for a longer period. |
+| `OUT TO STATION` | `ST` | At the station / off the road. |
+
+<Callout type="info">
+  **Only `CLEAR` detaches you from an incident** — every other status keeps you attached, so going
+  BUSY on scene doesn't lose your call. Status changes are server-authoritative and visible to every
+  terminal and the dispatch console instantly.
+</Callout>
+
+## See also
+
+- [MDT Toolbar & Status](/user-guide/mdt-toolbar) — where the status grid lives
+- [Working with Incidents](/user-guide/mdt-incidents) — the assignment workflow
+- [Dispatch Console](/user-guide/dispatch-console) — the dispatcher's view of both badge sets

@@ -1,0 +1,75 @@
+---
+title: "Staff Panel"
+---
+
+import { Callout } from 'nextra/components'
+
+# Staff Panel (`/admin`)
+
+One window for staff work: the **player list**, the **activity log** (Big Brother) and **self
+tools**. Opens with `/admin` (running it again closes it); `/bblog` opens the same window straight
+on the log view. A keybind ("Open the LACORE admin menu") ships unbound — assign one in
+*FiveM Settings ▸ Key Bindings ▸ FiveM*.
+
+In-panel navigation: **1** Players · **2** Log · **3** Self · **Esc** close.
+
+## Who gets in — access tiers
+
+| Tier (badge) | Comes from | May do |
+|---|---|---|
+| **Lead Dev** | Dev role / devmode | Everything |
+| **Admin** | Staff role or the `ban` ACE | Everything, incl. Jail + Ban |
+| **Moderator** | The `kick` ACE | Soft actions + Kick |
+
+The badge is UI only — **every action is re-checked on the server**. Jail/Ban buttons are greyed
+out for moderators. `Features.admin` off removes the panel and `/bblog` entirely.
+
+## Players view
+
+Search by name, character, id or department; filter chips for **All · On duty · Civilian ·
+Flagged**. Rows show id, callsign, character/account name, job, **trust points** (anticheat) and
+colour-coded ping. Selecting a row fills the aside on the right:
+
+- **Actions** (no reason needed, all logged): Goto · Bring · Spectate · Freeze/Unfreeze · Revive ·
+  Heal · Mark on map.
+- **Removal** (reason required, confirm modal): **Kick** · **Jail** (600 seconds via the
+  corrections module — the player stays connected) · **Ban** (permanent until lifted).
+- **Last events** + a **Dossier** button showing that player's recent log entries.
+
+<Callout type="info">
+  **Spectate**: "Backspace to stop" — clicking any player while spectating also stops it. The
+  target must be streamed in; from across the map you'll get "Target not loaded".
+</Callout>
+
+## Activity log (Big Brother)
+
+Every important event — connections, combat, admin actions, anticheat flags, chat, commands,
+vehicles, MDT actions — searchable with category/player/text filters, live-follow toggle, and
+25-per-page paging. Clicking a row opens a **dossier** for that identifier (30-day activity + a
+by-category breakdown).
+
+Without a database the log falls back to a memory buffer — a banner says so, and searching/paging
+are unavailable until oxmysql is configured. Configuration (categories, retention, Discord
+mirroring) lives in [`cfg-bigbrother-sv.lua`](/configuration/security).
+
+## Self tools
+
+Client-side only, never logged, never leave your game: Noclip (WASD, Shift faster, Q/E height) ·
+God mode · Invisible · Heal self · Repair vehicle · Overhead ids (server id above nearby players).
+
+## Player reports
+
+Players file `/report <id> <message>` → it lands on the `UserReports` Discord webhook and in the
+staff report queue. Staff answer the oldest open report with:
+
+| Command | Effect |
+|---|---|
+| `/rs <text>` | Reply **and** mark solved |
+| `/rr <text>` | Reply, keep it open |
+| `/rd` | Dismiss without reply |
+
+<Callout type="warning">
+  Everything the panel does **to another player** is written to the activity log with severity
+  *warn* and mirrored to your admin webhook — kicks, bans, jails, teleports, even "Marked player on
+  map". Staff work is auditable by design.
+</Callout>

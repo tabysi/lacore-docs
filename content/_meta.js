@@ -1,28 +1,29 @@
 export default {
   index: 'Introduction',
-  '--community': { type: 'separator', title: 'Community' },
-  partners: 'Partners & Creators',
-  support: 'Support & FAQ',
   'whats-included': "What's Included",
   'frameworks-scripts': 'Frameworks & Scripts',
-  'developer-api': 'Developer API',
 
-  '--get-started': { type: 'separator', title: 'Get started' },
+  '--setup': { type: 'separator', title: 'Setup (server owners)' },
   'getting-started': 'Getting Started',
-  features: 'Features',
-  'user-guide': 'User Guide',
-
-  '--configure': { type: 'separator', title: 'Configure & extend' },
   configuration: 'Configuration',
-  commands: 'Command Reference',
   anticheat: 'Anti-Cheat & Security',
 
-  '--products': { type: 'separator', title: 'Products & updates' },
-  products: 'Products',
-  'lacore-mdt': 'LACORE MDT (Standalone)',
-  'lacore-roblox': 'LACORE for Roblox',
-  updates: 'Updates & Changelog',
+  '--use': { type: 'separator', title: 'Using LACORE (in-game)' },
+  'user-guide': 'User Guide',
+  features: 'Features',
+  commands: 'Command Reference',
 
-  '--portal': { type: 'separator', title: 'Customer Portal' },
+  '--dev': { type: 'separator', title: 'Developers' },
+  'developer-api': 'Developer API',
+
+  '--products': { type: 'separator', title: 'Products' },
+  products: 'Products',
+
+  '--account': { type: 'separator', title: 'Account & Community' },
   'customer-portal': 'Customer Portal',
+  support: 'Support & FAQ',
+  partners: 'Partners & Creators',
+
+  '--updates': { type: 'separator', title: 'Updates' },
+  updates: 'Updates & Changelog',
 }
