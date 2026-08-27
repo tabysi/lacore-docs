@@ -1,0 +1,265 @@
+---
+title: Loading Screen
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Loading Screen — `configs/cfg-loadingscreen-sh.lua`
+
+The first thing anybody ever sees of your server is the screen they stare at while they connect.
+LACORE ships **two finished designs** for it. You pick one, point it at your artwork, and you are
+done — there is nothing to build and no second resource to install.
+
+Both are 1920×1080, both scale to any resolution, and both are driven by the **game's real loading
+progress**: the percentage, the bar, the ring and the log line all come from FiveM's own loading
+events. Nothing on the screen is an animation on a timer that reaches 100 % and then leaves the
+player waiting.
+
+## The two designs
+
+| | **`"cinematic"`** | **`"dossier"`** |
+| --- | --- | --- |
+| Layout | Full-bleed artwork | Split — status column left, artwork right |
+| Progress | Wide band across the bottom: huge percentage, current step, live log line, five step chips | Progress **ring**, plus all five steps as rows that tick over from *Waiting* → *Running…* → *Done* |
+| Headline | Very large, three lines, on the left | Short, one line, over the artwork |
+| Tips & rules | Cards stacked on the right | Rules in the left column, the tip laid over the artwork |
+| Music player | Card on the right | Compact, top-right over the artwork |
+| Reads best with | Strong, cinematic key art | Screenshot-style art, or no art worth showing off |
+
+Both read exactly the same data, so switching later costs you nothing:
+
+```lua
+LoadingScreen = {
+    enabled = true,
+    variant = "cinematic",   -- or "dossier"
+}
+```
+
+<Callout type="info">
+  **Want to see them before you choose?** The screen is a plain web page. Serve the resource folder
+  with any static server and open
+  `nui/loading/index.html?variant=dossier` (or `?variant=cinematic`) in a browser. The `?variant=`
+  parameter exists purely for this — in game there is no query string, so your config always wins.
+</Callout>
+
+## Turning it off
+
+Two switches do the same thing, whichever you find first:
+
+```lua
+-- configs/cfg-loadingscreen-sh.lua
+LoadingScreen = { enabled = false }
+
+-- configs/cfg-features-sh.lua
+Features = { loadingscreen = false }
+```
+
+<Callout type="warning">
+  It ships **on**, so after updating to a version that includes it your players see LACORE's loading
+  screen instead of the default one. Turn it off if you already run a loading-screen resource —
+  running both is the usual cause of a screen that never goes away.
+</Callout>
+
+Off does **not** mean a blank screen: LACORE takes its own NUI frame down at runtime, so the
+standard GTA/FiveM loading screen shows exactly as it did before.
+
+## Your artwork
+
+```lua
+background = {
+    images   = {
+        "assets/my-server-1.jpg",
+        "assets/my-server-2.jpg",
+    },
+    interval = 14,     -- seconds per image
+    drift    = true,   -- slow Ken-Burns push
+},
+```
+
+<Steps>
+
+### Drop the files in
+
+Put your images in `nui/loading/assets/`. They are packaged with the resource automatically — there
+is no `files {}` entry to add.
+
+### List them by path
+
+Paths are relative to `nui/loading/`, so `assets/my-server-1.jpg` is the whole reference.
+
+### Restart
+
+Two or more images cross-fade into each other on the interval you set.
+
+</Steps>
+
+Leave the list empty and you get LACORE's neutral placeholder plate, which says "replace me" in as
+many words. Aim for **1920×1080**; the artwork is cropped to fill, and both designs lay dark
+gradients over it so text stays readable on bright images.
+
+## Tips, rules and the headline
+
+**These ship written out.** The config arrives with a headline, six tips and five rules already in
+it, so the screen reads like a finished screen the first time you start the server — you edit
+wording rather than invent it:
+
+```lua
+headline = {
+    kicker = "Welcome back",
+    title  = "The south of San Andreas is waiting.",
+    body   = "Stay in character, get on the radio and drive carefully. …",
+    short  = "Stay in character.",   -- the one-liner over the artwork ("dossier")
+},
+
+tips = {
+    "Press I for the playerlist — it shows the area of play, dispatch and every unit on duty.",
+    "/mdt opens the computer for your department. Go on duty first with /onduty.",
+    -- … four more
+},
+tipInterval = 6,   -- seconds per tip
+
+rules = {
+    "Stay in character at all times — keep IC and OOC separate.",
+    -- … four more
+},
+```
+
+The shipped tips are about **LACORE's own** keys and commands — the playerlist, `/mdt`, `/report`,
+the radio — so they are worth keeping a couple of even after you add your own.
+
+<Callout type="warning">
+  **Filled in also means English.** The translation applies to LACORE's copy, not to text sitting in
+  your config. **Clear a field (`""`) or empty a list (`{}`)** and that one falls back to LACORE's
+  own wording, translated into `Language` from `config.lua`.
+
+  So on a German or Russian server, blanking `headline`, `tips` and `rules` is the one-step way to a
+  loading screen in your players' language:
+
+  ```lua
+  headline = { kicker = "", title = "", body = "", short = "" },
+  tips     = {},
+  rules    = {},
+  ```
+</Callout>
+
+The chrome around your text — *Core rules*, *Step 2 of 5*, *Running…*, *Server online* — always
+follows `Language`. A German server has a German loading screen without touching this file.
+
+Keep `rules` to about five lines. It is the short version a player should have read before they
+spawn, not your rulebook.
+
+## Music
+
+```lua
+music = {
+    enabled  = true,
+    autoplay = true,
+    volume   = 0.35,   -- 0.0 – 1.0
+    tracks   = {
+        { title = "Los Santos Nights", artist = "PVRP Radio", url = "music/nights.ogg" },
+    },
+},
+```
+
+Title, artist, a moving equaliser and prev / play / next. Put the audio files anywhere under
+`nui/loading/` and reference them relatively, or point `url` at a stream.
+
+<Callout type="warning">
+  **LACORE ships no music.** Every track worth playing belongs to somebody, and shipping one would
+  hand you a licensing problem you did not ask for. The player therefore only appears once you have
+  listed at least one track.
+</Callout>
+
+Players can also use **M** (play / pause) and **N** (next). Those work whether or not the cursor is
+up — and the cursor is hidden automatically whenever there is no player to click.
+
+<Callout type="info">
+  Browsers can refuse to start audio before the user has clicked anything. If that happens the
+  player simply starts paused rather than pretending music is running.
+</Callout>
+
+## The header tiles
+
+```lua
+show = {
+    status  = true,    -- the green "Server online" pill
+    aop     = true,    -- current Area of Play
+    players = true,    -- players online / slots
+    queue   = false,   -- see below
+    discord = true,
+},
+
+discord        = "discord.gg/lacore",
+supportChannel = "support",         -- "" drops the hint entirely
+```
+
+Area of Play and the player count are asked from the server while the screen is still up. A tile
+with nothing to show **hides itself** rather than printing a dash, so a slow answer never leaves a
+gap on the screen.
+
+### Queue
+
+LACORE runs no queue of its own and will not invent a number for one. If you use a queue resource
+that exports its length, name it and switch the tile on:
+
+```lua
+show        = { queue = true },
+queueExport = "connectqueue:getQueueSize",
+```
+
+The export is called **on the server** and must return a number. Anything else — a typo, a stopped
+resource, an export that throws — hides the tile instead of breaking the loading screen.
+
+## One honest caveat about the early load
+
+A loading screen is a web page, and it opens **before any Lua exists on the connecting client** —
+the game is still running its own init functions long before a single resource starts. So the screen
+runs on LACORE's built-in defaults for a good part of the join and becomes *your* screen the moment
+the resource starts on that player.
+
+Those defaults are a **complete screen**, not a placeholder: LACORE's own headline, tips, rules and
+phase names are compiled into the page and shown from the first frame. What they cannot know is
+anything that belongs to *you*.
+
+What that means in practice:
+
+- The percentage, the bar, the phase readout and the artwork are correct from the first frame.
+- LACORE's own headline, tips and rules are on screen immediately, in English. If you edited them —
+  or run a German or Russian server — your wording replaces them once the resource starts.
+- Your community name, Discord invite, support channel, player count and area of play only appear
+  once the resource starts. Their tiles stay **hidden** until then rather than showing a placeholder
+  or somebody else's invite.
+- If you chose **`"dossier"`**, players may briefly see **`"cinematic"`** first. It cross-fades
+  rather than snapping, but it is there.
+
+<Callout type="info">
+  This is a property of how FiveM loads resources, not a setting. We would rather write it down than
+  let you discover it on your own server.
+</Callout>
+
+## Reference
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Master switch. `false` = the standard game loading screen. |
+| `variant` | `"cinematic"` | `"cinematic"` or `"dossier"`. |
+| `background.images` | `{}` | Your 1920×1080 artwork, relative to `nui/loading/`. Empty = placeholder. |
+| `background.interval` | `14` | Seconds per image when you list more than one. |
+| `background.drift` | `true` | Slow Ken-Burns push on the artwork. |
+| `headline.*` | written out | `kicker` / `title` / `body` / `short`. `""` = LACORE's translated copy. |
+| `tips` | 6 shipped | Rotating tips. `{}` = LACORE's translated set. |
+| `tipInterval` | `6` | Seconds per tip. |
+| `rules` | 5 shipped | Your short rules. `{}` = LACORE's translated set. |
+| `music.enabled` | `true` | The player still only shows with at least one track. |
+| `music.autoplay` | `true` | Start playing on its own where the browser allows it. |
+| `music.volume` | `0.35` | `0.0` – `1.0`. |
+| `music.tracks` | `{}` | `{ title, artist, url }` each. |
+| `show.*` | see above | Which header tiles to draw. |
+| `queueExport` | `""` | `"resource:export"` returning a number. |
+| `discord` | `"discord.gg/lacore"` | Shown in the Discord tile and the `"dossier"` footer. |
+| `supportChannel` | `"support"` | Named in the bottom-right hint. `""` removes it. |
+
+<Callout type="warning">
+  A resource **restart** is required for changes to apply. The file is escrow-open and covered by
+  [config backup](/configuration/branding).
+</Callout>

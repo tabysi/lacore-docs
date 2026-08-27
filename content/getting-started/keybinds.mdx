@@ -2,30 +2,24 @@
 title: "Keybinds"
 ---
 
-import { Callout } from 'nextra/components'
-
 # Keybinds
 
-The keys bound **by default**. Every player can rebind them in
+These are the **default** keys. Every player can rebind them in
 **FiveM → Settings → Key Bindings → FiveM** (the engine remembers your choice).
 
-| Key | Action |
-|-----|--------|
-| **O** | Open / close the MDT |
-| **I** | Toggle the player list |
-| **G** | Toggle vehicle engine |
-| **K** | Seatbelt on / off *(only when `Features.seatbelt` is on)* |
-| **U** | Hands up *(only when `Features.rpemotes` is on)* |
-| **X** | Hand on holster *(only when `Features.rpemotes` is on)* |
-| **X** | Put down carried person / uncuff nearest |
-| **F1** | Open the phone |
-| **F5 / F6 / F7** | Air Unit: heli cam / auto-orbit / spotlight |
-
-<Callout type="warning">
-  **X is bound twice** — "Hand on holster" and "Release carried / Uncuff nearest". Both handlers
-  fire. Either turn `Features.rpemotes` off (if another resource owns your RP emotes) or rebind one
-  of them in the FiveM key settings.
-</Callout>
+| Key | Action | Command |
+|-----|--------|---------|
+| **O** | Open / close the MDT | `/mdt` |
+| **I** | Toggle the player list | `/playerlist` |
+| **G** | Toggle vehicle engine | `/engine` |
+| **K** | Toggle seatbelt | `/seatbelt` |
+| **U** | Raise / lower hands | `/hu` |
+| **X** | Hand on holster | `/hh` |
+| *(unbound)* | Open/close front driver door | `/door 1` |
+| *(unbound)* | Open/close front passenger door | `/door 2` |
+| *(unbound)* | Open/close trunk | `/trunk` |
+| *(unbound)* | Change weapon firing mode | `/firingmode` |
+| *(unbound)* | Dismiss a player's report (staff) | `/rd` |
 
 ## While hands are up (`/hu` / **U**)
 - **Crouch key** → kneel
@@ -36,9 +30,5 @@ The keys bound **by default**. Every player can rebind them in
 - Tap the character-wheel key to raise/lower the "hold there" hand
 - Hold **sprint** to lower your hand without drawing
 
-## Everything else
+> Anything marked *(unbound)* has no default key — assign one in Key Bindings if you want it on a hotkey, or just use the command.
 
-Many more actions ship **unbound** — the civilian radial, K9 orders, the in-car screen focus, the
-fingerprint scanner, doors/trunk, firing mode and more. The complete list of all 32 bindings lives
-in the [Command Reference](/commands) (Keybinds section at the top); assign keys to any of them in
-*FiveM Settings ▸ Key Bindings ▸ FiveM*.

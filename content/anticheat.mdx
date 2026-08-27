@@ -64,46 +64,119 @@ start acting on what they find.
   whitelist your staff so admins are never caught by their own tools.
 - **Evidence & logging.** Detections are logged to your Discord with the player's details (and can even
   attach a screenshot), so your team has a clear audit trail.
-- **Context, not just a verdict.** Every flag carries a short log of what that player was doing in the
-  seconds before it — respawns, duty changes, getting in and out of vehicles, weapon switches, health
-  jumps, earlier flags. That is usually what separates "cheat" from "someone's revive script".
 - **Constantly hardened.** The protection is maintained and expanded with every LACORE update.
 
-## What happened just before the flag
-
-A detection code tells you *what* tripped. `GOD_HEALTH · hp=300` reads like a cheat — until you see
-that the same player was revived twice forty seconds earlier, at which point it reads like a bug in a
-revive script. So each flag arrives with the story around it:
-
-```
-**Anticheat: GOD_HEALTH**
-Player: SomePlayer (ID 12)
-Action: log
-Detail: server hp=300 (> 200)
-
-**Leading up to it**
--42s · duty · on duty as Fire/EMS / AMR
--38s · spawn · respawned / revived (immunity window granted)
--21s · vehicle · entered a vehicle (model 1171614426)
--12s · health · health 100 → 300
-- 3s · flag · GOD_HEALTH → log (server hp=300)
-```
-
-The buffer holds the last 40 lines or 90 seconds, whichever runs out first, and records **changes
-only** — a player standing still writes nothing to it. You can also read it for anyone online without
-waiting for a flag:
-
-```
-/lacore accontext 12
-```
+## Configuration reference — `configs/cfg-anticheat-sh.lua`
 
 <Callout type="info">
-  **It stays on your server.** The buffer lives in memory, is dropped the moment the player
-  disconnects, and is attached only to the Discord log you were already receiving. It is deliberately
-  **not** added to the dashboard report — that payload is documented line by line in
-  `configs/cfg-anticheat-sh.lua`, and quietly widening it would be the wrong way to add a feature.
-  Turn the buffer off entirely with `Anticheat.Context.enabled = false`.
+  The **thresholds, honeypot names and blacklists are not in this file.** They live in
+  `modules/anticheat/anticheat-params-{sh,sv}.lua` so the escrow build can obfuscate them, and so the
+  server-only half never reaches a client at all — the config used to ship as plain text, which handed
+  every reader the exact numbers to stay under. You can still override any of them here: whatever you
+  set wins, the defaults only fill what you leave out.
 </Callout>
+
+### Master switches
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `Enabled` | `true` | The whole anti-cheat. |
+| `Mode` | `"observe"` | `"observe"` = every check runs, every hit is logged and scored, **nothing** is kicked or banned; each line says what it *would* have done. `"enforce"` = the actions below are carried out. |
+
+### Actions
+
+Every detection takes one of four actions:
+
+| Action | What happens |
+| --- | --- |
+| `"log"` | Discord webhook only. |
+| `"trust"` | Webhook + trust points — escalates only if the player keeps at it. |
+| `"kick"` | Webhook + kick. |
+| `"ban"` | Webhook + permanent ban. |
+
+In observe mode all four behave as `"log"`.
+
+### Detections
+
+Server-side checks cannot be patched out by a client; client-side ones can, which is why their default
+actions are milder.
+
+| Detection | Side | Default | Notes |
+| --- | --- | --- | --- |
+| `Explosions` | server | `ban` | |
+| `WeaponDamage` | server | `kick` | |
+| `EntitySpam` | server | `kick` | `skipOnFramework = true` skips the guard when ESX/QBCore/QBox is detected — garages and vehicle shops spawn server-side and would false-positive. Leave entity policing to the framework's own AC there. |
+| `GodMode` | client | `kick` | |
+| `BlacklistedWeapons` | client | `ban` | |
+| `SpeedHack` | client | `kick` | |
+| `Teleport` | client | `log` | Log only on purpose — the core teleports legitimately (spawn, jail). |
+| `Invisible` | client | `kick` | |
+| `NoClip` | client | `kick` | |
+| `SuperJump` | client | `kick` | |
+| `BlacklistedVehicles` | client | `kick` | `delete = true` also removes the vehicle straight away. |
+| `BlacklistedPeds` | server | `kick`, **off** | God peds / animals used for exploits. The server reads the ped model, so client-swapped models are caught even with the client AC gone. Empty by default — add your own. |
+| `Heartbeat` | both | `kick` | The client checks in every 30 s. Silence means the anti-cheat client was stopped (`stop lacore`, thread kill). |
+| `Honeypots` | server | `ban` | Event names that ESX/QBCore menus and known cheat menus fire blindly. LACORE is standalone, so **no** legitimate client ever triggers these — a trigger means an injected script. |
+| `EventRateLimit` | server | `kick` | Per-event ceiling for abuse-prone core events (mass cuff, jail flood). Still applies when the player *is* authorised — a compromised LEO client is the case it exists for. |
+| `AntiDump` | server | `kick` | Recognises dump bots by behaviour: headless clients never run scripts, and dump sessions are short. A random per-session challenge means replaying a static handshake isn't enough. What actually protects your files is the escrow build; this only recognises the behaviour. |
+
+### Server-authoritative sweep
+
+The server itself reads each player's ped health, position and model every interval. Requires OneSync
+(Infinity); the module auto-disables and warns if OneSync is off.
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `ServerSweep.enabled` | `true` | |
+| `ServerSweep.teleport.enabled` | `true` | Position half of the sweep. |
+| `ServerSweep.action` | `"trust"` | Feeds the trust score rather than banning outright. Tune before switching to `"kick"` / `"ban"`. |
+
+### Combat integrity
+
+Closes the "client anti-cheat was patched out" gap for weapons. All server-side
+(`weaponDamageEvent`, `startProjectileEvent`, `ptFxEvent`).
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `Combat.enabled` | `true` | |
+| `Combat.serverBlacklistWeapons` | `ban` | If a player *deals* damage with a blacklisted weapon, the server cancels it and punishes — even if the client check was removed. |
+| `Combat.aimbot` | `trust` | Aimbot / silent-aim / triggerbot **heuristic** — never exact, so it feeds trust by default and a hot gunfight can't insta-ban an innocent player. |
+| `Combat.projectiles` | `kick` | Grenade / RPG floods and crash projectiles. |
+| `Combat.ptfx` | `kick` | Particle-FX spam used by screen-crash and lag exploits. |
+
+### Trust, whitelist & evidence
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `Trust.enabled` | `true` | Every detection adds points by severity; points **decay** during clean play. Cross a threshold and it escalates. This is what makes `"log"` / `"kick"` safe to run: a single false positive can never ban on its own. |
+| `Whitelist.permission` | `"lacore.ac.bypass"` | Any player with this ACE permission is never punished — detections are still logged. Grant it with `add_ace group.admin lacore.ac.bypass allow`. Discord **Staff** / **Dev** roles are bypassed built-in. |
+| `Evidence.enabled` | `false` | On a serious detection, request a screenshot from the flagged client and attach the URL to the Discord log. Needs `screenshot-basic` and an upload endpoint. |
+| `Evidence.uploadUrl` | `""` | Your own upload endpoint. |
+| `Evidence.onSeverity` | `"alert"` | Capture at this severity and above (`info` < `warn` < `alert`). |
+
+### Reporting flags to your dashboard
+
+Off by default, and deliberately so: this sends flags — which are **accusations about individual
+players, with their identifiers** — out of your server to the LACORE backend so you can review them
+in the dashboard instead of scrolling a Discord channel.
+
+What leaves your server per flag: the detection code, severity, the action taken, the current trust
+score, the player's name and identifiers, the server, and a timestamp. Nothing else — no chat, no
+positions, no screenshots. Flags keep going to your own database and Discord webhook exactly as
+before; this is an **additional copy, never a move**.
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `Report.enabled` | `false` | Requires an active licence key (`setr lacore_license_key`) — that is what attributes flags to your dashboard account. Without one this is inert. |
+| `Report.minSeverity` | `"warn"` | `"info"` / `"warn"` / `"alert"` — quieter than the log by default. |
+| `Report.batchSec` | `30` | Flush at most every N seconds, so a flag storm sends one batch. |
+| `Report.maxBatch` | `50` | Hard cap per flush; the rest is dropped, never queued forever. |
+
+### Bypasses
+
+- The convar `lacore_devmode` on (`1` / `true` / `yes`) turns the anti-cheat **fully off**.
+- Discord role **Staff** or **Dev**, or the `Whitelist.permission` ACE, is never punished — but is
+  still logged.
 
 ## Reviewing flags in your dashboard
 

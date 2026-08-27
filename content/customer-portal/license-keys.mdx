@@ -7,23 +7,19 @@ import { Callout, Steps } from 'nextra/components'
 # License keys
 
 A **license key** links a running server to your dashboard account. Once linked, the server shows up
-under [Servers](/customer-portal/servers), can pull its [config](/customer-portal/server-config)
-online, and unlocks any paid add-ons your account owns.
+under [Servers](/customer-portal/servers) and can pull its [config](/customer-portal/server-config)
+online.
 
 <Steps>
 
 ### Create a key
 
-On **Dashboard → License keys**, optionally type a label (e.g. "Main RP server") and hit
-**+ CREATE KEY**. Keys look like this:
-
-```
-LACORE-XXXXX-XXXXX-XXXXX
-```
+On **Dashboard → License keys**, click **Create key**. Give it a label (e.g. "Main RP server") so you
+can tell your keys apart.
 
 ### Paste it into server.cfg
 
-The dashboard shows the ready-made line with a **COPY** button — drop it into your `server.cfg`:
+Copy the ready-made line and drop it into your server's `server.cfg`:
 
 ```cfg
 setr lacore_license_key "LACORE-XXXXX-XXXXX-XXXXX"
@@ -31,23 +27,16 @@ setr lacore_license_key "LACORE-XXXXX-XXXXX-XXXXX"
 
 ### Start the server
 
-The server reports in on startup and appears under **Servers**, verified as yours. Its config pull
-starts about 20 seconds after boot.
+Within a minute of starting, the server appears under **Servers**, verified as yours.
 
 </Steps>
 
-## Managing keys
-
-Each key card shows its label, when it was created and when it was **last seen** (or "never used"),
-plus a **COPY CFG** button for the `server.cfg` line.
-
-- **You can hold up to 10 active keys.** Revoke one before creating another if you hit the cap.
-- **Revoke** turns a key off without deleting it — any server still using it goes *unlicensed* on
-  its next heartbeat and keeps running on its local config. Revoked keys stay in the list, greyed
-  out, as a record.
+<Callout type="info">
+  **Revoking a key.** Revoke turns a key off without deleting it — any server still using it simply
+  becomes "unlicensed" on its next heartbeat (it keeps running on its local config). Create a fresh key
+  to re-link.
+</Callout>
 
 <Callout type="warning">
-  A key proves a server is **yours** and stays fully visible in your dashboard so you can copy it
-  again later. Treat it like a password — don't paste it in screenshots or public channels. If it
-  leaks, revoke it and create a fresh one.
+  A key is what proves a server is *yours*. Treat it like a password — don't share it publicly.
 </Callout>

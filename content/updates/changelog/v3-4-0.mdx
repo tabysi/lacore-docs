@@ -4,38 +4,60 @@ title: "3.4.0"
 
 ![LACORE 3.4.0](/changelog/v3-4-0.svg)
 
-# [3.4.0] – 2026-08-14 — A supervisor group, not a list of names
+# [3.4.0] – The Player Menu, rebuilt
+
+`/profile` was the oldest surface still shipping in the core's first visual language: rounded cards
+floating on a gradient, one avatar circle, everything about a character reachable only if that
+character happened to be the active one. It held a lot of information and gave almost none of it a
+shape. This is a full rebuild of that panel against the Modernist design — flat, 2px rules instead of
+card shadows, Archivo for text and IBM Plex Mono for anything that reads like a field value.
+
+### Changed
+
+#### Player Menu
+- **The whole panel is redrawn.** A title bar carrying the community name and one tab per character,
+  a 200px section rail with live counts, and a content column that fills the frame edge to edge
+  instead of floating inside it. Nothing is a card any more; the grid does the separating.
+- **The character tabs switch who you are *looking at*, not who you are playing.** Every character's
+  vehicles, records, relationships and licences are readable from the tab strip without touching the
+  active one — activating still lives on its own row on the Characters page, where it belongs, since
+  it respawns your ped. Achievements, the level block and the licence list all recompute for the
+  character you have open.
+- **A Recent Activity feed on the overview.** Five entries, derived entirely from timestamps the
+  server already stores — vehicle registrations, records you added, characters you created,
+  achievement and secret unlocks. Nothing here is invented: an event only appears when there is a
+  real time stamped against it.
+- **Achievements got their own page.** Nine achievements in a three-column grid and the secrets in a
+  five-column one, each with its own progress rule. The overview keeps a two-column summary with a
+  link across.
+- **Records keep the entries/timeline switch and gain an archive filter**, and the new-entry and
+  edit forms moved into the panel's own modal instead of pushing the list down the page.
+- **Vehicles are a table again** — plate, model, class, purchase date, insurance — with the insurance
+  cell still being the toggle it always was. The per-vehicle detail (year, colour, type, image URL)
+  opens as a strip under its row.
+- **The panel's own Settings page.** Language, interface scale, opacity and notification corner as
+  segmented controls; achievement sound, unlock popup, warrant-banner visibility and the default
+  visibility for new records as toggles. Next to it: your account block (server ID, callsign, status,
+  Discord roles, total playtime, first seen), membership progress, the licence list for the open
+  character, and a danger zone for deleting a character that is not the one you are playing.
+  Everything except the two achievement settings is local to your client; those two are mirrored to
+  the game side, because the chime and the toast are fired from Lua.
+- **Language is now yours to pick.** The server's `Language` still decides what everyone starts on,
+  but a player who sets EN/DE/RU in the Player Menu keeps it across every LACORE panel and across
+  sessions. Leave it on AUTO to follow the server.
 
 ### Added
 
-#### The supervisor panel takes an ACE permission
+- **Archivo and IBM Plex Mono ship with the resource.** Both are bundled as subsetted woff2 (≈200 KB
+  for Latin, Latin-Ext and — for the mono — Cyrillic) rather than pulled from a CDN, so the panel
+  renders identically on a client with no outbound access and there is no fallback flash on open.
+  Both fonts are SIL Open Font License 1.1.
+- **`profile_*` locale keys for everything new**, in `en`/`de`/`ru` as usual. No string in the panel
+  is hardcoded.
+- **`Branding.label` reaches the Player Menu.** The title bar reads whatever `cfg-branding-sh.lua`
+  says instead of a hardcoded "LACORE".
 
-Until now the panel had two doors: a framework job grade, or an allowlist of license identifiers and
-callsigns. Neither survives a real department. Collecting the license of every supervisor across three
-departments and keeping `server.cfg` in sync by hand is a job nobody wants, and the callsign entry was
-worse than inconvenient — a callsign is just text a player types, so anyone willing to put on a
-supervisor's callsign got the panel with it.
+### Fixed
 
-So there is a third door, and it is the one to use: an **ACE object**. Allow it on a group once, and
-every member of that group has the panel.
-
-```cfg
-add_ace group.lapd_supervisor lacore.supervisor allow
-add_principal identifier.discord:123456789012345678 group.lapd_supervisor
-```
-
-Any identifier works as the principal (`discord:`, `license:`, `fivem:`, `steam:`). If you run a
-Discord→ACE bridge, point your supervisor roles at those groups and the membership keeps itself in
-sync — a role change is the whole workflow. ACE objects are hierarchical, so a group allowed plain
-`lacore` gets it too, which is why `group.lacore_dev` already had it.
-
-Departments that want to be gated separately get their own object via `aceByDept`
-(`["LSPD"] = "lacore.supervisor.lspd"`), checked before the general one. `leoOnly` still applies: an
-ACE holder must be an on-duty LEO unit. And `/myperms` now ends with `supervisor=true|false`, so
-"did my ACE land?" is one command instead of a guess.
-
-The grade path and the allowlist are untouched — a server that adds nothing behaves exactly as before.
-
-⚠️ **Config change:** `configs/cfg-supervisor-sh.lua` gains `ace` (default `"lacore.supervisor"`) and
-`aceByDept`. The default grants nobody anything until you allow the object somewhere, so an existing
-install notices no difference.
+- **The notification stack can be moved off the top-right.** It was pinned there; it now follows the
+  Player Menu's notification-corner setting.

@@ -61,18 +61,6 @@ This snapshots every `configs/*.lua` into the DB store.
 It writes your saved configs back to disk (and first snapshots the current on-disk configs so a
 restore can be rolled back). **Restart the resource** for the restored config to take effect.
 
-Nothing is written that does not compile: every merged file goes through Lua's parser first, and one
-that fails is left untouched on disk and named in the output.
-
-### Not what you wanted? Undo
-
-```
-/lacoreconfig undo
-```
-
-Puts every config back exactly as it was before the last `restore` — that is what the pre-restore
-snapshot is for. **Restart the resource** afterwards.
-
 ### Check status
 
 ```
@@ -86,10 +74,9 @@ snapshot is for. **Restart the resource** afterwards.
   good backup with fresh defaults right after a reinstall. Run `backup` yourself when you're happy
   with your config.
 
-  Restore is a **3-way merge** (since 3.2.5): only *your* changes are re-applied onto the current
-  files, so keys and blocks added by an update survive. Where an update changed the exact spot you
-  also edited, the new default wins and the conflict count is reported. Legacy (pre-3.2.5) backups
-  still restore whole-file — re-run `backup` once to upgrade them.
+  After a **major version update** that adds new config keys, review the new defaults afterwards — a
+  restore writes your saved files back whole, so brand-new keys from the update won't be present
+  until you merge them (the rollback snapshot helps).
 </Callout>
 
 <Callout type="info">

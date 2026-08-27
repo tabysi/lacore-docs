@@ -76,29 +76,13 @@ Server exports:
              callsign, src, status,      -- optional: attach a creating unit
              notifyCreator = bool, actor = { name, label } }
 - ResolveCall(incidentNumber, reason [, src]) -> bool   (src optional; external if omitted)
-- AddCallNote(incidentNumber, note) -> bool   (set/replace the call's notes; emits callUpdated)
 - GetActiveCalls() -> call[]     (non-resolved)
 - GetCall(incidentNumber) -> call|nil
     call = { incidentNumber, type, message, address, postal, state, agency, notes, x, y, z, createdAtUnix }
-- SetUnitStatus(src, status) -> bool     ("CLEAR" detaches the unit's incident)
-- SetUnitCallsign(src, callsign) -> bool
-- AttachUnit(src, incidentNumber) -> bool   (ENROUTE, raises the call to Assigned)
-- GetCallByUnit(src) -> call|nil         (the call the unit is attached to)
 - QueryPerson(query) -> profile[]    (match by server id, name substring, or plate)
 - QueryPlate(plate) -> profile|nil   (registered owner profile, includes .vehicles)
     profile is sanitised: it NEVER contains raw `records` or `faction`; active BOLO hits
     are attached under `bolos`. Useful fields: name, dob, gender, vehicles (map by plate), bolos.
-- GetInsurance(plate) -> true|false|nil     (nil = unknown plate)
-- SetInsurance(plate, insured) -> bool      (emits insuranceChanged)
-- GetPersonnelFile(license) -> file|nil     (read-only)
-    file = { license, name, badge, dept, job, callsign, rank, status, counters, duty,
-             firstSeenUnix, lastSeenUnix }
-- GetDutyLog(license [, limit]) -> entry[]  (newest first; limit 1..500, default 100;
-    entry = { ts, action, secs, cs, dept, name }; empty license = all units)
-- GetCase(caseNumber) -> case|nil           (full case file)
-- GetCases(filter) -> caseSummary[]         (filter = { status, q }, max 200)
-- CreateCase(opts) -> caseNumber|nil
-    opts = { title, ctype, dept, location, postal, occurredAtUnix, incidentNumber }
 - GetBolos() -> bolo[]           (active, non-expired)
 - CreateBolo(opts) -> boloId|nil
     opts = { kind = "person"|"vehicle"|"plate" (default "person"),
@@ -113,26 +97,13 @@ Client exports:
 - OpenMDT() -> bool          (opens the LAPD MDT for the local player)
 - CloseMDT() -> bool         (closes whichever LACORE terminal is open)
 - IsMDTOpen() -> bool
-- GetDutyInfo() -> { job, dept, callsign, status, incident, onDuty }   (local player only)
 
-Events LACORE fires (AddEventHandler on the consumer side; all [server] unless noted):
-- 'lacore:api:callCreated'         (call)  -- fires for MDT calls AND every automatic call
-                                             (911/311/Panic/Crime Broadcast/Shot Spotter/Tow/...)
-- 'lacore:api:callUpdated'         (incidentNumber, fields)  fields = { notes }
-- 'lacore:api:callResolved'        (incidentNumber, reason, by)
-- 'lacore:api:panic'               (src, coords { x, y, z }, name)
-- 'lacore:api:dutyChanged'         (src, job, dept, onDuty)
-- 'lacore:api:unitStatusChanged'   (src, status, incident)
-- 'lacore:api:unitCallsignChanged' (src, callsign)
-- 'lacore:api:incidentAttached'    (src, incidentNumber)
-- 'lacore:api:reportFiled'         ({ src, target, rtype, location, involved, incident, officer })
-- 'lacore:api:chargesIssued'       ({ src, target, ctype, charges, fine, jailMonths, officer })
-- 'lacore:api:evidenceLogged'      ({ src, target, tag, etype, location, incident, officer })
-- 'lacore:api:recordAdded'         ({ src, target, body, officer })
-- 'lacore:api:warrantChanged'      ({ src, target, active, reason, officer })
-- 'lacore:api:insuranceChanged'    (plate, insured, by)
-- 'lacore:api:boloCreated'         (bolo)   bolo = { id, kind, subject, plate, reason, danger, by }
-- 'lacore:api:boloCancelled'       (id)
+Events LACORE fires (AddEventHandler on the consumer side):
+- 'lacore:api:callCreated'  (call)                        [server]
+- 'lacore:api:callResolved' (incidentNumber, reason, by)  [server]
+- 'lacore:api:dutyChanged'  (src, job, dept, onDuty)      [server]
+- 'lacore:api:boloCreated'  (bolo)                        [server]
+    bolo = { id, kind, subject, plate, reason, danger, by }
 - 'lacore:mdt:opened' / 'lacore:mdt:closed'  ()           [client]
 
 Now write the resource for MY SETUP above.
@@ -148,7 +119,6 @@ Swap the two placeholders for something concrete, for example:
 | `<<WHAT YOU WANT>>` | `When a bank robbery starts in my heist script, create a LAPD "211 in Progress" call at the vault and issue a vehicle BOLO for the getaway car.` |
 
 <Callout type="info">
-  The contract in this prompt is kept in sync with the shipped API. When LACORE adds exports, this
-  page updates — re-copy the prompt to get the newest contract. Check `GetApiVersion()` at runtime
-  to be sure.
+  The contract in this prompt is generated from the shipped API. When LACORE adds exports, this page
+  updates — re-copy the prompt to get the newest contract. Check `GetApiVersion()` at runtime to be sure.
 </Callout>

@@ -2,7 +2,7 @@
 
 import './config-wizard.css'
 import { useMemo, useState } from 'react'
-import { SECTIONS, CONVAR_TEMPLATE, TEMPLATES } from '../lib/configSchema.js'
+import { SECTIONS, CONVAR_TEMPLATE } from '../lib/configSchema.js'
 
 // ── Lua value formatting ─────────────────────────────────────────────────────
 function luaValue(field, v) {
@@ -10,13 +10,6 @@ function luaValue(field, v) {
   if (field.type === 'number') {
     const n = Number(v)
     return Number.isFinite(n) ? String(n) : '0'
-  }
-  // Some options are tri-state in Lua: "auto" is a string, but true/false are
-  // real booleans that the config compares with ==. `literalValues` lists the
-  // options that must therefore be written unquoted — `= "true"` would satisfy
-  // neither branch and silently behave like "auto".
-  if (Array.isArray(field.literalValues) && field.literalValues.includes(String(v))) {
-    return String(v)
   }
   // text / select → quoted string, escape backslash + quote
   return '"' + String(v ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
@@ -225,18 +218,6 @@ export function ConfigWizard() {
   const set = (id, val) => setValues((prev) => ({ ...prev, [id]: val }))
   const go = (i) => setStep(Math.max(0, Math.min(total - 1, i)))
 
-  // Starting points. A template sets a handful of fields and leaves the rest on
-  // their default, so it is a head start rather than a different product — every
-  // step stays walkable afterwards. Applying one resets first, otherwise picking
-  // a second template would leave the first one's answers behind.
-  const [template, setTemplate] = useState('')
-  const applyTemplate = (tpl) => {
-    if (changedCount > 0 && !window.confirm(
-      'Apply "' + tpl.name + '"? This resets every answer to the defaults first.')) return
-    setValues({ ...initial, ...tpl.values })
-    setTemplate(tpl.id)
-  }
-
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(output)
@@ -247,34 +228,6 @@ export function ConfigWizard() {
 
   return (
     <div className="cw">
-      {/* Starting points — optional; the wizard works from scratch just as well. */}
-      <div className="cw-templates">
-        <div className="cw-templates-hd">
-          <strong>Start from a template</strong>
-          <span className="cw-templates-sub">Optional. Sets a few answers for a server like yours — you can change every one of them afterwards.</span>
-        </div>
-        <div className="cw-templates-row">
-          {TEMPLATES.map((tpl) => (
-            <button
-              key={tpl.id}
-              type="button"
-              className={'cw-template' + (template === tpl.id ? ' active' : '')}
-              onClick={() => applyTemplate(tpl)}
-              title={tpl.blurb}
-            >
-              <span className="cw-template-ico">{tpl.icon}</span>
-              <span className="cw-template-name">{tpl.name}</span>
-              <span className="cw-template-n">{Object.keys(tpl.values).length} changes</span>
-            </button>
-          ))}
-        </div>
-        {template && (
-          <p className="cw-template-blurb">
-            {TEMPLATES.find((x) => x.id === template)?.blurb}
-          </p>
-        )}
-      </div>
-
       {/* Progress rail */}
       <div className="cw-rail">
         {SECTIONS.map((s, i) => (

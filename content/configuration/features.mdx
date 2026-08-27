@@ -34,6 +34,7 @@ Features = {
     bolo     = true,   -- BOLO system
   },
 
+  loadingscreen = true, -- LACORE's loading screen (false = the standard game one)
   phone       = true,  -- LACORE NUI phone
   airunit     = true,  -- Air Unit heli-cam
   cctv        = true,  -- CCTV surveillance
@@ -48,8 +49,6 @@ Features = {
   admin       = true,  -- staff tools (Big Brother log + admin menu)
   webdispatch = true,  -- external web dispatcher bridge
   spawnselect = true,  -- map-based spawn picker (false = one fixed spawn)
-  bugreport   = true,  -- /lacorereport — bug reports to the LACORE dashboard
-  replay      = true,  -- replay recorder + Director's Cut (clips stored on your disk)
 
   civilian = { enabled = true, org = true, turf = true },        -- emotes / props / orgs / turf
 
@@ -100,7 +99,7 @@ Features = {
   phone = false, airunit = false, cctv = false, corrections = false,
   impound = false, k9 = false, field = false, fingerprint = false, nads = false, stt = false,
   admin = false, webdispatch = false, spawnselect = false, rpemotes = false, identitylink = false,
-  bugreport = false, replay = false,
+  loadingscreen = false,
   civilian = { enabled = false },
   chat     = { enabled = false },
   aop      = { enabled = false },
@@ -115,8 +114,7 @@ Features = {
 
 ## Paid add-ons (entitlement-gated)
 
-The end of the `Features` table holds **paid add-on flags** — currently `penncad` (the
-[Pennsylvania CAD](/user-guide/pennsylvania-cad)) and `extracad` — shipped **off**. Unlike the
+The end of the `Features` table holds **paid add-on flags** (e.g. `extracad`), shipped **off**. Unlike the
 toggles above, you don't switch these on locally — they're **unlocked per account from the LACORE
 dashboard** and delivered to your server by its license key. The unlock is **fail-closed**: an add-on your
 account isn't entitled to is forced off at load even if the config says `true`, so a licensed server can't

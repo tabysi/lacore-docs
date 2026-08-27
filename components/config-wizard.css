@@ -201,30 +201,3 @@
   .cw-field { flex-direction: column; align-items: stretch; }
   .cw-field-ctl { align-self: flex-end; }
 }
-
-/* ── Starting points (templates) ─────────────────────────────────────────── */
-.cw-templates {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--cw-line);
-  background: var(--cw-soft);
-}
-.cw-templates-hd { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
-.cw-templates-sub { font-size: 12px; color: var(--cw-dim); }
-.cw-templates-row { display: flex; flex-wrap: wrap; gap: 8px; }
-.cw-template {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-  min-width: 150px; flex: 1 1 150px;
-  padding: 9px 12px;
-  border: 1px solid var(--cw-line); border-radius: 10px;
-  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
-}
-.cw-template:hover { border-color: var(--cw); }
-.cw-template.active { border-color: var(--cw); background: color-mix(in srgb, var(--cw) 12%, transparent); }
-.cw-template-ico { font-size: 16px; line-height: 1; }
-.cw-template-name { font-size: 13px; font-weight: 600; }
-.cw-template-n { font-size: 11px; color: var(--cw-dim); }
-.cw-template-blurb { margin: 10px 0 0; font-size: 12.5px; color: var(--cw-dim); line-height: 1.5; }
-
-@media (max-width: 640px) {
-  .cw-template { min-width: 0; flex-basis: 100%; }
-}

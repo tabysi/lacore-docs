@@ -2,21 +2,56 @@
 title: BOLOs & Charges
 ---
 
-import { Callout, Cards } from 'nextra/components'
+import { Callout, Steps } from 'nextra/components'
 
 # BOLOs & Charges
 
-Two related LEO systems that write to a person's record and surface across every terminal: a
-**BOLO** (Be On the Look-Out) alerts units to watch for a person or vehicle, and **charges /
-citations** are driven by a configurable penal code.
+Two related LEO systems that write to a person's record and surface across every terminal.
 
-The step-by-step guides live in the User Guide:
+## BOLOs
 
-<Cards>
-  <Cards.Card title="BOLO — create, hit, cancel" href="/user-guide/bolo" arrow />
-  <Cards.Card title="Citations & Charges" href="/user-guide/citations-charges" arrow />
-  <Cards.Card title="Penal code config" href="/configuration/law-enforcement" arrow />
-</Cards>
+A **BOLO** (Be On the Look-Out) alerts units to watch for a person or vehicle.
+
+<Steps>
+
+### Create
+
+From the MDT or LASD CAD, create a BOLO against a **name** or **plate** with a reason. It is stored
+server-side and broadcast to all on-duty units.
+
+### Hit on query
+
+When any unit runs a matching person or plate query, the BOLO surfaces as a **hit** on the result —
+and the CCTV scanner shows a **BOLO ACTIVE** flag.
+
+### Cancel
+
+When resolved, cancel the BOLO so it stops hitting.
+
+</Steps>
+
+<Callout type="info">
+  BOLOs are shared across the LAPD, LASD and Agency terminals — creating one anywhere is visible
+  everywhere, including the LASD CAD.
+</Callout>
+
+## Charges & citations
+
+Charges are driven by a configurable **penal code**. From a person's record an officer can:
+
+- **Apply charges** — pick one or more offences from the penal code, each with its reference and
+  severity. Charges attach to the subject's record.
+- **Issue a citation** — a lighter, fine-style entry (e.g. `Speeding 90/50`) for infractions that
+  don't warrant a full arrest.
+
+Both are written to the record and appear in the MDT query, the person card, and the CCTV scanner's
+MDT summary.
+
+### Penal code
+
+The penal code lives in the charges config, so you can tailor offences, categories and severities to
+your server's legal system. Each charge carries a title, category and reference used when it is
+applied.
 
 ## Where they show up
 
@@ -27,13 +62,10 @@ The step-by-step guides live in the User Guide:
 | Person card | Charges, citations, warrant status |
 | [CCTV scanner](/features/cctv) | BOLO ACTIVE / ACTIVE WARRANT flags + recent records |
 
-BOLOs are shared across the LAPD, LASD and Agency terminals — creating one anywhere is visible
-everywhere, including the LASD CAD.
-
 <Callout type="info">
   A person's **active warrant** also surfaces everywhere charges do, including a red **ACTIVE WARRANT**
   flag on the CCTV scan card. Any **on-duty unit** can set or clear a warrant straight from the person's
   record in every terminal (LAPD, LASD, Agency and the 9100-T) — the person can also set one on their
   own profile. Warrant changes are server-authoritative and written to the admin audit; supervisors see
-  every active warrant at a glance in the [Supervisor Panel](/configuration/supervisor).
+  every active warrant at a glance in the [Supervisor Panel](/features/supervisor).
 </Callout>

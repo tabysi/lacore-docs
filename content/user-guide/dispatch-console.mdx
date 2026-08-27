@@ -6,7 +6,7 @@ title: "Dispatch Console"
 
 A separate **full-screen CAD** for whoever is working **dispatch**. It's distinct from the in-car MDT and gives a live map of the area, every active incident, every on-duty unit, a chat channel between dispatch and units, and tools to manage zone boundaries that drive the region detection across the whole CAD.
 
-> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [Working with Incidents](/user-guide/mdt-incidents) · [Status labels](/user-guide/statuses)
+> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [Working with Incidents](/user-guide/mdt-incidents) · [Status labels](/support)
 
 ---
 
@@ -73,7 +73,7 @@ The console is **separate** from the MDT — when you open it, the MDT auto-clos
 
 | Element | Purpose |
 |---|---|
-| **DISPATCH CONSOLE** | Title — the region is detected automatically |
+| **DISPATCH CONSOLE** | Title (the old "LOS ANGELES COUNTY" tag is gone in 3.0.4 — region is detected automatically now) |
 | **Map Style dropdown** | Switch between **Atlas** (road map, default) · **Grid** (clean grid) · **Satellite** (real terrain). Live swap, no reload. The choice is remembered per client (`localStorage`). |
 | **⛬ Zones button** | Open the **Zone Editor** (per-zone region overrides) — see [Zone Editor](#-zone-editor) below |
 | **⚠ ATTENTION ALL UNITS** | Plays the alert tone (`3beep.ogg`) to **every on-duty LEO**, shows a "DISPATCH: Attention all units" notification, and logs the event |
@@ -99,7 +99,7 @@ A Leaflet map of the GTA world, fed by the **`lacore-maps`** resource (or your o
 | 🟣 `!` | Panic Button alert |
 | 🔵 `TS` | Traffic Stop |
 | ⚪ `INC` | Generic/manual incident |
-| 🚓 `<callsign>` | A live on-duty unit (coloured dot by status) |
+| 🚓 `<callsign>` | A live on-duty unit (colored dot by status) |
 
 Click a marker to **select** that incident or unit on the right sidebar.
 
@@ -175,7 +175,7 @@ Every unit currently on duty, **grouped by role**:
 - **LAW ENFORCEMENT (n)** — all LEO units with the count
 - **FIRE / EMS (n)** — Fire/EMS units (and Coroner if present)
 
-Each row shows the **callsign**, current **status** (coloured badge), and **incident number** if attached.
+Each row shows the **callsign**, current **status** (colored badge), and **incident number** if attached.
 
 **Partners** sharing a callsign (e.g. two officers in `1A-12`) are merged into one row with a `(2)` badge — expand it with the **▸ / ▾** arrow to see who's in the unit.
 
@@ -232,7 +232,7 @@ The same chat is also visible in the **Dispatch** tab of the MDT — units talk 
 
 ## ⛬ Zone Editor
 
-Each map area belongs to a **region** (e.g. "Los Angeles", "Compton", "Thousand Oaks"). By default the framework auto-detects the region from the GTA zone code; the **Zone Editor** lets you **override** that mapping per zone.
+Each map area belongs to a **region** (e.g. "Los Angeles", "Compton", "San Tierra"). By default the framework auto-detects the region from the GTA zone code; the **Zone Editor** lets you **override** that mapping per zone.
 
 Open it with the **⛬ Zones** button in the top bar. It's also accessible from the MDT's **Dispatch** tab.
 
@@ -312,7 +312,7 @@ Instead of (or alongside) the per-zone overrides above, you can **draw your own 
 - Synced to every client; new spawns / runs use the new polygons immediately
 - **Limits:** min 3 points, max 60 points per polygon (sanity cap)
 
-### Region colours
+### Region colors
 
 Each region has a fixed color so polygons (and their labels) are visually distinct:
 
@@ -320,6 +320,7 @@ Each region has a fixed color so polygons (and their labels) are visually distin
 |---|---|
 | Los Angeles | Light gray |
 | Thousand Oaks | Pink |
+| San Tierra | Yellow |
 | West Hollywood | Red |
 | Beverly Hills | Blue |
 | Santa Monica | White |
@@ -357,7 +358,7 @@ In `configs/config.lua`:
 | `DispatchMapStyle` | Default map style (`"styleAtlas"`, `"styleGrid"`, `"styleSatelite"`) — overridable per client via the dropdown |
 | `DispatchTileBase` | Empty = use the `lacore-maps` resource. Set to a full URL (with trailing slash) to serve tiles from your own CDN (e.g. `"https://maps.yourdomain.com/mdt/map/"`) |
 | `CallRetentionDays` | How long resolved incidents stay in the store (default: 7) |
-| `ShowIncidentBlips` | Whether on-duty units see GTA map blips for active incidents (default: `false`) |
+| `ShowIncidentBlips` | Whether on-duty units see GTA map blips for active incidents (default: `true`) |
 
 ---
 
@@ -385,5 +386,5 @@ In `configs/config.lua`:
 
 - [Using the MDT](/user-guide/mdt) — the in-car CAD
 - [Working with Incidents](/user-guide/mdt-incidents) — what a unit does after being assigned
-- [Status labels](/user-guide/statuses) — what the colour-coded badges across the CAD mean
+- [Status labels](/support) — what the colour-coded badges across the CAD mean
 

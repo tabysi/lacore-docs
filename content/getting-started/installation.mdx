@@ -18,10 +18,6 @@ This guide takes a fresh FiveM server to a running LACORE install.
 - A working **FiveM server** (txAdmin or manual).
 - **[oxmysql](https://github.com/overextended/oxmysql)** installed and connected to a MySQL /
   MariaDB database.
-- **[pma-voice](https://github.com/AvarianKnight/pma-voice)** — required for radio, 911/311 voice
-  calls and the phone.
-- **spawnmanager** — ships with the default FiveM server data (`[managers]`); just make sure it is
-  ensured.
 - *(Optional)* **[DPEmotes](https://github.com/andristum/dpemotes)** or
   **[RPEmotes-Reborn](https://github.com/alberttheprince/rpemotes-reborn)** for the civilian emote
   bridge.
@@ -41,12 +37,10 @@ resources/lacore
 
 ### Install dependencies
 
-All three hard dependencies must be started **before** LACORE:
+Make sure oxmysql is present and started **before** LACORE.
 
 ```ini
 ensure oxmysql
-ensure pma-voice
-ensure spawnmanager
 ```
 
 ### Configure the database
@@ -70,25 +64,10 @@ you are upgrading from `pvp-corev3`, it also migrates the old `pvp_*` tables —
 Copy the block from `server.cfg.example` into your `server.cfg` and fill in your values (Discord
 token, webhooks, owner ID). See [Configuration](/configuration) for the full reference.
 
-### Add your license key
-
-Generate a license key in the [Customer Portal](/customer-portal/license-keys) and add it to your
-`server.cfg`:
-
-```ini
-setr lacore_license_key "LACORE-XXXX-XXXX-XXXX"
-```
-
-The key links your server to your dashboard account. It is required for **remote config**, the
-**playerbase upload**, the **hosted web dispatcher**, **dashboard bug reports** and paid add-ons
-like **Pennsylvania CAD**. The core CAD runs without it — but set it now so everything works later.
-
 ### Start the resource
 
 ```ini
 ensure oxmysql
-ensure pma-voice
-ensure spawnmanager
 ensure lacore-maps   # optional map tiles
 ensure lacore
 ```
@@ -127,7 +106,7 @@ command suite lets you re-check anytime (console, or in-game as staff):
 
 | Symptom | Cause / fix |
 | --- | --- |
-| Stuck at **"Checking bans..."** on connect | oxmysql isn't reachable or the DB connection string is wrong — check the server console for oxmysql errors. |
+| Stuck at **"Checking bans..."** on connect | An old bug where DB schema init hung. Fixed in current builds; ensure you're up to date and oxmysql is reachable. |
 | Commands do nothing | You're likely not on a duty job/department — LEO tools are gated server-side. Check `/lacore status`. |
 | Emotes don't play | Install DPEmotes or RPEmotes; the radial bridges to whichever is present. |
 | Map markers offset | Tile calibration (`web/src/lib/mapproj.js`); needs an in-game reference point to tune. |

@@ -8,14 +8,6 @@ import { Callout } from 'nextra/components'
 
 The central gameplay/world config. Escrow-ignored — edit freely.
 
-<Callout type="info">
-  Since 3.4.4 `config.lua` holds only the core settings below. The data tables it used to carry
-  moved into their own files (backward compatible — an old `config.lua` that still defines them
-  wins): `agencies` → `cfg-agencies-sh.lua`, `BusStops`/`BusRoutes` → `cfg-busroutes-cl.lua`,
-  `textEntries` → `cfg-gametext-cl.lua`, `customIcon` → `cfg-phoneicons-cl.lua`,
-  `indestructibleProps` → `cfg-props-cl.lua`, `initialAOPs` → `cfg-server-sv.lua`.
-</Callout>
-
 ## General settings
 
 | Setting | Default | Description |
@@ -23,7 +15,7 @@ The central gameplay/world config. Escrow-ignored — edit freely.
 | `trainsEnabled` | `true` | Enable metro trains (only metros by default — others can bug out). |
 | `ThirdEye` | `true` | Enable ox_target player interactions (cuff / drag / put-in-vehicle / medic / revive / carry …). Requires `ox_target`. Chat commands (`/release`, `/uncuff` …) stay available regardless. |
 | `GameMinuteSeconds` | `8` | Real seconds per in-game minute. `8` → a full day ≈ 3.2 real hours. `60` = real time (1:1). |
-| `SyncGameTime` | `false` | `true` = LACORE owns the world clock so it advances smoothly for everyone and `/time <hh> <mm>` works. Ships `false` so a time/weather resource you already run is never fought over the clock — turn it on if LACORE should control time. |
+| `SyncGameTime` | `true` | Let LACORE own the world clock so it advances smoothly for everyone and `/time <hh> <mm>` works. Set `false` only if **another** resource controls the time — then LACORE won't touch it. |
 | `Language` | `"en"` | Locale for all server/HUD Lua text. Supported: `en`, `de`, `ru`. |
 | `MdtLanguage` | `""` | Separate language for the NUI (MDT / Dispatch / Profile). Empty = follow `Language`. |
 | `UseDatabase` | `true` | Mirror every persistent store to MySQL (oxmysql). `false` = local JSON only. |
@@ -54,20 +46,20 @@ CallCenter = {
   with other pma-voice usage.
 </Callout>
 
-## Agencies (`cfg-agencies-sh.lua`)
+## Agencies (departments / factions)
 
-`agencies` is the master list of departments used across the CAD/MDT — since 3.4.4 in its own
-file, `configs/cfg-agencies-sh.lua`. Each entry defines the department shown on duty and its
-loadout:
+`agencies` is the master list of departments used across the CAD/MDT — every faction on your server
+is one entry in this table. Players go on duty with `/onduty <short> <callsign>`, which sets their
+department, hands out the loadout and decides which terminal `/mdt` opens.
 
 ```lua
 agencies = {
   {
-    type = "Law Enforcement",           -- duty-window group (see below)
+    type  = "Law Enforcement",
     short = "LAPD",
-    cad = "lapd",                       -- which CAD/MDT /mdt opens (see below)
-    long = "Los Angeles Police Department",
+    long  = "Los Angeles Police Department",
     motto = "To Protect and Serve",
+    cad   = "lapd",                     -- which CAD design this agency opens
     equipment = {
       { weapon = "WEAPON_SERVICEPISTOL", components = { "COMPONENT_AT_PI_FLSH" } },
       { weapon = "WEAPON_TASER7", tint = 1 },
@@ -80,52 +72,85 @@ agencies = {
 }
 ```
 
-The `type` field controls which terminal a member gets and how dispatch treats them:
+### Fields
 
-| `type` | Terminal / role |
+| Field | Required | Description |
+| --- | --- | --- |
+| `type` | yes | The kind of department — see the table below. Decides the role, not the look. |
+| `short` | yes | What players type: `/onduty LAPD 1A-12`. Also what the CAD shows as the department. |
+| `long` | yes | Full name, shown in the MDT header and in the on-duty message. |
+| `motto` | no | One line under the name in the MDT. `""` for none. |
+| `cad` | no | **Which CAD/MDT design this agency opens** — see [Choosing the CAD design](#choosing-the-cad-design). |
+| `equipment` | no | Loadout handed out on duty. Supports `components`, `tint`, and `rack` (weapon goes in the vehicle rack instead of the officer's hands). |
+| `wallpaper` | no | `{ in-car screen, MDT background }` — texture names or an RGB triple. |
+| `primary` / `secondary` | no | MDT accent colours as `{ r, g, b }`. |
+
+The `type` field controls the role a member gets and how dispatch treats them:
+
+| `type` | Role |
 | --- | --- |
-| `Law Enforcement` | LAPD / LASD / Agency MDT (by `short`/dept name). |
-| `Fire/EMS` | EMS / Fire CAD. |
+| `Law Enforcement` | Full LEO: CAD, calls, units, queries, charges. |
+| `Fire/EMS` | Fire / medical units in the EMS CAD. |
 | `Coroner` | Coroner tools. |
-| `Tow Truck` | Tow contacts. |
+| `Tow Truck` | Tow contacts (the only type any player may go on duty as without membership). |
 | `Private Security` | CCTV `security` access + limited tools. |
 | `Animal Control` / `Public Works` | Utility departments. |
 
-### `cad` — the terminal a department opens (since 3.4.9.2)
+### Choosing the CAD design
 
-Without a `cad` field LACORE guesses the terminal from the department name: a `short` containing
-`lapd` gets the LACORE Mobile Client, `lasd`/`sheriff`/`bcso` the LASD CAD/PCMS, any other Law
-Enforcement department the Agency MDT, and Fire/EMS/Coroner the EMS CAD. Set `cad` on an entry to
-decide it yourself — the explicit value always wins over the guess **and** over the `type`:
+LACORE ships several CAD/MDT terminals. They are **re-skins of one system**: same calls, same units,
+same incidents, same dispatch. Only the look differs — so `cad` is purely which terminal your
+department sits in front of.
 
 | `cad` | Terminal |
 | --- | --- |
-| `"lapd"` | LACORE Mobile Client (LAPD PremierOne look) |
-| `"lasd"` | LASD CAD/PCMS terminal |
-| `"agency"` | Agency MDT (CHP style) — the all-round LEO terminal |
-| `"ems"` | EMS / Fire CAD |
-| `"90s"` | 9100-T retro terminal |
-| `"penn"` | Pennsylvania CAD (add-on; falls back to the Agency MDT when the add-on is not unlocked) |
-| `"none"` | this department gets no terminal at all |
+| `"lapd"` | **LACORE Mobile Client** — the LAPD PremierOne terminal (green-on-navy in-car look). |
+| `"lasd"` | **CAD / PCMS** — the Sheriff terminal (amber/teal). |
+| `"agency"` | **Agency MDT** — the CHP-style dark blue terminal. |
+| `"ems"` | **EMS / Fire CAD**. |
+| `"retro"` | **9100-T** — the green-phosphor 90s terminal. |
+| `"penn"` | **Pennsylvania CAD** — retro county terminal (add-on, see [Pennsylvania CAD](/configuration/cad-terminals)). |
 
-Aliases are accepted (`"pcms"` → `lasd`, `"chp"` → `agency`, `"fire"` → `ems`, `"retro"` → `90s`,
-`"off"` → `none`, …). An unknown value prints a console warning and falls back to the automatic
-routing, as does leaving the field out.
+<Callout type="info">
+  `cad` is optional. Leave it out and LACORE guesses from the department name, exactly as it always
+  has — see [Terminal routing](/configuration/cad-terminals) for the full order.
+</Callout>
 
-`equipment` entries support `components`, `tint`, and `rack` (weapon on a station rack). `wallpaper`
-is the MDT background (texture names or an RGB triple).
+So a new faction picks its terminal in one line:
 
-## The other data lists (own files since 3.4.4)
+```lua
+{
+  type  = "Law Enforcement",
+  short = "VSPD",
+  long  = "Vespucci Police Department",
+  motto = "",
+  cad   = "lasd",          -- open the Sheriff CAD, despite the name saying "PD"
+  equipment = { { weapon = "WEAPON_SERVICEPISTOL" } },
+}
+```
 
-| List | File | Purpose |
-| --- | --- | --- |
-| `textEntries` | `cfg-gametext-cl.lua` | Custom GTA text labels (advertisement titles, session messages, restriction notices). |
-| `customIcon` | `cfg-phoneicons-cl.lua` | Phone/contact icons (name → Discord-style handle + GTA icon). |
-| `BusStops` / `BusRoutes` | `cfg-busroutes-cl.lua` | Public transit stops and routes. |
-| `initialAOPs` | `cfg-server-sv.lua` | Starting Areas of Patrol for the AOP voting system. |
-| `indestructibleProps` | `cfg-props-cl.lua` | Props made indestructible (traffic signs, hydrants, streetlights …). |
+<Callout type="info">
+  Name-based routing is why the three shipped sheriff's offices — **VCSO**, **RSO** and **SBCSD** —
+  used to open the *Agency* MDT: their `short` says nothing about a terminal. They now ship with
+  `cad = "lasd"` and open the Sheriff CAD. Remove the line to put one of them back.
+</Callout>
 
-`RegisterPrices` and `SpeedLimits` were removed in 3.4.4 — nothing in the code ever read them.
+A terminal that is switched off in [`cfg-features-sh.lua`](/configuration/features), or an add-on that
+is not unlocked on your server, is skipped and the name guess applies instead — so a department never
+ends up with no terminal at all. A `cad` value that isn't in the table above is reported once in the
+server console and then ignored.
+
+## Other lists in `config.lua`
+
+| List | Purpose |
+| --- | --- |
+| `textEntries` | Custom GTA text labels (advertisement titles, session messages, restriction notices). |
+| `customIcon` | Phone/contact icons (name → Discord-style handle + GTA icon). |
+| `BusStops` / `BusRoutes` | Public transit stops and routes. |
+| `RegisterPrices` | Store register item prices. |
+| `initialAOPs` | Starting Areas of Patrol for the AOP voting system. |
+| `indestructibleProps` | Props made indestructible (traffic signs, hydrants, streetlights …). |
+| `SpeedLimits` | Per-road speed limits (with directional overrides). |
 
 <Callout type="info">
   Coordinates in these lists are placeholders tuned for a specific map — adjust them to your server.

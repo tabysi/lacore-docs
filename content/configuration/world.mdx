@@ -40,7 +40,7 @@ Named world areas/regions used for location display (street/area names). `AreaDe
 
 ```lua
 AreaDefinitions = {
-    { area = "Sandy Shores", region = "Los Angeles", configpoints = { 1, 2, 3, 4 } },
+    { area = "Sandy Shores", region = "San Tierra", configpoints = { 1, 2, 3, 4 } },
 }
 
 AreaPoints = {
@@ -49,42 +49,6 @@ AreaPoints = {
     -- …
 }
 ```
-
-## Regions & districts — `configs/cfg-regions-sh.lua`
-
-Which regions exist, what colour each one has on the dispatch map, and which GTA zone belongs to
-which region. Every incident, PLD readout and map polygon carries the region decided here.
-
-```lua
-Regions = {
-    default = "Los Angeles",     -- anything not mapped below falls here
-    mapStyle = "styleAtlas",     -- styleAtlas | styleGrid | styleSatelite
-
-    list = {
-        { name = "Los Angeles",   color = "#cfd6e0" },
-        { name = "Thousand Oaks", color = "#ff2d8e" },
-        -- …
-    },
-
-    zones = {                    -- GTA zone code -> region
-        PALETO = "Thousand Oaks",
-        WVINE  = "West Hollywood",
-        -- …
-    },
-
-    calib = { scale = 0.68, ox = 3710, oy = 5550 },  -- game coords -> map tile pixels
-}
-```
-
-Run **`/citydebug`** in game to see the raw zone code, the readable zone name and the detected region
-live — that code is the key you put in `zones`.
-
-<Callout type="warning">
-A server that has already run keeps its district list and per-zone overrides in
-`data/map_config.json` and `data/zone_regions.json`, and **those win over this file**. Change them
-live in the dispatch console's Zone Editor, or stop the server and delete both files to fall back to
-the config.
-</Callout>
 
 ## Weapon-on-back — `configs/cfg-weapons-cl.lua`
 

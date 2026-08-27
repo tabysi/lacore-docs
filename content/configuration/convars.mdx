@@ -84,18 +84,10 @@ set lacore_bb_webhook "https://discord.com/api/webhooks/xxx/yyy"   # default / f
 # set lacore_bb_webhook_mdt        ""
 ```
 
-### Web dispatcher (optional)
+### External web dispatcher (optional)
 
-Off by default — the shift's call data leaves your server only once you turn it on. With a licence
-key set, this is all the hosted portal needs; open it from **Dashboard → Servers → DISPATCH**.
+Only needed when you deploy the `bridge/` on your own VPS. Leave empty to disable the outbound push.
 See [Web Dispatcher](/features/webdispatch).
-
-```ini
-setr lacore_webdispatch "false"
-```
-
-Running your own bridge instead? Leave the two below empty to disable that outbound push. Both paths
-may run at once.
 
 ```ini
 set lacore_bridge_url   ""

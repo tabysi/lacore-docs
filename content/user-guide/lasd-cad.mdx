@@ -4,11 +4,7 @@ title: "LASD CAD / PCMS"
 
 # LASD CAD / PCMS
 
-The **CAD/PCMS terminal** is the in-car computer for **Sheriff departments** (LASD / BCSO), modeled
-on the real LASD Toughbook **PCMS** (amber text, teal status keys). This page also covers its
-**sibling skins** — every non-LAPD department gets a terminal in this family (Agency MDT, EMS CAD,
-9100-T; see [Terminal skins](#-terminal-skins-by-department) below), all sharing the same
-incidents, units and records as the LAPD MDT and the dispatch console.
+The **CAD/PCMS terminal** is the in-car computer for **every agency except LAPD** — Sheriff (LASD), Fire, EMS, Coroner, and any other department your server runs. It's modeled on the real LASD Toughbook **PCMS** (amber text, teal status keys), and shares the same incidents, units and records as the LAPD MDT and the dispatch console.
 
 > 📑 **Related:** [Using the MDT](/user-guide/mdt) · [Dispatch console](/user-guide/dispatch-console) · [Citations & Charges](/user-guide/citations-charges)
 
@@ -19,13 +15,11 @@ incidents, units and records as the LAPD MDT and the dispatch console.
 Go on duty with a non-LAPD department, then open your terminal the same way as the MDT:
 
 ```
-/mdt        # opens the terminal your department routes to (see below)
+/mdt        # opens the CAD/PCMS if your dept isn't LAPD
 /lasd       # always opens the CAD/PCMS
 ```
 
-`/mdt` picks the terminal by department: **LAPD** → [LACORE Mobile Client](/user-guide/mdt),
-**LASD / Sheriff / BCSO** → this CAD/PCMS, **Fire/EMS/Coroner** → the EMS CAD, and every other
-law-enforcement agency → the Agency (CHP-style) MDT.
+LAPD officers get the [LACORE Mobile Client](/user-guide/mdt) instead; everyone else gets this terminal.
 
 ![The LASD CAD / PCMS terminal](./images/lasd-cad-overview.png)
 

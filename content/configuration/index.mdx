@@ -23,37 +23,36 @@ LACORE is configured in three layers:
 ## Config file map
 
 Every config file, what it controls, and where it's documented. Files marked *(in-file)* are
-self-documented by the comment header at the top of the file. The same map also ships with the
-resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
+self-documented by the comment header at the top of the file.
 
 ### Core & world
 
 | File | Scope | Controls |
 | --- | --- | --- |
-| `config.lua` | shared | [Main config](/configuration/main) — general settings, call center, time (`SyncGameTime`), vehicles (since 3.4.4 the big data tables live in their own files below) |
-| `configs/cfg-agencies-sh.lua` | shared | *(in-file)* — every department the duty window and CAD/MDT know: tag, name, loadout, wallpaper |
-| `configs/cfg-regions-sh.lua` | shared | [World, blips & props](/configuration/world) — dispatch districts: regions, map colours, GTA-zone mapping |
-| `configs/cfg-gametext-cl.lua` | client | *(in-file)* — GTA text overrides: key hints, session/AOP notices, member-restriction messages |
-| `configs/cfg-busroutes-cl.lua` | client | *(in-file)* — public-transport bus stops + the routes chaining them |
+| `config.lua` | shared | [Main config](/configuration/main) — agencies, call center, time (`SyncGameTime`), transit, AOPs |
 | `configs/cfg-features-sh.lua` | shared | [Feature Toggles](/configuration/features) — enable/disable any component (e.g. run only the MDT/CAD) |
-| `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, agency whitelist, vehicle-spawner permission, webhooks |
+| `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, webhooks |
 | `configs/cfg-branding-sh.lua` | shared | [Branding & Backup](/configuration/branding) — your community/server name everywhere |
+| `configs/cfg-loadingscreen-sh.lua` | shared | [Loading Screen](/configuration/loading-screen) — which of the two designs runs, your artwork, tips, rules and music |
 | `configs/cfg-notify-sh.lua` | shared | [Notifications](/configuration/notifications) — LACORE / native GTA / custom notify resource |
-| `configs/cfg-hud-sh.lua` | shared | *(in-file)* — HUD master switch + per-element toggles (PLD, vehicle, player list, nameplates, MDT status/alerts) + `playerlistStyle` (`"duty"` / `"minimal"` / `"bar"`) + `settingsCommand` |
+| `configs/cfg-hud-sh.lua` | shared | [HUD & player list](/configuration/hud) — HUD master switch, per-element toggles, `playerlistStyle` (`"duty"` / `"minimal"`), `settingsCommand` |
 | `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) — map blips |
 | `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) — area labels / zones |
 | `configs/cfg-spawns-sh.lua` | shared | [World, blips & props](/configuration/world) — map-based spawn picker (capture points with `/spawnpoint`) |
-| `json/emojis.json` | server | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat (moved out of `configs/` in 3.4.3) |
+| `configs/cfg-emojis-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat |
 | `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
-| `configs/cfg-report-sh.lua` | shared | [Bug Reports](/user-guide/bug-reports) — `/lacorereport`: command name, cooldown, max length, categories |
 
 ### Law enforcement & CAD
 
 | File | Scope | Controls |
 | --- | --- | --- |
-| `configs/cfg-mdt-sh.lua` | shared | *(in-file)* — MDT options (e.g. only open the MDT while in a vehicle) |
-| `configs/cfg-mdt-labels-sh.lua` | shared | [Localisation](/configuration/localisation) — whitelabel: rename any MDT/CAD label |
-| `configs/cfg-penn-sh.lua` | shared | [Pennsylvania CAD](/user-guide/pennsylvania-cad) — department tags, call types, dispositions (paid add-on) |
+| `configs/cfg-mdt-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — MDT options (vehicle-only, close on exit, query broadcast) |
+| `configs/cfg-penn-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — Pennsylvania CAD: dept tags, call types, dispositions |
+| `configs/cfg-vehiclescreen-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — the CAD on the vehicle dashboard |
+| `configs/cfg-mdt-labels-sh.lua` | shared | [MDT & Dispatch](/features/mdt-and-dispatch) — whitelabel: rename any MDT/CAD label |
+| `configs/cfg-supervisor-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — who counts as a supervisor |
+| `configs/cfg-cases-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — case types, narrative sections, roles, dispositions |
+| `configs/cfg-personnel-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — write access, entry types, certifications |
 | `configs/cfg-licenses-sh.lua` | shared | [Penal code & evidence](/configuration/law-enforcement) — import ESX licences into the MDT slots |
 | `configs/cfg-fingerprint-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — mobile fingerprint ID scanner |
 | `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
@@ -64,11 +63,6 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-impound-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — impound lot + fees |
 | `configs/cfg-k9-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — K9 unit behaviour |
 | `configs/cfg-stt-sh.lua` | shared | [Radio STT](/features/radio-stt) — offline speech-to-text (experimental, off by default) |
-| `configs/cfg-supervisor-sh.lua` | shared | [Supervisor panel](/configuration/supervisor) — `/supervisor`: who counts as a supervisor (job grade or allowlist), panel options |
-| `configs/cfg-cases-sh.lua` | shared | [Supervisor panel](/configuration/supervisor) — case files: number prefix, case types, narrative sections |
-| `configs/cfg-personnel-sh.lua` | shared | [Supervisor panel](/configuration/supervisor) — personnel files: the higher write bar (`lacore.personnel.write` or job grade), entry types |
-| `configs/cfg-vehiclescreen-sh.lua` | shared | [In-Car Screen](/user-guide/in-car-screen) — per-model screen setup, audience, `mdt`/`incar` view, texture size, zoom, brightness, passengers |
-| `configs/cfg-cuffs-cl.lua` | client | *(in-file)* — which EUP accessory component a cuffed suspect wears |
 
 ### Player, civilian & phone
 
@@ -76,7 +70,6 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | --- | --- | --- |
 | `configs/cfg-phone-sh.lua` | shared | [Phone](/configuration/phone) — NUI phone: apps, ringtones, directory, prop hold |
 | `configs/cfg-retro-sh.lua` | shared | [Phone](/configuration/phone) — retro / 90s phone skin (year, model, prop, carrier) |
-| `configs/cfg-phoneicons-cl.lua` | client | *(in-file)* — contact/company → icon texture for the legacy phone and Bleeter |
 | `configs/cfg-vehicles-sh.lua` | shared | [Registering a vehicle](/user-guide/civilian-vehicles) — plate formatting, insured-by-default, `/vreg`-or-stolen window |
 | `configs/cfg-profile-sh.lua` | shared | [Profile & achievements](/configuration/profile) — the `/profile` UI |
 | `configs/cfg-achievements-sh.lua` | shared | [Profile & achievements](/configuration/profile) — XP / easter eggs |
@@ -84,8 +77,6 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-turf-sh.lua` | shared | [Civilian & emotes](/configuration/civilian) — turf / gang war |
 | `configs/cfg-props-cl.lua` | client | [Civilian & emotes](/configuration/civilian) — placeable props |
 | `configs/cfg-weapons-cl.lua` | client | [World, blips & props](/configuration/world) — member-only weapons |
-| `configs/cfg-replay-sh.lua` | shared | [Replay & Director's Cut](/user-guide/replay) — sampling, storage quotas, colour grades, depth of field (**ships off**) |
-| `configs/cfg-deathsync-sh.lua` | shared | Death Sync — how far and how hard a corpse is corrected on other screens; switch the pose and position fixes off separately if you run your own death script |
 
 ### Integrations & security
 
@@ -100,7 +91,9 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-remoteconfig-sh.lua` | server | [Anticheat & security](/configuration/security) — dashboard remote-config consent gate |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
 | `configs/cfg-presence-sh.lua` | shared | [Discord & Duty](/configuration/discord) — Discord Rich Presence |
-| `configs/cfg-library-sh.lua` | shared | *(in-file)* — model library: where `/modelcapture` screenshots are uploaded. Empty = LACORE hosts them for you; set `uploadUrl` to keep them on your own infrastructure. **Not** remotely editable |
+| `configs/cfg-report-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — the `/lacorereport` bug form |
+| `configs/cfg-library-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — model library uploads |
+| `configs/cfg-replay-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — replay recording, quotas, colour grades |
 
 ## Start here
 
@@ -115,7 +108,11 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 
 ## Localisation
 
-All user-facing strings are localised (`en` / `de` / `ru`). The active language is `Language` in
-`config.lua`; the MDT/NUI can use a separate one via `MdtLanguage`. Editing strings, adding a
-language and the whitelabel system are covered on the
-[Localisation page](/configuration/localisation).
+All user-facing strings are localised:
+
+- **Lua** (server/client): `T("key")` → `lang/en.lua` (+ `de.lua`, `ru.lua`).
+- **NUI**: `t("key")` → `lang/en.json` (+ `de.json`, `ru.json`).
+
+The active language is set by `Language` in `config.lua`; the MDT/NUI can use a separate language via
+`MdtLanguage`. To add a language, copy the `en` files, translate, and register the code in
+`configs/locale-sh.lua`.

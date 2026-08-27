@@ -39,34 +39,6 @@ PhoneCfg.apps = {
 }
 ```
 
-## Emergency numbers (911 / 311)
-
-Dialling one of these on the keypad does **not** look for a player who owns that number — the call
-goes straight into the [dispatcher call queue](/user-guide/dispatch-console) as a real 911/311 call,
-with the caller's location attached. The key is what is dialled, the value is the call type it
-becomes:
-
-```lua
-PhoneCfg.emergencyNumbers = {
-  ["911"] = "911",   -- emergency
-  ["311"] = "311",   -- non-emergency
-}
-```
-
-- Only `"911"` and `"311"` are valid **values** — they are the two call types the CAD knows.
-- The **key** is free: add `["112"] = "911"` or `["999"] = "911"` if your community dials those.
-- Numbers are matched on digits only, so `9-1-1` and `911` are the same number.
-- Remove an entry and that number goes back to being an ordinary player call.
-
-This works on the modern phone and on the retro brick — on the brick the keypad is the only way to
-reach dispatch, since it has no Emergency app.
-
-<Callout type="info">
-  If the call centre is switched off (`CallCenter.Enabled = false` in `configs/config.lua`) or the
-  whole CAD is gated out (`Features.cad`), the phone reports the call as failed straight away instead
-  of ringing at a queue nobody answers.
-</Callout>
-
 ## Retro / 90s phone — `configs/cfg-retro-sh.lua`
 
 Turning retro on swaps the modern NUI phone for a **1990s brick-phone skin** (green LCD, keypad, T9) and

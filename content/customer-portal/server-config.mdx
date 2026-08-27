@@ -6,77 +6,31 @@ import { Callout } from 'nextra/components'
 
 # Server config
 
-Change LACORE's settings from **Dashboard → Config** — no file edits, no re-upload. Your servers
-pull the changes by [license key](/customer-portal/license-keys).
+Change LACORE's settings from **Dashboard → Server config** — no file edits, no re-upload. Your servers
+pull the changes by [license key](/customer-portal/license-keys) and apply them automatically.
 
-## The override model — dashboard vs. local file
+## How it applies
 
-The dashboard does **not** replace your `configs/*.lua`. It layers on top of them, one setting at a
-time, and every field tells you who owns it:
+- **Live settings** (e.g. branding) apply within about **10 minutes**.
+- **Restart settings** (tagged **⟳ restart** — feature toggles, HUD, etc.) apply on the server's **next
+  restart**.
 
-| Badge | Meaning |
-|---|---|
-| **LOCAL FILE** | Untouched — your `configs/*.lua` decides this setting. |
-| **DASHBOARD ✕** | Managed from here; the dashboard value wins. Click the ✕ to hand it back to the local file. |
-| **INHERITED** | You're editing one server, but this value comes from your account-wide default. |
+The editor is organised into tabs (**General · Features · HUD & Phone · Modules**), every setting has a
+plain-English explanation, and a search box spans all tabs. Your server also reports its **current
+values** back, so you can see what's actually running and adopt it with one click.
 
-Only settings you actually manage are sent to your servers — everything else keeps working exactly
-as the files on your box say. **RELEASE ALL TO LOCAL** hands every setting back at once (then hit
-Save).
+## Templates & revisions
 
-## Per-server or account-wide
+- **Templates** — one-click starting points (Full RP · Police-CAD-only · Lightweight).
+- **Revisions** — every save is snapshotted; restore any of the **last 5**.
 
-A scope picker at the top switches between **All servers** (your account default) and a single
-server. A per-server override layers on top of the account default. A server can only be targeted
-individually once it has reported its Cfx server key.
+## Data lists
 
-## The editor
-
-Six tabs — **General · Features · HUD & Phone · Modules · Integrations · Sensitive** — with a search
-box that spans all of them. Settings are real controls, not text boxes: toggles, sliders, colour
-swatches, keybinds, searchable vehicle/ped/prop/weapon pickers and coordinate fields.
-
-Your server also **reports what it currently runs**, so the page can show you where reality and the
-form disagree: a bar at the top says how many settings differ, **SHOW DIFF** lists them side by
-side, and **LOAD CURRENT VALUES** adopts the server's values into the form.
-
-## Sensitive settings & the consent gate
-
-Three categories are locked by default and can only be managed remotely if **you** allow it on your
-own box:
-
-| Category | Covers |
-|---|---|
-| `destinations` | Where data is sent — upload targets, webhook URLs. |
-| `anticheat` | Anti-cheat thresholds and actions. |
-| `roles` | The Discord roles that grant staff access. |
-
-Locked fields show a 🔒 and stay ignored by your server until you set
-`RemoteConfig.allowSensitive = true` plus the individual category in
-[`configs/cfg-remoteconfig-sh.lua`](/configuration/security) and restart. The gate lives on your server on purpose — the dashboard can never open it for you.
-
-## How changes reach your server
-
-Your server **pulls**; nothing is pushed to it. It asks about every **10 minutes** (starting ~20
-seconds after boot):
-
-- **Live settings** apply on that poll — within ~10 minutes.
-- **Restart settings** (marked ⟳) are read at load, so they apply on the **next restart**.
-
-The last applied set is cached to disk, so load-time settings survive a restart even if the service
-is unreachable.
-
-## Templates, revisions & lists
-
-- **Templates** — one-click starting points: **Full RP suite**, **Police / CAD only**, **Lightweight**.
-- **Revisions** — every save is snapshotted; the **last 5** per scope can be restored into the form
-  (restoring then saving creates a new revision).
-- **Data lists** — edit LACORE's tables (penal code, blacklists …) as row editors, under Config.
-- **Model library** — every vehicle, ped, prop and weapon your servers actually have, inventoried
-  by `/modelscan`.
+Beyond single settings, **Data lists** (under Server config) let you edit LACORE's tables — like the
+**penal code** and **vehicle blacklists** — as simple editors.
 
 <Callout type="info">
-  **Fail-safe by design.** Only a vetted, typed set of settings can be changed remotely — never
-  files, never code, never secrets. If the service is unreachable or returns anything unexpected,
-  your server simply keeps its current configuration.
+  **Security by design.** Only a vetted, typed set of settings can be changed remotely — never files or
+  code, never secrets. If the service is ever unreachable, your server falls back to its shipped local
+  config.
 </Callout>

@@ -1,0 +1,66 @@
+---
+title: HUD & Player List
+---
+
+import { Callout } from 'nextra/components'
+
+# HUD & Player List — `configs/cfg-hud-sh.lua`
+
+Everything LACORE draws on screen outside a terminal: the location display, the vehicle HUD, the
+player list, nameplates and the duty-status badge.
+
+<Callout type="info">
+  A missing or unset key counts as **on**, so leaving this file alone keeps the HUD exactly as it was.
+  The table is called `HudCfg` (not `Hud`) so it cannot clash with a global of that name.
+</Callout>
+
+## Settings
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `enabled` | `true` | Master switch. `false` = the entire LACORE HUD is off and nothing below renders — what you want if you run another HUD. |
+| `pld` | `true` | **Player Location Display** — the street / AOP / alert / compass / time overlay at the bottom of the screen. Style is picked per player in the settings menu. |
+| `vehicle` | `true` | **Vehicle HUD** — speed, fuel, seatbelt and indicator icons while driving. (LACORE draws no gear indicator and has no manual transmission.) |
+| `playerlist` | `true` | The board the player-list key (default **I**) toggles. |
+| `playerlistStyle` | `"duty"` | Which player list to draw — see below. |
+| `nameplates` | `true` | Names drawn above nearby players, shown together with the player list. |
+| `mdtstatus` | `true` | The duty-status badge (CLEAR / CODE SIX / …) drawn bottom-right for Law Enforcement and Fire/EMS, also while the MDT is closed. |
+| `mdtalerts` | `true` | The bottom-right flashes for **panic button**, **crime broadcast** and unread MDT calls. Deliberately separate from `mdtstatus`: these are notifications, so switching off the status plate never hides a panic alert. |
+| `settingsCommand` | `"settings"` | The command that opens LACORE's settings menu (PLD theme/colour, HUD preferences). Rename it if another resource owns `/settings`; `false` registers no command. The menu stays bindable under **"LACORE: Open settings menu"** in FiveM's Key Bindings either way. |
+
+## Player list styles
+
+Both styles read the same data and answer the same key. Only the drawing differs.
+
+### `"duty"` — the duty board (default)
+
+Full screen. On-duty units grouped by department on the left with callsign and status, civilians as a
+dense roster on the right, area of play and server state in the header. Units are never paged — "who
+is on duty right now" is the question the board exists to answer, and an answer split across pages is
+not one. The civilians are the long tail, so that is where the page boundary sits.
+
+Built for roleplay servers whose players want to see who is on shift before they commit to a scene.
+
+### `"minimal"` — the compact card
+
+```lua
+HudCfg = {
+    playerlistStyle = "minimal",
+}
+```
+
+A small centred card: ID, name, ping, and a department + callsign + status for anyone on duty.
+Nothing else. The whole roster is one paged list — no split, no grouping.
+
+Pick this if the duty board is more than your server needs, or if you run mostly civilian roleplay
+where "who is on duty" is not the question.
+
+<Callout type="info">
+  Paging is on the **arrow keys** in both styles. The board takes no NUI focus on purpose — it is a
+  pure overlay, so the game keeps every other key while it is open.
+</Callout>
+
+An unknown value falls back to `"duty"` and says so once in the client console, so a typo doesn't
+look like the setting doing nothing.
+
+See the [player list user guide](/user-guide/playerlist) for what the board shows in play.

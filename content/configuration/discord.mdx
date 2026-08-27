@@ -19,36 +19,6 @@ See the [`lacore_devmode` convar](/configuration/convars#dev-mode). When on, it 
 bypasses **all** connect checks, and grants every player full staff/dev permissions. Never on in
 production.
 
-## External chat
-
-```lua
-ExternalChat = false
-```
-
-LACORE ships a lightweight OOC chat: it takes over the stock `chat` message, re-posts it as
-"OOC | Name", logs it to Discord and runs a name anti-spoof + slur filter. If you run a
-**third-party chat resource** (cc-chat / cc-rpchat, …), every line shows twice and their RP names
-can trip the anti-spoof kick — set `ExternalChat = true` so the other chat owns the display. The
-Discord OOC log and the slur filter stay active.
-
-## Entity lockdown (anti-cheat vs. NPC traffic)
-
-```lua
-EntityLockdown = "strict"
-```
-
-LACORE locks the default routing bucket so clients can't spawn arbitrary networked entities — a
-common cheat/griefing vector. The catch: ambient NPC traffic and pedestrians are **also**
-client-spawned, so a locked bucket means empty streets.
-
-| Value | Behaviour |
-| --- | --- |
-| `"strict"` *(default)* | Max protection, but **no** ambient NPC traffic / peds. |
-| `"inactive"` | Vanilla: NPC traffic + peds come back, but clients may spawn any entity again (other anti-cheat checks still run). |
-| `"relaxed"` | Middle ground; may or may not restore ambient traffic — test it on your build. |
-
-Want NPC cars back? Set `"inactive"`.
-
 ## Access control (whitelist & Discord on/off)
 
 Framework servers (ESX / QBCore / QBox) usually handle identity and permissions themselves and don't
@@ -56,9 +26,11 @@ need LACORE's Discord layer or its members-only whitelist. Switch either off her
 
 ```lua
 AccessControl = {
-    whitelist    = true,    -- members-only join gate (/wl). false = disabled entirely.
-    discordRoles = true,    -- require + read Discord roles and bridge them to ACE. false = off.
-    membership   = "auto",  -- who counts as a "member" for member-only perks. See below.
+    whitelist     = true,    -- members-only join gate (/wl). false = disabled entirely.
+    discordRoles  = true,    -- require + read Discord roles and bridge them to ACE. false = off.
+    membership    = "auto",  -- who counts as a "member" for member-only perks. See below.
+    minNameLength = 3,       -- shortest player name allowed at connect. 0 = no check.
+    maxNameLength = 20,      -- longest player name allowed at connect. 0 = no check.
 }
 ```
 
@@ -66,6 +38,16 @@ AccessControl = {
 | --- | --- |
 | `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans and the global-ban network still apply.** |
 | `discordRoles` | LACORE no longer requires Discord at connect (no “join our Discord” rejection), doesn't read Discord roles, and doesn't bridge them to ACE. Duty-role gating (`DutyRoles`) is skipped, and Staff/Dev powers come from **ACE / txAdmin** only. |
+
+### Player-name limits
+
+`minNameLength` and `maxNameLength` are enforced **at connect** — a name outside the range is rejected
+with "name too short" / "name too long". Set either to `0` to disable that check.
+
+<Callout type="info">
+  The defaults keep names RP-friendly. If players on a fresh or plug-and-play server are being turned
+  away, it is usually long Steam names hitting `maxNameLength = 20` — raise it.
+</Callout>
 
 ### Membership (member-only perks)
 
@@ -119,6 +101,7 @@ DiscordAuth = {
         LeadDeveloper = "1395534398299832431",
         LOA           = "1310081058762653696",
         LE            = "1285460493619953720",
+        leodoorkeys   = "1410047211722772633",
         -- Supporter / Donator tiers … (leave empty = "never present")
     },
 }
@@ -131,6 +114,27 @@ DiscordAuth = {
 
 Role names referenced elsewhere (profile badges, Big Brother access, duty whitelist) must match keys
 in this `roles` table.
+
+### The shipped role names
+
+| Role key | What it does |
+| --- | --- |
+| `Member` | Member-only perks — agency duty, member vehicles, board vote. See [Membership](#membership-member-only-perks). |
+| `Staff` | Staff powers, anti-cheat bypass, Big Brother access. |
+| `Dev` | Developer powers, same bypasses as `Staff`. |
+| `LOA` | **Rejects the connection.** While Discord auth is on, a player holding this role is turned away at connect with the "leave of absence" reason. |
+| `LE` | The default requirement for going on Law Enforcement duty (see [Duty whitelist](#duty-whitelist)). |
+| `SupporterSGT`, `SupporterIII1`, `SupporterIII`, `SupporterII`, `SupporterI` | Any one of them marks the player as a **supporter** — the role colour in the player list. Empty by default. |
+| `AssetDonatorIII`, `AssetDonatorII`, `AssetDonatorI` | Any one of them marks the player as a **donator**, likewise. Empty by default. |
+| `LeadDeveloper`, `leodoorkeys` | Mapped and fetched, but nothing in LACORE reads them — they are there for your own scripts and for the dashboard's remote config. |
+
+<Callout type="warning">
+  `LOA` is a **connect block**, not a badge. Give it to someone on leave and they cannot join until it
+  is taken away again. Leave the ID empty if you don't want that behaviour.
+</Callout>
+
+The IDs shipped in the file are from the developer's own guild — replace them with yours, or empty
+the ones you don't use. In `devmode` every flag above is granted to everyone.
 
 ## Duty whitelist
 
@@ -148,144 +152,6 @@ DutyRoles = {
 - An empty value (`""`) means no restriction — anyone may take that job.
 - Values are role names from `DiscordAuth.roles`.
 
-## Web dispatcher access
-
-Who may use the [hosted web dispatcher](/features/webdispatch) for **your** server:
-
-```lua
-WebDispatchAccess = {
-    dispatch = {},  -- e.g. { "Staff", "Dispatch" } — may act: status, assign, create, close
-    view     = {},  -- e.g. { "Member" }            — may watch, cannot act
-}
-```
-
-**Both lists empty = nobody but you** — that is the default on purpose. You (the license-key owner)
-and your dashboard team always have access without appearing here. Role **names** come from
-`DiscordAuth.roles`; the check runs on your server with your own bot token — the website only asks
-"may this Discord id dispatch?" and gets yes/no/read-only back.
-
-## Agency whitelist
-
-`DutyRoles` above gates the **job** ("Law Enforcement"). `DutyAccess` in `configs/cfg-server-sv.lua`
-gates the **agency** — the `short` of an entry in `configs/config.lua` `agencies` (`LAPD`, `LASD`,
-`CHP`, …). That matters because the agency is what decides the MDT portal a unit gets:
-
-| Agency (department) | Portal `/mdt` opens |
-| --- | --- |
-| `LAPD` | LAPD Mobile Client |
-| contains `LASD` / `Sheriff` / `BCSO` | LASD CAD/PCMS |
-| any other law-enforcement agency | Agency MDT (CHP style) |
-| Fire / EMS / Coroner | EMS CAD |
-
-A player who may not take an agency never gets its department — and without the department, `/mdt`
-never opens that agency's portal. There is no separate "portal permission" to keep in sync.
-
-An agency can require a **Discord role**, an **ACE permission**, or both. Holding **either one** is
-enough — they are alternatives, so you can move a department from one to the other without a flag day.
-
-```lua
-DutyAccess = {
-    enabled     = true,      -- ships false (no agency gate); set true to turn it on
-    bypassStaff = true,      -- let Staff/Dev take any agency; false = strict
-
-    agencies = {
-        LAPD = { role = "LAPD" },                           -- Discord role only
-        LASD = { ace  = "lacore.duty.lasd" },               -- ACE only
-        CHP  = { role = "CHP", ace = "lacore.duty.chp" },   -- either one is enough
-        NPS  = { role = { "NPS", "1285460493619953720" } }, -- several roles / raw role id
-        SAHP = "lacore.duty.sahp",                          -- short form for { ace = … }
-    },
-
-    fallback = "allow",      -- agencies with no entry: "allow" (default) or "deny"
-}
-```
-
-`role` and `ace` each take one string or a list, and any single entry in that list is enough.
-
-### Option A — Discord roles
-
-`role` is a key from the `DiscordAuth.roles` table above, the same place `DutyRoles` reads from. Add
-your department roles there and point the agency at them:
-
-```lua
-DiscordAuth = {
-    roles = {
-        LAPD = "1285460493619953721",
-        CHP  = "1285460493619953722",
-    },
-}
-```
-
-Nothing else to set up — no `server.cfg` lines, no ACE groups. A raw Discord role id also works
-directly as a `role` value if you would rather not register it.
-
-### Option B — ACE (vMenu-style servers)
-
-If your server already maps Discord roles to ACE groups — the usual vMenu setup — keep the principals
-you have and grant each one the LACORE ace once in `server.cfg`:
-
-```cfg
-add_ace group.lapd lacore.duty.lapd allow
-add_ace group.lasd lacore.duty.lasd allow
-add_ace group.chp  lacore.duty.chp  allow
-```
-
-<Callout type="info">
-  ACE checks ask about **ace objects**, not about groups, so `group.lapd` on its own is not something
-  LACORE can test for. The `add_ace` line above is what connects your existing group to the permission
-  LACORE asks about. Any resource that puts players into ACE groups works — vMenu's own role mapping,
-  a Discord→ACE bridge, or plain `add_principal` lines in your `server.cfg`.
-</Callout>
-
-### Behaviour
-
-- Checked **server-side** in `ondutyServer`, so a client cannot bypass it.
-- Not waived by the ESX/QBCore framework bridge: on a server that gates agencies, the gate is the last
-  word.
-- `devmode` bypasses everything, as everywhere else.
-- Civilian `/job` names are never gated — a strict `fallback = "deny"` cannot lock a mechanic out of
-  their own job.
-- Keys are matched case-insensitively, so `CHP` and `chp` behave the same.
-- A **role-only** agency on a server whose Discord auth is off or idle cannot be answered either way,
-  so it falls back to your `fallback` value and logs one line to the console — rather than silently
-  refusing everyone for a reason nobody can see. Agencies with an `ace` are unaffected.
-
-<Callout type="info">
-  A refused `/onduty` puts the player back to civilian and takes back the loadout that agency handed
-  out (only those weapons), then logs the missing role/ACE to the server console and your admin
-  webhook.
-</Callout>
-
-### Checking it works
-
-`/dutyaccess` prints the caller's agency access — a `+`/`-` per configured agency plus what each one
-wants. Run it in-game as the player you are testing, or in the server console. (`/dutyaces` is the
-name this shipped under first and still works, so older instructions keep landing somewhere.)
-
-```
-LACORE  Agency access (DutyAccess) — + allowed, - denied:
-  + CHP   [role CHP or ace lacore.duty.chp]
-  - LAPD  [role LAPD]
-  - LASD  [ace lacore.duty.lasd]
-```
-
-## Vehicle spawner permission
-
-The `/vehicle` spawner menu is open to everyone by default. Gate it behind an ACE permission:
-
-```lua
-VehicleSpawner = {
-    permission = "",   -- "" = everyone; e.g. "vehiclespawner" = requires the ACE below
-}
-```
-
-```cfg
-add_ace group.admin lacore.vehiclespawner allow
-```
-
-Checked server-side via the shared `HasPermission` helper — `devmode` and Staff/Dev always pass.
-This gates LACORE's spawner menu, not entity creation as such (that is the anticheat's job).
-
 ## Webhooks
 
 Webhook URLs are read from convars so they never live in the code. Any left empty disables that
@@ -298,7 +164,6 @@ Webhooks = {
     AdminLog        = GetConvar("lacore_webhook_adminlog", ""),
     DispatchLog     = GetConvar("lacore_webhook_dispatch", ""),
     UserReports     = GetConvar("lacore_webhook_reports", ""),
-    BugReport       = GetConvar("lacore_webhook_bugreport", ""),  -- your own copy of /lacorereport reports
     PrisonLog       = GetConvar("lacore_webhook_prison", ""),
     BleeterLog      = GetConvar("lacore_webhook_bleeter", ""),
     txAdminAdminLog = GetConvar("lacore_webhook_txadmin", ""),
