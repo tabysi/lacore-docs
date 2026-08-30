@@ -3,6 +3,50 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.4.9.10] – 2026-08-30 — The LASD terminal becomes a real MDC
+
+### Changed
+
+#### LASD MDC — full redesign with real dispatch procedure
+
+The LASD PCMS terminal has been rebuilt from the ground up after the new LASD-MDC design
+(Figma) — and it no longer just looks different, it now *works* like the real thing.
+
+**The screen.** Teal status keys across the top (the active status glows orange, an open
+menu turns its key white), yellow section headers, and a black message window in the
+middle. On the left: **DISPATCH INDEX**, a compact **DISPATCH DETAIL** card, **MESSAGE
+INDEX**, and an **ACTIVE BOLO** bar. On the right: the colored function keys (VEH, WANT,
+DMV, INQUIRIES, CALL & LOG, OTHER, SEND). Below the message window sits the blue command
+bar, the unit's callsign, the **CLEARANCE FORM / BACK / HANDLE** keys and the MSG-UNREAD
+counter (green at zero, red when something is waiting).
+
+**Two indexes, two origins.** Incidents now carry their origin: **(D)** for calls created
+by dispatch (911/311) — they live in the DISPATCH INDEX — and **(U)** for calls created
+by a unit, which appear in the MESSAGE INDEX. No more mixing.
+
+**HANDLE and BACK.** The first unit to press HANDLE becomes the incident's *primary* —
+and only the first: the server rejects every later attempt. BACK stays locked until a
+primary exists; from then on every further responding unit attaches with it. A unit that
+creates an incident is automatically its primary.
+
+**Clearing an incident.** Any attached unit *except* the primary can simply go 10-98.
+The primary must open the **CLEARANCE FORM** first and dispose the call properly (GOA,
+ARR, ADV, …) — exactly like the LAPD MDT's dispo mask.
+
+**ACK.** Does one thing and one thing only: it clears the unread-message counter.
+
+**The blue bar.** In the NEW MESSAGE state it takes **commands** — `BOLOS` (active BOLO
+table with ADD ENTRY), `UR` (unit roster) and `US` (unit status board). With an incident
+selected it takes **call notes** that land in the incident's activity log (and in the
+shared audit log for bridged calls).
+
+**Pop-up menus.** STATUS TEXT opens the status menu (10-97, 10-98, CODE 6, STATION,
+UNAVAIL); OBS opens the observation menu, which creates a CODE 6 / TRAFFIC / PED STOP
+incident at your position or requests Fire/EMS or the coroner.
+
+Not tested in-game yet — Lua syntax-checked, NUI verified in the browser preview against
+mocked data (all button-gating states, both indexes, commands, pop-ups, unread counter).
+
 ## [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item
 
 ### Added
