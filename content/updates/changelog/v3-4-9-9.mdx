@@ -102,6 +102,15 @@ so dropping this update onto a running server changes nothing until you edit it.
   for every player, and pushed again once the server has finished loading them so a resource restart
   cannot leave clients holding an empty map.
 
+- **The backup/EMS/Tow details prompt now lives inside the terminal — and ESC actually cancels.**
+  Requesting backup, Fire/EMS, a coroner, a tow truck or a crime broadcast used to open the game's
+  native on-screen keyboard for the optional details. That keyboard always draws UNDER the NUI, so
+  half of it hid behind the MDT window — and cancelling it with ESC still created the incident,
+  just with empty details. The prompt is now the terminal's own dialog, on top of everything:
+  type and press ENTER (or Send) to raise the call, press ESC (or Cancel) and nothing is sent.
+  Works the same in every terminal skin; the in-car dashboard screen, which has no keyboard,
+  keeps sending immediately without a prompt.
+
 - **The bar playerlist could silently hide players off the right screen edge.** The bar style pages
   27 players at a time, but its cards had a fixed minimum width — on narrower displays the ninth
   column no longer fit next to the server panel and was pushed past the screen edge, so a full page
