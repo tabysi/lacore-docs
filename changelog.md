@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.4.9.10] – 2026-08-30 — The LASD terminal becomes a real MDC
+## [3.5.0] – 2026-08-30 — The LASD terminal becomes a real MDC
 
 ### Changed
 
