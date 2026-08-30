@@ -3,6 +3,58 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.1] – 2026-08-30 — The car reads the street
+
+### Added
+
+#### ALPR — the plate reader
+
+A patrol car now reads the plates around it. Two cameras, **FRONT** and **REAR**, each showing the
+last plate it saw, and a banner when one of them is wanted.
+
+![ALPR — the car reads the street](/img/changelog/alpr.svg)
+
+```
+/alpr        arm / disarm the reader
+/alpr clear  release a held hit and keep reading
+```
+
+**Three things count as a hit**, each switchable in `configs/cfg-alpr-sh.lua`: the plate is
+**reported stolen**, there is an **active plate BOLO**, or the **registered owner has a warrant**.
+The BOLO match uses the same matcher a `10-28` uses, so the reader and a manual plate query can
+never disagree about the same car.
+
+**A clean plate tells you nothing.** No owner, no address, no record — the reply for a plate that
+is not wanted contains the plate and nothing else. An ALPR is not a way to run every car on the
+street through the DMV, and the wire will not carry that even if someone asks it to.
+
+**The client decides nothing.** It says "I can see plate XYZ123"; whether that is a hit, and what
+the hit says, is worked out on the server. The **job is re-checked there on every plate**, so a
+modified client cannot read plates for a job it does not hold, and cannot invent a hit to justify a
+stop. Requests are rate-limited per player, because a scan loop is a request loop.
+
+**Hits are logged, misses are not.** A hit goes to the admin log (`/bblog`) with the plate, the
+camera, the reason and the unit. A clean read does not — logging those would build a movement log
+of everyone who ever drove past a patrol car, which is a different thing than police work.
+
+**Idle, it costs a timer tick.** Disarmed, out of a vehicle, or not LEO: the loop sleeps for a full
+second and enumerates nothing. Going off duty stands an armed reader down rather than leaving it
+armed and silent.
+
+The reader is remote-configurable (range, cone, sweep interval, hold-on-hit, tone) and appears in
+the dashboard's config editor under **Modules → ALPR**.
+
+> ⚠️ **Config change:** new file `configs/cfg-alpr-sh.lua`, and `configs/cfg-features-sh.lua` gained
+> the `alpr` key. Existing configs keep working — a missing feature key counts as on, and the reader
+> does nothing until an officer types `/alpr`.
+
+Not tested in-game. Lua syntax-checked, `cd web && npm run build` green, the readout driven in the
+browser preview (clean, hit, dangerous hit, disarm, re-arm), and the server logic exercised offline:
+each hit kind fires, a registered owner **without** a warrant is not a hit, plate normalisation,
+a civilian and an unknown source get nothing at all, a miss carries no owner, the rate limiter drops
+a burst, and a clean read is not logged.
+
+
 ## [3.5.0] – 2026-08-30 — The terminals grow up, and the server explains itself
 
 ### Changed

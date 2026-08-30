@@ -1,0 +1,82 @@
+---
+title: ALPR Plate Reader
+---
+
+import { Callout } from 'nextra/components'
+
+# ALPR Plate Reader
+
+The camera set on your patrol car reads the plates around you and says something when one of them
+is wanted.
+
+![ALPR — the car reads the street](/img/features/alpr.svg)
+
+## Using it
+
+```
+/alpr        arm / disarm the reader
+/alpr clear  release a held hit and keep reading
+```
+
+Both are bindable in **FiveM Settings → Key Bindings → FiveM**.
+
+Armed, a small panel appears bottom-right with two cameras — **FRONT** and **REAR** — each showing
+the last plate it read. When a plate is wanted, the banner underneath names it.
+
+## What counts as a hit
+
+| Hit | Meaning |
+| --- | --- |
+| **REPORTED STOLEN** | The plate is on the MDT's stolen list |
+| **BOLO** | An active plate BOLO — shown with its number and reason |
+| **WARRANT** | The registered owner has an active warrant |
+
+A hit also carries the **registered owner's name**, because an officer acting on one needs to know
+who they are about to stop. Everything else about that person — address, licences, record — stays
+behind a deliberate [query](/user-guide/mdt-query).
+
+A **dangerous** hit (a warrant, or a BOLO flagged as dangerous) turns the panel red instead of amber.
+
+<Callout type="info">
+  **A clean plate tells you nothing.** If a plate is not wanted, the reader shows the plate and
+  nothing else — no owner, no record. An ALPR is not a way to run every car on the street through
+  the DMV.
+</Callout>
+
+## Holding a hit
+
+By default a hit **freezes on screen** so the plate stays readable while you act on it. The cameras
+keep reading underneath, so you can see the reader is still working. `/alpr clear` releases it.
+
+Server owners can turn that off (`Alpr.lockOnHit`) if they would rather the display always show the
+newest read.
+
+## What the server does
+
+The client only ever says *"I can see plate XYZ123"*. Whether that is a hit — and what the hit says
+— is decided on the server, which also re-checks your **job on every plate**. A modified client
+cannot read plates for a job it does not hold, and cannot invent a hit.
+
+**Hits go to the admin log** (`/bblog`) with the plate, camera, reason and unit. Clean reads do not:
+logging those would build a movement log of everyone who drove past a patrol car.
+
+## For server owners
+
+Everything lives in `configs/cfg-alpr-sh.lua`, and range, cone, sweep interval, hold-on-hit and the
+alert tone are also editable from the dashboard under **Modules → ALPR**.
+
+| Setting | What it does |
+| --- | --- |
+| `Alpr.jobs` | Which jobs may use a reader (re-checked server-side) |
+| `Alpr.requireVehicle` | Must the officer be in a car? `true` is the realistic setting |
+| `Alpr.range` | How far the cameras read, in metres |
+| `Alpr.cone` | How wide each camera looks — `0.5` ≈ 60° |
+| `Alpr.interval` | Seconds between sweeps |
+| `Alpr.repeatAfter` | Do not re-ask about the same plate for this long |
+| `Alpr.cameras` | Fit a front-only or rear-only setup |
+| `Alpr.check` | Turn off a hit kind — an unchecked kind is never even looked up |
+| `Alpr.lockOnHit`, `Alpr.sound`, `Alpr.logHits` | Display, tone and logging |
+
+**Performance:** disarmed, out of a vehicle or not LEO, the loop sleeps a full second and
+enumerates nothing. Turn the whole module off with `alpr = false` in
+[`cfg-features-sh.lua`](/configuration/features).

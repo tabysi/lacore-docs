@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">ALPR — <tspan fill="#6c8cff">THE CAR READS THE STREET</tspan></text>
+
+  <!-- Camera cones -->
+  <rect x="60" y="96" width="470" height="290" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="126" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">TWO CAMERAS</text>
+  <!-- rear cone -->
+  <path d="M295 250 L175 175 L175 325 Z" fill="#4a5cff" fill-opacity="0.10" stroke="#2c3650" stroke-width="1"/>
+  <!-- front cone -->
+  <path d="M295 250 L470 160 L470 340 Z" fill="#4a5cff" fill-opacity="0.16" stroke="#2c3650" stroke-width="1"/>
+  <!-- the patrol car -->
+  <rect x="277" y="232" width="36" height="20" rx="4" fill="#6c8cff"/>
+  <text x="295" y="278" fill="#9fb0ff" font-size="11" text-anchor="middle" letter-spacing="1">YOU</text>
+  <text x="430" y="150" fill="#7d8798" font-size="12" text-anchor="middle">FRONT</text>
+  <text x="185" y="163" fill="#7d8798" font-size="12" text-anchor="middle">REAR</text>
+  <!-- read plates -->
+  <rect x="404" y="196" width="58" height="17" rx="2" fill="#0d1526" stroke="#e0a458" stroke-width="1.5"/>
+  <text x="433" y="209" fill="#ffd9a0" font-size="10" font-family="'Consolas', monospace" text-anchor="middle">46TRK291</text>
+  <rect x="404" y="292" width="58" height="17" rx="2" fill="#0d1526" stroke="#2c3650" stroke-width="1"/>
+  <text x="433" y="305" fill="#7d8798" font-size="10" font-family="'Consolas', monospace" text-anchor="middle">2LXA118</text>
+  <rect x="182" y="238" width="58" height="17" rx="2" fill="#0d1526" stroke="#2c3650" stroke-width="1"/>
+  <text x="211" y="251" fill="#7d8798" font-size="10" font-family="'Consolas', monospace" text-anchor="middle">8XYZ004</text>
+  <text x="84" y="362" fill="#7d8798" font-size="12.5">Range and cone are configurable. A plate is asked about once, then remembered.</text>
+
+  <!-- The readout -->
+  <rect x="570" y="96" width="270" height="200" rx="6" fill="#060a12" stroke="#d1495b" stroke-width="2"/>
+  <text x="590" y="124" fill="#6c8cff" font-size="13" font-weight="700" letter-spacing="4">ALPR</text>
+  <text x="820" y="124" fill="#7d8798" font-size="9.5" letter-spacing="2" text-anchor="end">HIT HELD</text>
+  <rect x="590" y="136" width="115" height="40" rx="3" fill="#131a28" stroke="#e0a458" stroke-width="1"/>
+  <text x="600" y="152" fill="#7d8798" font-size="8.5" letter-spacing="1.5">FRONT</text>
+  <text x="600" y="169" fill="#e7ecf5" font-size="13" font-family="'Consolas', monospace" font-weight="700">46TRK291</text>
+  <rect x="713" y="136" width="107" height="40" rx="3" fill="#131a28" stroke="#22293c" stroke-width="1"/>
+  <text x="723" y="152" fill="#7d8798" font-size="8.5" letter-spacing="1.5">REAR</text>
+  <text x="723" y="169" fill="#e7ecf5" font-size="13" font-family="'Consolas', monospace" font-weight="700">8XYZ004</text>
+  <line x1="590" y1="190" x2="820" y2="190" stroke="#2c3650" stroke-width="1"/>
+  <text x="590" y="212" fill="#ff9aa4" font-size="17" font-family="'Consolas', monospace" font-weight="700">46TRK291</text>
+  <text x="590" y="232" fill="#e7ecf5" font-size="11">REPORTED STOLEN</text>
+  <text x="590" y="250" fill="#e7ecf5" font-size="11">WARRANT — failure to appear</text>
+  <text x="590" y="270" fill="#cfe0ff" font-size="10.5">Registered to Marcus Webb</text>
+  <text x="590" y="286" fill="#7d8798" font-size="9">/alpr clear to release</text>
+
+  <!-- Server decides -->
+  <rect x="880" y="96" width="260" height="200" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="902" y="126" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">THE SERVER DECIDES</text>
+  <text x="902" y="156" fill="#e7ecf5" font-size="13">stolen report</text>
+  <text x="902" y="180" fill="#e7ecf5" font-size="13">active plate BOLO</text>
+  <text x="902" y="204" fill="#e7ecf5" font-size="13">warrant on the owner</text>
+  <line x1="902" y1="224" x2="1118" y2="224" stroke="#2c3650" stroke-width="1"/>
+  <text x="902" y="248" fill="#7d8798" font-size="12">The client only says which plate it</text>
+  <text x="902" y="266" fill="#7d8798" font-size="12">can see. The job is re-checked here</text>
+  <text x="902" y="284" fill="#7d8798" font-size="12">on every single plate.</text>
+  <line x1="845" y1="196" x2="874" y2="196" stroke="#4a5cff" stroke-width="2" marker-end="url(#a5)"/>
+
+  <!-- A clean plate -->
+  <rect x="570" y="316" width="570" height="70" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="592" y="346" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">A CLEAN PLATE TELLS YOU NOTHING</text>
+  <text x="592" y="372" fill="#7d8798" font-size="12.5">No owner, no address, no record. An ALPR is not a way to run every car on the street through the DMV.</text>
+
+  <rect x="60" y="416" width="1080" height="86" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="446" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">/alpr — ARM · /alpr clear — RELEASE A HELD HIT</text>
+  <text x="84" y="472" fill="#7d8798" font-size="12.5">Disarmed, the reader sleeps: no vehicle enumeration, nothing drawn, one timer tick a second.</text>
+  <text x="84" y="492" fill="#7d8798" font-size="12.5">Hits go to the admin log. Clean plates do not — that would be a movement log of everyone who drove past a patrol car.</text>
+</svg>
