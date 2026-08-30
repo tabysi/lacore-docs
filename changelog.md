@@ -59,6 +59,37 @@ Not tested in-game yet — Lua syntax-checked, NUI verified in the browser previ
 mocked data (all button-gating states, both indexes, commands, pop-ups, unread counter, and
 switching between both skins in either direction).
 
+### Added
+
+#### The weapon crosshair is a config option now
+
+LACORE has always hidden GTA's weapon reticle — sniper scopes excepted — and there was no way to
+get it back short of editing `client/world-cl.lua`. `configs/cfg-hud-sh.lua` now has a
+**`crosshair`** switch:
+
+```lua
+HudCfg = {
+    crosshair = false,   -- default: reticle hidden, exactly as before
+    -- crosshair = true, -- reticle visible for every weapon
+}
+```
+
+![Weapon crosshair on and off](/img/changelog/hud-crosshair-toggle.svg)
+
+Sniper scopes keep their reticle either way. The option is deliberately **not** governed by
+`HudCfg.enabled`: the master switch only turns off what LACORE draws, it never changes what GTA
+draws — a server running its own HUD still gets to decide about the crosshair separately. The
+setting is read live, so the remote config (`hud.crosshair`) can flip it without a restart.
+
+While in there, the loop that does the hiding idles at 4 Hz whenever the player is unarmed or the
+crosshair is switched on, instead of running every single frame.
+
+> ⚠️ **Config change:** `configs/cfg-hud-sh.lua` gained the `crosshair` key. Existing config files
+> keep working untouched — a missing key counts as `false`, which is the previous behaviour.
+
+Not tested in-game yet — Lua syntax-checked only.
+
+
 ## [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item
 
 ### Added

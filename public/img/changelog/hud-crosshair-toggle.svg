@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)"/>
+  <rect width="1200" height="520" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 464 V492 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WEAPON <tspan fill="#6c8cff">CROSSHAIR</tspan> — HudCfg.crosshair</text>
+
+  <!-- Left: crosshair = false (default) -->
+  <rect x="60" y="96" width="500" height="300" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="80" y="128" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">crosshair = false</text>
+  <text x="80" y="150" fill="#7d8798" font-size="13">default — LACORE hides GTA's reticle</text>
+  <!-- empty screen centre, marked as hidden -->
+  <g opacity="0.28" stroke="#7d8798" stroke-width="2" fill="none">
+    <circle cx="310" cy="270" r="26" stroke-dasharray="5 6"/>
+    <path d="M310 232 V254 M310 286 V308 M272 270 H294 M326 270 H348" stroke-dasharray="5 6"/>
+  </g>
+  <text x="310" y="352" fill="#7d8798" font-size="13" text-anchor="middle" letter-spacing="2">HIDDEN</text>
+
+  <!-- Right: crosshair = true -->
+  <rect x="640" y="96" width="500" height="300" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="660" y="128" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">crosshair = true</text>
+  <text x="660" y="150" fill="#7d8798" font-size="13">the reticle is drawn for every weapon</text>
+  <g stroke="#e7ecf5" stroke-width="2" fill="none">
+    <circle cx="890" cy="270" r="26"/>
+    <path d="M890 232 V254 M890 286 V308 M852 270 H874 M906 270 H928"/>
+  </g>
+  <circle cx="890" cy="270" r="2.5" fill="#6c8cff"/>
+  <text x="890" y="352" fill="#6c8cff" font-size="13" text-anchor="middle" letter-spacing="2">VISIBLE</text>
+
+  <!-- Footnote -->
+  <rect x="60" y="424" width="1080" height="52" rx="6" fill="#10141d" stroke="#2c3650"/>
+  <text x="84" y="456" fill="#9fb0ff" font-size="14">Sniper scopes always keep their reticle in both modes — and the master switch HudCfg.enabled does not touch this option.</text>
+</svg>
