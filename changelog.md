@@ -166,6 +166,18 @@ so dropping this update onto a running server changes nothing until you edit it.
   teammate's save in between is refused with a one-click reload of their rows instead of being
   silently overwritten — RESET included.
 
+- **Support ticket drafts survive.** The ticket message is the longest thing anyone types into
+  the dashboard, and a stray click used to throw it away. It is now kept as a local draft while
+  you type: come back later — including after closing the tab — and the form restores it with a
+  "draft restored" note and a discard link. Opening the ticket clears the draft. Stored only in
+  your own browser.
+
+- **The admin server status wall no longer hangs on "Loading…".** The wall keyed its tiles on
+  the Cfx server key, falling back to the IP — but real rows carry an empty server key (FiveM
+  redacts it) and one customer's boxes can share an IP, so two tiles collided on the same key
+  and the whole wall died mid-render, stuck on "Loading…" forever. Tiles are now keyed on the
+  server row's own id, which is unique by construction.
+
 ## [3.4.9.8] – 2026-08-21 — A framework that starts late is still a framework
 
 ### Fixed
