@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/><rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 504 V532 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">THE PHONE — <tspan fill="#6c8cff">F1 · /phone</tspan></text>
+
+  <!-- Smartphone -->
+  <rect x="110" y="90" width="230" height="420" rx="26" fill="#0e1220" stroke="#4a5cff" stroke-width="3"/>
+  <rect x="196" y="102" width="58" height="8" rx="4" fill="#1a2131"/>
+  <!-- app grid -->
+  <g font-size="20" text-anchor="middle">
+    <g font-size="11" fill="#9fb0ff" font-weight="600">
+      <text x="152" y="150" font-size="20">📞</text><text x="152" y="166">Phone</text>
+      <text x="225" y="150" font-size="20">💬</text><text x="225" y="166">Messages</text>
+      <text x="298" y="150" font-size="20">🚨</text><text x="298" y="166">Emergency</text>
+      <text x="152" y="204" font-size="20">📷</text><text x="152" y="220">Camera</text>
+      <text x="225" y="204" font-size="20">🐦</text><text x="225" y="220">Bleeter</text>
+      <text x="298" y="204" font-size="20">👥</text><text x="298" y="220">Groups</text>
+      <text x="152" y="258" font-size="20">📒</text><text x="152" y="274">Contacts</text>
+      <text x="225" y="258" font-size="20">📝</text><text x="225" y="274">Notes</text>
+      <text x="298" y="258" font-size="20">🚗</text><text x="298" y="274">Garage</text>
+      <text x="152" y="312" font-size="20">🪪</text><text x="152" y="328">Wallet</text>
+      <text x="225" y="312" font-size="20">🌦</text><text x="225" y="328">Weather</text>
+      <text x="298" y="312" font-size="20">⚙️</text><text x="298" y="328">Settings</text>
+    </g>
+  </g>
+  <rect x="134" y="352" width="182" height="26" rx="13" fill="#0a0d13" stroke="#2c3650"/>
+  <text x="225" y="370" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">🔎 search — filters &amp; launches apps</text>
+  <!-- dock -->
+  <rect x="134" y="440" width="182" height="46" rx="14" fill="#0a0d13" stroke="#2c3650"/>
+  <g font-size="18" text-anchor="middle"><text x="164" y="470">📞</text><text x="205" y="470">💬</text><text x="246" y="470">📷</text><text x="287" y="470">⚙️</text></g>
+
+  <!-- Retro brick -->
+  <rect x="380" y="240" width="120" height="270" rx="14" fill="#0b0f0a" stroke="#2fae2f" stroke-width="2"/>
+  <rect x="396" y="258" width="88" height="70" rx="6" fill="#10260e"/>
+  <text x="440" y="286" fill="#7dff7d" font-size="10" font-weight="700" text-anchor="middle">NT-3100</text>
+  <text x="440" y="304" fill="#7dff7d" font-size="9" font-weight="600" text-anchor="middle">T9 · Snake 🐍</text>
+  <g fill="#1a2416">
+    <rect x="398" y="342" width="24" height="16" rx="4"/><rect x="428" y="342" width="24" height="16" rx="4"/><rect x="458" y="342" width="24" height="16" rx="4"/>
+    <rect x="398" y="364" width="24" height="16" rx="4"/><rect x="428" y="364" width="24" height="16" rx="4"/><rect x="458" y="364" width="24" height="16" rx="4"/>
+    <rect x="398" y="386" width="24" height="16" rx="4"/><rect x="428" y="386" width="24" height="16" rx="4"/><rect x="458" y="386" width="24" height="16" rx="4"/>
+    <rect x="428" y="408" width="24" height="16" rx="4"/>
+  </g>
+  <text x="440" y="452" fill="#2fae2f" font-size="10" font-weight="600" text-anchor="middle">optional retro skin</text>
+  <text x="440" y="468" fill="#2fae2f" font-size="10" font-weight="600" text-anchor="middle">(Retro.enabled)</text>
+  <text x="440" y="490" fill="#6b7689" font-size="9" font-weight="600" text-anchor="middle">same calls/SMS backend</text>
+
+  <!-- Right notes -->
+  <g font-size="14" font-weight="700">
+    <rect x="560" y="100" width="570" height="96" rx="12" fill="#0a0d13" stroke="#d04a4a" stroke-width="2"/>
+    <text x="584" y="130" fill="#ffb0b0">📞 911 / 311 — TWO WAYS TO REACH DISPATCH</text>
+    <text x="584" y="154" fill="#9fb0ff" font-size="12" font-weight="600">Emergency app → a typed report, location attached automatically</text>
+    <text x="584" y="176" fill="#9fb0ff" font-size="12" font-weight="600">Dialling 911/311 on the keypad → a real VOICE call into the dispatcher's queue</text>
+
+    <rect x="560" y="216" width="570" height="76" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+    <text x="584" y="246" fill="#e7ecf5">🎙 REAL VOICE VIA PMA-VOICE</text>
+    <text x="584" y="270" fill="#6b7689" font-size="12" font-weight="600">accept, talk, hang up — /hangup and the red button do the same · no dispatcher online → logged as an incident</text>
+
+    <rect x="560" y="312" width="570" height="76" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+    <text x="584" y="342" fill="#e7ecf5">🚶 PLAY WHILE IT'S OPEN</text>
+    <text x="584" y="366" fill="#6b7689" font-size="12" font-weight="600">walk &amp; drive with the phone up · clicking never shoots · others see the prop + animation</text>
+
+    <rect x="560" y="408" width="570" height="76" rx="12" fill="none" stroke="#8a9a2f" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="584" y="438" fill="#dcea8a">💾 PER-ACCOUNT PERSISTENCE — AND NO MONEY APP</text>
+    <text x="584" y="462" fill="#8a9a2f" font-size="12" font-weight="600">contacts · threads · call log · gallery · notes survive restarts — deliberately no banking, LACORE has no economy</text>
+  </g>
+
+  <text x="60" y="534" fill="#6b7689" font-size="14" font-weight="600">Needs a set RP character (/char) · number is auto-assigned (555-XXXX) · camera needs screenshot-basic on the server.</text>
+</svg>

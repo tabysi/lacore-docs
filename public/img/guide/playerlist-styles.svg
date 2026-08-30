@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)"/><rect width="1200" height="520" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 464 V492 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">PLAYER LIST — <tspan fill="#6c8cff">PRESS I · THREE STYLES</tspan></text>
+
+  <!-- duty board -->
+  <rect x="70" y="100" width="400" height="300" rx="10" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="270" y="126" fill="#9fb0ff" font-size="14" font-weight="700" text-anchor="middle">"duty" (default) — the full board</text>
+  <rect x="86" y="138" width="368" height="40" rx="6" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="96" y="154" fill="#e7ecf5" font-size="10" font-weight="700">LACORE ROLEPLAY · SANDY SHORES</text>
+  <text x="96" y="170" fill="#6b7689" font-size="9" font-weight="600">64 online · 26 on duty · 11 available · 21:47</text>
+  <!-- units -->
+  <rect x="86" y="186" width="178" height="200" rx="6" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="96" y="204" fill="#8fb4ff" font-size="10" font-weight="700">LSPD — 9 on duty · 4 avail</text>
+  <g font-size="9" font-weight="600">
+    <rect x="94" y="212" width="3" height="14" fill="#2fae2f"/><text x="102" y="223" fill="#c9d2e0">12 1-L-30 M. Adams · CLEAR</text>
+    <rect x="94" y="230" width="3" height="14" fill="#4a5cff"/><text x="102" y="241" fill="#c9d2e0">17 1-A-12 S. Reed · ON SCENE</text>
+    <rect x="94" y="248" width="3" height="14" fill="#d08a2a"/><text x="102" y="259" fill="#c9d2e0">23 7-A-31 T. Gomez · ENROUTE</text>
+  </g>
+  <text x="96" y="284" fill="#e0c93a" font-size="10" font-weight="700">AMR — 2 on duty · 0 avail</text>
+  <text x="102" y="300" fill="#ff7b6b" font-size="9" font-weight="600">0 available shows red</text>
+  <!-- civilians -->
+  <rect x="276" y="186" width="178" height="200" rx="6" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="286" y="204" fill="#9fb0ff" font-size="10" font-weight="700">CIVILIANS — ←→ pages</text>
+  <g font-size="9" font-weight="600" fill="#c9d2e0">
+    <text x="286" y="223">31 ● Elena Cruz · Someone</text>
+    <text x="286" y="241">36 ● Marcus Hale · Spawn…</text>
+    <text x="286" y="259">42 ● Dana West · Player3</text>
+  </g>
+  <text x="286" y="292" fill="#6b7689" font-size="9" font-weight="600">dot = role (staff/dev/…)</text>
+
+  <!-- minimal -->
+  <rect x="500" y="100" width="310" height="300" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="655" y="126" fill="#9fb0ff" font-size="14" font-weight="700" text-anchor="middle">"minimal" — one centred card</text>
+  <rect x="540" y="160" width="230" height="180" rx="8" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="552" y="182" fill="#e7ecf5" font-size="10" font-weight="700">LACORE RP · 64 · 17 on duty · 21:47</text>
+  <line x1="552" y1="192" x2="758" y2="192" stroke="#1a2131"/>
+  <g font-size="9" font-weight="600" fill="#c9d2e0">
+    <text x="552" y="212">1 Tabysi ● M. Adams · LSPD 1-L-30</text>
+    <text x="552" y="232">2 SomePlayer S. Reed · AMR M-1</text>
+    <text x="552" y="252">3 Randomer — Spawn session</text>
+  </g>
+  <text x="655" y="300" fill="#6b7689" font-size="9" font-weight="600" text-anchor="middle">one flat list, everyone — ←→ pages all</text>
+  <text x="655" y="318" fill="#6b7689" font-size="9" font-weight="600" text-anchor="middle">24 per page</text>
+
+  <!-- bar -->
+  <rect x="840" y="100" width="290" height="300" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="985" y="126" fill="#9fb0ff" font-size="14" font-weight="700" text-anchor="middle">"bar" — strip across the top</text>
+  <rect x="856" y="146" width="188" height="70" rx="6" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="866" y="162" fill="#e7ecf5" font-size="9" font-weight="700">17 ONLINE · 1/3</text>
+  <g font-size="8" font-weight="600" fill="#c9d2e0">
+    <rect x="864" y="170" width="80" height="18" rx="3" fill="#101a2e"/><text x="870" y="182">15 Rivera · LAPD 1-L-20</text>
+    <rect x="864" y="192" width="80" height="18" rx="3" fill="#0e1220"/><text x="870" y="204">16 Gomez · LAPD 7-A-31</text>
+    <rect x="950" y="170" width="80" height="18" rx="3" fill="#0e1220"/><text x="956" y="182">20 D. Wright</text>
+    <rect x="950" y="192" width="80" height="18" rx="3" fill="#0e1220"/><text x="956" y="204">21 reaprackzz</text>
+  </g>
+  <rect x="1050" y="146" width="64" height="70" rx="6" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="1082" y="162" fill="#9fb0ff" font-size="8" font-weight="700" text-anchor="middle">AOP · status</text>
+  <text x="1082" y="176" fill="#6b7689" font-size="8" font-weight="600" text-anchor="middle">911 off duty</text>
+  <text x="1082" y="190" fill="#6b7689" font-size="8" font-weight="600" text-anchor="middle">LEO 8 · 3 av</text>
+  <text x="985" y="248" fill="#6b7689" font-size="9" font-weight="600" text-anchor="middle">roster left, server panel right</text>
+  <text x="985" y="266" fill="#6b7689" font-size="9" font-weight="600" text-anchor="middle">27 per page · columns top-to-bottom</text>
+  <text x="985" y="296" fill="#6b7689" font-size="9" font-weight="600" text-anchor="middle">suits keeping it open mid-scene</text>
+
+  <rect x="70" y="420" width="1060" height="44" rx="10" fill="none" stroke="#2c3650" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="94" y="448" fill="#9fb0ff" font-size="13" font-weight="700">Read-only overlay — no cursor, the game keeps running · owner default in cfg-hud-sh.lua, players pick their own in Settings ▸ Player List Style</text>
+
+  <text x="60" y="496" fill="#6b7689" font-size="14" font-weight="600">All three read the same data: server ID · role dot · account + character name · status colours straight from the MDT.</text>
+</svg>

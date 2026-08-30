@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/></marker>
+  </defs>
+  <rect width="1200" height="480" fill="url(#bg)"/><rect width="1200" height="480" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 424 V452 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">REPLAY — <tspan fill="#6c8cff">FROM TAKE TO SHOT</tspan></text>
+
+  <!-- Record -->
+  <rect x="70" y="110" width="250" height="150" rx="12" fill="#0a0d13" stroke="#d04a4a" stroke-width="2"/>
+  <text x="195" y="140" fill="#ffb0b0" font-size="15" font-weight="700" text-anchor="middle">⏺ /replay start</text>
+  <g font-size="12" font-weight="600" fill="#9fb0ff" text-anchor="middle">
+    <text x="195" y="166">samples 10×/second</text>
+    <text x="195" y="188">every player + vehicle in 50 m</text>
+    <text x="195" y="210">max 32 entities, nearest first</text>
+  </g>
+  <text x="195" y="240" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">auto-stops at 180 s and keeps the take</text>
+  <line x1="320" y1="185" x2="400" y2="185" stroke="#2c3650" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="360" y="172" fill="#6b7689" font-size="11" font-weight="700" text-anchor="middle">save</text>
+
+  <!-- Library -->
+  <rect x="410" y="110" width="250" height="150" rx="12" fill="#0e1220" stroke="#4a5cff" stroke-width="3"/>
+  <text x="535" y="140" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">🎞 CLIP LIBRARY</text>
+  <g font-size="12" font-weight="600" fill="#9fb0ff" text-anchor="middle">
+    <text x="535" y="166">bare /replay opens it</text>
+    <text x="535" y="188">name · length · size per clip</text>
+    <text x="535" y="210">live storage quota on top</text>
+  </g>
+  <text x="535" y="240" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">clips live on the server's disk</text>
+  <line x1="660" y1="160" x2="740" y2="140" stroke="#2c3650" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="660" y1="215" x2="740" y2="250" stroke="#2c3650" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Playback -->
+  <rect x="750" y="90" width="380" height="120" rx="12" fill="#0a0d13" stroke="#2fae2f" stroke-width="2"/>
+  <text x="774" y="120" fill="#7dff7d" font-size="15" font-weight="700">▶ PLAYBACK — ghost entities</text>
+  <text x="774" y="146" fill="#9fb0ff" font-size="12" font-weight="600">scene rebuilt locally — nobody else sees it</text>
+  <text x="774" y="168" fill="#6b7689" font-size="12" font-weight="600">Catmull-Rom interpolation between samples</text>
+  <text x="774" y="190" fill="#6b7689" font-size="12" font-weight="600">BACKSPACE stops · HUD never takes focus</text>
+
+  <!-- Cutting room -->
+  <rect x="750" y="230" width="380" height="120" rx="12" fill="#0a0d13" stroke="#8c14a8" stroke-width="2"/>
+  <text x="774" y="260" fill="#d8a8ff" font-size="15" font-weight="700">🎬 CUTTING ROOM</text>
+  <text x="774" y="286" fill="#9fb0ff" font-size="12" font-weight="600">scene list · live shot · inspector · timeline</text>
+  <text x="774" y="308" fill="#6b7689" font-size="12" font-weight="600">direct the camera — frame the shot</text>
+  <text x="774" y="330" fill="#6b7689" font-size="12" font-weight="600">then capture with OBS / ShadowPlay</text>
+
+  <!-- Notes -->
+  <rect x="70" y="290" width="590" height="60" rx="12" fill="none" stroke="#d04a4a" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="94" y="316" fill="#ffb0b0" font-size="13" font-weight="700">⚠ SHIPS OFF — Replay.enabled = false</text>
+  <text x="94" y="338" fill="#6b7689" font-size="12" font-weight="600">clips cost your disk and every player gets a recorder — turning it on is your call</text>
+
+  <rect x="70" y="366" width="590" height="60" rx="12" fill="none" stroke="#8a9a2f" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="94" y="392" fill="#dcea8a" font-size="13" font-weight="700">🎥 NO VIDEO FILE AT THE END — FiveM can't encode video</text>
+  <text x="94" y="414" fill="#8a9a2f" font-size="12" font-weight="600">Replay sets up the shot; recording the screen stays your capture tool's job</text>
+
+  <text x="750" y="392" fill="#6b7689" font-size="13" font-weight="600">Not an admin tool — nothing in it is real.</text>
+  <text x="750" y="414" fill="#6b7689" font-size="13" font-weight="600">For an evidence trail, use the Big Brother log.</text>
+</svg>

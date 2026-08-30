@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/></marker>
+  </defs>
+  <rect width="1200" height="440" fill="url(#bg)"/><rect width="1200" height="440" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 384 V412 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">BUG REPORTS — <tspan fill="#6c8cff">/lacorereport</tspan></text>
+
+  <!-- Form -->
+  <rect x="70" y="110" width="280" height="200" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+  <text x="210" y="140" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">IN-GAME FORM</text>
+  <g font-size="11" font-weight="700" text-anchor="middle">
+    <rect x="90" y="154" width="52" height="22" rx="10" fill="#101a2e" stroke="#4a5cff"/><text x="116" y="169" fill="#9fb0ff">Bug</text>
+    <rect x="148" y="154" width="64" height="22" rx="10" fill="#0a0d13" stroke="#2c3650"/><text x="180" y="169" fill="#6b7689">Exploit</text>
+    <rect x="218" y="154" width="112" height="22" rx="10" fill="#0a0d13" stroke="#2c3650"/><text x="274" y="169" fill="#6b7689">Suggestion · …</text>
+  </g>
+  <rect x="90" y="186" width="240" height="66" rx="6" fill="#05070b" stroke="#1a2131"/>
+  <text x="102" y="208" fill="#6b7689" font-size="11">what happened … (max 800 chars)</text>
+  <text x="210" y="276" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">auto-attached: character · dept · callsign</text>
+  <text x="210" y="294" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">position · which server</text>
+
+  <!-- Relay -->
+  <line x1="350" y1="210" x2="450" y2="210" stroke="#4a5cff" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="400" y="196" fill="#9fb0ff" font-size="11" font-weight="700" text-anchor="middle">telemetry relay</text>
+  <rect x="460" y="160" width="240" height="100" rx="12" fill="#0e1220" stroke="#4a5cff" stroke-width="3"/>
+  <text x="580" y="196" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">LACORE DASHBOARD</text>
+  <text x="580" y="220" fill="#9fb0ff" font-size="12" font-weight="600" text-anchor="middle">the team's review inbox —</text>
+  <text x="580" y="238" fill="#9fb0ff" font-size="12" font-weight="600" text-anchor="middle">every report arrives here</text>
+
+  <!-- Branches -->
+  <g stroke="#2c3650" stroke-width="2">
+    <line x1="700" y1="190" x2="800" y2="150" marker-end="url(#arr)"/>
+    <line x1="700" y1="230" x2="800" y2="280" marker-end="url(#arr)"/>
+  </g>
+  <rect x="810" y="110" width="320" height="80" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+  <text x="970" y="140" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">YOUR OWNER DASHBOARD</text>
+  <text x="970" y="162" fill="#6b7689" font-size="12" font-weight="600" text-anchor="middle">shows reports filed on your servers —</text>
+  <text x="970" y="180" fill="#dcea8a" font-size="12" font-weight="700" text-anchor="middle">only with an active lacore_license_key</text>
+
+  <rect x="810" y="250" width="320" height="66" rx="12" fill="none" stroke="#2c3650" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="970" y="278" fill="#9fb0ff" font-size="14" font-weight="700" text-anchor="middle">OPTIONAL: YOUR DISCORD</text>
+  <text x="970" y="300" fill="#6b7689" font-size="12" font-weight="600" text-anchor="middle">lacore_webhook_bugreport — a copy, never a replacement</text>
+
+  <rect x="70" y="340" width="1060" height="48" rx="10" fill="none" stroke="#8a9a2f" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="94" y="370" fill="#dcea8a" font-size="13" font-weight="700">Cooldown enforced ON THE SERVER (120 s default) · not for players (/report) or tickets · never touches your own database</text>
+
+  <text x="60" y="418" fill="#6b7689" font-size="14" font-weight="600">Tune everything in cfg-report-sh.lua — command name, categories, cooldown, max length; Features.bugreport switches it off entirely.</text>
+</svg>

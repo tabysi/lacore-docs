@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)"/><rect width="1200" height="520" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 464 V492 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">LEO FIELD TOOLS — <tspan fill="#6c8cff">THE ON-SCENE KIT</tspan></text>
+
+  <g font-size="15" font-weight="700">
+    <!-- K9 -->
+    <rect x="70" y="100" width="345" height="120" rx="12" fill="#0a0d13" stroke="#d08a2a" stroke-width="2"/>
+    <text x="94" y="132" fill="#ffd9a0">🐕 K9 — /k9</text>
+    <text x="94" y="158" fill="#9fb0ff" font-size="12" font-weight="600">heel · stay · bark · search · engage · car</text>
+    <text x="94" y="180" fill="#6b7689" font-size="12" font-weight="600">search alerts on armed persons nearby</text>
+    <text x="94" y="202" fill="#6b7689" font-size="12" font-weight="600">fairness: handler down → dog disengages</text>
+
+    <!-- Air unit -->
+    <rect x="427" y="100" width="345" height="120" rx="12" fill="#0a0d13" stroke="#4a5cff" stroke-width="2"/>
+    <text x="451" y="132" fill="#9fb0ff">🚁 AIR UNIT — F5/F6/F7</text>
+    <text x="451" y="158" fill="#9fb0ff" font-size="12" font-weight="600">heli cam · auto-orbit · spotlight · thermal</text>
+    <text x="451" y="180" fill="#6b7689" font-size="12" font-weight="600">~2.5 s hold = lock-on + auto-track</text>
+    <text x="451" y="202" fill="#6b7689" font-size="12" font-weight="600">deliberately no plate readout — run the MDT query</text>
+
+    <!-- Impound -->
+    <rect x="784" y="100" width="345" height="120" rx="12" fill="#0a0d13" stroke="#2fae2f" stroke-width="2"/>
+    <text x="808" y="132" fill="#7dff7d">🚔 IMPOUND — /impound</text>
+    <text x="808" y="158" fill="#9fb0ff" font-size="12" font-weight="600">vehicle → lot record (plate · model · reason)</text>
+    <text x="808" y="180" fill="#6b7689" font-size="12" font-weight="600">/impounds — browse &amp; release (LEO)</text>
+    <text x="808" y="202" fill="#6b7689" font-size="12" font-weight="600">fee is display-only — no economy</text>
+
+    <!-- Corrections -->
+    <rect x="70" y="240" width="345" height="120" rx="12" fill="#0a0d13" stroke="#8c14a8" stroke-width="2"/>
+    <text x="94" y="272" fill="#d8a8ff">⛓ CORRECTIONS — /jail</text>
+    <text x="94" y="298" fill="#9fb0ff" font-size="12" font-weight="600">MDT arrest report auto-books · months → seconds</text>
+    <text x="94" y="320" fill="#6b7689" font-size="12" font-weight="600">live countdown · relog restores the sentence</text>
+    <text x="94" y="342" fill="#6b7689" font-size="12" font-weight="600">/inmates roster · offline bookings apply on connect</text>
+
+    <!-- Fingerprint -->
+    <rect x="427" y="240" width="345" height="120" rx="12" fill="#0a0d13" stroke="#d04a4a" stroke-width="2"/>
+    <text x="451" y="272" fill="#ffb0b0">🖐 FINGERPRINT — /mobileid</text>
+    <text x="451" y="298" fill="#9fb0ff" font-size="12" font-weight="600">scan a cuffed suspect → identity card + flags</text>
+    <text x="451" y="320" fill="#6b7689" font-size="12" font-weight="600">/liftprint — anonymous latents from vehicles,</text>
+    <text x="451" y="342" fill="#6b7689" font-size="12" font-weight="600">match later → files itself as evidence</text>
+
+    <!-- Breathalyser -->
+    <rect x="784" y="240" width="345" height="120" rx="12" fill="#0a0d13" stroke="#8a9a2f" stroke-width="2"/>
+    <text x="808" y="272" fill="#dcea8a">🍺 BREATHALYSER — /breatha</text>
+    <text x="808" y="298" fill="#9fb0ff" font-size="12" font-weight="600">honesty-based: subject answers /breath &lt;µg&gt;</text>
+    <text x="808" y="320" fill="#6b7689" font-size="12" font-weight="600">over 35 µg/100 ml = over the limit · no value = refusal</text>
+    <text x="808" y="342" fill="#6b7689" font-size="12" font-weight="600">drug swab: /druga → /saliva — THC/COC or NEG</text>
+  </g>
+
+  <rect x="70" y="388" width="1059" height="48" rx="10" fill="none" stroke="#2c3650" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="94" y="418" fill="#9fb0ff" font-size="13" font-weight="700">All LEO-gated · individually removable via feature toggles (k9 · airunit · impound · corrections · fingerprint · field) · everything logs to Big Brother</text>
+
+  <text x="60" y="482" fill="#6b7689" font-size="14" font-weight="600">Keybinds ship unbound on purpose — assign them under FiveM Settings ▸ Key Bindings. Tuning lives in the matching cfg-*-sh.lua.</text>
+</svg>

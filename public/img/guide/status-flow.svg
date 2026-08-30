@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/></marker>
+  </defs>
+  <rect width="1200" height="460" fill="url(#bg)"/><rect width="1200" height="460" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 404 V432 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">STATUS LABELS — <tspan fill="#6c8cff">CALLS &amp; UNITS</tspan></text>
+
+  <!-- Call states flow -->
+  <text x="70" y="112" fill="#9fb0ff" font-size="15" font-weight="700">CALL / INCIDENT STATES</text>
+  <g font-size="15" font-weight="700" text-anchor="middle">
+    <rect x="70" y="130" width="220" height="56" rx="10" fill="#16090b" stroke="#d04a4a" stroke-width="2"/>
+    <text x="180" y="158" fill="#ffb0b0">OUTSTANDING</text><text x="180" y="176" fill="#6b7689" font-size="11">no unit attached yet</text>
+    <rect x="350" y="130" width="220" height="56" rx="10" fill="#1a1610" stroke="#d08a2a" stroke-width="2"/>
+    <text x="460" y="158" fill="#ffd9a0">ASSIGNED</text><text x="460" y="176" fill="#6b7689" font-size="11">≥1 unit attached — automatic</text>
+    <rect x="630" y="130" width="220" height="56" rx="10" fill="#101a2e" stroke="#4a5cff" stroke-width="2"/>
+    <text x="740" y="158" fill="#9fb0ff">ON SCENE</text><text x="740" y="176" fill="#6b7689" font-size="11">a unit arrived (C6 / AS)</text>
+    <rect x="910" y="130" width="220" height="56" rx="10" fill="#101a10" stroke="#2fae2f" stroke-width="2"/>
+    <text x="1020" y="158" fill="#7dff7d">RESOLVED</text><text x="1020" y="176" fill="#6b7689" font-size="11">disposition → history</text>
+  </g>
+  <g stroke="#2c3650" stroke-width="2">
+    <line x1="290" y1="158" x2="342" y2="158" marker-end="url(#arr)"/>
+    <line x1="570" y1="158" x2="622" y2="158" marker-end="url(#arr)"/>
+    <line x1="850" y1="158" x2="902" y2="158" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- Unit statuses -->
+  <text x="70" y="248" fill="#9fb0ff" font-size="15" font-weight="700">UNIT STATUSES — the same colours on every terminal</text>
+  <g font-size="13" font-weight="700" text-anchor="middle">
+    <rect x="70"  y="266" width="140" height="52" rx="8" fill="#101a10" stroke="#2fae2f" stroke-width="2"/>
+    <text x="140" y="288" fill="#7dff7d">CLEAR · CL</text><text x="140" y="306" fill="#2fae2f" font-size="10">available — DETACHES</text>
+    <rect x="222" y="266" width="140" height="52" rx="8" fill="#1a1610" stroke="#d08a2a" stroke-width="2"/>
+    <text x="292" y="288" fill="#ffd9a0">ENROUTE · EN</text><text x="292" y="306" fill="#d08a2a" font-size="10">auto when attached</text>
+    <rect x="374" y="266" width="140" height="52" rx="8" fill="#101a2e" stroke="#4a5cff" stroke-width="2"/>
+    <text x="444" y="288" fill="#9fb0ff">CODE SIX · C6</text><text x="444" y="306" fill="#4a5cff" font-size="10">LEO — investigating</text>
+    <rect x="526" y="266" width="140" height="52" rx="8" fill="#101a2e" stroke="#4a5cff" stroke-width="2"/>
+    <text x="596" y="288" fill="#9fb0ff">ON SCENE · AS</text><text x="596" y="306" fill="#4a5cff" font-size="10">Fire/EMS — arrived</text>
+    <rect x="678" y="266" width="140" height="52" rx="8" fill="#16101a" stroke="#8c14a8" stroke-width="2"/>
+    <text x="748" y="288" fill="#d8a8ff">BUSY · BY</text><text x="748" y="306" fill="#8c14a8" font-size="10">occupied</text>
+    <rect x="830" y="266" width="140" height="52" rx="8" fill="#16090b" stroke="#d04a4a" stroke-width="2"/>
+    <text x="900" y="288" fill="#ffb0b0">UNAVAIL · UA</text><text x="900" y="306" fill="#d04a4a" font-size="10">off the air</text>
+    <rect x="982" y="266" width="148" height="52" rx="8" fill="#0a0d13" stroke="#6b7689" stroke-width="2"/>
+    <text x="1056" y="288" fill="#c9d2e0">STATION · ST</text><text x="1056" y="306" fill="#6b7689" font-size="10">off the road</text>
+  </g>
+
+  <rect x="70" y="346" width="1060" height="52" rx="10" fill="none" stroke="#8a9a2f" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="94" y="378" fill="#dcea8a" font-size="14" font-weight="700">⚠ Only CLEAR detaches you from an incident — every other status keeps the attachment, so going BUSY on scene never loses your call.</text>
+
+  <text x="60" y="432" fill="#6b7689" font-size="14" font-weight="600">Server-authoritative — a status set anywhere is instantly visible on every terminal and the dispatch console.</text>
+</svg>

@@ -6,6 +6,8 @@ title: "Replay & Director's Cut"
 
 **`/replay`** records what happens around you and plays it back. A take samples every nearby player — plus whatever vehicle they are sitting in — ten times a second into a clip; playback rebuilds the scene out of **ghost entities** and watches it through a camera you direct.
 
+![The replay pipeline — record, library, playback, cutting room](/img/guide/replay-pipeline.svg)
+
 This is the raw material for trailers and highlight videos. It is deliberately **not an admin tool**: playback is local to whoever started it, nobody else on the server sees it, and nothing in it is real. (For an evidence trail, see the [Big Brother log](/features/security).)
 
 > ⚠️ **It ships off.** `Replay.enabled = false` in `configs/cfg-replay-sh.lua` — clips live on **your** disk and every player gets a recorder, so having it is a decision you make. Set it to `true` and restart; nothing else needs changing.
