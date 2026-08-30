@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/><rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 504 V532 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">CIVILIAN LAYER — <tspan fill="#6c8cff">RP-ONLY, NO ECONOMY</tspan></text>
+
+  <!-- Radial -->
+  <g transform="translate(340 310)">
+    <circle r="150" fill="#0e1220" stroke="#4a5cff" stroke-width="3"/>
+    <circle r="52" fill="#0a0d13" stroke="#6c8cff" stroke-width="2"/>
+    <text y="-6" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">CIVILIAN</text>
+    <text y="14" fill="#9fb0ff" font-size="13" font-weight="700" text-anchor="middle">RADIAL</text>
+    <g stroke="#2c3650" stroke-width="2">
+      <line x1="0" y1="-52" x2="0" y2="-150"/><line x1="0" y1="52" x2="0" y2="150"/>
+      <line x1="-52" y1="0" x2="-150" y2="0"/><line x1="52" y1="0" x2="150" y2="0"/>
+    </g>
+    <g font-size="13" font-weight="700" fill="#9fb0ff" text-anchor="middle">
+      <text x="-75" y="-90">EMOTES</text>
+      <text x="75" y="-90">MY ID</text>
+      <text x="-75" y="100">PROPS</text>
+      <text x="75" y="100">SERVICES</text>
+    </g>
+  </g>
+
+  <!-- Emote bridge -->
+  <rect x="80" y="100" width="280" height="88" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+  <text x="220" y="128" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">EMOTES — BRIDGED</text>
+  <text x="220" y="150" fill="#9fb0ff" font-size="12" font-weight="600" text-anchor="middle">auto-detects DPEmotes / RPEmotes-Reborn</text>
+  <text x="220" y="170" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">no own animation engine — no clashes</text>
+  <line x1="255" y1="188" x2="285" y2="212" stroke="#2c3650" stroke-width="2"/>
+
+  <!-- Right column: tools -->
+  <g font-size="14" font-weight="700">
+    <rect x="620" y="110" width="500" height="74" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+    <text x="644" y="140" fill="#e7ecf5">🪪 DIGITAL ID + SELF-SERVICE VEHICLE REGISTRATION</text>
+    <text x="644" y="164" fill="#6b7689" font-size="12">show your ID to nearby players · registered plates appear in LEO queries</text>
+
+    <rect x="620" y="200" width="500" height="74" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+    <text x="644" y="230" fill="#e7ecf5">🚧 PROPS — cones, barriers, signs, chairs</text>
+    <text x="644" y="254" fill="#6b7689" font-size="12">server-synced for everyone · per-player limit · pick up / delete your own</text>
+
+    <rect x="620" y="290" width="500" height="74" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+    <text x="644" y="320" fill="#e7ecf5">👥 ORGANISATIONS / GANGS</text>
+    <text x="644" y="344" fill="#6b7689" font-size="12">name · tag · colour · MOTD · ranks — LEO sees affiliation in the MDT query</text>
+
+    <rect x="620" y="380" width="500" height="74" rx="12" fill="none" stroke="#d04a4a" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="644" y="410" fill="#ffb0b0">⚔ TURF WAR — OPT-IN, OFF BY DEFAULT</text>
+    <text x="644" y="434" fill="#6b7689" font-size="12">kill-based capture bar per zone · influence is prestige, not money · anti-farm cooldowns</text>
+  </g>
+
+  <text x="60" y="520" fill="#6b7689" font-size="15" font-weight="600">Progression runs on the achievements/XP layer — deliberately no money anywhere in the civilian update.</text>
+</svg>

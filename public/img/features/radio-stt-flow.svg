@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/></marker>
+  </defs>
+  <rect width="1200" height="500" fill="url(#bg)"/><rect width="1200" height="500" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 444 V472 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">RADIO TRANSCRIPT — <tspan fill="#6c8cff">FULLY OFFLINE STT</tspan></text>
+
+  <!-- Step 1: PTT -->
+  <rect x="70" y="140" width="230" height="120" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+  <text x="185" y="172" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">🎙 HOLD PTT &amp; SPEAK</text>
+  <text x="185" y="198" fill="#9fb0ff" font-size="12" font-weight="600" text-anchor="middle">on-duty units only</text>
+  <text x="185" y="220" fill="#6b7689" font-size="12" font-weight="600" text-anchor="middle">live 🎙… chip shows the</text>
+  <text x="185" y="238" fill="#6b7689" font-size="12" font-weight="600" text-anchor="middle">partial transcript</text>
+  <line x1="300" y1="200" x2="380" y2="200" stroke="#2c3650" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Step 2: local Vosk -->
+  <rect x="390" y="120" width="290" height="160" rx="12" fill="#0e1220" stroke="#4a5cff" stroke-width="3"/>
+  <text x="535" y="152" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">VOSK — ON YOUR CLIENT</text>
+  <text x="535" y="178" fill="#9fb0ff" font-size="12" font-weight="600" text-anchor="middle">WebAssembly · self-hosted model</text>
+  <text x="535" y="200" fill="#9fb0ff" font-size="12" font-weight="600" text-anchor="middle">radio grammar: ten-codes + phonetics</text>
+  <rect x="420" y="216" width="230" height="26" rx="6" fill="#101a10" stroke="#2fae2f"/>
+  <text x="535" y="234" fill="#7dff7d" font-size="12" font-weight="700" text-anchor="middle">no cloud · no API keys · no cost</text>
+  <text x="535" y="266" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">downloaded once per client, cached</text>
+  <line x1="680" y1="200" x2="760" y2="200" stroke="#2c3650" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Step 3: server + log -->
+  <rect x="770" y="120" width="360" height="160" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+  <text x="950" y="152" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">SERVER → /radiolog</text>
+  <g font-size="12" font-weight="600">
+    <text x="794" y="182" fill="#8fb4ff">14:31 [1A-12 · LAPD]</text><text x="960" y="182" fill="#9fb0ff">“code four at main street”</text>
+    <text x="794" y="206" fill="#e0c93a">14:32 [285A · LASD]</text><text x="960" y="206" fill="#9fb0ff">“ten ninety-eight”</text>
+    <text x="794" y="230" fill="#ff9b8b">14:33 [M-201 · EMS]</text><text x="960" y="230" fill="#9fb0ff">“enroute to acacia”</text>
+  </g>
+  <text x="950" y="262" fill="#6b7689" font-size="11" font-weight="600" text-anchor="middle">searchable · dept-coloured badges · shared with dispatch + MDTs</text>
+
+  <!-- 911 note -->
+  <rect x="390" y="320" width="740" height="70" rx="12" fill="none" stroke="#8a9a2f" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="414" y="348" fill="#dcea8a" font-size="14" font-weight="700">📞 911/311 CALLS — both sides transcribed automatically while connected</text>
+  <text x="414" y="372" fill="#8a9a2f" font-size="12" font-weight="600">free recognition (no radio grammar) · live in the call session · saved to the call log · toggle STT.calls</text>
+
+  <rect x="70" y="320" width="290" height="70" rx="12" fill="none" stroke="#d04a4a" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="215" y="348" fill="#ffb0b0" font-size="14" font-weight="700" text-anchor="middle">⚠ EXPERIMENTAL</text>
+  <text x="215" y="372" fill="#d04a4a" font-size="12" font-weight="600" text-anchor="middle">STT.enabled = false by default</text>
+
+  <text x="60" y="455" fill="#6b7689" font-size="15" font-weight="600">Recognition uses each client's own CPU — the server never transcribes. Clients that can't init simply can't transmit; they still read the log.</text>
+</svg>

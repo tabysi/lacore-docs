@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/></marker>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/><rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 504 V532 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">BOLOS &amp; CHARGES — <tspan fill="#6c8cff">ONE RECORD, EVERY SURFACE</tspan></text>
+
+  <!-- Center: person record -->
+  <rect x="450" y="170" width="300" height="220" rx="12" fill="#0e1220" stroke="#4a5cff" stroke-width="3"/>
+  <text x="600" y="202" fill="#e7ecf5" font-size="18" font-weight="700" text-anchor="middle">PERSON RECORD</text>
+  <g font-size="14" font-weight="600">
+    <text x="478" y="236" fill="#9fb0ff">• Charges &amp; citations</text>
+    <text x="478" y="262" fill="#9fb0ff">• BOLO hits (person / plate)</text>
+    <text x="478" y="288" fill="#9fb0ff">• Reports &amp; evidence</text>
+    <text x="478" y="314" fill="#ff7b6b">• ACTIVE WARRANT flag</text>
+  </g>
+  <rect x="478" y="334" width="244" height="30" rx="6" fill="#1a1030" stroke="#8c14a8"/>
+  <text x="600" y="354" fill="#d8a8ff" font-size="12" font-weight="700" text-anchor="middle">penal code — configurable</text>
+
+  <!-- Left: who writes -->
+  <g font-size="14" font-weight="700" text-anchor="middle">
+    <rect x="80" y="200" width="240" height="60" rx="10" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
+    <text x="200" y="226" fill="#e7ecf5">ANY ON-DUTY UNIT</text>
+    <text x="200" y="246" fill="#6b7689" font-size="12">creates BOLOs · files charges · sets warrants</text>
+  </g>
+  <line x1="320" y1="230" x2="442" y2="260" stroke="#2c3650" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Right: surfaces -->
+  <g font-size="14" font-weight="700" text-anchor="middle">
+    <rect x="880" y="120" width="240" height="52" rx="10" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/><text x="1000" y="152" fill="#e7ecf5">MDT / CAD QUERY</text>
+    <rect x="880" y="192" width="240" height="52" rx="10" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/><text x="1000" y="224" fill="#e7ecf5">DISPATCH CONSOLE</text>
+    <rect x="880" y="264" width="240" height="52" rx="10" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/><text x="1000" y="296" fill="#e7ecf5">PERSON CARD</text>
+    <rect x="880" y="336" width="240" height="52" rx="10" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/><text x="1000" y="368" fill="#e7ecf5">CCTV SCANNER</text>
+  </g>
+  <g stroke="#2c3650" stroke-width="2">
+    <line x1="750" y1="220" x2="872" y2="150" marker-end="url(#arr)"/>
+    <line x1="750" y1="255" x2="872" y2="220" marker-end="url(#arr)"/>
+    <line x1="750" y1="300" x2="872" y2="292" marker-end="url(#arr)"/>
+    <line x1="750" y1="335" x2="872" y2="360" marker-end="url(#arr)"/>
+  </g>
+
+  <text x="60" y="470" fill="#6b7689" font-size="15" font-weight="600">A BOLO created on any terminal — LAPD, LASD, Agency, 9100-T — is live everywhere, and the red</text>
+  <text x="60" y="492" fill="#6b7689" font-size="15" font-weight="600">ACTIVE WARRANT flag follows the person onto every query and the CCTV scan card. Server-authoritative + audited.</text>
+</svg>
