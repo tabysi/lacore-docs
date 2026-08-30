@@ -3,6 +3,62 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.2] – 2026-08-30 — Reports that ask the right questions
+
+### Added
+
+#### Five real report forms — and a way to write your own
+
+Every report type used to be the same form: pick a type, write a narrative. A Use of Force report
+and a tow sheet asked exactly the same question, which is to say neither of them asked anything.
+
+![Reports that ask the right questions](/img/changelog/report-forms.svg)
+
+Five types now carry **their own fields**:
+
+| Report | Asks about |
+| --- | --- |
+| **Incident** | classification, when it occurred, who reported it, witnesses, property, cleared by arrest |
+| **Use of Force** | the subject's action *before* the force used, rounds fired, injuries, medical aid, supervisor, body-cam |
+| **Traffic Collision** | severity, vehicles, direction, weather/road, primary collision factor, towed, EMS |
+| **DUI** | suspected substance, BAC, refusal, field sobriety tests, driving observed, vehicle, towed |
+| **CHP-180** | plate, VIN, make/model, authority for removal, removed from, stored at, tow company, odometer, **condition before the tow**, contents, hold |
+
+Arrest, Field Interview and Supplemental stay plain narrative reports, exactly as before.
+
+**The forms are declared, not coded.** A type's fields live in `configs/cfg-evidence-sh.lua`, and
+the form in the LAPD MDT, the LASD CAD, the PCMS and the Agency MDT is *rendered from that table*.
+Add a field to the config and it appears in all of them, with no code change — which is also why
+this is five forms rather than five forms times six terminals.
+
+**The schema is a contract, not a suggestion.** The same table the form is drawn from is what the
+server validates against: a key the schema does not declare is dropped, a select accepts only its
+own options, numbers are clamped to their range, text is capped, and a missing required field
+rejects the report and **names itself** back to the officer. The greyed-out submit button is a
+courtesy; the schema is the rule.
+
+**The answers are written into the record, not just stored beside it.** The filled-in fields are
+rendered as a readable block at the top of the report body, so the person's record card, the case
+file and the Discord webhook all show them without knowing anything about schemas. A report whose
+answers only live in a field nobody renders is a report nobody reads. The structured copy is kept
+alongside, for anything that wants the answers as data.
+
+Required fields are named while you fill the form — "Still required: Plate, Make / model" — rather
+than leaving you to guess why Submit is grey.
+
+> ⚠️ **Config change:** `configs/cfg-evidence-sh.lua` — `Evidence.reportTypes` entries may now carry
+> a `fields` table, and two new types ship (`dui`, `chp180`). An existing config keeps working
+> untouched: a type without `fields` is a plain narrative report, exactly as before.
+
+Not tested in-game. Lua syntax-checked, `cd web && npm run build` green, the form driven in the
+browser preview (fields appear per type, required fields named, submit gated, switching type clears
+the answers rather than carrying a BAC reading into a tow sheet), and the validation exercised
+offline against the real shipped schema: an undeclared key is dropped, an invalid select refused by
+name, required fields named one at a time, numbers clamped both ways, an unticked box stored as
+absent rather than as "false", a plain type storing nothing, and the rendered block checked
+line by line — including a multi-line answer indented under its label.
+
+
 ## [3.5.1] – 2026-08-30 — The car reads the street
 
 ### Added

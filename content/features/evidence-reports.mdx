@@ -17,19 +17,59 @@ from the MDT.
 
 ### Choose a type
 
-Report types are configured in `cfg-evidence-sh.lua` (e.g. *Incident Report*, *Arrest Report*,
-*Use of Force*).
+Report types are configured in `cfg-evidence-sh.lua`. Shipped: *Incident*, *Use of Force*, *Traffic
+Collision*, *DUI*, *CHP-180 (Tow / Stored Vehicle)*, *Arrest Report*, *Field Interview* and
+*Supplemental*.
+
+### Answer the type's questions
+
+Five of those types carry **their own fields** — a DUI asks for the BAC reading and the driving you
+observed; a CHP-180 asks where the car was removed from, where it is stored and what damage it
+already had. The form changes with the type you pick. Required fields are named while you fill it in.
 
 ### Write the narrative
 
-Enter the report narrative. The report is stored on the subject's record with the filing officer and
-date.
+Enter the report narrative — what the fields do not already say. The report is stored on the
+subject's record with the filing officer and date, and the answers you gave are written into it as a
+readable block above your narrative.
 
 ### Review
 
 Authorised units (faction / staff) see the report in the MDT query and person card.
 
 </Steps>
+
+### Writing your own form
+
+A report type's questions are declared in `configs/cfg-evidence-sh.lua`, and every terminal renders
+its form from that table — add a field and it appears in the LAPD MDT, the LASD CAD, the PCMS and
+the Agency MDT at once.
+
+![Reports that ask the right questions](/img/features/report-forms.svg)
+
+```lua
+{ id = "chp180", label = "CHP-180 (Tow / Stored Vehicle)", fields = {
+    { id = "plate",  label = "Plate", type = "text", max = 12, required = true },
+    { id = "reason", label = "Authority for removal", type = "select", required = true,
+      options = { "Abandoned", "Evidence / hold", "Arrest of driver" } },
+    { id = "hold",   label = "Hold — do not release", type = "check" },
+} },
+```
+
+| Key | What it does |
+| --- | --- |
+| `id` | Unique within the type. Stored as the key. |
+| `label` | What the officer reads. |
+| `type` | `text` (default) · `textarea` · `select` · `check` · `number` · `date` |
+| `options` | For `select` — the allowed values, and nothing else is accepted |
+| `max` | text: characters. number: largest value |
+| `min` | number: smallest value |
+| `required` | The form will not submit without it |
+| `help` | One line under the field |
+
+**The same table is what the server validates against**: a key it does not find there is dropped, a
+select takes only its own options, numbers are clamped and text is capped, and a missing required
+field rejects the report. A type with no `fields` is a plain narrative report.
 
 ## Evidence
 

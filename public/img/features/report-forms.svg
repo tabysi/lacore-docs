@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="620" fill="url(#bg)"/>
+  <rect width="1200" height="620" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 564 V592 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">REPORTS THAT <tspan fill="#6c8cff">ASK THE RIGHT QUESTIONS</tspan></text>
+
+  <!-- The schema -->
+  <rect x="60" y="96" width="380" height="290" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="82" y="126" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">configs/cfg-evidence-sh.lua</text>
+  <g font-family="'Consolas', monospace" font-size="11.5">
+    <text x="82" y="156" fill="#7d8798">{ id = "chp180", label = "CHP-180",</text>
+    <text x="82" y="176" fill="#7d8798">  fields = {</text>
+    <text x="82" y="196" fill="#e7ecf5">    { id = "plate", label = "Plate",</text>
+    <text x="82" y="214" fill="#e7ecf5">      type = "text", required = true },</text>
+    <text x="82" y="238" fill="#e7ecf5">    { id = "reason", type = "select",</text>
+    <text x="82" y="256" fill="#e7ecf5">      options = { "Abandoned", … } },</text>
+    <text x="82" y="280" fill="#e7ecf5">    { id = "hold", type = "check" },</text>
+    <text x="82" y="300" fill="#7d8798">  } }</text>
+  </g>
+  <line x1="82" y1="322" x2="418" y2="322" stroke="#2c3650" stroke-width="1"/>
+  <text x="82" y="346" fill="#7d8798" font-size="12.5">Add a field here and it appears in every</text>
+  <text x="82" y="366" fill="#7d8798" font-size="12.5">terminal at once. No code change.</text>
+
+  <line x1="448" y1="240" x2="486" y2="240" stroke="#4a5cff" stroke-width="2" marker-end="url(#a6)"/>
+
+  <!-- The form -->
+  <rect x="500" y="96" width="330" height="290" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="522" y="126" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">THE FORM, RENDERED</text>
+  <text x="522" y="154" fill="#7d8798" font-size="10">PLATE <tspan fill="#d1495b">*</tspan></text>
+  <rect x="522" y="160" width="130" height="22" rx="2" fill="#131a28" stroke="#2c3650"/>
+  <text x="530" y="176" fill="#e7ecf5" font-size="11.5" font-family="'Consolas', monospace">8XYZ004</text>
+  <text x="668" y="154" fill="#7d8798" font-size="10">MAKE / MODEL <tspan fill="#d1495b">*</tspan></text>
+  <rect x="668" y="160" width="140" height="22" rx="2" fill="#131a28" stroke="#2c3650"/>
+  <text x="676" y="176" fill="#e7ecf5" font-size="11.5">Bravado Buffalo</text>
+
+  <text x="522" y="204" fill="#7d8798" font-size="10">AUTHORITY FOR REMOVAL <tspan fill="#d1495b">*</tspan></text>
+  <rect x="522" y="210" width="286" height="22" rx="2" fill="#131a28" stroke="#2c3650"/>
+  <text x="530" y="226" fill="#e7ecf5" font-size="11.5">Abandoned ▾</text>
+
+  <text x="522" y="254" fill="#7d8798" font-size="10">CONDITION / DAMAGE NOTED</text>
+  <rect x="522" y="260" width="286" height="40" rx="2" fill="#131a28" stroke="#2c3650"/>
+  <text x="530" y="276" fill="#e7ecf5" font-size="11">Scrape on the rear quarter,</text>
+  <text x="530" y="292" fill="#e7ecf5" font-size="11">wing mirror missing.</text>
+
+  <rect x="522" y="314" width="12" height="12" rx="2" fill="#6c8cff"/>
+  <text x="542" y="325" fill="#e7ecf5" font-size="11.5">Hold — do not release</text>
+  <text x="522" y="356" fill="#d1495b" font-size="11">Still required: Plate, Make / model</text>
+  <text x="522" y="374" fill="#7d8798" font-size="10.5">— so a greyed-out Submit is never a guess.</text>
+
+  <!-- Server -->
+  <rect x="850" y="96" width="290" height="290" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="872" y="126" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">AND THE SERVER AGREES</text>
+  <g fill="#e7ecf5" font-size="12.5">
+    <text x="872" y="158">a key the schema does not</text>
+    <text x="872" y="176">declare is dropped</text>
+    <text x="872" y="204">a select takes only its</text>
+    <text x="872" y="222">own options</text>
+    <text x="872" y="250">numbers clamped, text capped</text>
+    <text x="872" y="278">a missing required field</text>
+    <text x="872" y="296">rejects the whole report</text>
+  </g>
+  <line x1="872" y1="318" x2="1118" y2="318" stroke="#2c3650" stroke-width="1"/>
+  <text x="872" y="342" fill="#7d8798" font-size="12">A disabled button is a courtesy.</text>
+  <text x="872" y="360" fill="#7d8798" font-size="12">The schema is the rule.</text>
+
+  <!-- Five forms -->
+  <rect x="60" y="416" width="1080" height="76" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="446" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">SHIPPED FORMS</text>
+  <text x="84" y="472" fill="#e7ecf5" font-size="13">Incident · Use of Force · Traffic Collision · DUI · CHP-180 (Tow / Stored Vehicle) — plus Arrest, Field Interview and Supplemental as before.</text>
+
+  <text x="60" y="536" fill="#e7ecf5" font-size="14" font-weight="700" letter-spacing="2">THE ANSWERS ARE WRITTEN INTO THE RECORD, NOT JUST STORED BESIDE IT</text>
+  <text x="60" y="562" fill="#7d8798" font-size="13">Every existing reader — the record card, the case file, the webhook — shows the body. A report whose answers only live somewhere else is one nobody reads.</text>
+</svg>
