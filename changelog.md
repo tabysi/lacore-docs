@@ -140,6 +140,15 @@ so dropping this update onto a running server changes nothing until you edit it.
   and a page that doesn't fit gets another row instead of an invisible column — every player on the
   page is always on screen.
 
+- **Per-server config editing in the dashboard actually works now.** The scope picker's server
+  pills were never clickable — for anyone. The per-server override layer identified a server by
+  its Cfx `sv_licenseKey`, but FiveM redacts that convar from scripts, so every server reported
+  an empty key and the dashboard marked every one of them as "has not reported its identity yet".
+  "All servers" was the only editable scope any account ever had. A server's identity is now its
+  **dashboard license key** — which every server already sends and the backend already verifies —
+  so each server becomes individually editable on its next heartbeat, with no resource update
+  needed. Since the key is the identity, give each server its own key rather than sharing one.
+
 ## [3.4.9.8] – 2026-08-21 — A framework that starts late is still a framework
 
 ### Fixed
