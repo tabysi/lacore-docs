@@ -159,3 +159,10 @@ so dropping this update onto a running server changes nothing until you edit it.
   last-writer-win silently — the later save is now refused with "someone else saved this config
   in the meantime" and a one-click reload of their version. Revision history entries additionally
   record who overwrote them.
+
+- **The Data lists editor got the same protections.** Unsaved rows now show as "● unsaved
+  changes", the save button names its target (`SAVE → <server>`) and is disabled while nothing
+  changed, and switching the server pill, opening another list, navigating away or closing the
+  tab with unsaved edits asks first. Saving carries the stamp the rows were loaded on, so a
+  teammate's save in between is refused with a one-click reload of their rows instead of being
+  silently overwritten — RESET included.
