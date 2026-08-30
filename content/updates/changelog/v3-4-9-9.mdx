@@ -102,6 +102,14 @@ so dropping this update onto a running server changes nothing until you edit it.
   for every player, and pushed again once the server has finished loading them so a resource restart
   cannot leave clients holding an empty map.
 
+- **Changing the classic spawn point in the config actually moves the spawn now.** The
+  auto-spawn and the map-picker fallback in `client/events-cl.lua` had the power-plant
+  coordinates hardcoded, so editing `SpawnCfg.fallback` in `configs/cfg-spawns-sh.lua`
+  changed nothing — players kept spawning at the power plant whenever the spawn selector
+  was disabled, timed out or declined to open. Both paths now read `SpawnCfg.fallback`
+  (and apply its heading); the hardcoded point remains only as a last resort for a
+  broken or removed config.
+
 - **New calls turn the duty-status plate into an amber UNREAD badge.** An unread incoming call
   used to draw a wide black "Unread MDT Calls" bar; it now takes over the bottom-right status
   plate itself — same bordered style, amber, reading UNREAD until a terminal is opened. Two call
