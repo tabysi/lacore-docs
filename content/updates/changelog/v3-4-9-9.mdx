@@ -102,6 +102,12 @@ so dropping this update onto a running server changes nothing until you edit it.
   for every player, and pushed again once the server has finished loading them so a resource restart
   cannot leave clients holding an empty map.
 
+- **The phone no longer hides behind other resources' UI.** NUI frames of different resources
+  stack by resource start order, so a radio or radar HUD started after LACORE painted over the
+  phone. While the phone is open, LACORE now lifts its frame above the others (`SET_NUI_ZINDEX`)
+  and drops it back on close — so it never parks on top of another script's focused menu. On
+  clients older than late 2024 the native doesn't exist and behaviour is unchanged.
+
 - **The backup/EMS/Tow details prompt now lives inside the terminal — and ESC actually cancels.**
   Requesting backup, Fire/EMS, a coroner, a tow truck or a crime broadcast used to open the game's
   native on-screen keyboard for the optional details. That keyboard always draws UNDER the NUI, so
