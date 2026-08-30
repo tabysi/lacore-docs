@@ -49,8 +49,9 @@
     <text x="300" y="166" fill="#5a6474" font-size="13">white/grey · dept contains “lapd”</text>
     <!-- LASD -->
     <rect x="470" y="76" width="260" height="76" rx="10" fill="#05070b" stroke="#1789a2" stroke-width="2"/>
-    <text x="600" y="109" fill="#c7ad1d" font-size="17">LASD MDC</text>
-    <text x="600" y="132" fill="#1789a2" font-size="13">teal keys · lasd / sheriff / bcso</text>
+    <text x="600" y="105" fill="#c7ad1d" font-size="17">LASD MDC</text>
+    <text x="600" y="126" fill="#1789a2" font-size="13">lasd / sheriff / bcso</text>
+    <text x="600" y="143" fill="#6b7689" font-size="12">skins: MDC · CLASSIC PCMS</text>
     <!-- Agency -->
     <rect x="770" y="110" width="260" height="76" rx="10" fill="#0a1430" stroke="#2a52d0" stroke-width="2"/>
     <text x="900" y="143" fill="#c8d6ff" font-size="17">Agency MDT (CHP)</text>
