@@ -3,102 +3,6 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [Unreleased]
-
-#### Network activity in the admin panel
-- **Every server's Big Brother log now reaches the LACORE dashboard**, and staff read all of them in
-  one table: **Admin → Activity**. Bans, kicks, jails and warns with who-did-what-to-whom, anticheat
-  flags, connections, combat, chat, commands, vehicle spawns, MDT actions and profile changes —
-  filterable by category, severity, server, free text and time range, paged, with a Live toggle that
-  follows the newest page.
-
-  The question this exists for is the one that used to need three browser tabs and an SSH session:
-  *who banned that player, on which server, and what happened in the ten minutes before it.*
-
-  > ⚠ **This is not opt-in.** It ships with the licence and has no switch, unlike the anticheat's
-  > dashboard reporting. What leaves a customer's server is written out in plain language at the
-  > bottom of `configs/cfg-bigbrother-sv.lua` and in the docs: category, severity, action, the detail
-  > text, player name and identifier, server id, coordinates and zone where present, a timestamp, the
-  > hostname and the licence key — and for the `chat` and `command` categories the detail text is the
-  > message itself. Server owners with their own privacy obligations need to disclose it.
-  >
-  > What an owner still decides: the reporting rides on `BBLog()` rather than around it, so
-  > `BigBrother.enabled = false` or a category switched off in `BigBrother.categories` is never
-  > logged and therefore never sent. Collecting a category someone explicitly turned off locally
-  > would be a different thing from "the reporting has no off switch".
-
-  Transport is batched (`dashboard.batchSeconds`, default 30 s) and bounded (`dashboard.maxBatch`,
-  default 200 rows, oldest dropped first), so a full chat channel is not an HTTP storm and a server
-  that loses its uplink cannot grow the buffer without limit. Storage is capped per account and
-  trimmed oldest-first on every write — this is an operational feed with a short useful life, not an
-  archive, and one busy server must not fill the database on everyone else's behalf.
-
-- **Fixed: paging in `pb.list` was silently dropped.** Callers were already passing `page`, but the
-  helper never forwarded it, so the loop behind **Admin → Players** re-fetched page 1 every round and
-  only looked correct because the union-find dedup collapsed the repeats.
-
-> **New PocketBase collection to import:** `landing/pocketbase/pocketbase-activity-collection.json`
-> (`lacore_activity`).
-
-#### CAD terminals
-- **The three shipped sheriff's offices ride the Sheriff CAD now.** VCSO, RSO and SBCSD carry
-  `cad = "lasd"` in `configs/cfg-agencies-sh.lua` (the per-department `cad` field from 3.4.9.2), so
-  they open the CAD/PCMS terminal instead of the Agency MDT — which is what a sheriff's office
-  wants. Delete the line to put one of them back.
-
-#### Documentation
-- **Every config file is in the docs now.** The config file map was missing eight of them entirely —
-  case files, personnel files, the supervisor panel, the Pennsylvania CAD, the in-car screen, the
-  model library, the replay tool and the bug-report form — which meant the only way to find those
-  settings was to open the Lua and read the header. Three new pages carry them: **CAD Terminals &
-  Routing**, **Records, Personnel & Supervisor**, and **HUD & Player List**. The rest were folded
-  into the pages they belong to.
-- **The anti-cheat page grew a full configuration reference** — every detection with its side,
-  default action and what it is actually looking for, plus the trust score, whitelist, evidence
-  capture and dashboard reporting. Thresholds stay out of it on purpose: they live in the obfuscated
-  params file precisely so they are not a printed guide to staying under them.
-
-## [3.4.9.10] – 2026-08-27 — Out of the box, it explains itself
-
-A pass over everything a new customer touches first — driven by a customer-experience review of the
-product downloads, the shipped configs and the docs.
-
-### Changed
-
-- **The standalone products ship their manual.** `lacore-mdt` and `lacore-90s-cad` now include a
-  real step-by-step start guide as their README (requirements, minimal `server.cfg`, first boot with
-  `/lacore doctor`, which config file does what, troubleshooting), plus the adapted
-  `server.cfg.example`, `CHANGELOG.md` and `LICENSE.md`. Before, a buyer got the config files and a
-  20-line README pointing at documents that were never shipped.
-- **`set`, not `setr`, for the license key.** `lacore_license_key` is only ever read on the server,
-  so every console message, doc page and dashboard copy-line now says `set` — consistent with the
-  "never `setr` for secrets" rule (a replicated key would be readable by every client, and a stolen
-  key can link a foreign server to your dashboard account). Same for `lacore_playerbase_enforce`.
-  Existing `setr` lines keep working.
-- **The license key is part of the install path.** `START-HERE.md` (step 3) and
-  `server.cfg.example` now carry the `set lacore_license_key` line with a plain-language note on
-  what it unlocks — it used to be documented only in the Customer-Portal section of the docs.
-
-### Fixed
-
-- **Shipped configs no longer contain our own Discord role IDs.** Seven role IDs in
-  `cfg-server-sv.lua` were pre-filled with the LACORE dev server's values — plausible-looking but
-  foreign, so a customer who only replaced some of them got silently dead roles. They ship empty
-  now, and `DutyRoles["Law Enforcement"]` is open by default (with an empty LE role ID it would
-  have locked everyone out of going on duty).
-- **The MDT product's anticheat honeypots arm again.** The generated `fxmanifest` loads
-  `anticheat-params-sv.lua` explicitly before the module glob (the glob loads alphabetically, so
-  `events-sv` registered its handlers before the parameter list existed and armed nothing) and now
-  loads `modules/anticheat/*-sh.lua` at all. Its `escrow_ignore` also keeps `configs/.defaults/`
-  readable, so `/lacoreconfig` baselines work in the product.
-- **The docs tell the truth about the anticheat default.** `START-HERE.md` and `DOCS.md` still
-  claimed "off by default — enable after configuring"; since 3.3.2 it ships ON in **observe**
-  (log-only) mode. The troubleshooting entries now explain that players only get kicked after
-  someone switches `Mode` to `enforce`.
-- **Product builds zip on macOS/Linux too** — a system-`zip` fallback joins archiver and
-  PowerShell `Compress-Archive`.
-- **"What's New" in the docs was three release-series behind** — it now leads with 3.4.9.x.
-
 ## [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item
 
 ### Added
@@ -196,6 +100,13 @@ so dropping this update onto a running server changes nothing until you edit it.
   `/dispatch open` at least once. The overrides and the drawn polygons are now pulled once on join,
   for every player, and pushed again once the server has finished loading them so a resource restart
   cannot leave clients holding an empty map.
+
+- **The bar playerlist could silently hide players off the right screen edge.** The bar style pages
+  27 players at a time, but its cards had a fixed minimum width — on narrower displays the ninth
+  column no longer fit next to the server panel and was pushed past the screen edge, so a full page
+  showed only 24 of its 27 players (with 28 online: 24 on page one, three invisible, one on page
+  two). Cards now shrink to fit instead of overflowing; long names ellipsize, but every player on
+  the page is always on screen.
 
 ## [3.4.9.8] – 2026-08-21 — A framework that starts late is still a framework
 

@@ -68,7 +68,6 @@ agencies = {
     cad = "lapd",                       -- which CAD/MDT /mdt opens (see below)
     long = "Los Angeles Police Department",
     motto = "To Protect and Serve",
-    cad   = "lapd",                     -- which CAD design this agency opens
     equipment = {
       { weapon = "WEAPON_SERVICEPISTOL", components = { "COMPONENT_AT_PI_FLSH" } },
       { weapon = "WEAPON_TASER7", tint = 1 },
@@ -81,27 +80,14 @@ agencies = {
 }
 ```
 
-### Fields
+The `type` field controls which terminal a member gets and how dispatch treats them:
 
-| Field | Required | Description |
-| --- | --- | --- |
-| `type` | yes | The kind of department — see the table below. Decides the role, not the look. |
-| `short` | yes | What players type: `/onduty LAPD 1A-12`. Also what the CAD shows as the department. |
-| `long` | yes | Full name, shown in the MDT header and in the on-duty message. |
-| `motto` | no | One line under the name in the MDT. `""` for none. |
-| `cad` | no | **Which CAD/MDT design this agency opens** — see [Choosing the CAD design](#choosing-the-cad-design). |
-| `equipment` | no | Loadout handed out on duty. Supports `components`, `tint`, and `rack` (weapon goes in the vehicle rack instead of the officer's hands). |
-| `wallpaper` | no | `{ in-car screen, MDT background }` — texture names or an RGB triple. |
-| `primary` / `secondary` | no | MDT accent colours as `{ r, g, b }`. |
-
-The `type` field controls the role a member gets and how dispatch treats them:
-
-| `type` | Role |
+| `type` | Terminal / role |
 | --- | --- |
-| `Law Enforcement` | Full LEO: CAD, calls, units, queries, charges. |
-| `Fire/EMS` | Fire / medical units in the EMS CAD. |
+| `Law Enforcement` | LAPD / LASD / Agency MDT (by `short`/dept name). |
+| `Fire/EMS` | EMS / Fire CAD. |
 | `Coroner` | Coroner tools. |
-| `Tow Truck` | Tow contacts (the only type any player may go on duty as without membership). |
+| `Tow Truck` | Tow contacts. |
 | `Private Security` | CCTV `security` access + limited tools. |
 | `Animal Control` / `Public Works` | Utility departments. |
 
@@ -128,12 +114,6 @@ routing, as does leaving the field out.
 
 `equipment` entries support `components`, `tint`, and `rack` (weapon on a station rack). `wallpaper`
 is the MDT background (texture names or an RGB triple).
-
-<Callout type="info">
-  The three shipped sheriff's offices — **VCSO**, **RSO** and **SBCSD** — carry `cad = "lasd"` and
-  open the Sheriff CAD; their names say nothing about a terminal, so the automatic guess would put
-  them on the Agency MDT. Remove the line to put one of them back.
-</Callout>
 
 ## The other data lists (own files since 3.4.4)
 

@@ -39,7 +39,7 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-server-sv.lua` | server | [Discord & Duty](/configuration/discord) — devmode, Discord auth, duty roles, agency whitelist, vehicle-spawner permission, webhooks |
 | `configs/cfg-branding-sh.lua` | shared | [Branding & Backup](/configuration/branding) — your community/server name everywhere |
 | `configs/cfg-notify-sh.lua` | shared | [Notifications](/configuration/notifications) — LACORE / native GTA / custom notify resource |
-| `configs/cfg-hud-sh.lua` | shared | [HUD & player list](/configuration/hud) — HUD master switch, per-element toggles, `playerlistStyle` (`"duty"` / `"minimal"` / `"bar"`), `settingsCommand` |
+| `configs/cfg-hud-sh.lua` | shared | *(in-file)* — HUD master switch + per-element toggles (PLD, vehicle, player list, nameplates, MDT status/alerts) + `playerlistStyle` (`"duty"` / `"minimal"` / `"bar"`) + `settingsCommand` |
 | `configs/cfg-blips-cl.lua` | client | [World, blips & props](/configuration/world) — map blips |
 | `configs/cfg-areas-cl.lua` | client | [World, blips & props](/configuration/world) — area labels / zones |
 | `configs/cfg-spawns-sh.lua` | shared | [World, blips & props](/configuration/world) — map-based spawn picker (capture points with `/spawnpoint`) |
@@ -51,13 +51,9 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 
 | File | Scope | Controls |
 | --- | --- | --- |
-| `configs/cfg-mdt-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — MDT options (vehicle-only, close on exit, query broadcast) |
-| `configs/cfg-penn-sh.lua` | shared | [Pennsylvania CAD](/user-guide/pennsylvania-cad) — department tags, call types, dispositions (paid add-on) |
-| `configs/cfg-vehiclescreen-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — the CAD on the vehicle dashboard |
+| `configs/cfg-mdt-sh.lua` | shared | *(in-file)* — MDT options (e.g. only open the MDT while in a vehicle) |
 | `configs/cfg-mdt-labels-sh.lua` | shared | [Localisation](/configuration/localisation) — whitelabel: rename any MDT/CAD label |
-| `configs/cfg-supervisor-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — who counts as a supervisor |
-| `configs/cfg-cases-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — case types, narrative sections, roles, dispositions |
-| `configs/cfg-personnel-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — write access, entry types, certifications |
+| `configs/cfg-penn-sh.lua` | shared | [Pennsylvania CAD](/user-guide/pennsylvania-cad) — department tags, call types, dispositions (paid add-on) |
 | `configs/cfg-licenses-sh.lua` | shared | [Penal code & evidence](/configuration/law-enforcement) — import ESX licences into the MDT slots |
 | `configs/cfg-fingerprint-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — mobile fingerprint ID scanner |
 | `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
@@ -104,9 +100,7 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-remoteconfig-sh.lua` | server | [Anticheat & security](/configuration/security) — dashboard remote-config consent gate |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
 | `configs/cfg-presence-sh.lua` | shared | [Discord & Duty](/configuration/discord) — Discord Rich Presence |
-| `configs/cfg-report-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — the `/lacorereport` bug form |
-| `configs/cfg-library-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — model library uploads (empty `uploadUrl` = LACORE hosts them; set it to keep them on your own infrastructure) |
-| `configs/cfg-replay-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — replay recording, quotas, colour grades |
+| `configs/cfg-library-sh.lua` | shared | *(in-file)* — model library: where `/modelcapture` screenshots are uploaded. Empty = LACORE hosts them for you; set `uploadUrl` to keep them on your own infrastructure. **Not** remotely editable |
 
 ## Start here
 
