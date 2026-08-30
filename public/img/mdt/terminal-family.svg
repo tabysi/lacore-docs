@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#9fb0ff"/>
+      <stop offset="0.45" stop-color="#4a5cff"/>
+      <stop offset="1" stop-color="#2a35b0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="640" fill="url(#bg)"/>
+  <rect width="1200" height="640" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 584 V612 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">ONE BACKEND, <tspan fill="#6c8cff">EVERY TERMINAL</tspan></text>
+
+  <!-- Center: shared backend -->
+  <g transform="translate(600 330)">
+    <polygon points="0,-110 96,-55 96,55 0,110 -96,55 -96,-55" fill="#0e1220" stroke="#4a5cff" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="0" cy="-8" r="34" fill="none" stroke="#6c8cff" stroke-width="3"/>
+    <circle cx="0" cy="-8" r="12" fill="url(#core)"/>
+    <text x="0" y="52" fill="#e7ecf5" font-size="17" font-weight="700" text-anchor="middle">SHARED CAD</text>
+    <text x="0" y="74" fill="#9fb0ff" font-size="13" font-weight="600" text-anchor="middle">incidents · units · BOLOs</text>
+    <text x="0" y="92" fill="#9fb0ff" font-size="13" font-weight="600" text-anchor="middle">records · charges</text>
+  </g>
+
+  <!-- Connection lines -->
+  <g stroke="#2c3650" stroke-width="2">
+    <line x1="600" y1="220" x2="600" y2="150"/>
+    <line x1="504" y1="275" x2="300" y2="185"/>
+    <line x1="696" y1="275" x2="900" y2="185"/>
+    <line x1="504" y1="385" x2="300" y2="470"/>
+    <line x1="696" y1="385" x2="900" y2="470"/>
+    <line x1="600" y1="440" x2="600" y2="490"/>
+  </g>
+
+  <!-- Terminal boxes -->
+  <g font-weight="700" text-anchor="middle">
+    <!-- LAPD -->
+    <rect x="170" y="110" width="260" height="76" rx="10" fill="#f2f3f5" stroke="#b9c1cf" stroke-width="2"/>
+    <text x="300" y="143" fill="#10141c" font-size="17">LAPD Mobile Client</text>
+    <text x="300" y="166" fill="#5a6474" font-size="13">white/grey · dept contains “lapd”</text>
+    <!-- LASD -->
+    <rect x="470" y="76" width="260" height="76" rx="10" fill="#05070b" stroke="#1789a2" stroke-width="2"/>
+    <text x="600" y="109" fill="#c7ad1d" font-size="17">LASD MDC</text>
+    <text x="600" y="132" fill="#1789a2" font-size="13">teal keys · lasd / sheriff / bcso</text>
+    <!-- Agency -->
+    <rect x="770" y="110" width="260" height="76" rx="10" fill="#0a1430" stroke="#2a52d0" stroke-width="2"/>
+    <text x="900" y="143" fill="#c8d6ff" font-size="17">Agency MDT (CHP)</text>
+    <text x="900" y="166" fill="#6c8cff" font-size="13">dark-blue · every other LEO dept</text>
+    <!-- EMS -->
+    <rect x="170" y="440" width="260" height="76" rx="10" fill="#140a0a" stroke="#d04a4a" stroke-width="2"/>
+    <text x="300" y="473" fill="#ffb0b0" font-size="17">EMS / Fire CAD</text>
+    <text x="300" y="496" fill="#d04a4a" font-size="13">dark CAD · AMR / fire / ems / fd</text>
+    <!-- 9100-T -->
+    <rect x="770" y="440" width="260" height="76" rx="10" fill="#061006" stroke="#2fae2f" stroke-width="2"/>
+    <text x="900" y="473" fill="#7dff7d" font-size="17">9100-T Retro</text>
+    <text x="900" y="496" fill="#2fae2f" font-size="13">green CRT · dept contains “90s”</text>
+    <!-- Penn CAD -->
+    <rect x="470" y="500" width="260" height="76" rx="10" fill="#0b0f0a" stroke="#8a9a2f" stroke-width="2"/>
+    <text x="600" y="533" fill="#dcea8a" font-size="17">Pennsylvania CAD</text>
+    <text x="600" y="556" fill="#8a9a2f" font-size="13">paid add-on · Penn.deptTags</text>
+  </g>
+
+  <!-- Dispatch console + web dispatcher (left of the backend) -->
+  <line x1="504" y1="330" x2="330" y2="316" stroke="#2c3650" stroke-width="2"/>
+  <g font-weight="700" text-anchor="middle">
+    <rect x="110" y="278" width="220" height="42" rx="8" fill="none" stroke="#4a5cff" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="220" y="305" fill="#9fb0ff" font-size="14">DISPATCH CONSOLE</text>
+    <rect x="110" y="332" width="220" height="42" rx="8" fill="none" stroke="#2c3650" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="220" y="359" fill="#6b7689" font-size="14">WEB DISPATCHER</text>
+  </g>
+
+  <text x="60" y="620" fill="#6b7689" font-size="15" font-weight="600">`/mdt` routes by department · a BOLO, call or status set on one terminal is live on all of them</text>
+</svg>

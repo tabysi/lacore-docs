@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="620" fill="url(#bg)"/>
+  <rect width="1200" height="620" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 564 V592 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">IN-CAR <tspan fill="#6c8cff">SCREEN</tspan> — HOW IT SITS IN THE CRUISER</text>
+
+  <!-- Dashboard silhouette -->
+  <path d="M60 540 Q 180 400 380 386 L 820 386 Q 1020 400 1140 540 L 1140 560 L 60 560 Z"
+        fill="#0a0d13" stroke="#1a2131" stroke-width="2"/>
+  <!-- Steering wheel hint -->
+  <circle cx="300" cy="512" r="86" fill="none" stroke="#1a2131" stroke-width="10"/>
+  <circle cx="300" cy="512" r="86" fill="none" stroke="#2c3650" stroke-width="2"/>
+
+  <!-- Windshield -->
+  <path d="M150 100 L 1050 100 L 980 360 L 220 360 Z" fill="#0b1020" stroke="#1a2131" stroke-width="2" opacity="0.8"/>
+  <text x="600" y="220" fill="#2c3650" font-size="18" font-weight="600" text-anchor="middle" letter-spacing="4">— ROAD AHEAD, GAME INPUT STAYS ALIVE —</text>
+
+  <!-- Terminal screen on the dash -->
+  <g>
+    <rect x="620" y="300" width="330" height="216" rx="10" fill="#111318" stroke="#4a5cff" stroke-width="3"/>
+    <!-- mini LAPD client -->
+    <rect x="634" y="314" width="302" height="24" fill="#f2f3f5"/>
+    <text x="644" y="331" fill="#10141c" font-size="12" font-weight="700">LACORE MOBILE CLIENT — 1A-12</text>
+    <rect x="634" y="342" width="302" height="20" fill="#dfe3e9"/>
+    <text x="644" y="356" fill="#333" font-size="10" font-weight="700">CALLS  ·  UNITS  ·  QUERY  ·  BOLO  ·  STATUS</text>
+    <rect x="634" y="366" width="180" height="136" fill="#fafbfc" stroke="#c6ccd6"/>
+    <text x="644" y="384" fill="#333" font-size="10" font-weight="700">INC 2481 — TRAFFIC STOP</text>
+    <text x="644" y="400" fill="#666" font-size="10">MAIN ST / ROUTE 68</text>
+    <text x="644" y="416" fill="#666" font-size="10">1A-12 ENROUTE</text>
+    <rect x="820" y="366" width="116" height="136" fill="#eef1f5" stroke="#c6ccd6"/>
+    <text x="830" y="384" fill="#333" font-size="10" font-weight="700">UNITS</text>
+    <text x="830" y="400" fill="#666" font-size="10">1A-12 ENRT</text>
+    <text x="830" y="416" fill="#666" font-size="10">4A-31 CLEAR</text>
+  </g>
+
+  <!-- /cad zoom hint -->
+  <g stroke="#6c8cff" stroke-width="2" fill="none">
+    <path d="M560 420 Q 590 410 616 408" marker-end="none"/>
+  </g>
+  <rect x="404" y="398" width="150" height="40" rx="8" fill="none" stroke="#6c8cff" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="479" y="416" fill="#9fb0ff" font-size="14" font-weight="700" text-anchor="middle">/cad</text>
+  <text x="479" y="432" fill="#9fb0ff" font-size="11" font-weight="600" text-anchor="middle">camera leans in + mouse</text>
+
+  <text x="60" y="600" fill="#6b7689" font-size="15" font-weight="600">Drawn per client — your partner sees their own terminal · a civilian in the same seat sees the vehicle's stock texture</text>
+</svg>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="620" fill="url(#bg)"/>
+  <rect width="1200" height="620" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 564 V592 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">PENNSYLVANIA <tspan fill="#6c8cff">CAD</tspan> — SCREEN LAYOUT</text>
+
+  <!-- Terminal frame -->
+  <rect x="60" y="84" width="1080" height="460" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+
+  <!-- F-key rail (left) -->
+  <g font-size="11" font-weight="700">
+    <rect x="76" y="100" width="150" height="428" fill="#0a0d13" stroke="#1a2131"/>
+    <g text-anchor="middle">
+      <rect x="86" y="112" width="130" height="40" fill="#10160e" stroke="#8a9a2f"/>
+      <text x="151" y="129" fill="#dcea8a">F1</text><text x="151" y="144" fill="#dcea8a">MY CALL INFO</text>
+      <rect x="86" y="160" width="130" height="40" fill="#10160e" stroke="#8a9a2f"/>
+      <text x="151" y="177" fill="#dcea8a">F2</text><text x="151" y="192" fill="#dcea8a">CREATE A CALL</text>
+      <rect x="86" y="208" width="130" height="40" fill="#10160e" stroke="#8a9a2f"/>
+      <text x="151" y="225" fill="#dcea8a">F3</text><text x="151" y="240" fill="#dcea8a">QUERY</text>
+      <rect x="86" y="256" width="130" height="40" fill="#10160e" stroke="#8a9a2f"/>
+      <text x="151" y="273" fill="#dcea8a">F4</text><text x="151" y="288" fill="#dcea8a">MESSAGING</text>
+      <rect x="86" y="304" width="130" height="40" fill="#10160e" stroke="#8a9a2f"/>
+      <text x="151" y="321" fill="#dcea8a">F5</text><text x="151" y="336" fill="#dcea8a">ADMIN</text>
+      <rect x="86" y="466" width="130" height="40" fill="#2a0d0d" stroke="#d04a4a"/>
+      <text x="151" y="483" fill="#ffb0b0">PANIC</text><text x="151" y="498" fill="#ffb0b0">BUTTON</text>
+    </g>
+  </g>
+
+  <!-- Current Units table -->
+  <rect x="242" y="100" width="882" height="20" fill="#1a2416"/>
+  <text x="252" y="115" fill="#dcea8a" font-size="12" font-weight="700">CURRENT UNITS</text>
+  <rect x="242" y="120" width="882" height="130" fill="#0a0d13" stroke="#1a2131"/>
+  <g fill="#9fdc8a" font-size="12" font-weight="600">
+    <text x="252" y="140">UNIT</text><text x="380" y="140">STATUS</text><text x="520" y="140">INC</text><text x="640" y="140">LOCATION</text>
+    <text x="252" y="162">4-A-12</text><text x="380" y="162">ENROUTE</text><text x="520" y="162">2481</text><text x="640" y="162">MAIN ST / ROUTE 68</text>
+    <text x="252" y="184">4-A-31</text><text x="380" y="184">AVAILABLE</text><text x="520" y="184">—</text><text x="640" y="184">—</text>
+    <text x="252" y="206">M-201</text><text x="380" y="206">ON SCENE</text><text x="520" y="206">2479</text><text x="640" y="206">8743 ACACIA AVE</text>
+  </g>
+
+  <!-- Current Incidents table -->
+  <rect x="242" y="262" width="882" height="20" fill="#1a2416"/>
+  <text x="252" y="277" fill="#dcea8a" font-size="12" font-weight="700">CURRENT INCIDENTS</text>
+  <rect x="242" y="282" width="882" height="150" fill="#0a0d13" stroke="#1a2131"/>
+  <g fill="#9fdc8a" font-size="12" font-weight="600">
+    <text x="252" y="302">INC</text><text x="350" y="302">TYPE</text><text x="560" y="302">PRI</text><text x="650" y="302">LOCATION</text><text x="920" y="302">UNITS</text>
+    <text x="252" y="324">2481</text><text x="350" y="324">TRAFFIC STOP</text><text x="560" y="324">3</text><text x="650" y="324">MAIN ST / ROUTE 68</text><text x="920" y="324">4-A-12</text>
+    <text x="252" y="346">2479</text><text x="350" y="346">STRUCTURE FIRE</text><text x="560" y="346">1</text><text x="650" y="346">8743 ACACIA AVE</text><text x="920" y="346">M-201 E-33</text>
+    <text x="252" y="368">2482</text><text x="350" y="368">DISTURBANCE</text><text x="560" y="368">2</text><text x="650" y="368">221 CARSON ST</text><text x="920" y="368">—</text>
+  </g>
+
+  <!-- Waiting strip -->
+  <rect x="242" y="444" width="882" height="26" fill="#2a2410"/>
+  <text x="683" y="462" fill="#f0c414" font-size="13" font-weight="700" text-anchor="middle">WAITING FOR RESPONSE …</text>
+
+  <!-- Command bar -->
+  <rect x="242" y="482" width="882" height="30" fill="#10160e" stroke="#8a9a2f"/>
+  <text x="252" y="502" fill="#dcea8a" font-size="13" font-weight="700">&gt; _  COMMAND LINE — create, clear, query, message</text>
+
+  <!-- Callout -->
+  <text x="60" y="586" fill="#6b7689" font-size="15" font-weight="600">F-key rail on the left · Current Units over Current Incidents · command line along the bottom — same shared CAD data as every other terminal</text>
+</svg>
