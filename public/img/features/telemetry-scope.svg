@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WHAT LEAVES <tspan fill="#6c8cff">YOUR SERVER</tspan> — and what never does</text>
+
+  <!-- Report 1 -->
+  <rect x="60" y="100" width="470" height="196" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="84" y="134" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">1 · SERVER REGISTRATION</text>
+  <text x="84" y="158" fill="#7d8798" font-size="12.5">start · heartbeat every 60 min · stop</text>
+  <g fill="#e7ecf5" font-size="13.5">
+    <text x="84" y="190">IP · hostname · resource + version</text>
+    <text x="84" y="214">licence keys · owner Discord</text>
+    <text x="84" y="238">slots · players · uptime</text>
+    <text x="84" y="262">8 server-browser convars (fixed list)</text>
+  </g>
+
+  <!-- Report 2 -->
+  <rect x="60" y="320" width="470" height="196" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="84" y="354" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">2 · SETUP REPORT</text>
+  <text x="84" y="378" fill="#7d8798" font-size="12.5">only when it changes · forced once a day</text>
+  <g fill="#e7ecf5" font-size="13.5">
+    <text x="84" y="410">framework (esx / qb / qbox / standalone)</text>
+    <text x="84" y="434">resource counts</text>
+    <text x="84" y="458">started third-party resources: name + version</text>
+    <text x="84" y="482">overlaps with LACORE features</text>
+  </g>
+
+  <!-- Relay -->
+  <rect x="580" y="248" width="180" height="120" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="670" y="296" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2" text-anchor="middle">WRITE-ONLY</text>
+  <text x="670" y="318" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2" text-anchor="middle">RELAY</text>
+  <text x="670" y="344" fill="#7d8798" font-size="12" text-anchor="middle">no DB host, no credential</text>
+  <line x1="530" y1="198" x2="572" y2="272" stroke="#4a5cff" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="530" y1="418" x2="572" y2="344" stroke="#4a5cff" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- Never -->
+  <rect x="810" y="100" width="330" height="416" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="834" y="134" fill="#7d8798" font-size="15" font-weight="700" letter-spacing="2">NEVER SENT</text>
+  <g fill="#7d8798" font-size="13.5">
+    <text x="834" y="176">✕  player identifiers</text>
+    <text x="834" y="206">✕  player names</text>
+    <text x="834" y="236">✕  chat</text>
+    <text x="834" y="266">✕  positions and actions</text>
+    <text x="834" y="296">✕  database contents</text>
+    <text x="834" y="326">✕  file contents</text>
+    <text x="834" y="356">✕  configs and scripts</text>
+    <text x="834" y="386">✕  secrets of any kind</text>
+    <text x="834" y="416">✕  arbitrary convars</text>
+  </g>
+  <line x1="834" y1="440" x2="1116" y2="440" stroke="#2c3650" stroke-width="1"/>
+  <text x="834" y="468" fill="#7d8798" font-size="12.5">The Lua runtime is sandboxed — the last</text>
+  <text x="834" y="488" fill="#7d8798" font-size="12.5">four are not reachable, not just unused.</text>
+
+  <text x="60" y="556" fill="#7d8798" font-size="13">Every field of both reports is listed in full on this page — a collector you cannot audit is a collector you should not trust.</text>
+</svg>

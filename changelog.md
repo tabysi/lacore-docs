@@ -3,16 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.5.0] – 2026-08-30 — The LASD terminal becomes a real MDC
-
-> ⚠️ In development — 3.5.0 is not released yet. Changes keep landing in this version until it
-> ships; treat everything below as the current work-in-progress state.
-
-![LASD MDC layout](/img/changelog/lasd-mdc-layout.svg)
+## [3.5.0] – 2026-08-30 — The terminals grow up, and the server explains itself
 
 ### Changed
 
 #### LASD MDC — full redesign with real dispatch procedure
+
+![LASD MDC layout](/img/changelog/lasd-mdc-layout.svg)
 
 The LASD PCMS terminal has been rebuilt from the ground up after the new LASD-MDC design
 (Figma) — and it no longer just looks different, it now *works* like the real thing.
@@ -88,6 +85,280 @@ crosshair is switched on, instead of running every single frame.
 > keep working untouched — a missing key counts as `false`, which is the previous behaviour.
 
 Not tested in-game yet — Lua syntax-checked only.
+
+#### LACORE looks around before it complains
+
+A new module, `modules/autoconfig/detect-sv.lua`, works out what is actually running on your
+server: which framework, which resources are up, and which of them do the same job as a LACORE
+feature. It is the groundwork for the self-configuring setup report — and on its own it already
+answers the question that starts most support tickets.
+
+![Environment detection — one answer, two consumers](/img/changelog/detect-environment.svg)
+
+Ten seconds after start, once late-starting resources have settled, the console says one line:
+
+```
+[lacore:detect] Framework: esx · 42 resources started (31 third-party)
+```
+
+And if something overlaps, a second one — naming it:
+
+```
+[lacore:detect] 3 resource(s) overlap a LACORE feature: ps-dispatch (dispatch system),
+                lb-phone (phone resource), qb-hud (HUD resource)
+```
+
+That is a statement, not an accusation. Running your own dispatch next to LACORE's is a perfectly
+normal setup; the line only tells you the overlap exists, so that "why do I get two 911 calls" is
+a two-second answer instead of an evening.
+
+Matching survives renaming, because everybody renames: `ps-dispatch`, `cd_dispatch` and
+`core_dispatch` are all recognised. Short words are matched on whole name parts rather than
+anywhere in the string, so `esx_arcade` is not reported as a CAD system and `decades_clothing` is
+not reported at all.
+
+**The framework is not detected twice.** `modules/bridge` already works that out — export-based,
+and it corrects itself when the framework starts *after* LACORE. The new module reads that answer
+instead of forming its own, because two detections would disagree exactly on the servers where it
+matters.
+
+**And what it cannot do is written down.** FiveM's Lua runtime is sandboxed: a resource sees
+resource names, states and manifest versions. There is no walk through the FxServer folder tree —
+not left out, simply not offered by the platform. That limit is in the module's own header, so the
+next person to ask for it finds the answer where they are looking.
+
+Not tested in-game yet. Lua syntax-checked, and the matching rules verified against a mocked
+resource list (renamed resources recognised, look-alike names rejected, stopped and built-in
+resources ignored).
+
+#### The setup report
+
+Support for LACORE has always started the same way: *what does your server actually look like?*
+Three messages back and forth before the real question can even be asked. A new module,
+`modules/security/merz-sv.lua`, answers it up front — the framework, the started third-party
+resources with their versions, and which of them overlap a LACORE feature.
+
+![The setup report — sent when it changes, not on a clock](/img/changelog/setup-report-flow.svg)
+
+**It is sent when it changes, not on a clock.** A setup barely moves: the same framework and the
+same resources, week after week. So the report is fingerprinted and only sent when the fingerprint
+actually moves, plus one forced refresh every 24 hours so a record cannot quietly go stale. On a
+stable server that is about one report a day, and it rides the existing telemetry cadence — the
+resource does not gain a second clock.
+
+**It cannot grow.** The report is written onto the server's own row in the dashboard, not into a
+collection of its own. One server, one row, one current answer — a server that reshuffles its
+resources every hour still occupies exactly as much space as one that never changes.
+
+**What it does not send** is the part worth reading. No player identifiers, names, chat, positions
+or actions. No database contents. No file contents — not a config, not a script, not one line of
+either. No convars (those belong to the existing registration, which has an explicit allow-list).
+And not the player count: telemetry already reports that every heartbeat, and one number should
+have one sender.
+
+A resource listing is names, states and the `version` field of a manifest — the same information a
+player's own console shows them when they connect. Nothing in this module opens a file, and it
+could not if it tried: FiveM's Lua runtime is sandboxed, which is a fact about the platform rather
+than a promise about our restraint.
+
+**Caps say so.** The listing stops at 400 resources. If yours runs more, the count of what was left
+out travels with the report and the console says it out loud:
+
+```
+[lacore:setup] Setup report sent — 37 resource(s) over the 400-entry cap were not listed.
+```
+
+Every field of both reports — this one and the server registration that came before it — is now
+listed in full on its own documentation page, **Telemetry & Setup Report**. A collector you cannot
+audit is a collector you should not trust, so the page lists the fields rather than describing them.
+
+> ⚠️ **Dashboard change:** the `lacore_servers` collection gained two fields, `setupJson` and
+> `setupAt`. Re-import `landing/pocketbase/pocketbase-servers-collection.json` before the reports
+> can be stored — until then the ingest route accepts them and PocketBase drops the two fields.
+
+Not tested against the live service. Lua syntax-checked, the JavaScript side syntax-checked and the
+web app built; the send behaviour verified offline against stubbed natives (posts once at start,
+stays silent while nothing changes, posts again when a resource appears, and the payload carries no
+identifiers and no player count).
+
+#### The setup review — LACORE tells you what it would change
+
+Knowing what is running is only half of it. `modules/autoconfig/` now turns that into a short list
+of settings that would probably suit your server better, with a reason on every line. Run
+`/lacore autoconfig` any time; it also prints itself once at start, but only when it actually has
+something to say.
+
+![The setup review — it tells you, it does not do it](/img/changelog/autoconfig-review.svg)
+
+```
+[lacore:autoconfig] Setup review — framework: esx
+Nothing below has been changed. These are suggestions.
+
+Settings that may suit this server better (2):
+  features.cad.dispatch = false
+     ps-dispatch already runs a dispatch console — two of them means every call arrives twice.
+  features.phone = false
+     lb-phone is running — LACORE's own phone would be a second one on the same key.
+
+Worth knowing — no setting fixes these (1):
+  Second anticheat detected: FiveGuard
+     Two anticheats can punish the same player twice for one event. Decide which one owns bans.
+```
+
+**It changes nothing.** Not a config file, not a remote value, not one of its own suggestions. A
+resource that silently reconfigures somebody's server is the fastest way to lose them, so applying
+a line stays a human decision — you change it in `configs/` and restart, or set it in the dashboard.
+
+**Every line says why, and names the resource that caused it.** A suggestion that only says
+*recommended* is one nobody acts on, because acting on it would mean trusting it blindly. Naming
+`ps-dispatch` lets you check it in five seconds and disagree in ten.
+
+**A suggestion you are already following is not a suggestion.** The current value of every setting
+is read before the list is built, so a well-configured server gets a short list or none at all —
+not a wall of things it is already doing.
+
+**What it is allowed to suggest is bounded, by construction.** Every key must exist in the
+remote-config allowlist — the same typed list the dashboard's config editor is bound by — must
+match that key's declared type, and must not be one of the sensitive ones (upload URLs, Discord
+role ids). A rule cannot invent a setting or reach past the allowlist, because those are dropped by
+the gate rather than left to the rules being careful.
+
+**And that gate is what makes the AI hook safe to leave open.** `LacoreAutoConfigAdvisor` is an
+undefined function today — a documented seam for the local model that is meant to sit there later.
+Whatever it returns goes through exactly the same gate as a hand-written rule, and it never wins
+against one. An advisor can therefore be wrong, but it cannot be dangerous: the worst it can do is
+propose an allowlisted, correctly-typed, non-sensitive setting that you then decline.
+
+The suggestions ride along on the setup report, so support can start from what your server actually
+looks like instead of asking. The reasons stay in your console — those are for a person reading
+them, not for a database row.
+
+Not tested in-game. Lua syntax-checked and the rules exercised offline against a mocked environment:
+each rule fires on the right resource, a setting already in use is dropped, and the gate refuses an
+unknown key, a sensitive key, a wrongly-typed value and an advisor trying to overwrite a rule — with
+a deliberately broken advisor confirmed not to take the report down with it.
+
+#### An officer can finally see their own numbers
+
+**My Activity** — a new view in the LAPD MDT's rail and on the Agency MDT's function bar. Arrests,
+citations, warnings, calls closed, reports, evidence, and every charge you have filed broken down
+into Infraction, Misdemeanor and Felony.
+
+![My Activity — your own numbers, in your own terminal](/img/changelog/officer-stats.svg)
+
+It needs no permission, because it is about you: the server works out whose file to send from the
+connection asking, so the view cannot be pointed at anybody else. Reading *someone else's* file is
+still the Supervisor Panel's job — and discipline entries stay there, where they belong.
+
+**Warnings are a thing now.** Cite / Charge has a third button next to Citation and Arrest:
+**Warning** documents the stop and the charges without imposing anything — no fine, no jail, no
+booking. Until now, letting somebody off left either nothing behind or a free-text note that no
+statistic could count, which made a lenient officer look like an inactive one.
+
+**Charges carry their class.** Twenty parking tickets and twenty armed robberies used to be the same
+"twenty charges". The Infraction / Misdemeanor / Felony split fixes that — and a charge keeps the
+class it had **when it was issued**, because rewriting your penal code should change what happens
+next, not re-judge what already happened. Records written before this update are read from today's
+penal code instead, and a code that no longer exists there is counted as **Unclassified** rather
+than dropped: dropping it would make an old file look cleaner than it was.
+
+**Calls closed** counts the dispatch incidents you resolved, from the call audit — and counts
+**distinct incidents**, so resolving the same call twice is one call closed, not two.
+
+All of it keeps the existing design: the numbers are **counted by a scan** of what you actually
+authored, never a running total. A total drifts the first time a record is deleted or a save is
+lost; a scan can always be re-run. And the line under the figures still says **"counted from
+&lt;date&gt;"** — activity from before your personnel file existed carries no author to attribute,
+so it is not guessed at.
+
+The Supervisor Panel's Activity tab gained the same figures. A supervisor showing fewer numbers than
+the person they supervise would be an odd file to hold.
+
+Not tested in-game. Lua syntax-checked, `cd web && npm run build` green, and the counting logic
+exercised offline: the class breakdown, warnings, unattributable records, a call resolved twice
+counting once, a second scan producing the same answer, and an officer with no activity getting
+zeros rather than blanks. The view itself was driven in the browser preview against mocked data in
+both terminals — populated, empty ("no personnel file yet"), and the class bar's proportions.
+
+#### Six more agencies get their own terminal
+
+The Agency MDT — the terminal every LEO department except LAPD and LASD opens — went from seven
+colour skins to **thirteen**. New: **DOJ / BOI**, **State Parks**, **Fish & Wildlife**,
+**Marshals**, **Cal Fire** and **Coroner**.
+
+![Agency MDT — thirteen skins, one terminal](/img/changelog/agency-skins.svg)
+
+A skin is a **palette and nothing else**: same markup, same data, same server rules, ten CSS
+variables. Two departments can run different skins of the same terminal side by side, and the choice
+is remembered per player.
+
+The rule that keeps thirteen skins apart is that **no two share an accent colour** — the accent
+fills the active function key, so it is what the eye actually lands on. That is why the three
+green-ish agencies do not all end up green: DOJ takes gold on dark green, State Parks olive on tan,
+Fish & Wildlife deep-water teal. Cal Fire is ember orange rather than a second red, and Marshals
+bronze rather than a second gold.
+
+**Two contrast failures fixed on the way through.** Every skin's text on a filled accent key was
+measured, not eyeballed: Ranger Green was running white text on its bright green at **3.49:1** and
+the new Coroner skin came out at 4.11:1 — both under the 4.5:1 threshold. Both now carry an explicit
+`--a-on-accent`, and all thirteen clear it (4.65:1 to 16.83:1).
+
+Skin names are locale strings now, including the seven that already existed — they were hardcoded
+English in the component.
+
+Not tested in-game. `cd web && npm run build` green; all thirteen skins driven in the browser
+preview, the six new ones screenshotted, and the contrast ratio of every skin's active function key
+computed against the rendered page rather than the stylesheet.
+
+#### A whole city in one line
+
+Moving LACORE off Los Angeles used to mean editing two hundred lines of zone mapping by hand — and
+there was no way at all to change what a street is called. Both are now a **preset**:
+
+```lua
+-- configs/cfg-regions-sh.lua
+preset = "new-york",
+```
+
+![A whole city in one line](/img/changelog/region-presets.svg)
+
+That swaps the regions, the GTA-zone → region map **and** the street names in one go. Shipped:
+`los-angeles` (the map LACORE already had, plus a starter set of LA street names), `san-andreas`
+(vanilla — every zone keeps Rockstar's own name) and `new-york` (the five boroughs, all 88 zones
+mapped). They are plain JSON in `data/regionpresets/`, in cleartext: copy one, edit it, and it is
+your city.
+
+**Leaving the preset empty changes nothing at all.** No file is read and the config is used exactly
+as before — this is opt-in, and switching back is deleting one line.
+
+**Street renaming is new, and it is a display layer.** LACORE asked the game for a street name in
+**29 places across 12 files**, each one directly. They now all go through a single
+`LacoreStreetName()`, so a preset reaches the HUD, dispatch calls, the MDT, the air unit and the
+phone at once. What it does *not* touch: the GTA street hashes, the pause-map labels, or anything in
+the world. A street LACORE calls "Broadway" is still Vespucci Blvd to the game — and a street you
+did not list keeps its name.
+
+**A broken preset cannot break dispatch.** A file that is missing, misnamed or not valid JSON is
+skipped with a console message and your own config is used. Malformed sections inside an otherwise
+good preset are skipped individually.
+
+**One real bug fell out of the migration.** In `client/vehicle-cl.lua`, the Liberty City branch
+looked up the cross street by passing *coordinates* to the hash-key native, which cannot work — so
+every Liberty City address came back with an empty cross street. Both halves now come from one
+`GetStreetNameAtCoord` call, the same as everywhere else.
+
+> ⚠️ **Config change:** `configs/cfg-regions-sh.lua` gained the `preset` key. Existing config files
+> keep working untouched — a missing key means no preset, which is the previous behaviour.
+>
+> **Also note:** a server that has already run keeps `data/map_config.json` and
+> `data/zone_regions.json`, and **those win over the preset**. That is the usual reason a preset
+> looks like it did nothing. Delete both, or edit live in the dispatch console's Zone Editor.
+
+Not tested in-game. Lua syntax-checked across all 14 touched files, and the loader exercised
+offline against the real shipped preset files: no preset leaves the config untouched, each of the
+three presets applies its regions, zones and renames, an unlisted street keeps its name, an unknown
+hash still returns an empty string, and both a missing preset and a preset name containing a path
+are refused without disturbing the local config.
 
 
 ## [3.4.9.9] – 2026-08-22 — Everything that can be an item is an item

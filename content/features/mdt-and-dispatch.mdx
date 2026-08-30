@@ -24,8 +24,35 @@ Open with `/mdt`. Which terminal you get is routed automatically by your departm
 | **Agency** MDT | CHP dark-blue (re-skin of LAPD data) | any other LEO department |
 | **EMS / Fire** | dark CAD | `AMR` / `fire` / `ems` / `medic` / `fd` |
 
-Each terminal is draggable, opacity/scale adjustable, and theme-able (the Agency MDT ships several
-colour presets). Settings persist per player.
+Each terminal is draggable, opacity/scale adjustable, and theme-able. Settings persist per player.
+
+### Agency MDT skins
+
+The Agency MDT ships **thirteen** colour skins, picked from its own settings panel (the gear in the
+title bar) and remembered per player.
+
+![Agency MDT — thirteen skins, one terminal](/img/mdt/agency-skins.svg)
+
+| Skin | For |
+| --- | --- |
+| CHP Blue | Highway Patrol — the default |
+| SAHP Gold | State Highway Patrol |
+| Ranger Green | Park Ranger / Game Warden |
+| DOJ / BOI | Department of Justice, Bureau of Investigation |
+| State Parks | State Parks department |
+| Fish & Wildlife | Fish & Wildlife / conservation |
+| Marshals | Marshals service |
+| Cal Fire | Wildland fire agency |
+| Fire / EMS | Fire & EMS command |
+| Coroner | County Coroner |
+| Slate · White · Black | Neutral, light and high-contrast |
+
+A skin is a **palette and nothing else** — same markup, same data, same server rules; ten CSS
+variables change. Two departments can run different skins of the same terminal side by side.
+
+No two skins share an accent colour, because the accent is what fills the active function key and
+is therefore what the eye lands on. Every skin's text on a filled accent key clears a 4.5:1 contrast
+ratio — measured, not assumed.
 
 ## What the MDT does
 

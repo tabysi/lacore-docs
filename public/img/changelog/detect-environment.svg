@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/>
+  <rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 504 V532 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">ENVIRONMENT <tspan fill="#6c8cff">DETECTION</tspan> — one answer, two consumers</text>
+
+  <!-- What it reads -->
+  <rect x="60" y="96" width="330" height="290" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="82" y="128" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">WHAT THE SERVER OFFERS</text>
+  <g fill="#e7ecf5" font-size="14">
+    <text x="82" y="164">resource names</text>
+    <text x="82" y="192">resource states</text>
+    <text x="82" y="220">manifest metadata (version)</text>
+  </g>
+  <g fill="#4a5cff" font-size="14">
+    <text x="358" y="164" text-anchor="end">✓</text>
+    <text x="358" y="192" text-anchor="end">✓</text>
+    <text x="358" y="220" text-anchor="end">✓</text>
+  </g>
+  <line x1="82" y1="244" x2="368" y2="244" stroke="#2c3650" stroke-width="1"/>
+  <text x="82" y="274" fill="#7d8798" font-size="14">the FxServer folder tree</text>
+  <text x="358" y="274" fill="#7d8798" font-size="14" text-anchor="end">✕</text>
+  <text x="82" y="300" fill="#7d8798" font-size="14">files outside resources</text>
+  <text x="358" y="300" fill="#7d8798" font-size="14" text-anchor="end">✕</text>
+  <text x="82" y="342" fill="#7d8798" font-size="12.5">The Lua runtime is sandboxed — the two</text>
+  <text x="82" y="362" fill="#7d8798" font-size="12.5">crossed-out lines are not omissions.</text>
+
+  <!-- Detection module -->
+  <rect x="440" y="150" width="320" height="182" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="600" y="184" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2" text-anchor="middle">modules/autoconfig/detect-sv</text>
+  <g fill="#e7ecf5" font-size="13.5" text-anchor="middle">
+    <text x="600" y="216">LacoreDetect.framework()</text>
+    <text x="600" y="242">LacoreDetect.resources()</text>
+    <text x="600" y="268">LacoreDetect.conflicts()</text>
+    <text x="600" y="294">LacoreDetect.summary()</text>
+  </g>
+  <text x="600" y="320" fill="#7d8798" font-size="12.5" text-anchor="middle">cached · invalidated on start/stop</text>
+  <line x1="390" y1="241" x2="432" y2="241" stroke="#4a5cff" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Consumers -->
+  <rect x="820" y="128" width="320" height="86" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="842" y="160" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">AUTOCONFIG</text>
+  <text x="842" y="186" fill="#7d8798" font-size="13">recommends settings</text>
+
+  <rect x="820" y="234" width="320" height="86" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="842" y="266" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">MERZ</text>
+  <text x="842" y="292" fill="#7d8798" font-size="13">reports the setup</text>
+
+  <line x1="760" y1="215" x2="812" y2="180" stroke="#4a5cff" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="760" y1="266" x2="812" y2="276" stroke="#4a5cff" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Framework note -->
+  <rect x="440" y="366" width="700" height="72" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="462" y="396" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">THE FRAMEWORK COMES FROM THE BRIDGE</text>
+  <text x="462" y="422" fill="#7d8798" font-size="13">modules/bridge already detects it and corrects itself on a late start — a second detection would be a second truth.</text>
+
+  <!-- Console line -->
+  <rect x="60" y="416" width="330" height="88" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="82" y="446" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">ONCE AT BOOT</text>
+  <text x="82" y="472" fill="#4ade80" font-size="12" font-family="'Consolas', monospace">[lacore:detect] Framework: esx ·</text>
+  <text x="82" y="490" fill="#4ade80" font-size="12" font-family="'Consolas', monospace">42 started (31 third-party)</text>
+</svg>

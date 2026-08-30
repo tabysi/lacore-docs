@@ -1,6 +1,8 @@
 export default {
   index: 'Overview',
   editor: 'Config Editor',
+  autoconfig: 'Setup Review (Auto-Config)',
+  'region-presets': 'Region & Street Presets',
   features: 'Feature Toggles',
   branding: 'Branding & Backup',
   localisation: 'Localisation',

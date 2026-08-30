@@ -31,7 +31,8 @@ The record-card route is the quickest during a stop you already ran. The **Charg
 
 1. **Pick your subject** — either open their record card, or open the **Charges** tab and fill in **Target**.
 2. On a record card, click **⚖ Cite / Charge**. In the Charges tab you are already there.
-3. Choose the report type: **Citation** (ticket / fine) or **Arrest** (booking + jail time).
+3. Choose the report type: **Citation** (ticket / fine), **Arrest** (booking + jail time) or
+   **Warning** (documented, but costs nothing).
 4. **Search and pick charges** from the penal code list. Each charge shows its class:
 
    | Badge | Class | Meaning |
@@ -45,7 +46,7 @@ The record-card route is the quickest during a stop you already ran. The **Charg
 
 ```
 ┌──────────────────────────────────────────────┐
-│ [Citation] [Arrest]      [Search charges… ]  │
+│ [Citation] [Arrest] [Warning]  [Search… ]     │
 │ ──────────────────────────────────────────── │
 │ 🟦 T1  Speeding (1-15 over)          $150     │
 │ 🟥 F3  Armed Robbery (211)    $5000 · 20mo  ✓ │
@@ -57,6 +58,17 @@ The record-card route is the quickest during a stop you already ran. The **Charg
 ```
 
 ![The charge picker on a person record](./images/mdt-charge-picker.png)
+
+### Warning
+
+A **warning** records the stop and the charges you *would* have filed, and imposes nothing: no fine,
+no jail, no booking. It lands on the subject's record like a citation does, so the next officer to
+run them can see they have already been spoken to about it.
+
+It is also counted — see [My Activity](/user-guide/officer-stats). Before this existed, letting
+someone off with a warning left either nothing behind or a free-text note that no statistic could
+count, which made a lenient officer look like an inactive one.
+
 
 The **Charges tab** is the same list on a full-width sheet, with the Target field and the type switch in the bar above it:
 

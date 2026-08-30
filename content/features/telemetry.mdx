@@ -1,0 +1,102 @@
+---
+title: Telemetry & Setup Report
+---
+
+import { Callout } from 'nextra/components'
+
+# Telemetry & Setup Report
+
+LACORE reports two things to the author's service: **that your server exists** and **how it is put
+together**. This page lists every single field of both, because a collector you cannot audit is a
+collector you should not trust.
+
+![What LACORE reports and what it never touches](/img/features/telemetry-scope.svg)
+
+Both go through a **write-only relay** (`lacore.netica.dev`). The resource holds no database host
+and no database credential — only a narrow ingest token that can write these two records and read
+nothing back.
+
+<Callout type="info">
+  Everything below is **server-level**. Nothing about a player — no identifier, no name, no chat, no
+  position, no action — is sent by either report, at any point, under any setting.
+</Callout>
+
+## 1 · Server registration (telemetry)
+
+Sent on **start**, on a **heartbeat every 60 minutes**, and on **stop**. You configure nothing.
+
+| Field | What it is |
+| --- | --- |
+| `ip` | Public IPv4 of the server |
+| `hostname` | `sv_hostname` |
+| `resource`, `version` | Resource name and the `version` from its manifest |
+| `serverKey` | Cfx server key (`sv_licenseKey`) |
+| `licenseKey` | Your LACORE key (`lacore_license_key`), if set — links the server to your dashboard |
+| `ownerDiscord` | `lacore_owner_discord`, if set |
+| `slots`, `players` | Slot count and current player count |
+| `uptime` | Seconds since the resource started |
+| `event` | `start` · `heartbeat` · `stop` |
+| Server-browser convars | `sv_projectName`, `sv_projectDesc`, `tags`, `sv_enforceGameBuild`, `onesync`, `locale`, `gametype`, `mapname` |
+
+That convar list is a **fixed allow-list**, not a dump. Nothing iterates your convars, which is what
+keeps `mysql_connection_string`, `steam_webApiKey` and bot tokens out of it by construction rather
+than by care.
+
+## 2 · Setup report
+
+New in 3.5.0. It answers "what is this server built out of?" — the question behind most support
+tickets, and the input the self-configuring setup works from.
+
+| Field | What it is |
+| --- | --- |
+| `licenseKey`, `serverKey` | Attribution, same as above |
+| `framework` | `esx` · `qb` · `qbox` · `standalone` |
+| `counts` | How many resources exist, how many are started, how many are third-party |
+| `resources` | The started third-party resources: **name** and the `version` from the manifest |
+| `overlaps` | Which of those do the same job as a LACORE feature |
+| `advice` | Which settings the [setup review](/configuration/autoconfig) suggests — keys and values only, and nothing has been applied |
+| `dropped` | How many resources were left out of the listing (see the cap below) |
+| `reason` | `start` or `change` |
+
+The `advice` field carries the **keys and values** of the setup review, not its reasons. The reasons
+are written for a person reading a console; they stay on your server.
+
+### What it does not send
+
+- Player identifiers, names, chat, positions, actions — nothing about people
+- Database contents: no CAD records, characters, incidents or reports
+- **File contents.** Not a config, not a script, not one line of either. The report is a resource
+  *listing* — names, states, manifest versions — the same information any player's client console
+  shows them when they connect. Nothing here opens a file.
+- Convars of any kind. Those belong to the registration above.
+- The player count. Telemetry already reports it every heartbeat, and one number should have one
+  sender.
+
+### It is sent when it changes, not on a clock
+
+A setup barely changes: the same framework and the same resources, week after week. So the report
+is fingerprinted and only sent when the fingerprint moves — plus one forced refresh every 24 hours
+so a record can never quietly go stale. On a stable server that is roughly **one report a day**.
+
+### The cap is declared
+
+The listing is capped at 400 resources. If your server runs more, the count of what was left out
+travels with the report and the server console says so:
+
+```
+[lacore:setup] Setup report sent — 37 resource(s) over the 400-entry cap were not listed.
+```
+
+A truncated list that does not say it is truncated reads as a complete one.
+
+## What LACORE cannot see
+
+FiveM's Lua runtime is **sandboxed**. A resource sees resource names, resource states and manifest
+metadata. There is no walk through your FxServer folder, no reading of files outside a resource, no
+look at your database. That is not a policy LACORE chose and could change later — it is what the
+platform offers.
+
+<Callout type="error">
+  Tampering with the IP-lock, telemetry or license checks is a breach of the EULA (`LICENSE.md`) and
+  will lock the server. Both reports ship escrow-encrypted for that reason.
+</Callout>

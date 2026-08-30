@@ -7,6 +7,7 @@ export default {
   'mdt-query': 'Query: People & Plates',
   bolo: 'BOLO',
   'citations-charges': 'Citations & Charges',
+  'officer-stats': 'My Activity',
   'dispatch-console': 'Dispatch Console',
   'lasd-cad': 'LASD CAD / PCMS',
   'retro-mdt': '9100-T Retro Terminal',

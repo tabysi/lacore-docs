@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/>
+  <rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 504 V532 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">MY <tspan fill="#6c8cff">ACTIVITY</tspan> — your own numbers, in your own terminal</text>
+
+  <!-- Tiles -->
+  <g>
+    <rect x="60" y="100" width="168" height="86" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="144" y="146" fill="#6c8cff" font-size="30" font-weight="700" text-anchor="middle">27</text>
+    <text x="144" y="168" fill="#7d8798" font-size="11" letter-spacing="2" text-anchor="middle">ARRESTS</text>
+
+    <rect x="244" y="100" width="168" height="86" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="328" y="146" fill="#6c8cff" font-size="30" font-weight="700" text-anchor="middle">91</text>
+    <text x="328" y="168" fill="#7d8798" font-size="11" letter-spacing="2" text-anchor="middle">CITATIONS</text>
+
+    <rect x="428" y="100" width="168" height="86" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="512" y="146" fill="#6c8cff" font-size="30" font-weight="700" text-anchor="middle">14</text>
+    <text x="512" y="168" fill="#7d8798" font-size="11" letter-spacing="2" text-anchor="middle">WARNINGS</text>
+
+    <rect x="612" y="100" width="168" height="86" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="696" y="146" fill="#6c8cff" font-size="30" font-weight="700" text-anchor="middle">148</text>
+    <text x="696" y="168" fill="#7d8798" font-size="11" letter-spacing="2" text-anchor="middle">CALLS CLOSED</text>
+
+    <rect x="796" y="100" width="168" height="86" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="880" y="146" fill="#6c8cff" font-size="30" font-weight="700" text-anchor="middle">12</text>
+    <text x="880" y="168" fill="#7d8798" font-size="11" letter-spacing="2" text-anchor="middle">REPORTS</text>
+
+    <rect x="980" y="100" width="160" height="86" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="1060" y="146" fill="#6c8cff" font-size="30" font-weight="700" text-anchor="middle">6</text>
+    <text x="1060" y="168" fill="#7d8798" font-size="11" letter-spacing="2" text-anchor="middle">EVIDENCE</text>
+  </g>
+
+  <!-- Class bar -->
+  <text x="60" y="234" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">CHARGES BY CLASS</text>
+  <g>
+    <rect x="60" y="248" width="544" height="20" fill="#3f8ddb"/>
+    <rect x="604" y="248" width="328" height="20" fill="#e0a458"/>
+    <rect x="932" y="248" width="182" height="20" fill="#d1495b"/>
+    <rect x="1114" y="248" width="26" height="20" fill="#8a8f98"/>
+    <rect x="60" y="248" width="1080" height="20" fill="none" stroke="#2c3650" stroke-width="2"/>
+  </g>
+  <g font-size="13">
+    <rect x="60" y="284" width="11" height="11" fill="#3f8ddb"/><text x="80" y="294" fill="#e7ecf5">Infraction 63</text>
+    <rect x="220" y="284" width="11" height="11" fill="#e0a458"/><text x="240" y="294" fill="#e7ecf5">Misdemeanor 38</text>
+    <rect x="400" y="284" width="11" height="11" fill="#d1495b"/><text x="420" y="294" fill="#e7ecf5">Felony 21</text>
+    <rect x="540" y="284" width="11" height="11" fill="#8a8f98"/><text x="560" y="294" fill="#7d8798">Unclassified 3</text>
+  </g>
+
+  <!-- Where it comes from -->
+  <rect x="60" y="332" width="530" height="150" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="364" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">COUNTED, NOT TALLIED</text>
+  <text x="84" y="394" fill="#e7ecf5" font-size="13">The numbers come from a scan of what you</text>
+  <text x="84" y="416" fill="#e7ecf5" font-size="13">actually authored, re-run every few minutes.</text>
+  <text x="84" y="446" fill="#7d8798" font-size="12.5">A running total drifts the first time a record is</text>
+  <text x="84" y="466" fill="#7d8798" font-size="12.5">deleted. A scan can always be re-run.</text>
+
+  <rect x="610" y="332" width="530" height="150" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="634" y="364" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">AND IT SAYS WHERE IT STARTS</text>
+  <text x="634" y="394" fill="#e7ecf5" font-size="13">"Counted from 21 Jul 2026" — activity from</text>
+  <text x="634" y="416" fill="#e7ecf5" font-size="13">before your personnel file existed is not</text>
+  <text x="634" y="438" fill="#e7ecf5" font-size="13">guessed at.</text>
+  <text x="634" y="468" fill="#7d8798" font-size="12.5">A statistic without its starting date is a claim.</text>
+</svg>

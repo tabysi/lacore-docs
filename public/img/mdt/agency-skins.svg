@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="620" fill="url(#bg)"/>
+  <rect width="1200" height="620" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 564 V592 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">AGENCY MDT — <tspan fill="#6c8cff">THIRTEEN SKINS</tspan>, one terminal</text>
+  <text x="60" y="86" fill="#7d8798" font-size="13">Each card shows the skin's panel colour and the accent that fills its active function key. No two skins share an accent.</text>
+
+  <!-- row 1 -->
+  <g>
+    <rect x="60" y="112" width="256" height="96" rx="6" fill="#0d2342" stroke="#1c3b6b" stroke-width="2"/>
+    <rect x="76" y="128" width="72" height="30" rx="3" fill="#2f6fd0"/>
+    <text x="112" y="148" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="164" y="148" fill="#cfe0ff" font-size="14" font-weight="700">CHP Blue</text>
+    <text x="76" y="188" fill="#6f86ad" font-size="12">Highway Patrol · the default</text>
+
+    <rect x="336" y="112" width="256" height="96" rx="6" fill="#2a2008" stroke="#5c451a" stroke-width="2"/>
+    <rect x="352" y="128" width="72" height="30" rx="3" fill="#d8a128"/>
+    <text x="388" y="148" fill="#1d1604" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="440" y="148" fill="#ffe9b0" font-size="14" font-weight="700">SAHP Gold</text>
+    <text x="352" y="188" fill="#b39a64" font-size="12">State Highway Patrol</text>
+
+    <rect x="612" y="112" width="256" height="96" rx="6" fill="#0a2a18" stroke="#1a5c38" stroke-width="2"/>
+    <rect x="628" y="128" width="72" height="30" rx="3" fill="#2e9c5a"/>
+    <text x="664" y="148" fill="#04120a" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="716" y="148" fill="#d2ffe2" font-size="14" font-weight="700">Ranger Green</text>
+    <text x="628" y="188" fill="#6fae8a" font-size="12">Park Ranger / Game Warden</text>
+
+    <rect x="888" y="112" width="252" height="96" rx="6" fill="#0c2317" stroke="#1d4a31" stroke-width="2"/>
+    <rect x="904" y="128" width="72" height="30" rx="3" fill="#c9a227"/>
+    <text x="940" y="148" fill="#08170f" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="992" y="148" fill="#e8f5ea" font-size="14" font-weight="700">DOJ / BOI</text>
+    <text x="904" y="188" fill="#7fa78d" font-size="12">Dept. of Justice · new</text>
+  </g>
+
+  <!-- row 2 -->
+  <g>
+    <rect x="60" y="228" width="256" height="96" rx="6" fill="#232111" stroke="#4e4a25" stroke-width="2"/>
+    <rect x="76" y="244" width="72" height="30" rx="3" fill="#9aa552"/>
+    <text x="112" y="264" fill="#18170b" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="164" y="264" fill="#f0eeda" font-size="14" font-weight="700">State Parks</text>
+    <text x="76" y="304" fill="#a49f77" font-size="12">olive &amp; tan · new</text>
+
+    <rect x="336" y="228" width="256" height="96" rx="6" fill="#082a25" stroke="#135950" stroke-width="2"/>
+    <rect x="352" y="244" width="72" height="30" rx="3" fill="#1fa598"/>
+    <text x="388" y="264" fill="#051b18" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="440" y="264" fill="#d6fff8" font-size="14" font-weight="700">Fish &amp; Wildlife</text>
+    <text x="352" y="304" fill="#6fada5" font-size="12">deep water teal · new</text>
+
+    <rect x="612" y="228" width="256" height="96" rx="6" fill="#1f1710" stroke="#4a3826" stroke-width="2"/>
+    <rect x="628" y="244" width="72" height="30" rx="3" fill="#a97142"/>
+    <text x="664" y="264" fill="#140f0a" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="716" y="264" fill="#f2e6d8" font-size="14" font-weight="700">Marshals</text>
+    <text x="628" y="304" fill="#a68d74" font-size="12">bronze on near-black · new</text>
+
+    <rect x="888" y="228" width="252" height="96" rx="6" fill="#2d1408" stroke="#633012" stroke-width="2"/>
+    <rect x="904" y="244" width="72" height="30" rx="3" fill="#e2701c"/>
+    <text x="940" y="264" fill="#1f0d05" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="992" y="264" fill="#ffe6d2" font-size="14" font-weight="700">Cal Fire</text>
+    <text x="904" y="304" fill="#b98d6e" font-size="12">ember orange · new</text>
+  </g>
+
+  <!-- row 3 -->
+  <g>
+    <rect x="60" y="344" width="256" height="96" rx="6" fill="#2e0c0e" stroke="#5e1c20" stroke-width="2"/>
+    <rect x="76" y="360" width="72" height="30" rx="3" fill="#d23a44"/>
+    <text x="112" y="380" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="164" y="380" fill="#ffdcdf" font-size="14" font-weight="700">Fire / EMS</text>
+    <text x="76" y="420" fill="#b3868a" font-size="12">command red</text>
+
+    <rect x="336" y="344" width="256" height="96" rx="6" fill="#1c1927" stroke="#3d3552" stroke-width="2"/>
+    <rect x="352" y="360" width="72" height="30" rx="3" fill="#9d80dd"/>
+    <text x="388" y="380" fill="#13111a" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="440" y="380" fill="#e9e4f5" font-size="14" font-weight="700">Coroner</text>
+    <text x="352" y="420" fill="#8d85a3" font-size="12">violet on grey · new</text>
+
+    <rect x="612" y="344" width="256" height="96" rx="6" fill="#1d2128" stroke="#3a414d" stroke-width="2"/>
+    <rect x="628" y="360" width="72" height="30" rx="3" fill="#8a93a3"/>
+    <text x="664" y="380" fill="#15181d" font-size="12" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="716" y="380" fill="#e6eaf2" font-size="14" font-weight="700">Slate</text>
+    <text x="628" y="420" fill="#8893a3" font-size="12">neutral graphite</text>
+
+    <rect x="888" y="344" width="122" height="96" rx="6" fill="#eef1f6" stroke="#c5cfdd" stroke-width="2"/>
+    <rect x="900" y="360" width="60" height="26" rx="3" fill="#2457a6"/>
+    <text x="930" y="378" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="900" y="406" fill="#182033" font-size="13" font-weight="700">White</text>
+    <text x="900" y="426" fill="#51627d" font-size="11">light mode</text>
+
+    <rect x="1018" y="344" width="122" height="96" rx="6" fill="#121212" stroke="#3a3a3a" stroke-width="2"/>
+    <rect x="1030" y="360" width="60" height="26" rx="3" fill="#e6e6e6"/>
+    <text x="1060" y="378" fill="#000000" font-size="11" font-weight="700" text-anchor="middle">CALLS</text>
+    <text x="1030" y="406" fill="#f4f4f4" font-size="13" font-weight="700">Black</text>
+    <text x="1030" y="426" fill="#9a9a9a" font-size="11">high contrast</text>
+  </g>
+
+  <rect x="60" y="466" width="1080" height="100" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="498" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="2">A SKIN IS A PALETTE, NOTHING ELSE</text>
+  <text x="84" y="524" fill="#7d8798" font-size="13">Same markup, same data, same server rules — only ten CSS variables change. Your choice is remembered per player, per browser.</text>
+  <text x="84" y="548" fill="#7d8798" font-size="13">Every skin's text on a filled accent key clears a 4.5:1 contrast ratio, checked rather than assumed.</text>
+</svg>

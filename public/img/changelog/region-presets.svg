@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 580" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4a5cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="580" fill="url(#bg)"/>
+  <rect width="1200" height="580" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 524 V552 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">A WHOLE CITY IN <tspan fill="#6c8cff">ONE LINE</tspan></text>
+
+  <!-- The line -->
+  <rect x="60" y="96" width="480" height="70" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="84" y="126" fill="#7d8798" font-size="12">configs/cfg-regions-sh.lua</text>
+  <text x="84" y="152" fill="#4ade80" font-size="15" font-family="'Consolas', monospace">preset = "new-york"</text>
+
+  <!-- Arrow -->
+  <line x1="548" y1="131" x2="596" y2="131" stroke="#4a5cff" stroke-width="2" marker-end="url(#a4)"/>
+
+  <!-- What it swaps -->
+  <rect x="612" y="96" width="528" height="70" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="636" y="124" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">REPLACES</text>
+  <text x="636" y="150" fill="#e7ecf5" font-size="13">regions · zone → region map · street names</text>
+
+  <!-- Before / after -->
+  <rect x="60" y="196" width="528" height="222" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="226" fill="#7d8798" font-size="13" font-weight="700" letter-spacing="2">WITHOUT A PRESET</text>
+  <text x="84" y="258" fill="#e7ecf5" font-size="13.5" font-family="'Consolas', monospace">Region:  Los Angeles</text>
+  <text x="84" y="284" fill="#e7ecf5" font-size="13.5" font-family="'Consolas', monospace">Street:  Vespucci Blvd</text>
+  <text x="84" y="310" fill="#e7ecf5" font-size="13.5" font-family="'Consolas', monospace">Cross:   Alta St</text>
+  <line x1="84" y1="334" x2="564" y2="334" stroke="#2c3650" stroke-width="1"/>
+  <text x="84" y="362" fill="#7d8798" font-size="12.5">Exactly what the config file says — nothing is</text>
+  <text x="84" y="382" fill="#7d8798" font-size="12.5">read, nothing is swapped. A preset is opt-in, and</text>
+  <text x="84" y="402" fill="#7d8798" font-size="12.5">switching back is deleting one line.</text>
+
+  <rect x="612" y="196" width="528" height="222" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="636" y="226" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">WITH "new-york"</text>
+  <text x="636" y="258" fill="#e7ecf5" font-size="13.5" font-family="'Consolas', monospace">Region:  <tspan fill="#6c8cff">Manhattan</tspan></text>
+  <text x="636" y="284" fill="#e7ecf5" font-size="13.5" font-family="'Consolas', monospace">Street:  <tspan fill="#6c8cff">Broadway</tspan></text>
+  <text x="636" y="310" fill="#e7ecf5" font-size="13.5" font-family="'Consolas', monospace">Cross:   <tspan fill="#6c8cff">8th Ave</tspan></text>
+  <line x1="636" y1="334" x2="1116" y2="334" stroke="#2c3650" stroke-width="1"/>
+  <text x="636" y="362" fill="#7d8798" font-size="12.5">Renaming is a DISPLAY layer: the GTA hashes, the</text>
+  <text x="636" y="382" fill="#7d8798" font-size="12.5">pause map and the world do not change. Only what</text>
+  <text x="636" y="402" fill="#7d8798" font-size="12.5">LACORE prints follows the preset.</text>
+
+  <!-- Shipped -->
+  <rect x="60" y="446" width="1080" height="86" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="84" y="476" fill="#9fb0ff" font-size="13" font-weight="700" letter-spacing="2">SHIPPED · data/regionpresets/</text>
+  <text x="84" y="504" fill="#e7ecf5" font-size="13">los-angeles (today's map) · san-andreas (vanilla zone names) · new-york (five boroughs)</text>
+  <text x="84" y="524" fill="#7d8798" font-size="12.5">Plain JSON in cleartext — copy one, edit it, and it is your city. A missing or broken file falls back to your config.</text>
+</svg>

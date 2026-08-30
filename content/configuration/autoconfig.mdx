@@ -1,0 +1,99 @@
+---
+title: Setup Review (Auto-Config)
+---
+
+import { Callout } from 'nextra/components'
+
+# Setup Review (Auto-Config)
+
+LACORE looks at what is running on your server and tells you which of its settings would probably
+suit it better — with a reason on every line.
+
+![The setup review — it tells you, it does not do it](/img/changelog/autoconfig-review.svg)
+
+<Callout type="info">
+  **It changes nothing.** Not a config file, not a remote value, not one of its own suggestions.
+  Applying a line is your decision.
+</Callout>
+
+## Running it
+
+```
+/lacore autoconfig
+```
+
+Works from the server console and in-game for Staff / Dev (the same permission as every other
+`/lacore` sub-command). It also prints itself once, about 30 seconds after start — but only when it
+has something to say, so a well-configured server never has to scroll past it.
+
+## What it looks like
+
+```
+[lacore:autoconfig] Setup review — framework: esx
+Nothing below has been changed. These are suggestions.
+
+Settings that may suit this server better (2):
+  features.cad.dispatch = false
+     ps-dispatch already runs a dispatch console — two of them means every call arrives twice.
+  features.phone = false
+     lb-phone is running — LACORE's own phone would be a second one on the same key.
+
+Worth knowing — no setting fixes these (1):
+  Second anticheat detected: FiveGuard
+     Two anticheats can punish the same player twice for one event. Decide which one owns bans.
+
+To apply one: change it in configs/ and restart, or set it in your dashboard's
+config editor. Re-run this any time with /lacore autoconfig.
+```
+
+Two sections, on purpose:
+
+- **Settings** — there is a key you can change, and a value it suggests.
+- **Worth knowing** — real, but no setting fixes it. Two MDTs is a decision about which terminal
+  your department uses, not a config value. Saying so is more useful than inventing a suggestion.
+
+## What it suggests, and why
+
+| Situation | Suggestion |
+| --- | --- |
+| ESX / QBCore / QBox is running | Take names and characters from the framework |
+| No framework is running | Turn the bridge's framework options off — they have nothing to read from |
+| Another dispatch resource | Turn LACORE's dispatch console off |
+| Another phone | Turn LACORE's phone off |
+| Another HUD | Turn LACORE's HUD off |
+| Another jail / corrections script | Turn LACORE's corrections off |
+| Another EMS / ambulance job | Turn the EMS CAD off |
+
+Detection survives renaming — `ps-dispatch`, `cd_dispatch` and `core_dispatch` are all recognised —
+and short words are matched on whole name parts, so `esx_arcade` is not mistaken for a CAD.
+
+**A suggestion you are already following is not shown.** Your current value for every setting is
+read before the list is built.
+
+## What it is allowed to suggest
+
+Every suggested key must:
+
+1. exist in the **remote-config allowlist** — the same typed list the
+   [Config Editor](/configuration/editor) is bound by,
+2. match that key's declared **type**, and
+3. not be one of the **sensitive** keys (upload URLs, Discord role ids).
+
+Anything else is dropped by the gate, rather than left to the rules being careful about what they
+ask for. A rule cannot invent a setting or reach past the allowlist.
+
+## The AI hook
+
+`LacoreAutoConfigAdvisor` is an undefined function — a documented seam for a model to sit in later.
+If something defines it, what it returns goes through **exactly the same gate** as a hand-written
+rule, and it never wins against one.
+
+An advisor can therefore be wrong, but it cannot be dangerous: the worst it can do is propose an
+allowlisted, correctly-typed, non-sensitive setting that you then decline.
+
+## What the team sees
+
+The suggestions (keys and values, not the reasons) ride along on the
+[setup report](/features/telemetry), so a support conversation can start from what your server
+actually looks like instead of asking. The reasons stay in your console — those are written for a
+person, not for a database row.

@@ -1,0 +1,57 @@
+---
+title: My Activity
+---
+
+import { Callout } from 'nextra/components'
+
+# My Activity
+
+Your own numbers, in your own terminal: what you have filed, what you have closed, and how long you
+have been on duty.
+
+![My Activity — your own numbers, in your own terminal](/img/features/officer-stats.svg)
+
+## Opening it
+
+- **LAPD MDT** — the **My Activity** row in the left-hand rail
+- **Agency MDT** — the **MY STATS** key on the function bar
+
+It needs no permission, because it is about you: the server works out whose numbers to send from
+your own connection, so the view cannot be pointed at anybody else. Looking at *someone else's*
+file is the [Supervisor Panel](/configuration/supervisor)'s job and stays there.
+
+## What it counts
+
+| Figure | What it is |
+| --- | --- |
+| Arrests | Charge records you filed as an arrest |
+| Citations | Charge records you filed as a citation |
+| Warnings | Warnings you issued — documented, no fine |
+| Calls closed | Dispatch incidents you resolved |
+| Reports | Formal reports you wrote |
+| Evidence | Evidence items you logged |
+
+**Charges by class** breaks every charge on those records into Infraction, Misdemeanor and Felony —
+so twenty parking tickets and twenty armed robberies stop looking like the same twenty charges.
+
+## Where the numbers come from
+
+They are **counted by a scan**, not kept as a running total: the server re-reads what you actually
+authored every few minutes, and the same scan can be re-run at any time. A running total drifts the
+first time a record is deleted or a save is lost; a scan does not.
+
+A call you resolved twice counts **once** — it is one call closed, not two.
+
+<Callout type="info">
+  **"Counted from &lt;date&gt;"** sits under the numbers, and it is not decoration. Activity from
+  before your personnel file existed carries no author that can be attributed, so it is not guessed
+  at. A statistic without its starting date is a claim, not a number.
+</Callout>
+
+### Unclassified charges
+
+A charge whose code is no longer in your server's penal code shows up as **Unclassified** rather
+than being dropped. Dropping it would make an old record look cleaner than it was.
+
+Charges filed from 3.5.0 onwards keep their class **as it stood when they were issued** — rewriting
+the penal code changes what happens next, not what already happened.

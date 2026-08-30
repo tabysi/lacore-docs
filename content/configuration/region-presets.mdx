@@ -1,0 +1,97 @@
+---
+title: Region & Street Presets
+---
+
+import { Callout } from 'nextra/components'
+
+# Region & Street Presets
+
+A preset is a ready-made map of your city: which regions exist, which GTA zone belongs to which one,
+and what the streets are called. Picking one is a single line.
+
+![A whole city in one line](/img/configuration/region-presets.svg)
+
+```lua
+-- configs/cfg-regions-sh.lua
+Regions = {
+    preset = "new-york",
+    ...
+}
+```
+
+<Callout type="info">
+  **Without a preset, nothing changes.** Leave `preset` empty (or remove the line) and the values
+  written in `cfg-regions-sh.lua` are used exactly as before. Switching back is deleting one line.
+</Callout>
+
+## Shipped presets
+
+| Name | What it is |
+| --- | --- |
+| `los-angeles` | The map LACORE ships with — seven LA districts, plus a starter set of LA street names |
+| `san-andreas` | Vanilla: every GTA zone keeps Rockstar's own name, nothing renamed |
+| `new-york` | The five NYC boroughs across the San Andreas map, with NYC street names |
+
+They live in `data/regionpresets/*.json`, in cleartext. Copy one, edit it, and it is your city.
+
+## The format
+
+```json
+{
+  "label": "New York City",
+  "default": "Manhattan",
+  "list": [
+    { "name": "Manhattan", "color": "#cfd6e0" },
+    { "name": "Brooklyn",  "color": "#ff2d8e" }
+  ],
+  "zones": {
+    "PBOX": "Manhattan",
+    "DAVIS": "Brooklyn"
+  },
+  "streets": {
+    "Vespucci Blvd": "Broadway",
+    "Alta St": "8th Ave"
+  }
+}
+```
+
+| Key | What it does |
+| --- | --- |
+| `label` | Name printed in the server console when the preset loads |
+| `default` | The region anything not listed in `zones` falls back to |
+| `list` | Every region that exists, with its colour on the dispatch map |
+| `zones` | GTA zone code → region. The code is what `GetNameOfZone()` returns; `/citydebug` shows it live in game |
+| `streets` | What LACORE should call a street. Keyed by the name the **game** uses |
+
+`default`, `list` and `zones` **replace** what the config declares — they do not merge. A half-applied
+map ("Los Angeles" districts with New York zone names) is worse than either map on its own.
+
+## Street renaming is a display layer
+
+Renaming changes what **LACORE prints** — the HUD, MDT calls, dispatch, the phone. It does not change
+the GTA street hashes, the pause-map labels, or anything about the world. A street LACORE calls
+"Broadway" is still Vespucci Blvd to the game.
+
+Streets you do not list keep their names. There is no need to map all of them.
+
+## Writing your own
+
+1. Copy a shipped preset to `data/regionpresets/<yourname>.json`.
+2. Run `/citydebug` in game to read the zone code you are standing in.
+3. Set `Regions.preset = "<yourname>"` and restart.
+
+The console says what was applied:
+
+```
+[lacore:regions] Preset 'new-york' (New York City) applied — default, 5 regions, 88 zones, 17 street renames.
+```
+
+A preset that is missing, misnamed or not valid JSON is **skipped with a message**, and your config's
+own regions are used. A broken data file never takes dispatch down with it.
+
+<Callout type="warning">
+  **A server that has already run keeps its stored map.** `data/map_config.json` and
+  `data/zone_regions.json` win over both the preset and the config — which is the usual reason a
+  preset looks like it did nothing. Delete both files, or edit live in the
+  [dispatch console](/user-guide/dispatch-console)'s Zone Editor.
+</Callout>
