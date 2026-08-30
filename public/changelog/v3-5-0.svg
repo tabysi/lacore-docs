@@ -50,8 +50,8 @@
   </g>
   <text x="84" y="112" fill="#e7ecf5" font-size="30" font-weight="700" letter-spacing="7">LA<tspan fill="#6c8cff">CORE</tspan></text>
   <g>
-    <rect x="84" y="150" width="150" height="30" rx="5" fill="none" stroke="#2c3650"/>
-    <text x="100" y="171" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="3">RELEASE</text>
+    <rect x="84" y="150" width="220" height="30" rx="5" fill="none" stroke="#2c3650"/>
+    <text x="100" y="171" fill="#ffb454" font-size="15" font-weight="700" letter-spacing="3">IN DEVELOPMENT</text>
   </g>
   <text x="80" y="342" fill="#eef2f8" font-size="168" font-weight="700" letter-spacing="-4">v3.5.0</text>
   <text x="84" y="452" fill="#9fb0ff" font-size="40" font-weight="600">The LASD terminal becomes a real MDC</text>

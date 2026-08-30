@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="660" fill="url(#bg)"/>
+  <rect width="1200" height="660" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 604 V632 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">LASD <tspan fill="#6c8cff">MDC</tspan> — SCREEN LAYOUT</text>
+
+  <!-- Terminal frame -->
+  <rect x="60" y="84" width="1080" height="500" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+
+  <!-- Top status keys -->
+  <g font-size="12" font-weight="700" text-anchor="middle">
+    <rect x="78"  y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="126" y="118" fill="#cfeef4">CLEAR DISP</text><text x="126" y="134" fill="#cfeef4">WINDOW</text>
+    <rect x="180" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="228" y="126" fill="#cfeef4">ACK</text>
+    <rect x="282" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="330" y="126" fill="#cfeef4">ENRT</text>
+    <rect x="384" y="100" width="96" height="44" fill="#c9660c" stroke="#e88a2e"/>
+    <text x="432" y="126" fill="#fff">10-97</text>
+    <rect x="486" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="534" y="126" fill="#cfeef4">10-98</text>
+    <rect x="588" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="636" y="126" fill="#cfeef4">OBS</text>
+    <rect x="690" y="100" width="96" height="44" fill="#eceff5" stroke="#b9c1cf"/>
+    <text x="738" y="118" fill="#10141c">STATUS</text><text x="738" y="134" fill="#10141c">TEXT</text>
+    <rect x="792" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="840" y="126" fill="#cfeef4">CODE 6</text>
+    <rect x="894" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="942" y="118" fill="#cfeef4">NEW</text><text x="942" y="134" fill="#cfeef4">MESSAGE</text>
+    <rect x="996" y="100" width="96" height="44" fill="#123a46" stroke="#1789a2"/>
+    <text x="1044" y="118" fill="#cfeef4">CLEAR DEF</text><text x="1044" y="134" fill="#cfeef4">WINDOW</text>
+  </g>
+
+  <!-- Left column -->
+  <rect x="78" y="156" width="330" height="16" fill="#f5f77e"/>
+  <text x="243" y="168" fill="#10141c" font-size="11" font-weight="700" text-anchor="middle">DISPATCH INDEX</text>
+  <rect x="78" y="172" width="330" height="70" fill="#0a0d13" stroke="#1a2131"/>
+  <rect x="80" y="174" width="326" height="16" fill="#c9c9c9"/>
+  <text x="88" y="186" fill="#1414c8" font-size="11" font-weight="700">14:25  1244  C3  (D)  281K 285A</text>
+  <rect x="80" y="192" width="326" height="16" fill="#c9c9c9"/>
+  <text x="88" y="204" fill="#1414c8" font-size="11" font-weight="700">14:25  1245  C3  (D)</text>
+
+  <rect x="78" y="250" width="330" height="16" fill="#f5f77e"/>
+  <text x="243" y="262" fill="#10141c" font-size="11" font-weight="700" text-anchor="middle">DISPATCH DETAIL</text>
+  <rect x="78" y="266" width="330" height="80" fill="#0a0d13" stroke="#1a2131"/>
+  <text x="88" y="284" fill="#c7ad1d" font-size="11" font-weight="700">1244 CODE 3 · (D)</text>
+  <text x="88" y="300" fill="#c7ad1d" font-size="11" font-weight="700">8743 ACACIA AVE</text>
+  <text x="88" y="316" fill="#c7ad1d" font-size="11" font-weight="700">RMK: COMPACT INCIDENT INFO</text>
+
+  <rect x="78" y="354" width="330" height="16" fill="#f5f77e"/>
+  <text x="243" y="366" fill="#10141c" font-size="11" font-weight="700" text-anchor="middle">MESSAGE INDEX</text>
+  <rect x="78" y="370" width="330" height="130" fill="#0a0d13" stroke="#1a2131"/>
+  <rect x="80" y="372" width="326" height="16" fill="#c9c9c9"/>
+  <text x="88" y="384" fill="#1414c8" font-size="11" font-weight="700">15:10  1246  TRAFFIC  (U)  280S</text>
+  <rect x="80" y="390" width="326" height="16" fill="#c9c9c9"/>
+  <text x="88" y="402" fill="#1414c8" font-size="11" font-weight="700">14:11  1243  CODE 6  (U)  282E</text>
+
+  <rect x="78" y="508" width="330" height="24" fill="#b8dde0"/>
+  <text x="88" y="524" fill="#1414a0" font-size="12" font-weight="700">ACTIVE BOLO</text>
+
+  <!-- Center window -->
+  <rect x="420" y="156" width="580" height="16" fill="#f5f77e"/>
+  <text x="710" y="168" fill="#10141c" font-size="11" font-weight="700" text-anchor="middle">MESSAGE DETAIL/DEFAULT WINDOW</text>
+  <rect x="420" y="172" width="580" height="270" fill="#0a0d13" stroke="#1a2131"/>
+  <g fill="#c7ad1d" font-size="12" font-weight="700">
+    <text x="436" y="196">INCIDENT RECORD   08/14/26</text>
+    <text x="436" y="216">1244 DSP · UNITS: 281K 285A · PRIMARY: 281K</text>
+    <text x="436" y="236">PRIORITY: CODE 3 · LOCATION: 8743 ACACIA AVE</text>
+    <text x="436" y="256">REMARKS: …</text>
+    <text x="436" y="284">14:26 281K ENRT</text>
+    <text x="436" y="304">14:31 285A 10-97</text>
+  </g>
+
+  <!-- Command bar -->
+  <rect x="420" y="442" width="530" height="22" fill="#1414cc"/>
+  <text x="685" y="457" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">ENTER COMMANDS / CALL NOTES HERE</text>
+  <rect x="950" y="442" width="50" height="22" fill="#0a0aa0"/>
+  <text x="975" y="457" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">SEND</text>
+
+  <!-- Unit row -->
+  <rect x="420" y="470" width="220" height="30" fill="#f2eeba"/>
+  <text x="432" y="491" fill="#333" font-size="18" font-weight="700" letter-spacing="2">285A</text>
+  <rect x="640" y="470" width="130" height="30" fill="#9a9a9a" stroke="#6f6f6f"/>
+  <text x="705" y="489" fill="#111" font-size="11" font-weight="700" text-anchor="middle">CLEARANCE FORM</text>
+  <rect x="770" y="470" width="115" height="30" fill="#565656" stroke="#6f6f6f"/>
+  <text x="827" y="489" fill="#2e2e2e" font-size="11" font-weight="700" text-anchor="middle">BACK</text>
+  <rect x="885" y="470" width="115" height="30" fill="#9a9a9a" stroke="#6f6f6f"/>
+  <text x="942" y="489" fill="#111" font-size="11" font-weight="700" text-anchor="middle">HANDLE</text>
+
+  <!-- Unread -->
+  <rect x="420" y="506" width="130" height="26" fill="#17c917"/>
+  <text x="485" y="523" fill="#043a04" font-size="11" font-weight="700" text-anchor="middle">0 MSG UNREAD</text>
+
+  <!-- Right rail -->
+  <g font-size="11" font-weight="700" text-anchor="middle">
+    <rect x="1012" y="156" width="110" height="52" fill="#e01414"/><text x="1067" y="186" fill="#fff">VEH</text>
+    <rect x="1012" y="214" width="110" height="52" fill="#17d417"/><text x="1067" y="244" fill="#043a04">WANT</text>
+    <rect x="1012" y="272" width="110" height="52" fill="#f0f014"/><text x="1067" y="302" fill="#333">DMV</text>
+    <rect x="1012" y="330" width="110" height="52" fill="#1789a2"/><text x="1067" y="360" fill="#fff">INQUIRIES</text>
+    <rect x="1012" y="388" width="110" height="52" fill="#1789a2"/><text x="1067" y="410" fill="#fff">CALL &amp; LOG</text><text x="1067" y="424" fill="#fff">FUNCTIONS</text>
+    <rect x="1012" y="446" width="110" height="52" fill="#1789a2"/><text x="1067" y="468" fill="#fff">OTHER</text><text x="1067" y="482" fill="#fff">FUNCTIONS</text>
+    <rect x="1012" y="504" width="110" height="52" fill="#8c14a8"/><text x="1067" y="534" fill="#fff">SEND</text>
+  </g>
+
+  <!-- Callouts -->
+  <g font-size="14" fill="#9fb0ff" font-weight="600">
+    <text x="78" y="620">(D) dispatch-created — 911/311 · (U) unit-created · HANDLE = first unit becomes primary · BACK attaches further units</text>
+    <text x="78" y="644">The primary must dispose via the CLEARANCE FORM before going 10-98 · ACK only clears the unread counter</text>
+  </g>
+</svg>

@@ -45,10 +45,14 @@ function parseHeader(headerLine) {
 }
 
 // A branded 1200×630 release card per release (lacore-release-card-template.svg).
-function thumbnailSVG({ version, title, date }) {
+// `dev: true` renders the badge as IN DEVELOPMENT (version not released yet).
+function thumbnailSVG({ version, title, date, dev }) {
   const ver = xml('v' + version)
   const t = xml(clip(title, 44))
   const d = xml(date || '')
+  const badge = dev ? 'IN DEVELOPMENT' : 'RELEASE'
+  const badgeW = dev ? 220 : 150
+  const badgeColor = dev ? '#ffb454' : '#9fb0ff'
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -101,8 +105,8 @@ function thumbnailSVG({ version, title, date }) {
   </g>
   <text x="84" y="112" fill="#e7ecf5" font-size="30" font-weight="700" letter-spacing="7">LA<tspan fill="#6c8cff">CORE</tspan></text>
   <g>
-    <rect x="84" y="150" width="150" height="30" rx="5" fill="none" stroke="#2c3650"/>
-    <text x="100" y="171" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="3">RELEASE</text>
+    <rect x="84" y="150" width="${badgeW}" height="30" rx="5" fill="none" stroke="#2c3650"/>
+    <text x="100" y="171" fill="${badgeColor}" font-size="15" font-weight="700" letter-spacing="3">${badge}</text>
   </g>
   <text x="80" y="342" fill="#eef2f8" font-size="168" font-weight="700" letter-spacing="-4">${ver}</text>
   <text x="84" y="452" fill="#9fb0ff" font-size="40" font-weight="600">${t}</text>
@@ -228,6 +232,22 @@ function splitWarnings(body) {
 const yaml = (s) => '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
 const slugFor = (ver) => 'v' + ver.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
+// Releases older than 30 days are ARCHIVED: no page, no card, no nav entry.
+// They stay in changelog.md (the source of record) and are listed as plain text
+// in a collapsed block on the All-Releases index. Undated sections are treated
+// as old (every recent release carries a date).
+const ARCHIVE_MS = 30 * 24 * 60 * 60 * 1000
+const cutoff = Date.now() - ARCHIVE_MS
+function isArchived(headerLine) {
+  const { date } = parseHeader(headerLine)
+  if (!date) return true
+  return new Date(date + 'T00:00:00Z').getTime() < cutoff
+}
+
+// A `> ⚠️ In development …` warning in a section marks a version that exists in
+// the manifest but is NOT released yet → card badge "IN DEVELOPMENT".
+const isDev = (body) => /^>\s*(\[!WARNING\]\s*)?⚠️?\s*in development/im.test(body)
+
 const sections = []
 for (let s = 0; s < starts.length; s++) {
   const from = starts[s]
@@ -235,7 +255,7 @@ for (let s = 0; s < starts.length; s++) {
   const headerLine = lines[from].replace(/^## /, '').trim()
   const body = lines.slice(from + 1, to).join('\n').replace(/\n+$/, '')
   const bracket = (headerLine.match(/^\[([^\]]+)\]/) || [])[1] || headerLine
-  sections.push({ headerLine, body, bracket })
+  sections.push({ headerLine, body, bracket, archived: isArchived(headerLine), dev: isDev(body) })
 }
 
 // Clean any old generated pages (keep nothing but what we regenerate).
@@ -251,10 +271,11 @@ const meta = { index: "'All Releases'" }
 for (const sec of sections) {
   // [Unreleased] blocks are internal development notes — never published.
   if (/^unreleased$/i.test(sec.bracket)) continue
+  if (sec.archived) continue // >30 days old — archived, not rendered
   const slug = slugFor(sec.bracket)
   meta[slug] = "'" + sec.bracket + "'"
   const { title: secTitle, date: secDate } = parseHeader(sec.headerLine)
-  const cardSVG = thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate })
+  const cardSVG = thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate, dev: sec.dev })
   fs.writeFileSync(path.join(THUMBS, slug + '.svg'), cardSVG)   // crisp in-page banner
   await renderPNG(cardSVG, path.join(THUMBS, slug + '.png'))    // PNG share card for OG
   // Warnings (e.g. config changes) become a <Callout> alert banner at the top,
@@ -281,8 +302,11 @@ const metaBody = 'export default {\n' + Object.entries(meta)
   .join('\n') + '\n}\n'
 fs.writeFileSync(path.join(OUT, '_meta.js'), metaBody)
 
-// index.mdx — card grid with a thumbnail per version.
-const cards = sections.filter((s) => !/^unreleased$/i.test(s.bracket)).map((s) => {
+// index.mdx — card grid with a thumbnail per version (recent only; archived
+// versions are listed as plain text in a collapsed block below the grid).
+const live = sections.filter((s) => !/^unreleased$/i.test(s.bracket) && !s.archived)
+const archived = sections.filter((s) => !/^unreleased$/i.test(s.bracket) && s.archived)
+const cards = live.map((s) => {
   const slug = slugFor(s.bracket)
   const desc = xml(parseHeader(s.headerLine).title)
   return `  <a href="/updates/changelog/${slug}" style={{ display: 'block', border: '1px solid var(--lac-line, #1a2131)', borderRadius: '12px', overflow: 'hidden', textDecoration: 'none', background: 'var(--lac-panel, #0d1017)' }}>
@@ -301,10 +325,20 @@ Every LACORE release has its own page with the complete notes. Pick a version be
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '18px', marginTop: '28px' }}>
 ${cards}
 </div>
-`
+${archived.length ? `
+<details style={{ marginTop: '36px', color: 'var(--lac-fg, #d7deea)' }}>
+  <summary style={{ cursor: 'pointer', fontWeight: 600, opacity: 0.7 }}>Archived releases (older than 30 days)</summary>
+  <ul style={{ marginTop: '12px', opacity: 0.65, fontSize: '0.9em' }}>
+${archived.map((s) => {
+  const { title, date } = parseHeader(s.headerLine)
+  return `    <li><strong>${xml(s.bracket)}</strong>${date ? ' · ' + xml(date) : ''} — ${xml(title || '')}</li>`
+}).join('\n')}
+  </ul>
+</details>
+` : ''}`
 fs.writeFileSync(path.join(OUT, 'index.mdx'), idx)
 
 // Site-wide default share card (shown for every non-version page).
 await renderPNG(defaultCardSVG(), path.join(OGDIR, 'default.png'))
 
-console.log(`Generated ${Object.keys(meta).length - 1} pages + PNG cards + default OG from changelog.md`)
+console.log(`Generated ${Object.keys(meta).length - 1} pages + PNG cards + default OG from changelog.md (${archived.length} archived >30d)`)

@@ -5,6 +5,11 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [3.5.0] – 2026-08-30 — The LASD terminal becomes a real MDC
 
+> ⚠️ In development — 3.5.0 is not released yet. Changes keep landing in this version until it
+> ships; treat everything below as the current work-in-progress state.
+
+![LASD MDC layout](/img/changelog/lasd-mdc-layout.svg)
+
 ### Changed
 
 #### LASD MDC — full redesign with real dispatch procedure
