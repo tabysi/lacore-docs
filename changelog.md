@@ -101,6 +101,13 @@ so dropping this update onto a running server changes nothing until you edit it.
   for every player, and pushed again once the server has finished loading them so a resource restart
   cannot leave clients holding an empty map.
 
+- **New calls turn the duty-status plate into an amber UNREAD badge.** An unread incoming call
+  used to draw a wide black "Unread MDT Calls" bar; it now takes over the bottom-right status
+  plate itself — same bordered style, amber, reading UNREAD until a terminal is opened. Two call
+  types never raised the cue at all and now do: backup requests (sent as "Requesting LEO", which
+  the old job-name comparison could never match) and Shot Spotter activations for LEO units.
+  Panic Button and Crime Broadcast keep their own alert banners.
+
 - **The phone no longer hides behind other resources' UI.** NUI frames of different resources
   stack by resource start order, so a radio or radar HUD started after LACORE painted over the
   phone. While the phone is open, LACORE now lifts its frame above the others (`SET_NUI_ZINDEX`)
