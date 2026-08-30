@@ -111,9 +111,11 @@ so dropping this update onto a running server changes nothing until you edit it.
   Works the same in every terminal skin; the in-car dashboard screen, which has no keyboard,
   keeps sending immediately without a prompt.
 
-- **The bar playerlist could silently hide players off the right screen edge.** The bar style pages
-  27 players at a time, but its cards had a fixed minimum width — on narrower displays the ninth
-  column no longer fit next to the server panel and was pushed past the screen edge, so a full page
-  showed only 24 of its 27 players (with 28 online: 24 on page one, three invisible, one on page
-  two). Cards now shrink to fit instead of overflowing; long names ellipsize, but every player on
-  the page is always on screen.
+- **The bar playerlist could silently hide players off the right screen edge — and now reads
+  left-to-right.** The bar style pages 27 players at a time, but its cards flowed column-first with
+  a fixed minimum width — on narrower displays the ninth column no longer fit next to the server
+  panel and was pushed past the screen edge, so a full page showed only 24 of its 27 players (with
+  28 online: 24 on page one, three invisible, one on page two). The cards now flow row-first and
+  wrap: ids read left to right (1‥8, then 9‥16 on the next line) the way a scoreboard is scanned,
+  and a page that doesn't fit gets another row instead of an invisible column — every player on the
+  page is always on screen.
