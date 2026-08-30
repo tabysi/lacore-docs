@@ -149,6 +149,16 @@ so dropping this update onto a running server changes nothing until you edit it.
   so each server becomes individually editable on its next heartbeat, with no resource update
   needed. Since the key is the identity, give each server its own key rather than sharing one.
 
+- **The dashboard config editor protects unsaved work.** The save bar counts unsaved changes,
+  and the Save button names the scope it writes to (`SAVE → ALL SERVERS` / `SAVE → <server>`)
+  and is disabled while there is nothing to save — so it is always clear whether there is
+  anything to save and *where* it would land. Switching the server pill, navigating away or
+  closing the tab with unsaved edits now asks first instead of silently discarding them. Saves
+  are also concurrency-checked: with team access, two people editing the same scope used to
+  last-writer-win silently — the later save is now refused with "someone else saved this config
+  in the meantime" and a one-click reload of their version. Revision history entries additionally
+  record who overwrote them.
+
 ## [3.4.9.8] – 2026-08-21 — A framework that starts late is still a framework
 
 ### Fixed
