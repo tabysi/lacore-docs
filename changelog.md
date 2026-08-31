@@ -3,6 +3,27 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.3] – 2026-08-31 — Unit lists that survive a full patrol
+
+### Fixed
+
+#### UR and US went blank when two units shared a callsign
+
+On the LASD MDC, `UR` (unit roster) and `US` (unit status) worked fine in a two-officer test and
+stopped working during a patrol with eleven officers on duty. It was never about the number of
+units — it was about two of them carrying the **same callsign**.
+
+![Unit lists and duplicate callsigns](/img/changelog/unit-list-duplicate-callsign.svg)
+
+Both lists identified each row by callsign alone. An officer who never set one registers as `UNIT`,
+so the moment a second officer did the same, two rows claimed the same identity and the list refused
+to render — the command looked dead while the rest of the terminal kept working. Rows are now
+identified by callsign **and** position, so duplicates are simply two separate rows.
+
+The same pattern sat in every other unit list, and all of them are fixed: Dispatch (unit table and
+the assign dropdowns), the LAPD MDT unit list, the Agency MDT unit and incident-unit lists, the EMS
+CAD, Penn CAD, and the in-car CAD.
+
 ## [3.5.2] – 2026-08-30 — Reports that ask the right questions
 
 ### Added

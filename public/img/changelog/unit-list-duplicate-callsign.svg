@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="620" fill="url(#bg)"/>
+  <rect width="1200" height="620" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 564 V592 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">UNIT LISTS — <tspan fill="#6c8cff">DUPLICATE CALLSIGNS</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">UR (unit roster) and US (unit status) stopped rendering once two units shared a callsign.</text>
+
+  <!-- BEFORE -->
+  <rect x="60" y="120" width="500" height="420" rx="8" fill="#05070b" stroke="#5a2230" stroke-width="2"/>
+  <text x="84" y="152" fill="#ff8fa3" font-size="15" font-weight="700" letter-spacing="3">BEFORE</text>
+  <text x="84" y="180" fill="#9fb0ff" font-size="13">list key = callsign</text>
+  <g font-size="14" font-family="Consolas, 'Courier New', monospace">
+    <rect x="84" y="200" width="452" height="30" fill="#0d1220" stroke="#243050"/>
+    <text x="96" y="220" fill="#e7ecf5">1-ADAM-12   ·  key "1-ADAM-12"</text>
+    <rect x="84" y="236" width="452" height="30" fill="#0d1220" stroke="#243050"/>
+    <text x="96" y="256" fill="#e7ecf5">7-LINCOLN-4 ·  key "7-LINCOLN-4"</text>
+    <rect x="84" y="272" width="452" height="30" fill="#0d1220" stroke="#243050"/>
+    <text x="96" y="292" fill="#e7ecf5">UNIT        ·  key "UNIT"</text>
+    <rect x="84" y="308" width="452" height="30" fill="#2a1017" stroke="#a33a4e"/>
+    <text x="96" y="328" fill="#ff8fa3">UNIT        ·  key "UNIT"  ← collision</text>
+  </g>
+  <rect x="84" y="360" width="452" height="60" rx="6" fill="#2a1017" stroke="#a33a4e"/>
+  <text x="104" y="384" fill="#ff8fa3" font-size="14" font-weight="700">Duplicate key → render aborts</text>
+  <text x="104" y="404" fill="#ffc2cd" font-size="13">UR / US show nothing, the terminal looks frozen</text>
+  <text x="84" y="460" fill="#9fb0ff" font-size="13">Two officers without a set callsign both</text>
+  <text x="84" y="480" fill="#9fb0ff" font-size="13">registered as "UNIT" — likely on a full patrol,</text>
+  <text x="84" y="500" fill="#9fb0ff" font-size="13">near impossible in a two-officer test.</text>
+
+  <!-- arrow -->
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M578 330 H620"/>
+    <path d="M612 322 L622 330 L612 338" fill="#4a5cff" stroke="none"/>
+  </g>
+
+  <!-- AFTER -->
+  <rect x="640" y="120" width="500" height="420" rx="8" fill="#05070b" stroke="#1f4a35" stroke-width="2"/>
+  <text x="664" y="152" fill="#7fe0ab" font-size="15" font-weight="700" letter-spacing="3">AFTER</text>
+  <text x="664" y="180" fill="#9fb0ff" font-size="13">list key = callsign + row index</text>
+  <g font-size="14" font-family="Consolas, 'Courier New', monospace">
+    <rect x="664" y="200" width="452" height="30" fill="#0d1220" stroke="#243050"/>
+    <text x="676" y="220" fill="#e7ecf5">1-ADAM-12   ·  key "1-ADAM-12#0"</text>
+    <rect x="664" y="236" width="452" height="30" fill="#0d1220" stroke="#243050"/>
+    <text x="676" y="256" fill="#e7ecf5">7-LINCOLN-4 ·  key "7-LINCOLN-4#1"</text>
+    <rect x="664" y="272" width="452" height="30" fill="#0d1220" stroke="#243050"/>
+    <text x="676" y="292" fill="#e7ecf5">UNIT        ·  key "UNIT#2"</text>
+    <rect x="664" y="308" width="452" height="30" fill="#0f2419" stroke="#2f7a52"/>
+    <text x="676" y="328" fill="#7fe0ab">UNIT        ·  key "UNIT#3"  ← unique</text>
+  </g>
+  <rect x="664" y="360" width="452" height="60" rx="6" fill="#0f2419" stroke="#2f7a52"/>
+  <text x="684" y="384" fill="#7fe0ab" font-size="14" font-weight="700">Every row keeps its own key</text>
+  <text x="684" y="404" fill="#b8f0d0" font-size="13">UR / US render the full roster, however big</text>
+  <text x="664" y="460" fill="#9fb0ff" font-size="13">Same fix applied to every other unit list:</text>
+  <text x="664" y="480" fill="#9fb0ff" font-size="13">Dispatch, LAPD MDT, Agency MDT, EMS CAD,</text>
+  <text x="664" y="500" fill="#9fb0ff" font-size="13">Penn CAD and the in-car CAD.</text>
+</svg>
