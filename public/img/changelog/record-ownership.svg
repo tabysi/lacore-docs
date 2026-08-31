@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WHO OWNS <tspan fill="#6c8cff">WHAT ON A FILE</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">Identity belongs to the person. Enforcement belongs to the officer. The two no longer share a write path.</text>
+
+  <!-- Left: civilian -->
+  <rect x="60" y="124" width="470" height="416" rx="8" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <rect x="60" y="124" width="470" height="42" rx="8" fill="#131a2b"/>
+  <text x="84" y="152" fill="#9fb0ff" font-size="14" font-weight="700" letter-spacing="3">THE PERSON WRITES</text>
+  <g font-size="14">
+    <text x="84" y="200" fill="#e7ecf5">Name · date of birth · gender</text>
+    <text x="84" y="230" fill="#e7ecf5">Address</text>
+    <text x="84" y="260" fill="#e7ecf5">Height · weight · hair · eyes</text>
+    <text x="84" y="290" fill="#e7ecf5">Licence slots (self-declared RP)</text>
+    <text x="84" y="320" fill="#e7ecf5">Own notes and file entries</text>
+    <text x="84" y="350" fill="#e7ecf5">Vehicles and relationships</text>
+    <text x="84" y="380" fill="#e7ecf5">Character presets</text>
+  </g>
+  <rect x="84" y="410" width="422" height="52" rx="6" fill="#0d1220" stroke="#243050"/>
+  <text x="104" y="432" fill="#9fb0ff" font-size="13">Entry point: /char and /profile</text>
+  <text x="104" y="452" fill="#6b7590" font-size="13">Saving these never touches anything below.</text>
+
+  <!-- Right: officer -->
+  <rect x="570" y="124" width="470" height="416" rx="8" fill="#05070b" stroke="#5a4520" stroke-width="2"/>
+  <rect x="570" y="124" width="470" height="42" rx="8" fill="#2a1d0d"/>
+  <text x="594" y="152" fill="#ffb057" font-size="14" font-weight="700" letter-spacing="3">ONLY AN OFFICER WRITES</text>
+  <g font-size="14">
+    <rect x="594" y="184" width="422" height="46" rx="6" fill="#2a1d0d" stroke="#a8720d"/>
+    <text x="614" y="204" fill="#ffcf8a" font-weight="700">Warrant — active + reason</text>
+    <text x="614" y="222" fill="#c9a86a" font-size="12.5">char:OfficerSetWarrant · on-duty gated · audited</text>
+
+    <rect x="594" y="244" width="422" height="46" rx="6" fill="#2a1d0d" stroke="#a8720d"/>
+    <text x="614" y="264" fill="#ffcf8a" font-weight="700">Officer file notes</text>
+    <text x="614" y="282" fill="#c9a86a" font-size="12.5">char:OfficerAddRecord · marked, attributed, sealed</text>
+  </g>
+  <rect x="594" y="316" width="422" height="146" rx="6" fill="#0d1220" stroke="#243050"/>
+  <text x="614" y="342" fill="#9fb0ff" font-size="13" font-weight="700">On the subject's own file these are read-only:</text>
+  <text x="614" y="368" fill="#e7ecf5" font-size="13">· editing is refused</text>
+  <text x="614" y="392" fill="#e7ecf5" font-size="13">· archiving is refused</text>
+  <text x="614" y="416" fill="#e7ecf5" font-size="13">· deleting is refused</text>
+  <text x="614" y="444" fill="#6b7590" font-size="12.5">The buttons are gone from the UI, and the server refuses anyway.</text>
+
+  <text x="60" y="578" fill="#6b7590" font-size="13">Licence slots stay self-declared — nothing in LACORE suspends one, so there is no enforcement state there to protect.</text>
+</svg>

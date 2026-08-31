@@ -24,6 +24,119 @@ The same pattern sat in every other unit list, and all of them are fixed: Dispat
 the assign dropdowns), the LAPD MDT unit list, the Agency MDT unit and incident-unit lists, the EMS
 CAD, Penn CAD, and the in-car CAD.
 
+Worth saying why the LASD MDC was the one that broke: everywhere else the unit list passes through
+`mergedUnits()`, which folds partners sharing a callsign into one row before anything renders, so
+duplicates never reached the list. The MDC reads its own unit feed directly and had no such step.
+
+**And partners sharing a callsign is the normal case, not the fault.** Two officers riding one unit
+answer to one designator — that is why the shared MDTs merge them and offer the crew behind an
+expander. The MDC now does the same where it belongs:
+
+- `US` (unit status) is a **unit** view, so partners are one line carrying the crew count —
+  `1-ADAM-12 (2)`. Where a crew is split across statuses the line follows whoever is on an incident,
+  because a unit listed against a call must not read as available.
+- `UR` (unit roster) is a **personnel** list and deliberately keeps one line per officer, so a
+  supervisor can still see who is actually out there.
+
+#### Going on duty failed silently for players without Discord
+
+Three log lines built a Discord handle straight into a string without checking that the player had
+one. No linked Discord account meant no handle, and the concatenation aborted the handler.
+
+![Going on duty without Discord](/img/changelog/duty-change-abort.svg)
+
+The abort happened **before** the duty change itself. Job, department, callsign and status were
+never written, the personnel file recorded nothing, and the API event never fired — while the
+client, which applies the job the moment `/onduty` is typed, kept showing the player as on duty.
+The same line sits in the end-of-watch path, where the abort also skipped removing the player from
+the unit list, leaving a unit on the board that nobody was driving.
+
+This only ever surfaced on servers with Discord authentication **off** — with it on, the connect
+gate turns those players away long before they reach a duty command. All three sites now fall back
+to `no Discord linked`.
+
+#### A wanted person could clear their own warrant
+
+The `/char` form sent the whole profile back to the server, warrant included, and the server took it
+at face value — then mirrored it into the character record, which is the exact field an officer
+writes through `char:OfficerSetWarrant`. An officer put a warrant out; the wanted player opened
+their own profile, hit save, and it was gone. The same field travelled through `/profile` character
+edits and through saved character presets.
+
+![Who owns what on a file](/img/changelog/record-ownership.svg)
+
+The warrant is now off the client's write path entirely. `/char`, `/profile` and presets keep the
+existing server value instead of overwriting it, so setting and clearing a warrant is an officer
+action and nothing else. Licence slots stay self-declared — nothing in LACORE suspends one, so
+there is no enforcement state there to protect.
+
+#### Police entries could be deleted from the file they were written on
+
+File entries an officer added were stored on the subject's own character, and the three handlers
+that manage entries — save, archive, delete — never asked who wrote them. Anyone could delete an
+officer's note from their own record, or hide it in the archive. Sending back an existing entry's
+id even let the client rewrite one in place, and the officer marking came off in the process.
+
+Officer entries are now sealed: the server refuses to edit, archive or delete them, and in the
+profile UI they carry a **Police record** badge where the action buttons used to be.
+
+#### CAD access outlived the shift it was granted for
+
+Opening the LASD MDC registered you as a unit, and that registration was the permission: every
+command afterwards — self-assign, handle, back, call notes, status, and the person and plate
+lookups — only asked whether the registration existed, never whether you were still on duty. The
+entry was cleared on disconnect and nowhere else, so going off duty changed nothing. You kept full
+CAD access, person lookups included, and stayed on the roster as an active unit for the rest of the
+session.
+
+Two changes close it. The unit lookup now re-asks the duty gate on every command and drops a stale
+registration on the spot, and a duty change takes the unit off the roster immediately instead of
+leaving a ghost behind until the player leaves. The EMS CAD was built on the same pattern and got
+the same treatment.
+
+#### Callsigns are shaped before they reach the roster
+
+`ondutyServer` validated the job and the agency carefully and then took the callsign exactly as the
+client sent it — no length limit, no character filter. It travels a long way from there: every MDT
+roster, the dispatch text, the radio name.
+
+Callsigns are now uppercased, reduced to letters, digits, hyphens and single spaces, and capped at
+16 characters. The client applies the identical shaping before sending, so the HUD never shows a
+callsign the roster doesn't have.
+
+Duplicates are deliberately still allowed: partners riding one unit share a callsign, and the MDTs
+fold them back into a single row with both names under it.
+
+#### CAD data no longer goes to everyone on the server
+
+Two payloads in the two-second dispatch sync still went to every connected player: the unit list,
+and the call blips — the latter carrying **coordinates for every open incident**. The clients
+already filtered both for display (blips are drawn for on-duty units only, unit data needs an open
+CAD), so nothing looked wrong. But filtering at the client is a display rule, not a boundary: the
+data was on the wire, and anything reading the wire had the whole board, live, every two seconds.
+The call list itself had already been moved off the broadcast for exactly this reason — these two
+were left behind. The bulletin board was broadcasting to everyone too.
+
+All of them now go to on-duty units only, through the same audience the call list uses.
+
+#### Reading the CAD needs a badge now
+
+Writing to the CAD has always been gated. Reading it was not, and five handlers answered whoever
+asked: the full call and unit sync, the incident history (200 closed incidents with their notes and
+comments), the BOLO list, the bulletin board, and the dispatcher's unit list. The contrast was
+sharpest on the board, where posting checked that you were on duty and reading checked nothing.
+
+All five now ask the same question the write side does — are you on duty, in any job — through a
+new `PlayerIsUnit` helper next to the existing `PlayerIsAuthorized`. Officers, medics, dispatch and
+staff are unaffected; nothing else gets an answer.
+
+#### AMR never announced its start of watch
+
+The end-of-watch branch listed four jobs, the start-of-watch branch three: `AMR` — the in-game job
+string for Fire/EMS — was missing from the second one. Medic units got no "Start of Watch" dispatch
+line and no on-duty entry in the webhook log, but a clean off-duty entry when they logged out, which
+made the log read as if they had never gone on duty at all.
+
 ## [3.5.2] – 2026-08-30 — Reports that ask the right questions
 
 ### Added

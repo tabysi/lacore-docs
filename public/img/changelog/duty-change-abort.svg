@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/>
+  <rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 504 V532 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">GOING ON DUTY — <tspan fill="#6c8cff">WITHOUT DISCORD</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">A log line built from a missing Discord ID aborted the handler before the job was ever applied.</text>
+
+  <!-- BEFORE row -->
+  <text x="60" y="140" fill="#ff8fa3" font-size="14" font-weight="700" letter-spacing="3">BEFORE</text>
+  <g font-size="13">
+    <rect x="60" y="156" width="196" height="66" rx="6" fill="#0d1220" stroke="#2f7a52"/>
+    <text x="158" y="182" fill="#7fe0ab" text-anchor="middle" font-weight="700">PERMISSION</text>
+    <text x="158" y="202" fill="#9fb0ff" text-anchor="middle">checked, passed</text>
+
+    <rect x="286" y="156" width="196" height="66" rx="6" fill="#2a1017" stroke="#a33a4e"/>
+    <text x="384" y="182" fill="#ff8fa3" text-anchor="middle" font-weight="700">WEBHOOK LOG</text>
+    <text x="384" y="202" fill="#ffc2cd" text-anchor="middle">nil concatenation</text>
+
+    <rect x="512" y="156" width="196" height="66" rx="6" fill="#1a1a1f" stroke="#4a4a55"/>
+    <text x="610" y="182" fill="#8a8a99" text-anchor="middle" font-weight="700">JOB APPLIED</text>
+    <text x="610" y="202" fill="#6a6a77" text-anchor="middle">never reached</text>
+
+    <rect x="738" y="156" width="196" height="66" rx="6" fill="#1a1a1f" stroke="#4a4a55"/>
+    <text x="836" y="182" fill="#8a8a99" text-anchor="middle" font-weight="700">CALLSIGN</text>
+    <text x="836" y="202" fill="#6a6a77" text-anchor="middle">never reached</text>
+
+    <rect x="964" y="156" width="176" height="66" rx="6" fill="#1a1a1f" stroke="#4a4a55"/>
+    <text x="1052" y="182" fill="#8a8a99" text-anchor="middle" font-weight="700">PERSONNEL</text>
+    <text x="1052" y="202" fill="#6a6a77" text-anchor="middle">never reached</text>
+  </g>
+  <g stroke="#4a5cff" stroke-width="2" fill="none" opacity="0.5">
+    <path d="M256 189 H286"/><path d="M482 189 H512"/><path d="M708 189 H738"/><path d="M934 189 H964"/>
+  </g>
+  <g stroke="#a33a4e" stroke-width="3" fill="none">
+    <path d="M470 234 L498 262"/><path d="M498 234 L470 262"/>
+  </g>
+  <text x="520" y="256" fill="#ff8fa3" font-size="14">handler stops here — the client already shows "on duty"</text>
+
+  <!-- AFTER row -->
+  <text x="60" y="336" fill="#7fe0ab" font-size="14" font-weight="700" letter-spacing="3">AFTER</text>
+  <g font-size="13">
+    <rect x="60" y="352" width="196" height="66" rx="6" fill="#0d1220" stroke="#2f7a52"/>
+    <text x="158" y="378" fill="#7fe0ab" text-anchor="middle" font-weight="700">PERMISSION</text>
+    <text x="158" y="398" fill="#9fb0ff" text-anchor="middle">checked, passed</text>
+
+    <rect x="286" y="352" width="196" height="66" rx="6" fill="#0f2419" stroke="#2f7a52"/>
+    <text x="384" y="378" fill="#7fe0ab" text-anchor="middle" font-weight="700">WEBHOOK LOG</text>
+    <text x="384" y="398" fill="#b8f0d0" text-anchor="middle">"no Discord linked"</text>
+
+    <rect x="512" y="352" width="196" height="66" rx="6" fill="#0f2419" stroke="#2f7a52"/>
+    <text x="610" y="378" fill="#7fe0ab" text-anchor="middle" font-weight="700">JOB APPLIED</text>
+    <text x="610" y="398" fill="#b8f0d0" text-anchor="middle">job · dept · status</text>
+
+    <rect x="738" y="352" width="196" height="66" rx="6" fill="#0f2419" stroke="#2f7a52"/>
+    <text x="836" y="378" fill="#7fe0ab" text-anchor="middle" font-weight="700">CALLSIGN</text>
+    <text x="836" y="398" fill="#b8f0d0" text-anchor="middle">set + radio name</text>
+
+    <rect x="964" y="352" width="176" height="66" rx="6" fill="#0f2419" stroke="#2f7a52"/>
+    <text x="1052" y="378" fill="#7fe0ab" text-anchor="middle" font-weight="700">PERSONNEL</text>
+    <text x="1052" y="398" fill="#b8f0d0" text-anchor="middle">shift recorded</text>
+  </g>
+  <g stroke="#4a5cff" stroke-width="2" fill="none">
+    <path d="M256 385 H286"/><path d="M482 385 H512"/><path d="M708 385 H738"/><path d="M934 385 H964"/>
+  </g>
+  <text x="60" y="466" fill="#9fb0ff" font-size="14">The same log line sits in the end-of-watch path, where the abort also skipped removing the player</text>
+  <text x="60" y="490" fill="#9fb0ff" font-size="14">from the unit list — which is where the ghost units in dispatch came from.</text>
+</svg>
