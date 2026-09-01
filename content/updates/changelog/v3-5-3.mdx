@@ -66,7 +66,104 @@ Both surface weeks later as "records keep disappearing" or "the camera does noth
 named checks by resource name rather than by catalogue category, so adding another resource to that
 category later cannot silently switch them off.
 
+### Changed
+
+#### Prompt dialogs take more than one line now
+
+Every prompt in the CAD — the details on a backup request, a resolve reason, anything that asks you
+to type something — shared one single-line input capped at 120 characters. A sentence fit. A short
+scene description did not, and there was no way to put two facts on two lines.
+
+![Request details before and after](/img/features/prompt-dialog-multiline.svg)
+
+It is a proper text box now: four lines tall, drag the corner for more, 500 characters, and the
+dialog itself is wider to match. **Enter** inserts a line break, **Ctrl+Enter** confirms — Escape
+still cancels. Confirm dialogs without an input field are unchanged, Enter confirms them as before.
+
+#### The legacy phone draws at the top of the script layer
+
+The scaleform phone and its apps (texts, contacts, Bleeter, the radio app) drew at script draw
+order 4. They are at **7**, the highest the game accepts, so nothing another script draws can land
+on top of them.
+
+> This orders *script draws* against each other. A NUI/HTML overlay from another resource — a radio
+> panel, a HUD — is composited above every scaleform by the client and cannot be reordered from
+> here. If your radio still covers the phone, it has to hide itself, or the phone has to move.
+
+#### Every player decides where their phone sits
+
+The phone was nailed to the bottom-right corner, which is also where a lot of servers put a radio,
+a HUD or a speedometer — and whatever that other resource draws sits on top, because a NUI overlay
+is composited above every scaleform and no draw order can change that. So the phone moves instead.
+
+![The 25 spots a phone can take](/img/features/phone-position.svg)
+
+**`/profile` → Settings → In-Game Phone & Computer** has two new entries, **Phone Horizontal
+Position** (Right · Centre right · Centre · Centre left · Left) and **Phone Vertical Position**
+(Bottom · A little higher · Higher · Much higher · Top). 25 spots between them.
+
+It is a **player setting, not a server one**: it lives on that player's own client in the same
+`LACORE:SETTINGS` store as their PLD colour and their map style, so two officers on the same server
+can put their phone in two different places. Nothing in `configs/` changed.
+
+Both phones follow it — the scaleform phone and the NUI phone, the retro brick included — and a
+change applies to a phone that is already on screen, not only to the next one you open. A raised
+phone is capped so it cannot run off the top edge on a short screen.
+
+#### The dev launcher lists every interface, not the ones somebody needed
+
+The Vite dev launcher (`npm run dev`, the DEV button) knew about 18 of the NUI's interfaces. The
+other 26 could only be reached by hand-writing a `window.postMessage` with the right payload, which
+meant in practice they were not looked at.
+
+![What the dev launcher now covers](/img/features/dev-launcher.svg)
+
+It lists **44** now — everything `App.svelte` can render. New: the phone (modern and the retro
+brick, plus its placement spots), Spawn Select, the Session window, Mobile ID, the In-Car CAD and
+MDT dashboards, ALPR, the Air Unit camera, the Turf HUD, the civilian ID card, the AOP ballot, the
+911 call session, notifications, Corrections, the Impound lot, the CCTV manager, the vehicle and
+prop spawners, the phone booth, Organisations, the bug report form, the zone editor and both MDT
+record forms. Many carry variants — ALPR with a warrant hit, the Air Unit camera in thermal and
+night vision, Mobile ID with no match.
+
+Each opener sends the **same message the Lua side sends**, so a payload that drifts shows up as a
+broken preview instead of a mock that quietly disagrees with the resource. Writing them found one
+already drifted: the mock 911 transcript used field names the component does not read.
+
+`Close all UIs` now really closes all of them — the zone editor, the civilian form and the ID card
+are opened by a store flag rather than a message, and were surviving it.
+
+> Dev-only. This is behind `import.meta.env.DEV` and is not in a built resource.
+
 ### Fixed
+
+#### Half of your configuration was never in the config backup
+
+`/lacoreconfig backup` exists so a reinstall cannot eat your settings. It carries a static list of
+the files it snapshots — FiveM's Lua sandbox cannot list a directory, so a resource only knows the
+files it is told about — and **that list had drifted to 29 of 59**.
+
+Everything below was outside the backup, silently, while the command reported success:
+
+`cfg-hud` · `cfg-mdt` · `cfg-regions` · `cfg-supervisor` · `cfg-permissions` · `cfg-vehicles` ·
+`cfg-spawns` · `cfg-licenses` · `cfg-alpr` · `cfg-airunit` · `cfg-k9` · `cfg-impound` ·
+`cfg-corrections` · `cfg-cases` · `cfg-items` · `cfg-report` · `cfg-replay` · `cfg-personnel` ·
+`cfg-fingerprint` · `cfg-penn` · `cfg-retro` · `cfg-library` · `cfg-globalban` · `cfg-identitylink` ·
+`cfg-deathsync` · `cfg-cuffs` · `cfg-remoteconfig` · `cfg-vehiclescreen` · `cfg-mdt-labels` ·
+`cfg-autoconfig`
+
+All 59 are covered now. Because a hand-kept list rots again the moment someone adds a config, the
+build checks it: `build/check-configlist.mjs` compares the list against the folder and fails
+`escrow.ps1` on any drift — done where a directory can actually be read.
+
+`backup` also reported success unconditionally. It now refuses and says why when the storage layer
+is unavailable or not one file could be read, and names the count against the total, so a partial
+backup no longer reads like a complete one.
+
+&lt;Callout type="warning">
+  **Re-run `/lacoreconfig backup` once after updating.** An existing backup was taken with the old
+  list and is missing those thirty files.
+&lt;/Callout>
 
 #### Dispatch radio arrives now — "Start of Watch" reached nobody
 

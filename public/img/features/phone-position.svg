@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" width="900" height="420" font-family="'Chakra Petch', 'Segoe UI', system-ui">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0H0V30" fill="none" stroke="#1a2130" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="420" fill="url(#bg)"/>
+  <rect width="900" height="420" fill="url(#grid)"/>
+
+  <text x="40" y="46" fill="#9fb0ff" font-size="15" letter-spacing="2">PHONE POSITION — 5 × 5 SPOTS, PER PLAYER</text>
+
+  <!-- screen -->
+  <rect x="40" y="70" width="500" height="300" rx="8" fill="#05070b" stroke="#2a3448"/>
+  <text x="52" y="90" fill="#3d4a66" font-size="11">YOUR SCREEN</text>
+
+  <!-- grid of spots -->
+  <g fill="#1c2434" stroke="#2f3c58">
+    <rect x="66"  y="106" width="26" height="46" rx="4"/>
+    <rect x="170" y="106" width="26" height="46" rx="4"/>
+    <rect x="274" y="106" width="26" height="46" rx="4"/>
+    <rect x="378" y="106" width="26" height="46" rx="4"/>
+    <rect x="482" y="106" width="26" height="46" rx="4"/>
+    <rect x="66"  y="166" width="26" height="46" rx="4"/>
+    <rect x="170" y="166" width="26" height="46" rx="4"/>
+    <rect x="274" y="166" width="26" height="46" rx="4"/>
+    <rect x="378" y="166" width="26" height="46" rx="4"/>
+    <rect x="482" y="166" width="26" height="46" rx="4"/>
+    <rect x="66"  y="226" width="26" height="46" rx="4"/>
+    <rect x="170" y="226" width="26" height="46" rx="4"/>
+    <rect x="274" y="226" width="26" height="46" rx="4"/>
+    <rect x="378" y="226" width="26" height="46" rx="4"/>
+    <rect x="66"  y="286" width="26" height="46" rx="4"/>
+    <rect x="170" y="286" width="26" height="46" rx="4"/>
+    <rect x="274" y="286" width="26" height="46" rx="4"/>
+    <rect x="378" y="286" width="26" height="46" rx="4"/>
+  </g>
+
+  <!-- occupied bottom-right corner: radio of another resource -->
+  <rect x="452" y="226" width="76" height="130" rx="6" fill="#171b24" stroke="#3a4358"/>
+  <rect x="462" y="244" width="56" height="34" rx="3" fill="#0b1a12" stroke="#1e3a29"/>
+  <text x="490" y="266" fill="#4ad991" font-size="10" text-anchor="middle">RADIO</text>
+  <circle cx="474" cy="300" r="6" fill="#232a38"/><circle cx="490" cy="300" r="6" fill="#232a38"/><circle cx="506" cy="300" r="6" fill="#232a38"/>
+  <circle cx="474" cy="318" r="6" fill="#232a38"/><circle cx="490" cy="318" r="6" fill="#232a38"/><circle cx="506" cy="318" r="6" fill="#232a38"/>
+  <text x="490" y="372" fill="#6d7a92" font-size="11" text-anchor="middle">another resource</text>
+
+  <!-- the chosen spot -->
+  <rect x="378" y="166" width="26" height="46" rx="4" fill="#4a5cff" stroke="#6c8cff"/>
+  <text x="391" y="156" fill="#9fb0ff" font-size="10" text-anchor="middle">YOUR PHONE</text>
+
+  <!-- legend -->
+  <text x="580" y="112" fill="#e7ecf5" font-size="14" font-weight="700">Two settings, one per axis</text>
+  <text x="580" y="140" fill="#9fb0ff" font-size="12">Phone Horizontal Position</text>
+  <text x="580" y="160" fill="#6d7a92" font-size="11">Right · Centre right · Centre · Centre left · Left</text>
+  <text x="580" y="190" fill="#9fb0ff" font-size="12">Phone Vertical Position</text>
+  <text x="580" y="210" fill="#6d7a92" font-size="11">Bottom · A little higher · Higher ·</text>
+  <text x="580" y="226" fill="#6d7a92" font-size="11">Much higher · Top</text>
+
+  <text x="580" y="266" fill="#e7ecf5" font-size="12">/profile → Settings →</text>
+  <text x="580" y="284" fill="#e7ecf5" font-size="12">In-Game Phone &amp; Computer</text>
+  <text x="580" y="316" fill="#6d7a92" font-size="11">Saved per player, on their own client.</text>
+  <text x="580" y="332" fill="#6d7a92" font-size="11">Applies to the scaleform phone and</text>
+  <text x="580" y="348" fill="#6d7a92" font-size="11">the NUI phone, while it is open.</text>
+</svg>
