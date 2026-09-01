@@ -131,6 +131,26 @@ All five now ask the same question the write side does — are you on duty, in a
 new `PlayerIsUnit` helper next to the existing `PlayerIsAuthorized`. Officers, medics, dispatch and
 staff are unaffected; nothing else gets an answer.
 
+#### Four small ones from the same audit
+
+- **A removal inside a loop skipped the next entry.** Two `table.remove` calls sat in a running
+  `ipairs`, where the following element slides onto the index the iterator has already passed. The
+  player cleanup now stops after its one match; the unban walks backwards, so a duplicate ban id
+  can no longer survive by being stepped over.
+- **`json.decode` was handed a `nil` on a fresh client.** The settings load guarded the *result*
+  with `or {}`, but the decode errors on a nil *argument*, which is what a client has before the
+  key has ever been written. It gets `"{}"` now.
+- **Placed props could be deleted from anywhere.** Removing a prop by network id checked that the
+  prop was one LACORE had placed — sensibly, so arbitrary world entities are safe — but never
+  checked where the caller was standing. Walking the id space cleared the map from a chair. It now
+  uses the same five-metre reach as removing the nearest prop, which is all the Third-Eye that
+  fires it ever needs.
+- **A turf kill did not require anyone to die.** The handler verified the zone, both parties'
+  positions, the orgs, and a per-victim cooldown — everything except the death. Two allies in a
+  zone could trade a report every 20 seconds. The victim's ped is now confirmed dead server-side,
+  with a short grace period so health replication lagging behind the report doesn't cost an honest
+  capture.
+
 #### AMR never announced its start of watch
 
 The end-of-watch branch listed four jobs, the start-of-watch branch three: `AMR` — the in-game job
