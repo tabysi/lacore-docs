@@ -63,6 +63,23 @@ category later cannot silently switch them off.
 
 ### Fixed
 
+#### Two notifications showed their own key instead of a sentence
+
+A pre-release sweep across every locale key used in the code turned up two that were never
+declared. Neither fails loudly: `T()` returns `[key]` for something it doesn't know, and the NUI's
+`t()` does the same — so the fallback written next to one of them could never fire, because a
+string in brackets is still a string.
+
+- **`staff_marked`** — when a staff member marks a location on your map, the notification read
+  `[staff_marked]`. Missing from all three Lua locales.
+- **`fp_not_restrained`** — trying to take prints from someone who isn't cuffed showed
+  `[fp_not_restrained]` in the Mobile ID panel. The Lua locales had it; the three NUI locale files
+  did not, and that is the path the panel uses.
+
+Everything else came back clean: all 304 Lua files parse, every path in `fxmanifest.lua` resolves,
+the two files that load twice do so deliberately and say so, and the Lua and NUI locale sets are
+identical across English, German and Russian.
+
 #### UR and US went blank when two units shared a callsign
 
 On the LASD MDC, `UR` (unit roster) and `US` (unit status) worked fine in a two-officer test and
