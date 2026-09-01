@@ -63,6 +63,37 @@ category later cannot silently switch them off.
 
 ### Fixed
 
+#### /onduty could die with "table expected, got nil"
+
+Reported from a live server: running `/onduty` threw
+`bad argument #1 to 'for iterator' (table expected, got nil)` and did nothing.
+
+The command's first act is to look your character up in the online-player list, and that lookup was
+the one reader of the list that never guarded it — `playerlist-cl`, `phonebooth-cl` and `mdt-nui-cl`
+all write `onlinePlayers or {}`, so somebody had met this before and hardened their own call sites
+only.
+
+The cause sits one step further back. `syncPlayerList` is an **unnamespaced** event name, so
+anything running on the server can fire it, and the handler assigned the payload to the global
+before looking at it. A single nil payload therefore left the list nil for good — every later
+lookup threw, and only a rejoin fixed it.
+
+The handler now ignores a payload it cannot use and keeps the last good list, and the four
+remaining unguarded readers were brought in line with the three that already were.
+
+#### Dying destroyed the weapon you were holding
+
+A thread watched for your death, told the server to drop your weapon into the world, and then
+removed it from your hands. There has never been a server handler for that event — not in any
+version of this resource — so only the second half ever happened. The weapon was taken away, no
+pickup appeared, and nothing was logged. Nothing else in LACORE strips weapons on death, so this
+was the whole of it.
+
+The destructive half is gone. The receiving half — the pickup loop and the two sync events — stays
+in place and dormant: it only ever acts on drops the server announces, and the server announces
+none. Implementing that side is what would turn this into a working feature; until then, not
+deleting a player's weapon is the correct behaviour.
+
 #### Two notifications showed their own key instead of a sentence
 
 A pre-release sweep across every locale key used in the code turned up two that were never
