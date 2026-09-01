@@ -9,17 +9,19 @@ import { Callout } from 'nextra/components'
 LACORE looks at what is running on your server and tells you which of its settings would probably
 suit it better — with a reason on every line.
 
-![The setup review — it tells you, it does not do it](/img/changelog/autoconfig-review.svg)
+![The setup review](/img/changelog/autoconfig-review.svg)
 
 <Callout type="info">
-  **It changes nothing.** Not a config file, not a remote value, not one of its own suggestions.
-  Applying a line is your decision.
+  **Looking is free.** `/lacore autoconfig` on its own changes nothing at all. Applying is a
+  separate command, and everything it does can be taken back exactly.
 </Callout>
 
 ## Running it
 
 ```
-/lacore autoconfig
+/lacore autoconfig           # look — changes nothing
+/lacore autoconfig apply     # apply every suggestion
+/lacore autoconfig revert    # put them all back
 ```
 
 Works from the server console and in-game for Staff / Dev (the same permission as every other
@@ -42,8 +44,9 @@ Worth knowing — no setting fixes these (1):
   Second anticheat detected: FiveGuard
      Two anticheats can punish the same player twice for one event. Decide which one owns bans.
 
-To apply one: change it in configs/ and restart, or set it in your dashboard's
-config editor. Re-run this any time with /lacore autoconfig.
+Apply all of them with /lacore autoconfig apply — undo with /lacore autoconfig revert.
+Or set them yourself in configs/ or the dashboard's config editor; anything you
+set in the dashboard overrides what AutoConfig applied.
 ```
 
 Two sections, on purpose:
@@ -70,6 +73,50 @@ and short words are matched on whole name parts, so `esx_arcade` is not mistaken
 **A suggestion you are already following is not shown.** Your current value for every setting is
 read before the list is built.
 
+## Applying, and taking it back
+
+`/lacore autoconfig apply` writes the suggested values to **`data/autoconfig.json`**. Never into
+the files in `configs/` — rewriting your config files at runtime would be fragile, and there would
+be no clean way back.
+
+That file is a layer of its own, and the three layers have a fixed order:
+
+![Which settings layer wins](/img/features/autoconfig-layers.svg)
+
+Anything you set in the **dashboard beats what AutoConfig applied**, always. The order is enforced
+by load order alone, so there is no rule that could disagree with itself.
+
+Settings marked *live* (branding) take effect the moment they are applied. The rest are read once
+when the server loads, so they need one restart — the command says so when that is the case.
+
+<Callout type="info">
+  **Revert is exact, not "back to default".** Every apply records the values it is about to replace,
+  including ones you had edited by hand, and `revert` restores those — not the shipped defaults.
+</Callout>
+
+## Doing it on install
+
+`configs/cfg-autoconfig-sh.lua`:
+
+```lua
+AutoConfig = {
+    enabled           = true,
+    applyOnFirstStart = false,   -- opt-in
+    excludeKeys       = {},      -- settings AutoConfig must never touch
+}
+```
+
+`applyOnFirstStart` applies the suggestions once, automatically, about 15 seconds after a server
+starts — but **only on a server that has never applied them before**. Once `data/autoconfig.json`
+exists it never fires again, so a server already in service is never reconfigured behind its
+owner's back.
+
+`excludeKeys` is the opposite end: settings you want left alone no matter what is detected.
+
+```lua
+excludeKeys = { "features.phone", "hud.style" },
+```
+
 ## What it is allowed to suggest
 
 Every suggested key must:
@@ -89,11 +136,13 @@ If something defines it, what it returns goes through **exactly the same gate** 
 rule, and it never wins against one.
 
 An advisor can therefore be wrong, but it cannot be dangerous: the worst it can do is propose an
-allowlisted, correctly-typed, non-sensitive setting that you then decline.
+allowlisted, correctly-typed, non-sensitive setting — which you can still decline, and which
+`revert` can still undo.
 
 ## What the team sees
 
 The suggestions (keys and values, not the reasons) ride along on the
-[setup report](/features/telemetry), so a support conversation can start from what your server
-actually looks like instead of asking. The reasons stay in your console — those are written for a
+[setup report](/features/telemetry), together with what you have actually applied — so a support
+conversation starts from what your server really looks like instead of asking, and nobody suggests
+a change you made weeks ago. The reasons stay in your console — those are written for a
 person, not for a database row.

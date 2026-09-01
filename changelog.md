@@ -5,6 +5,39 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [3.5.3] – 2026-08-31 — Unit lists that survive a full patrol
 
+### Added
+
+#### Auto-Config can now apply what it suggests
+
+The setup review has been telling you which settings would suit your server better since 3.5.0, and
+then leaving you to make every one of them by hand. It can do them now.
+
+![Which settings layer wins](/img/features/autoconfig-layers.svg)
+
+```
+/lacore autoconfig           # look — changes nothing, exactly as before
+/lacore autoconfig apply     # apply every suggestion
+/lacore autoconfig revert    # put them all back
+```
+
+Applied values go to **`data/autoconfig.json`** — never into the files in `configs/`, because
+rewriting a config file at runtime is fragile and leaves no clean way back. That gives settings
+three layers with a fixed order: `configs/*.lua` < `data/autoconfig.json` < dashboard. **Anything
+you set in the dashboard beats what Auto-Config applied**, and the order is enforced by load order
+alone, so no rule can disagree with itself.
+
+Reverting restores what was really there before — including values you had edited by hand — not the
+shipped defaults. Every apply snapshots the values it is about to replace, and repeated applies keep
+the original snapshot rather than recording their own work as the thing to go back to.
+
+Nothing about the safety rails changed: only allowlisted, correctly typed, non-sensitive keys can be
+touched, and applying still requires Staff / Dev like every other `/lacore` command.
+
+> ⚠️ **New config file:** `configs/cfg-autoconfig-sh.lua`. Existing servers need no change — the
+> defaults keep the current behaviour, where nothing is applied unless you ask. `applyOnFirstStart`
+> is the opt-in that applies once on a server that has never applied before; it cannot fire on a
+> server already in service.
+
 ### Fixed
 
 #### UR and US went blank when two units shared a callsign

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="620" fill="url(#bg)"/>
+  <rect width="1200" height="620" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/><path d="M1172 564 V592 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">AUTOCONFIG — <tspan fill="#6c8cff">WHO WINS</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">Three layers of settings. Each one may override the one below it, and nothing overrides the top.</text>
+
+  <!-- Layer 3 -->
+  <rect x="60" y="120" width="1080" height="118" rx="8" fill="#101a2e" stroke="#4a5cff" stroke-width="2"/>
+  <text x="88" y="152" fill="#9fb0ff" font-size="12" font-weight="700" letter-spacing="3">3 · HIGHEST</text>
+  <text x="88" y="184" fill="#e7ecf5" font-size="19" font-weight="700">Dashboard</text>
+  <text x="88" y="210" fill="#9fb0ff" font-size="14">What you set in the config editor. Pulled by licence key, cached in data/remote-config.json.</text>
+  <text x="1112" y="184" fill="#6c8cff" font-size="13" text-anchor="end">applied last, so it wins</text>
+
+  <!-- Layer 2 -->
+  <rect x="60" y="254" width="1080" height="118" rx="8" fill="#0f1a16" stroke="#2f7a52" stroke-width="2"/>
+  <text x="88" y="286" fill="#7fe0ab" font-size="12" font-weight="700" letter-spacing="3">2 · AUTOCONFIG</text>
+  <text x="88" y="318" fill="#e7ecf5" font-size="19" font-weight="700">data/autoconfig.json</text>
+  <text x="88" y="344" fill="#9fb0ff" font-size="14">Written by /lacore autoconfig apply. Only allowlisted, typed, non-sensitive keys — never your config files.</text>
+  <text x="1112" y="318" fill="#7fe0ab" font-size="13" text-anchor="end">revert restores the exact previous values</text>
+
+  <!-- Layer 1 -->
+  <rect x="60" y="388" width="1080" height="118" rx="8" fill="#12141c" stroke="#3a4258" stroke-width="2"/>
+  <text x="88" y="420" fill="#8a94ad" font-size="12" font-weight="700" letter-spacing="3">1 · BASE</text>
+  <text x="88" y="452" fill="#e7ecf5" font-size="19" font-weight="700">configs/*.lua</text>
+  <text x="88" y="478" fill="#9fb0ff" font-size="14">The files you ship and edit by hand. AutoConfig never writes here.</text>
+
+  <g stroke="#4a5cff" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M600 388 V376"/><path d="M592 384 L600 374 L608 384" fill="#4a5cff" stroke="none"/>
+    <path d="M600 254 V242"/><path d="M592 250 L600 240 L608 250" fill="#4a5cff" stroke="none"/>
+  </g>
+
+  <text x="60" y="552" fill="#9fb0ff" font-size="14">Enforced by load order alone: autoconfig-early-sv.lua is listed before remoteconfig-early-sv.lua in</text>
+  <text x="60" y="576" fill="#9fb0ff" font-size="14">fxmanifest.lua, so a dashboard value is always applied last, over the top of everything else.</text>
+</svg>
