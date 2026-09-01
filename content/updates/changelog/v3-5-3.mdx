@@ -135,6 +135,67 @@ are opened by a store flag rather than a message, and were surviving it.
 
 > Dev-only. This is behind `import.meta.env.DEV` and is not in a built resource.
 
+#### The settings screen stops being a wall of text
+
+Feedback from the team, and it was right: the settings are all there and none of
+them are easy to find. Four vertical strips — the profile's own nav, the category
+rail, the settings list and the account column — were splitting a 1240px window,
+which left the list about **300px** of text column. Descriptions wrapped to five
+lines, the control sat wherever the text happened to end, and every row looked
+exactly like the one above it.
+
+![Settings rows before and after](/img/features/settings-readability.svg)
+
+Nothing was removed and no setting moved. What changed is the room and the rhythm:
+
+- **The profile window is 1440px wide** instead of 1240 (still `96vw`, so smaller
+  screens are unaffected). The account column is capped at 340px instead of taking
+  a fixed share, and the whole difference goes into the settings list — **460px** of
+  text column instead of 300.
+- **Every setting is a card**, with real space between the cards. Twenty-six
+  settings behind a hairline rule read as one block; the eye needs somewhere to
+  stop.
+- **One control column.** Switches and dropdowns line up on the same edge on every
+  row, instead of stepping in and out with the length of the label. When the
+  window gets genuinely narrow the control wraps onto its own line rather than
+  crushing the text into one word per line.
+- Names are a size bigger, descriptions have more line height, the category header
+  carries its count, and the "changes save as you make them" note moved out of the
+  search row — where it was wrapping to three lines — down under the list.
+
+#### Picking a character in the tab strip activates it
+
+Also from the team. The character tabs along the top of the profile only changed
+which character you were **looking at**; making one the active character was a
+second click on another screen, and nobody expected that — a strip of character
+tabs reads as a character switcher.
+
+It switches now. The dot on each tab marks the **active** character, not the open
+tab, so the change is visible where it happened. Framework-managed setups are left
+alone: there the framework owns the active character, and LACORE follows it.
+
+Activating only moves which record is active — name, licences, vehicles. It does
+not respawn anything.
+
+#### The rest of the weapon-drop system is gone
+
+The half that destroyed weapons was disabled earlier in this release. The other
+half — about 140 lines of it — was still sitting in `client/weapons-cl.lua`:
+`weaponDrop:syncWeaponDrop` and `weaponDrop:removeWeaponDrop` spawning and
+deleting props, a five-minute despawn timer, and a pickup loop that gave the
+weapon back and reported it with `weaponDrop:pickupWeapon`.
+
+None of those three events has ever had a server handler anywhere in this
+repository, so none of that code could run. It is deleted, along with the
+now-orphaned rate limit for `weaponDrop:dropWeapon` in the anticheat parameters.
+
+**Dropping a weapon on purpose is untouched.** `/drop` never used this system —
+it calls the game's own `SetPedDropsInventoryWeapon` and announces it over
+`weaponDropped`, which does have a server handler.
+
+If a death-drop is wanted as a real feature, it needs a server that owns the
+drops. The client half alone is what caused the original bug.
+
 ### Fixed
 
 #### Half of your configuration was never in the config backup

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" width="900" height="430" font-family="'Chakra Petch', 'Segoe UI', system-ui">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0H0V30" fill="none" stroke="#1a2130" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="430" fill="url(#bg)"/>
+  <rect width="900" height="430" fill="url(#grid)"/>
+
+  <text x="40" y="46" fill="#9fb0ff" font-size="15" letter-spacing="2">PLAYER SETTINGS — SAME SETTINGS, ROOM TO READ THEM</text>
+
+  <!-- BEFORE -->
+  <text x="40" y="78" fill="#6d7a92" font-size="13">Before · 300px of text column, hairline rows</text>
+  <rect x="40" y="92" width="380" height="286" rx="8" fill="#0d1119" stroke="#232c3e"/>
+
+  <text x="58" y="118" fill="#e7ecf5" font-size="12" font-weight="700">Always Show AOP</text>
+  <text x="58" y="136" fill="#6d7a92" font-size="10">Toggle between always</text>
+  <text x="58" y="150" fill="#6d7a92" font-size="10">showing the AOP, or</text>
+  <text x="58" y="164" fill="#6d7a92" font-size="10">showing the AOP only</text>
+  <text x="58" y="178" fill="#6d7a92" font-size="10">when outside of it.</text>
+  <rect x="330" y="138" width="34" height="18" rx="9" fill="#4a5cff"/>
+  <circle cx="356" cy="147" r="6.5" fill="#fff"/>
+  <path d="M50 192H410" stroke="#1c2331"/>
+
+  <text x="58" y="214" fill="#e7ecf5" font-size="12" font-weight="700">Hide PLD when minimap is hidden</text>
+  <text x="58" y="232" fill="#6d7a92" font-size="10">When the minimap is</text>
+  <text x="58" y="246" fill="#6d7a92" font-size="10">hidden, automatically</text>
+  <text x="58" y="260" fill="#6d7a92" font-size="10">switch to the Hidden</text>
+  <text x="58" y="274" fill="#6d7a92" font-size="10">option until the minimap</text>
+  <text x="58" y="288" fill="#6d7a92" font-size="10">is reenabled.</text>
+  <rect x="292" y="242" width="34" height="18" rx="9" fill="#2a3244" stroke="#3a4358"/>
+  <circle cx="301" cy="251" r="6.5" fill="#cfd7e6"/>
+  <path d="M50 302H410" stroke="#1c2331"/>
+
+  <text x="58" y="324" fill="#e7ecf5" font-size="12" font-weight="700">Use Intercardinal Directions</text>
+  <text x="58" y="342" fill="#6d7a92" font-size="10">Have the PLD show</text>
+  <text x="58" y="356" fill="#6d7a92" font-size="10">intercardinal directions</text>
+  <rect x="252" y="338" width="34" height="18" rx="9" fill="#4a5cff"/>
+  <circle cx="278" cy="347" r="6.5" fill="#fff"/>
+
+  <text x="58" y="372" fill="#a06060" font-size="10">controls land wherever the text ends</text>
+
+  <!-- arrow -->
+  <path d="M436 235h32" stroke="#4a5cff" stroke-width="2"/>
+  <path d="M468 235l-9-5v10z" fill="#4a5cff"/>
+
+  <!-- AFTER -->
+  <text x="486" y="78" fill="#9fb0ff" font-size="13">Now · 460px, cards, one control column</text>
+  <rect x="486" y="92" width="374" height="286" rx="8" fill="#0d1119" stroke="#2f3c58"/>
+
+  <rect x="500" y="106" width="346" height="52" rx="8" fill="#151a24" stroke="#2b3346"/>
+  <text x="514" y="128" fill="#e7ecf5" font-size="12" font-weight="700">Always Show AOP</text>
+  <text x="514" y="145" fill="#6d7a92" font-size="10">Toggle between always showing the AOP, or</text>
+  <rect x="796" y="123" width="34" height="18" rx="9" fill="#4a5cff"/>
+  <circle cx="822" cy="132" r="6.5" fill="#fff"/>
+
+  <rect x="500" y="166" width="346" height="52" rx="8" fill="#151a24" stroke="#2b3346"/>
+  <text x="514" y="188" fill="#e7ecf5" font-size="12" font-weight="700">Hide PLD when minimap is hidden</text>
+  <text x="514" y="205" fill="#6d7a92" font-size="10">When the minimap is hidden, switch to Hidden</text>
+  <rect x="796" y="183" width="34" height="18" rx="9" fill="#2a3244" stroke="#3a4358"/>
+  <circle cx="805" cy="192" r="6.5" fill="#cfd7e6"/>
+
+  <rect x="500" y="226" width="346" height="52" rx="8" fill="#151a24" stroke="#2b3346"/>
+  <text x="514" y="248" fill="#e7ecf5" font-size="12" font-weight="700">Use Intercardinal Directions</text>
+  <text x="514" y="265" fill="#6d7a92" font-size="10">Show NW, SW, SE, NE on the location display</text>
+  <rect x="796" y="243" width="34" height="18" rx="9" fill="#4a5cff"/>
+  <circle cx="822" cy="252" r="6.5" fill="#fff"/>
+
+  <rect x="500" y="286" width="346" height="52" rx="8" fill="#151a24" stroke="#2b3346"/>
+  <text x="514" y="308" fill="#e7ecf5" font-size="12" font-weight="700">Player List Style</text>
+  <text x="514" y="325" fill="#6d7a92" font-size="10">Which list the I key opens</text>
+  <rect x="744" y="300" width="90" height="24" rx="6" fill="#05070b" stroke="#34405a"/>
+  <text x="754" y="316" fill="#e7ecf5" font-size="10">Server default</text>
+
+  <path d="M790 100v272" stroke="#4a5cff" stroke-dasharray="3 4" opacity="0.55"/>
+  <text x="700" y="366" fill="#6c8cff" font-size="10">one control column, every row</text>
+</svg>
