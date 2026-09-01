@@ -55,6 +55,19 @@ Two sections, on purpose:
 - **Worth knowing** — real, but no setting fixes it. Two MDTs is a decision about which terminal
   your department uses, not a config value. Saying so is more useful than inventing a suggestion.
 
+## Missing pieces, not just duplicated ones
+
+Most of the review asks whether something is running **twice**. It also asks the opposite — whether
+something LACORE leans on is missing:
+
+| Missing | What quietly stops working |
+| --- | --- |
+| `oxmysql` | Data lives only in the JSON mirror on disk. It works, but nothing is durable, and nothing survives a wiped resource folder. |
+| `screenshot-basic` | Evidence photos, the phone camera and the anticheat's screenshot upload. No error — they simply do nothing. |
+
+Neither of these announces itself. They surface weeks later as "records keep disappearing" or
+"the camera does nothing", which is exactly the kind of ticket the review exists to prevent.
+
 ## What it suggests, and why
 
 | Situation | Suggestion |

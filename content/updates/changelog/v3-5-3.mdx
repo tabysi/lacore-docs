@@ -49,6 +49,23 @@ suggestion list by itself, which from the outside looks exactly like never havin
 [telemetry page](/features/telemetry) lists the field, as it does every other one: what leaves your
 server is documented, and this addition is no exception.
 
+#### The setup review now notices what is missing, not just what is doubled
+
+Every check in the review asked the same shape of question: is something running **twice**? Two
+dispatch systems, two phones, two HUDs. Nothing ever asked whether something LACORE depends on was
+**absent** — even though the two resources in question have sat in the detection catalogue since
+3.5.0, filed under a comment reading *"absence is the interesting case"*. The entries were there.
+The question was never asked.
+
+- **`oxmysql` not running** — data lives only in the JSON mirror on disk. It works, so nothing looks
+  wrong, but nothing is durable either.
+- **`screenshot-basic` not running** — evidence photos, the phone camera and the anticheat's
+  screenshot upload are inert. No error, just nothing.
+
+Both surface weeks later as "records keep disappearing" or "the camera does nothing". They are
+named checks by resource name rather than by catalogue category, so adding another resource to that
+category later cannot silently switch them off.
+
 ### Fixed
 
 #### UR and US went blank when two units shared a callsign
