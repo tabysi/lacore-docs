@@ -38,6 +38,12 @@ touched, and applying still requires Staff / Dev like every other `/lacore` comm
 > is the opt-in that applies once on a server that has never applied before; it cannot fire on a
 > server already in service.
 
+The setup report carries the applied settings along with the suggestions now, so support never
+reads a change you made weeks ago as an outstanding one — an applied setting drops out of the
+suggestion list by itself, which from the outside looks exactly like never having had one. The
+[telemetry page](/features/telemetry) lists the field, as it does every other one: what leaves your
+server is documented, and this addition is no exception.
+
 ### Fixed
 
 #### UR and US went blank when two units shared a callsign

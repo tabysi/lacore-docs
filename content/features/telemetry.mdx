@@ -54,12 +54,18 @@ tickets, and the input the self-configuring setup works from.
 | `counts` | How many resources exist, how many are started, how many are third-party |
 | `resources` | The started third-party resources: **name** and the `version` from the manifest |
 | `overlaps` | Which of those do the same job as a LACORE feature |
-| `advice` | Which settings the [setup review](/configuration/autoconfig) suggests — keys and values only, and nothing has been applied |
+| `advice.suggestions` | Which settings the [setup review](/configuration/autoconfig) suggests — keys and values only |
+| `advice.applied` | Which of them this server has actually applied, and the revision number |
 | `dropped` | How many resources were left out of the listing (see the cap below) |
 | `reason` | `start` or `change` |
 
 The `advice` field carries the **keys and values** of the setup review, not its reasons. The reasons
 are written for a person reading a console; they stay on your server.
+
+Since Auto-Config gained the ability to [apply its suggestions](/configuration/autoconfig), the
+report also says which ones you took. Without that, support would keep reading a suggestion you
+acted on weeks ago as an outstanding one — an applied setting drops out of the suggestion list by
+itself, which from the outside looks exactly like never having had one.
 
 ### What it does not send
 
