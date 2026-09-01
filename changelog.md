@@ -63,6 +63,30 @@ category later cannot silently switch them off.
 
 ### Fixed
 
+#### Dispatch radio arrives now — "Start of Watch" reached nobody
+
+Going on duty announced you over dispatch. Going off duty did too. `/xmit` transmitted. All of it
+was sent by the server and **no client ever listened** — `dispatchText` had four senders and not a
+single handler, anywhere, ever. `client/core-cl.lua` even declared a `dispatchTextQueue` that
+nothing filled or read.
+
+It arrives now, as a notification with the callsign as its title, which is how a radio line reads:
+who is speaking, then what they said. It goes through the normal notification system, so whichever
+style you picked in `cfg-notify` applies here too.
+
+Two things changed on the way out:
+
+- **It goes to on-duty units, not to everyone.** It used to be broadcast to every client, which put
+  a department's radio traffic in front of every civilian on the server — and, until now, in front
+  of nobody at all.
+- **"Start of Watch" was hardcoded English** while its counterpart went through `T("end_of_watch")`.
+  It has a locale entry now, like everything else.
+
+`/xmit` itself had two faults, both fixed. `jobA == "Law Enforcement" or jobA == "Fire/EMS" and
+#args > 0` binds as `a or (b and c)`, so law enforcement skipped the argument check entirely and
+could transmit an empty line. And `AMR` — the in-game EMS job string — was missing from the check
+outright, so medics could not use the radio at all.
+
 #### /onduty could die with "table expected, got nil"
 
 Reported from a live server: running `/onduty` threw
