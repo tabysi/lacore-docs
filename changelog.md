@@ -123,6 +123,16 @@ this release. Nothing changed in the code. Docs: [Web Dispatcher](/features/webd
 
   ![The License keys page — every key with the servers and URLs under it](/img/changelog/licensing-hub.svg)
 
+- **The three `add_ace resource.lacore …` grants are documented now.** LACORE creates its own ACE
+  groups at start-up, which FiveM only allows if the resource holds `command.add_ace` /
+  `add_principal` / `remove_principal`. They were in `server.cfg.example` but nowhere explained, so
+  a missing grant read as twenty-one cryptic `Access denied for command add_ace.` lines — with the
+  staff groups silently left empty behind them. The example file now says why the block is there,
+  and the docs cover it in [Permissions & ACE](/configuration/permissions), the installation guide,
+  the convar reference and troubleshooting.
+
+  ![How LACORE creates its ACE groups, with and without the three grants](/img/configuration/ace-bootstrap.svg)
+
 - **Escape closes the Pennsylvania CAD and the Agency MDT.** Inside a text field the first Escape
   only drops the focus, the second closes — so a half-typed comment is never lost to the key.
 - **Every visible string** of the new features is in the locale files (`lang/*.lua`, `lang/*.json`).

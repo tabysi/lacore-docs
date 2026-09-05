@@ -63,6 +63,8 @@ More: [Using the MDT — Troubleshooting](/user-guide/mdt#troubleshooting).
 
 | Symptom | Cause / fix |
 | --- | --- |
+| Console spams **"Access denied for command add_ace."** (~21x) and `add_principal` (2x) at start | The three `add_ace resource.lacore …` grants are missing from `server.cfg`, so LACORE cannot create its own groups — and they end up empty. See [Permissions & ACE](/configuration/permissions#first-let-lacore-create-its-groups). |
+| Staff role held, but `/ban` and `/kick` are still refused | Same cause as the row above: the player is bridged into a group that has no rights. Add the three grants, restart, verify with `/lacoreperms`. |
 | "Did my ACE land?" | `/myperms` prints the caller's resolved permissions (ends with `supervisor=true|false`). |
 | Supervisor panel refused | Needs the ACE object, a listed Discord role, grade or allowlist — see [Supervisor Panel](/configuration/supervisor). |
 | Discord roles not read | Bot token + guild id convars missing, bot not in the guild, or **Server Members Intent** off — see [Discord role authentication](/configuration/discord#discord-role-authentication-built-in). |

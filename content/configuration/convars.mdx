@@ -14,6 +14,21 @@ them in your `server.cfg`. The complete list ships in `server.cfg.example` at th
   your bot token and webhook URLs. Use `set` for everything below.
 </Callout>
 
+## Not a convar, but required: the ACE grants
+
+The first block in `server.cfg.example` is not a convar at all — it is what allows LACORE to build
+its own ACE groups. Keep it, above `ensure lacore`:
+
+```ini
+add_ace resource.lacore command.add_ace allow
+add_ace resource.lacore command.add_principal allow
+add_ace resource.lacore command.remove_principal allow
+```
+
+Without them every start logs `Access denied for command add_ace.` twenty-one times, and the staff
+groups stay empty. Full explanation: [Permissions &
+ACE](/configuration/permissions#first-let-lacore-create-its-groups).
+
 ## Full reference
 
 ### Dependencies

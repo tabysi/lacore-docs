@@ -16,6 +16,35 @@ about the file that decides what that helper says: **`configs/cfg-permissions-sv
   You should rarely need to read this page instead of that command.
 </Callout>
 
+## First: let LACORE create its groups
+
+LACORE builds `group.lacore_dev` / `_staff` / `_mod` itself at start-up, and moves players in and
+out of them as their Discord roles change. `add_ace`, `add_principal` and `remove_principal` are
+console-only commands in FiveM, so the resource needs them granted to its own principal. **Three
+lines in your `server.cfg`, above `ensure lacore`:**
+
+```
+add_ace resource.lacore command.add_ace allow
+add_ace resource.lacore command.add_principal allow
+add_ace resource.lacore command.remove_principal allow
+```
+
+They are already in the shipped `server.cfg.example`.
+
+![How LACORE creates its ACE groups, with and without the three grants](/img/configuration/ace-bootstrap.svg)
+
+<Callout type="error">
+  **Symptom if they are missing:** the console prints `Access denied for command add_ace.` about
+  twenty-one times and `add_principal` twice on every start. That is not cosmetic — the groups end
+  up **empty**, so a player bridged into `group.lacore_staff` still cannot run `/ban`, `/kick` or
+  `/staff`. With `lacore_devmode` on you will not notice, because devmode passes every check
+  regardless; it breaks the moment you go live.
+</Callout>
+
+Rather not hand the resource that right? Then set `bridge = false`, create the groups yourself in
+`server.cfg` and manage principals by hand — `/lacoreperms` prints every line ready to copy. The
+denials stay in the log in that case, but they are then genuinely harmless.
+
 ## How a permission is answered
 
 In order — the first hit wins:

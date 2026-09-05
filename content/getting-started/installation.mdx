@@ -70,6 +70,13 @@ you are upgrading from `pvp-corev3`, it also migrates the old `pvp_*` tables —
 Copy the block from `server.cfg.example` into your `server.cfg` and fill in your values (Discord
 token, webhooks, owner ID). See [Configuration](/configuration) for the full reference.
 
+<Callout type="warning">
+  **Do not drop the three `add_ace resource.lacore …` lines at the top of that file.** They let
+  LACORE create its own ACE groups; without them the console fills with `Access denied for command
+  add_ace.` on every start and the staff groups end up empty. See
+  [Permissions & ACE](/configuration/permissions#first-let-lacore-create-its-groups).
+</Callout>
+
 ### Add your license key
 
 Generate a license key in the [Customer Portal](/customer-portal/license-keys) and add it to your
