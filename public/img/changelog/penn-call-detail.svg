@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 574 V602 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">PENNSYLVANIA <tspan fill="#6c8cff">CAD</tspan> — CALL DETAIL</text>
+
+  <!-- LEFT: the table row, clipped -->
+  <text x="60" y="104" fill="#9fb0ff" font-size="13" letter-spacing="3">BEFORE — ONE ROW PER CALL</text>
+  <rect x="60" y="116" width="420" height="88" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <g font-size="11" fill="#9fb0ff">
+    <text x="74" y="138">Call#</text><text x="128" y="138">Call Type</text><text x="206" y="138">Location</text><text x="330" y="138">Status</text><text x="406" y="138">Time</text>
+  </g>
+  <line x1="66" y1="146" x2="474" y2="146" stroke="#2c3650"/>
+  <rect x="66" y="152" width="408" height="22" fill="#1f3f8f"/>
+  <g font-size="12" fill="#ffffff" font-weight="700">
+    <text x="74" y="168">1514</text><text x="128" y="168">10-78</text><text x="206" y="168">2053 Union Rd</text><text x="330" y="168">Assigned</text><text x="406" y="168">00h 25m</text>
+  </g>
+  <text x="74" y="194" fill="#6f7d90" font-size="11" font-style="italic">caller · reported text · notes · log — not on screen</text>
+
+  <!-- arrow -->
+  <g stroke="#6c8cff" stroke-width="3" fill="none">
+    <path d="M490 240 H540"/>
+    <path d="M530 230 L542 240 L530 250"/>
+  </g>
+  <text x="464" y="268" fill="#9fb0ff" font-size="11" letter-spacing="2">DOUBLE-CLICK</text>
+  <text x="464" y="284" fill="#9fb0ff" font-size="11" letter-spacing="2">OR SUB-TAB</text>
+
+  <!-- RIGHT: the detail pane -->
+  <text x="560" y="104" fill="#9fb0ff" font-size="13" letter-spacing="3">AFTER — CALL DETAIL SUB-TAB</text>
+  <rect x="560" y="116" width="580" height="452" rx="6" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+
+  <!-- header strip -->
+  <rect x="572" y="128" width="556" height="34" fill="#1f3f8f"/>
+  <text x="584" y="151" fill="#ffffff" font-size="17" font-weight="800" letter-spacing="1">1514</text>
+  <text x="640" y="151" fill="#ffffff" font-size="14" font-weight="700">10-78</text>
+  <rect x="700" y="136" width="70" height="18" fill="#f7b24a"/>
+  <text x="735" y="149" fill="#40160a" font-size="10" font-weight="700" text-anchor="middle">Assigned</text>
+  <text x="1116" y="150" fill="#dbe3ff" font-size="11" text-anchor="end">Priority 1 · Time 00h 25m</text>
+
+  <!-- field grid -->
+  <g font-size="9.5" fill="#9fb0ff" letter-spacing="1">
+    <rect x="572" y="172" width="272" height="40" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="580" y="186">LOCATION</text>
+    <rect x="852" y="172" width="134" height="40" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="860" y="186">DAREA</text>
+    <rect x="994" y="172" width="134" height="40" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="1002" y="186">AGENCY</text>
+    <rect x="572" y="220" width="134" height="40" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="580" y="234">CALLER</text>
+    <rect x="714" y="220" width="130" height="40" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="722" y="234">ASSIGNED UNITS</text>
+    <rect x="852" y="220" width="276" height="66" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="860" y="234">REPORTED</text>
+    <rect x="572" y="268" width="272" height="40" fill="#0a0d13" stroke="#1a2131"/>
+    <text x="580" y="282">NOTES</text>
+  </g>
+  <g font-size="12" fill="#e7ecf5" font-weight="600">
+    <text x="580" y="204">2053 Union Rd</text>
+    <text x="860" y="204">Arroyo County</text>
+    <text x="1002" y="204">ACSO</text>
+    <text x="580" y="252">John Doe</text>
+    <text x="722" y="252">1, 2A12</text>
+    <text x="580" y="300">Second caller confirms weapon seen.</text>
+  </g>
+  <g font-size="10.5" fill="#e7ecf5">
+    <text x="860" y="250">CALLER REPORTS TWO MALES FIGHTING</text>
+    <text x="860" y="264">IN FRONT OF THE GAS STATION, ONE</text>
+    <text x="860" y="278">POSSIBLY ARMED WITH A KNIFE.</text>
+  </g>
+
+  <!-- log -->
+  <text x="572" y="330" fill="#e7ecf5" font-size="12" font-weight="700">Incident log (4)</text>
+  <line x1="572" y1="336" x2="1128" y2="336" stroke="#2c3650"/>
+  <rect x="572" y="342" width="556" height="150" fill="#0a0d13" stroke="#1a2131"/>
+  <g font-size="11">
+    <g fill="#6f7d90"><text x="584" y="362">1</text><text x="584" y="388">2</text><text x="584" y="414">3</text><text x="584" y="440">4</text></g>
+    <g fill="#9fb0ff"><text x="600" y="362">18:41</text><text x="600" y="388">18:43</text><text x="600" y="414">18:44</text><text x="600" y="440">18:47</text></g>
+    <g fill="#6c8cff" font-weight="700"><text x="646" y="362">DISPATCH</text><text x="646" y="388">1</text><text x="646" y="414">SYSTEM</text><text x="646" y="440">2A12</text></g>
+    <g fill="#e7ecf5">
+      <text x="726" y="362">Units 1 and 2A12 assigned.</text>
+      <text x="726" y="388">Enroute from Paleto, ETA 4 minutes.</text>
+      <text x="726" y="414" fill="#6f7d90" font-style="italic">Backup requested by 2A12</text>
+      <text x="726" y="440">On scene, one male detained, second male fled</text>
+      <text x="726" y="454">on foot northbound towards the rail yard.</text>
+      <text x="726" y="468">Requesting K9.</text>
+    </g>
+  </g>
+
+  <!-- comment entry -->
+  <rect x="572" y="504" width="470" height="26" fill="#0a0d13" stroke="#2c3650"/>
+  <text x="582" y="521" fill="#6f7d90" font-size="11" font-style="italic">Add a comment to this incident…</text>
+  <rect x="1050" y="504" width="78" height="26" fill="#1f3f8f"/>
+  <text x="1089" y="521" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">Submit</text>
+
+  <text x="572" y="556" fill="#9fb0ff" font-size="11">Live — a comment posted by another unit lands here without reopening.</text>
+</svg>

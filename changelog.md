@@ -3,6 +3,33 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.4] – 2026-09-05 — The whole call, not one row of it
+
+### Added
+
+#### Pennsylvania CAD: a Call Detail view
+
+The CAD Viewer had exactly one table row per incident, and that row clips. The caller's words, the
+notes, who is attached and everything in the comment log were never on screen at all — a request
+from a Pennsylvania CAD community: *"can the call view be enlarged, so the whole info is visible?"*
+
+![Pennsylvania CAD Call Detail sub-tab](/img/changelog/penn-call-detail.svg)
+
+**Double-click an incident** in Current Incidents, or open the new **Call Detail** sub-tab under
+My Call Info, and the selected call fills the pane at reading size:
+
+- Call number, type, state, priority and elapsed time in the header.
+- Location, DArea, agency, caller, **assigned units with their status**, the **reported text**
+  in full and the dispatcher's notes.
+- The **complete incident log**, numbered, with time and callsign — long comments wrap instead of
+  being cut off, system lines read grey.
+- A comment field at the bottom, so you can write into the log from the same screen. It goes
+  through the same path as F10 / the command bar.
+
+The pane is live: a comment another unit posts lands in the log without reopening the call. Back to
+the tables with the **Back** button or the **CAD Viewer** sub-tab. `Full Screen` still works on top
+of it if the window itself is too small.
+
 ## [3.5.3] – 2026-08-31 — Unit lists that survive a full patrol
 
 ### Added
