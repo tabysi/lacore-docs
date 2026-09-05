@@ -36,10 +36,25 @@ starts about 20 seconds after boot.
 
 </Steps>
 
-## Managing keys
+## Managing keys — which key runs where
 
-Each key card shows its label, when it was created and when it was **last seen** (or "never used"),
-plus a **COPY CFG** button for the `server.cfg` line.
+![The License keys page — every key with the servers and URLs under it](/img/changelog/licensing-hub.svg)
+
+The page is built around one question: **which key runs where, and under which URLs**. Each key
+card shows:
+
+- its label, when it was created, when it was **last seen** (or "never used"), the key itself and
+  a **COPY CFG LINE** button;
+- the key's **community page URL** (`/community/<id>`), with **LIVE** once the server has pushed
+  its first roster and **NOT PUSHED YET** before — and a copy button;
+- **every server running on this key**: online dot, name, IP, version, players, and per server the
+  **web dispatcher** link (`/server/<id>`) with a copy button.
+
+The dispatcher URL is per *server*, the community page per *key* — one key per server keeps the two
+in step, which is why the label field asks which server the key is for.
+
+Servers that report to your account without an active key appear below the cards as
+**unlicensed**, so a forgotten cfg line is visible at a glance.
 
 - **You can hold up to 10 active keys.** Revoke one before creating another if you hit the cap.
 - **Revoke** turns a key off without deleting it — any server still using it goes *unlicensed* on

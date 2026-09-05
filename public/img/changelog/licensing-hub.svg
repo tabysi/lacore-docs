@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 574 V602 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">LICENSE KEYS — <tspan fill="#6c8cff">WHICH KEY RUNS WHERE</tspan></text>
+
+  <!-- steps -->
+  <g font-size="12">
+    <rect x="60" y="90" width="340" height="56" rx="10" fill="#0c0f16" stroke="#1a2131"/>
+    <circle cx="86" cy="118" r="12" fill="#4a5cff"/><text x="86" y="122" text-anchor="middle" fill="#fff" font-weight="800" font-size="11">1</text>
+    <text x="108" y="114" fill="#fff" font-weight="700">Create a key</text><text x="108" y="132" fill="#98a6c0" font-size="11">one per server, the label says which</text>
+    <rect x="430" y="90" width="340" height="56" rx="10" fill="#0c0f16" stroke="#1a2131"/>
+    <circle cx="456" cy="118" r="12" fill="#4a5cff"/><text x="456" y="122" text-anchor="middle" fill="#fff" font-weight="800" font-size="11">2</text>
+    <text x="478" y="114" fill="#fff" font-weight="700">Paste the line</text><text x="478" y="132" fill="#98a6c0" font-size="11">into that server's server.cfg, restart</text>
+    <rect x="800" y="90" width="340" height="56" rx="10" fill="#0c0f16" stroke="#1a2131"/>
+    <circle cx="826" cy="118" r="12" fill="#4a5cff"/><text x="826" y="122" text-anchor="middle" fill="#fff" font-weight="800" font-size="11">3</text>
+    <text x="848" y="114" fill="#fff" font-weight="700">It shows up under its key</text><text x="848" y="132" fill="#98a6c0" font-size="11">with dispatcher + community links ready</text>
+  </g>
+
+  <!-- key card -->
+  <rect x="60" y="172" width="1080" height="380" rx="14" fill="#0e1118" stroke="#1a2131" stroke-width="2"/>
+  <text x="84" y="206" fill="#fff" font-size="17" font-weight="700">Main RP server</text>
+  <rect x="236" y="192" width="64" height="20" rx="10" fill="#12362a"/><text x="268" y="206" text-anchor="middle" fill="#6fe3b4" font-size="10" font-weight="700">ACTIVE</text>
+  <rect x="310" y="192" width="78" height="20" rx="10" fill="#12141c"/><text x="349" y="206" text-anchor="middle" fill="#828a96" font-size="10" font-weight="700">2 SERVERS</text>
+  <rect x="84" y="220" width="220" height="20" rx="5" fill="#12161f" stroke="#1a2131"/><text x="94" y="234" fill="#cfe0ff" font-size="11" font-family="Consolas, monospace">LACORE-7K2F-9Q1M-ZX4A</text>
+  <text x="316" y="234" fill="#828a96" font-size="11">· created 2026-08-12 · last seen just now</text>
+  <rect x="900" y="192" width="120" height="30" rx="8" fill="#12161f" stroke="#2c3650"/><text x="960" y="211" text-anchor="middle" fill="#9fb0cc" font-size="10" font-weight="700">COPY CFG LINE</text>
+  <rect x="1030" y="192" width="86" height="30" rx="8" fill="#2a1216" stroke="#4a2226"/><text x="1073" y="211" text-anchor="middle" fill="#ff8f9a" font-size="10" font-weight="700">REVOKE</text>
+
+  <!-- urls strip -->
+  <rect x="61" y="256" width="1078" height="42" fill="#0a0d13"/>
+  <line x1="61" y1="256" x2="1139" y2="256" stroke="#171b26"/>
+  <text x="84" y="282" fill="#828a96" font-size="9.5" letter-spacing="1">COMMUNITY PAGE</text>
+  <text x="210" y="282" fill="#9fb0ff" font-size="12" font-family="Consolas, monospace">https://lacore.netica.dev/community/k8f3q2…</text>
+  <rect x="640" y="268" width="48" height="18" rx="9" fill="#12362a"/><text x="664" y="281" text-anchor="middle" fill="#6fe3b4" font-size="9" font-weight="700">LIVE</text>
+  <rect x="700" y="266" width="54" height="22" rx="6" fill="#12161f" stroke="#2c3650"/><text x="727" y="281" text-anchor="middle" fill="#9fb0cc" font-size="9" font-weight="700">COPY</text>
+
+  <!-- servers -->
+  <line x1="61" y1="298" x2="1139" y2="298" stroke="#171b26"/>
+  <g font-size="12">
+    <circle cx="92" cy="336" r="5" fill="#3cd296"/>
+    <text x="110" y="332" fill="#fff" font-size="14" font-weight="700">Pacific Valley RP — Main</text>
+    <text x="110" y="352" fill="#828a96" font-size="10.5" font-family="Consolas, monospace">45.92.10.123 · v3.5.5 · 42/64 players · online</text>
+    <rect x="900" y="322" width="110" height="26" rx="6" fill="#12161f" stroke="#2c3650"/><text x="955" y="339" text-anchor="middle" fill="#9fb0cc" font-size="10" font-weight="700">DISPATCHER ↗</text>
+    <rect x="1020" y="322" width="96" height="26" rx="6" fill="#12161f" stroke="#2c3650"/><text x="1068" y="339" text-anchor="middle" fill="#9fb0cc" font-size="10" font-weight="700">COPY URL</text>
+
+    <line x1="61" y1="372" x2="1139" y2="372" stroke="#171b26"/>
+    <circle cx="92" cy="410" r="5" fill="#47506a"/>
+    <text x="110" y="406" fill="#fff" font-size="14" font-weight="700">Pacific Valley RP — Dev</text>
+    <text x="110" y="426" fill="#828a96" font-size="10.5" font-family="Consolas, monospace">127.0.0.1 · v3.5.4 · 0/32 players · last seen yesterday</text>
+    <rect x="900" y="396" width="110" height="26" rx="6" fill="#12161f" stroke="#2c3650"/><text x="955" y="413" text-anchor="middle" fill="#9fb0cc" font-size="10" font-weight="700">DISPATCHER ↗</text>
+    <rect x="1020" y="396" width="96" height="26" rx="6" fill="#12161f" stroke="#2c3650"/><text x="1068" y="413" text-anchor="middle" fill="#9fb0cc" font-size="10" font-weight="700">COPY URL</text>
+  </g>
+
+  <text x="84" y="500" fill="#98a6c0" font-size="12">The dispatcher URL is per <tspan fill="#e7ecf5" font-weight="700">server</tspan>; the community page is per <tspan fill="#e7ecf5" font-weight="700">key</tspan>.</text>
+  <text x="84" y="522" fill="#98a6c0" font-size="12">A server that reports without an active key is listed below the cards as <tspan fill="#ff8f9a">unlicensed</tspan>.</text>
+</svg>
