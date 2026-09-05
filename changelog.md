@@ -80,7 +80,14 @@ account needed, rate-limited, honeypot); applications land in the dashboard inbo
 accept / decline / note. Stored in the configs collection under `community:<keyId>`, so nothing
 new to import.
 
-*Not yet:* applications forwarded to Discord via the bot, roster history, an access gate.
+**Applications reach Discord.** Two switches under Notifications: a **DM from the LACORE bot** to the
+account owner (default on) and a **webhook** into a channel of the community's own Discord — both
+carry department, names, answers, free text and a link to the inbox. **Many departments** no longer
+mean a wall: above seven the tab row becomes a picker, cards sort recruiting-first then by units on
+duty, and the rest folds behind *Show all*; the dashboard list is an accordion with filter and a
+recruiting-only switch.
+
+*Not yet:* roster history, an access gate for the roster.
 
 #### Config overhaul, first layer
 

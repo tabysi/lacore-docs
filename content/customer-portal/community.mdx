@@ -71,6 +71,28 @@ They land under **Dashboard → Community → Applications**, newest first: **AC
 (with an optional note for your records) or **DELETE**. The applicant is not messaged by the portal —
 you reach them on Discord with the name they gave. Up to 200 applications are kept per page.
 
+### Forwarded to Discord
+
+Under **Notifications** on the same page:
+
+- **DM me on Discord** (default on) — the LACORE bot sends the account owner a direct message with
+  the application: department, Discord and in-game name, the answers, the free text, and a link to
+  the inbox. Needs DMs from server members allowed on the LACORE Discord.
+- **Discord webhook** — paste a webhook URL from a channel in *your own* Discord (Channel settings →
+  Integrations → Webhooks) and every application is posted there as an embed, for the whole
+  recruiting team to see. Only `discord.com/api/webhooks/…` URLs are accepted; the URL is never shown
+  on the public page.
+
+Both fire when the application is stored; a failed notification never loses the application.
+
+## Many departments
+
+A server with twenty agencies does not get twenty tabs. Above seven departments the tab row becomes
+a **department picker**, cards are ordered **recruiting first, then by units on duty**, the grid
+turns compact, and everything past the first eight folds behind **Show all**. In the dashboard the
+department list is an accordion with a filter box and a **Recruiting only** switch; each row's
+header shows RECRUITING / DESCRIBED / EMPTY without opening it.
+
 ## What leaves your server
 
 Branding, the agency list (short + long name + type), and per on-duty unit: callsign, nick,
