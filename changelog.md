@@ -87,6 +87,12 @@ mean a wall: above seven the tab row becomes a picker, cards sort recruiting-fir
 duty, and the rest folds behind *Show all*; the dashboard list is an accordion with filter and a
 recruiting-only switch.
 
+**Deep tier for notifications.** Invite the LACORE bot into the community's own Discord, paste the
+server id, and the dashboard offers its roles and channels: a channel the bot posts every
+application into, roles to ping there, roles whose members get a DM — as page defaults and
+**per department** (a department either inherits or sets its own). Three new bot control
+endpoints (`guild-info`, `notify-roles`, `notify-channel`); only picked roles may ever be pinged.
+
 *Not yet:* roster history, an access gate for the roster.
 
 #### Config overhaul, first layer

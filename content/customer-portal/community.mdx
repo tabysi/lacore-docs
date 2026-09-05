@@ -85,6 +85,24 @@ Under **Notifications** on the same page:
 
 Both fire when the application is stored; a failed notification never loses the application.
 
+### The deep tier — your Discord, your roles, per department
+
+Invite the LACORE bot into **your own** Discord and the notifications become yours to route:
+
+1. **Discord connection** — *INVITE THE BOT* (it needs to see channels, send messages, embed links),
+   paste your **server id**, *CHECK*. The dashboard then knows your roles and channels.
+2. **Default targets** — a **channel** the bot posts every application into, **roles to ping** in
+   that post, and **roles whose members get a DM**. The webhook stays available as well.
+3. **Per department** — open a department row and switch on *Own notification targets*: the same
+   pickers, for that department only. Anything not overridden inherits the defaults.
+
+So LAPD applications can land in `#lapd-recruiting` with a ping for `@LAPD Command` while the
+sheriff's go to their own channel, and the recruiter role gets a DM for every department.
+
+Role DMs need the bot's members intent (`ENABLE_GUILD_MEMBERS=true` on the LACORE bot); the
+connection check says whether it is on. Channel posts and pings work regardless. The free text of an
+application can never ping anyone — only the roles you picked are allowed to.
+
 ## Many departments
 
 A server with twenty agencies does not get twenty tabs. Above seven departments the tab row becomes
