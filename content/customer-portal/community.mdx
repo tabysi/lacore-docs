@@ -39,6 +39,38 @@ first accepted push:
 
 Anyone with the link may look; no sign-in is needed.
 
+## Making it yours — Dashboard → Community
+
+Departments and the roster come from the server. Everything else you write on **Dashboard →
+Community**, one page per licence key:
+
+- **Header** — tagline, accent colour (the page's brand colour), Discord invite and website. What
+  you set here wins over the values in the server config.
+- **About** — free text, and **Rules**, one per line, rendered as a numbered list.
+- **Departments** — every department the server reports gets a row: an *About* blurb (shown on the
+  card and the department page), *Requirements*, and a **Recruiting** switch.
+- **Applications** — one switch to accept applications on the page, plus optional extra questions,
+  one per line. Discord name, in-game name and a free text are always asked.
+
+**SAVE PAGE** publishes immediately; the public page picks it up on its next refresh.
+
+## Department pages
+
+Every department card opens its own view at `/community/<id>/<DEPT>` — description, requirements,
+the recruiting badge and who from that department is on duty. The tab row at the top of the page
+switches between the overview and the departments, and a department link can be shared directly.
+
+## Applications
+
+With applications on and at least one department recruiting, the page shows **Apply** (top) and
+**Apply to …** on each recruiting department. The form asks for Discord name, in-game name, your
+extra questions and a free text; it is sessionless (players do not need a LACORE account), rate
+limited per connection and protected by a honeypot. One open application per person and department.
+
+They land under **Dashboard → Community → Applications**, newest first: **ACCEPT**, **DECLINE**
+(with an optional note for your records) or **DELETE**. The applicant is not messaged by the portal —
+you reach them on Discord with the name they gave. Up to 200 applications are kept per page.
+
 ## What leaves your server
 
 Branding, the agency list (short + long name + type), and per on-duty unit: callsign, nick,
@@ -49,6 +81,6 @@ Nothing is stored: the roster lives in memory on the portal and is gone when the
 pushing (the page then says *last seen a while ago*).
 
 <Callout type="info">
-  **Foundation release (3.5.5).** Next on this page: department sub-pages with roster history,
-  application forms that land in your Discord, and a rules section — all fed the same way.
+  **Next on this page:** roster history per department, applications forwarded to your Discord
+  through the LACORE bot, and an optional access gate for the roster.
 </Callout>

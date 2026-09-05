@@ -72,7 +72,16 @@ and on every duty change over the same write-only relay the telemetry uses; the 
 URL once. Discord ids stay server-side and are never published. Nothing is stored. Master switch
 `Features.community`. Docs: [Community page](/customer-portal/community).
 
-*Not yet:* department sub-pages, application forms, a rules section, a per-server access gate.
+**Second layer, same day:** the page is now **yours to write** — Dashboard → Community gives every
+key an editor for tagline, accent colour, about text, rules, Discord and website, plus a blurb,
+requirements and a **Recruiting** switch per department. Each department has its **own page**
+(`/community/<id>/<DEPT>`) with its on-duty units. Switch **applications** on and recruiting
+departments get an **Apply** form (Discord name, in-game name, your questions, free text — no
+account needed, rate-limited, honeypot); applications land in the dashboard inbox with
+accept / decline / note. Stored in the configs collection under `community:<keyId>`, so nothing
+new to import.
+
+*Not yet:* applications forwarded to Discord via the bot, roster history, an access gate.
 
 #### Config overhaul, first layer
 
