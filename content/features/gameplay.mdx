@@ -1,0 +1,59 @@
+---
+title: Gameplay & Balance
+---
+
+import { Callout } from 'nextra/components'
+
+# Gameplay & Balance
+
+The game-design layer: **how hard the world hits**, and **what a newcomer is told** in their first
+minutes. One config file, one client module, nothing per player.
+
+<Callout type="warning">
+  **Fairness rule.** Every multiplier applies to every player on the server, the same value at the
+  same time. LACORE does not ship a rule that favours some players — a damage bonus for one role
+  would be exactly that, so there isn't one.
+</Callout>
+
+## Balance
+
+`configs/cfg-gameplay-sh.lua`, block `Gameplay.balance`:
+
+| Key | What it scales | Default |
+|-----|----------------|---------|
+| `weaponDamage` | damage the player **deals** with guns | `1.0` |
+| `meleeDamage` | damage the player deals with fists / melee weapons | `1.0` |
+| `vehicleDamage` | damage the player deals with a vehicle | `1.0` |
+| `weaponDefense` | damage the player **takes** from weapons (`0.8` = tankier) | `1.0` |
+
+The client re-applies the modifiers every five seconds and on every spawn, because GTA and other
+scripts reset them. All four are **live dashboard settings** — change them in the customer portal
+and every client picks them up within one cycle, no restart.
+
+## Session loop — onboarding
+
+A player who joins for the first time gets a short sequence of hints, one every seven seconds,
+once. Two sets:
+
+- **Civilian** — on the first spawn: where the radial is, where ID / vehicle / organisation live,
+  how activities work, how to reach 911 / 311.
+- **Officer** — the first time duty is granted: `/mdt`, `/dispatch`, how calls flow, scene
+  evidence, warrants.
+
+Both lists are plain strings in `Gameplay.session` — rewrite them for your server. `%s` in a line
+is replaced by your community name. `/onboarding civ` or `/onboarding leo` replays a set (support
+use). `Gameplay.session.onboarding = false` (or the dashboard toggle) turns the hints off.
+
+## Config wizard
+
+Not sure which of the 60 files matters? In the server console:
+
+```
+/lacoreconfig wizard
+```
+
+walks through the eight settings every owner should have seen once — language, branding,
+departments, feature switches, balance, dashboard consent, licence key, restore — each with its
+**current value** and the file it lives in. It changes nothing.
+
+Master switch: `Features.gameplay` in `configs/cfg-features-sh.lua`.

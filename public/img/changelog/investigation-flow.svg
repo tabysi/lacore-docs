@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#6c8cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 574 V602 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">INVESTIGATION — <tspan fill="#6c8cff">FROM SCENE TO RECORD</tspan></text>
+
+  <!-- row 1: evidence pipeline -->
+  <text x="60" y="108" fill="#9fb0ff" font-size="13" letter-spacing="3">SCENE EVIDENCE</text>
+  <g font-size="13" fill="#e7ecf5">
+    <rect x="60" y="124" width="200" height="110" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="160" y="158" text-anchor="middle" font-size="26">🔫</text>
+    <text x="160" y="190" text-anchor="middle" font-weight="700">A shot is fired</text>
+    <text x="160" y="212" text-anchor="middle" fill="#9fb0ff" font-size="11">casing dropped · death → blood</text>
+
+    <rect x="310" y="124" width="200" height="110" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <circle cx="410" cy="158" r="9" fill="#ebc846" opacity=".8"/>
+    <text x="410" y="190" text-anchor="middle" font-weight="700">Officer sees the trace</text>
+    <text x="410" y="212" text-anchor="middle" fill="#9fb0ff" font-size="11">marker within 30 m · [E] Collect</text>
+
+    <rect x="560" y="124" width="200" height="110" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="660" y="162" text-anchor="middle" font-size="18" font-weight="800" fill="#6c8cff">SC260905-4F2A</text>
+    <text x="660" y="190" text-anchor="middle" font-weight="700">Tagged evidence</text>
+    <text x="660" y="212" text-anchor="middle" fill="#9fb0ff" font-size="11">/evidence list · attach &lt;case&gt;</text>
+
+    <rect x="810" y="124" width="200" height="110" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="910" y="158" text-anchor="middle" font-size="26">🧪</text>
+    <text x="910" y="190" text-anchor="middle" font-weight="700">Lab analysis</text>
+    <text x="910" y="212" text-anchor="middle" fill="#9fb0ff" font-size="11">/evidence analyze · 120 s</text>
+
+    <rect x="1060" y="124" width="80" height="110" rx="10" fill="#1f3f8f" stroke="#4a5cff" stroke-width="2"/>
+    <text x="1100" y="170" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">MDT</text>
+    <text x="1100" y="188" text-anchor="middle" font-size="10" fill="#dbe3ff">person</text>
+    <text x="1100" y="202" text-anchor="middle" font-size="10" fill="#dbe3ff">record</text>
+  </g>
+  <g stroke="#6c8cff" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <path d="M262 179 H306"/><path d="M512 179 H556"/><path d="M762 179 H806"/><path d="M1012 179 H1056"/>
+  </g>
+  <text x="60" y="262" fill="#98a6c0" font-size="12">A trace knows who left it — but only the lab says so. Until then it is a casing on the ground and a tag in a list, not a name.</text>
+
+  <!-- row 2: warrants -->
+  <text x="60" y="320" fill="#9fb0ff" font-size="13" letter-spacing="3">WARRANTS</text>
+  <g font-size="13" fill="#e7ecf5">
+    <rect x="60" y="336" width="300" height="96" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="76" y="366" font-weight="700">Unit requests</text>
+    <text x="76" y="388" fill="#9fb0ff" font-size="11" font-family="Consolas, monospace">/warrant request arrest John Doe | armed robbery</text>
+    <text x="76" y="412" fill="#98a6c0" font-size="11">search or arrest · a reason · lands as #id</text>
+
+    <rect x="410" y="336" width="300" height="96" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="426" y="366" font-weight="700">Supervisor decides</text>
+    <text x="426" y="388" fill="#9fb0ff" font-size="11" font-family="Consolas, monospace">/warrant list · approve 12 · deny 12</text>
+    <text x="426" y="412" fill="#98a6c0" font-size="11">every online supervisor is notified</text>
+
+    <rect x="760" y="336" width="380" height="96" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="776" y="366" font-weight="700">Approved arrest warrant</text>
+    <rect x="776" y="378" width="140" height="22" rx="4" fill="#e0303a"/>
+    <text x="846" y="394" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">WARRANT · ACTIVE</text>
+    <text x="776" y="420" fill="#98a6c0" font-size="11">the same flag every MDT query already shows</text>
+  </g>
+  <g stroke="#6c8cff" stroke-width="2.5" fill="none" marker-end="url(#arr)"><path d="M362 384 H406"/><path d="M712 384 H756"/></g>
+
+  <!-- row 3: case -->
+  <text x="60" y="486" fill="#9fb0ff" font-size="13" letter-spacing="3">CASE FILE</text>
+  <rect x="60" y="500" width="1080" height="70" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <text x="80" y="530" fill="#e7ecf5" font-size="13" font-weight="700">LAPD-26-000142</text>
+  <text x="230" y="530" fill="#98a6c0" font-size="12">incidents · persons · vehicles · reports · <tspan fill="#3cd296" font-weight="700">scene evidence</tspan> · narrative</text>
+  <text x="80" y="554" fill="#9fb0ff" font-size="11" font-family="Consolas, monospace">/evidence attach SC260905-4F2A LAPD-26-000142</text>
+  <text x="1120" y="554" fill="#98a6c0" font-size="11" text-anchor="end">Off with Features.investigation = false</text>
+</svg>

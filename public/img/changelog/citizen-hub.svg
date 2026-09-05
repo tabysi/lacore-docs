@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 574 V602 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">CITIZEN <tspan fill="#6c8cff">HUB</tspan> — ONE PANEL FOR THE CIVILIAN</text>
+
+  <!-- left: radial → hub -->
+  <text x="60" y="108" fill="#9fb0ff" font-size="13" letter-spacing="3">BEFORE — FOUR RADIAL ENTRIES</text>
+  <g font-size="12" fill="#e7ecf5">
+    <circle cx="200" cy="260" r="110" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <circle cx="200" cy="260" r="34" fill="#0a0d13" stroke="#2c3650"/>
+    <text x="200" y="264" text-anchor="middle" fill="#9fb0ff" font-size="10">SERVICES</text>
+    <text x="200" y="176" text-anchor="middle">My ID</text>
+    <text x="292" y="264" text-anchor="middle">Vehicle</text>
+    <text x="200" y="352" text-anchor="middle">Activities</text>
+    <text x="108" y="264" text-anchor="middle">Org</text>
+  </g>
+  <text x="60" y="410" fill="#98a6c0" font-size="11">Each entry did one thing and showed nothing —</text>
+  <text x="60" y="428" fill="#98a6c0" font-size="11">no place to READ your own record, your plates,</text>
+  <text x="60" y="446" fill="#98a6c0" font-size="11">or how often you ran a route.</text>
+  <text x="60" y="500" fill="#9fb0ff" font-size="12" font-weight="700">Now: radial → Citizen Hub, or /citizen</text>
+  <text x="60" y="520" fill="#98a6c0" font-size="11">The old entries stay. The hub adds the reading.</text>
+
+  <!-- right: the panel -->
+  <rect x="420" y="100" width="720" height="460" rx="14" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+  <rect x="420" y="100" width="720" height="46" rx="14" fill="#182031"/>
+  <text x="444" y="129" fill="#e7ecf5" font-size="15" font-weight="800">Citizen Hub</text>
+  <text x="560" y="129" fill="#9fb0ff" font-size="13" font-weight="600">Maria Lopez</text>
+  <text x="1112" y="130" fill="#8a96ad" font-size="14">✕</text>
+
+  <g font-size="11" font-weight="700" letter-spacing="1">
+    <rect x="436" y="158" width="168" height="30" rx="6" fill="#4a5cff"/><text x="520" y="178" text-anchor="middle" fill="#fff">OVERVIEW</text>
+    <rect x="612" y="158" width="168" height="30" rx="6" fill="#1a2131" stroke="#2c3650"/><text x="696" y="178" text-anchor="middle" fill="#8a96ad">VEHICLES</text>
+    <rect x="788" y="158" width="168" height="30" rx="6" fill="#1a2131" stroke="#2c3650"/><text x="872" y="178" text-anchor="middle" fill="#8a96ad">ACTIVITIES</text>
+    <rect x="964" y="158" width="160" height="30" rx="6" fill="#1a2131" stroke="#2c3650"/><text x="1044" y="178" text-anchor="middle" fill="#8a96ad">ORGANISATION</text>
+  </g>
+
+  <g font-size="9" fill="#8a96ad" letter-spacing="1">
+    <rect x="436" y="204" width="688" height="44" rx="8" fill="#1a2131" stroke="#232c42"/><text x="448" y="220">NAME</text>
+    <rect x="436" y="256" width="338" height="44" rx="8" fill="#1a2131" stroke="#232c42"/><text x="448" y="272">DATE OF BIRTH</text>
+    <rect x="786" y="256" width="338" height="44" rx="8" fill="#1a2131" stroke="#232c42"/><text x="798" y="272">GENDER</text>
+    <rect x="436" y="308" width="688" height="44" rx="8" fill="#1a2131" stroke="#232c42"/><text x="448" y="324">ADDRESS</text>
+    <rect x="436" y="360" width="338" height="44" rx="8" fill="#1a2131" stroke="#232c42"/><text x="448" y="376">JOB</text>
+    <rect x="786" y="360" width="338" height="44" rx="8" fill="#1a2131" stroke="#232c42"/><text x="798" y="376">FACTION</text>
+  </g>
+  <g font-size="14" fill="#e7ecf5" font-weight="600">
+    <text x="448" y="240">Maria Lopez</text>
+    <text x="448" y="292">1994-03-12</text><text x="798" y="292">Female</text>
+    <text x="448" y="344">214 Vinewood Blvd</text>
+    <text x="448" y="396">Mechanic</text><text x="798" y="396">Vagos</text>
+  </g>
+  <text x="436" y="436" fill="#9fb0cc" font-size="10" font-weight="800" letter-spacing="1">LICENCES</text>
+  <rect x="436" y="446" width="92" height="22" rx="11" fill="#12362a" stroke="#3cd296"/><text x="482" y="461" text-anchor="middle" fill="#3cd296" font-size="11">Driver: Valid</text>
+  <rect x="536" y="446" width="124" height="22" rx="11" fill="#3a1418" stroke="#e0303a"/><text x="598" y="461" text-anchor="middle" fill="#ff8a90" font-size="11">CCW: Suspended</text>
+  <rect x="436" y="488" width="120" height="34" rx="8" fill="#4a5cff"/><text x="496" y="510" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Show my ID</text>
+  <text x="1124" y="548" text-anchor="end" fill="#6b7689" font-size="10">Vehicles: plates + insurance · Activities: completions + waypoint · Org: rank + members</text>
+</svg>

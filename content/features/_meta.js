@@ -11,4 +11,6 @@ export default {
   playerbase: 'Enhanced Playerbase',
   bridge: 'Framework Bridge',
   webdispatch: 'Web Dispatcher',
+  investigation: 'Investigation',
+  gameplay: 'Gameplay & Balance',
 }

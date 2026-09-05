@@ -1,0 +1,54 @@
+---
+title: Community page
+---
+
+import { Callout } from 'nextra/components'
+
+# Community page
+
+Every licensed server gets a **public page on the LACORE portal**: the server's name, its
+departments, and who is on duty right now — a roleplay website with a law-enforcement focus that
+you do not have to build or host.
+
+![The community page — push, portal, page](/img/changelog/community-page.svg)
+
+## Getting one
+
+Nothing to configure beyond what a licensed server already has:
+
+1. `setr lacore_license_key "…"` in `server.cfg` (the key from **License keys**).
+2. `Features.community = true` (the default).
+
+Within two minutes of starting, the server pushes its first roster and the page exists at
+`https://lacore.netica.dev/community/<id>`. The `<id>` is your licence key's record id — stable,
+not guessable, and never the key itself. The server console prints the full URL once, on the
+first accepted push:
+
+```
+[lacore] Community page live: https://lacore.netica.dev/community/k8f3…
+```
+
+## What the page shows
+
+- **Header** — community name, online / last seen, players, on-duty count, a **Join the Discord**
+  button (from `discordInvite` in `cfg-presence-sh.lua`) and your website.
+- **Departments** — one card per agency from `cfg-agencies-sh.lua`, law enforcement first, with the
+  number of units on duty. Fire / EMS and other services below.
+- **On duty right now** — callsign, name, department, status. Refreshes every 30 seconds.
+- **My unit** — an officer signed in to the portal with Discord sees their own row highlighted.
+
+Anyone with the link may look; no sign-in is needed.
+
+## What leaves your server
+
+Branding, the agency list (short + long name + type), and per on-duty unit: callsign, nick,
+department, job, status. The Discord id travels with the roster **only** so the portal can match a
+signed-in officer to their row — it is stripped from everything the page or the API returns.
+
+Nothing is stored: the roster lives in memory on the portal and is gone when the server stops
+pushing (the page then says *last seen a while ago*).
+
+<Callout type="info">
+  **Foundation release (3.5.5).** Next on this page: department sub-pages with roster history,
+  application forms that land in your Discord, and a rules section — all fed the same way.
+</Callout>

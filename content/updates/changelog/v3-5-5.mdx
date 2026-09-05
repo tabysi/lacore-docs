@@ -1,0 +1,107 @@
+---
+title: "3.5.5"
+---
+
+![LACORE 3.5.5](/changelog/v3-5-5.svg)
+
+# [3.5.5] – 2026-09-05 — Seven foundations
+
+> One release, seven building sites. Each of these ships as a **foundation**: a real, working first
+> layer with its data model settled, so what lands next builds on it instead of replacing it. Every
+> section says what is there today and what is not yet.
+
+### Added
+
+#### Investigation: scene traces, a lab, warrants
+
+![From scene to record — traces, lab, warrants, case](/img/changelog/investigation-flow.svg)
+
+Every shot fired now leaves a **shell casing** where the shooter stood, and a death leaves a **blood
+trace**. Officers on duty see them as markers at the scene and collect them with **E**; each one
+becomes a tagged piece of evidence (`SC260905-4F2A`). A trace knows who left it, but only the
+**lab** says so: `/evidence analyze <tag>` returns a match after a configurable delay and logs it on
+that person's record through the existing evidence locker, so an MDT query shows it like any
+hand-logged item.
+
+**Warrants** get a request-and-approve flow: `/warrant request <search|arrest> <name> | <reason>`
+from any unit, `/warrant list · approve · deny` for supervisors, who are notified of every request.
+An approved arrest warrant sets the person's warrant flag — the one every terminal already shows.
+
+**Case files** accept scene evidence: `/evidence attach <tag> <case#>` lists it in the case with tag,
+kind, lab result and who collected it. New events for integrations: `lacore:api:evidenceCollected`,
+`lacore:api:warrantDecided`. Config: `configs/cfg-investigation-sh.lua`; master switch
+`Features.investigation`. Docs: [Investigation](/features/investigation).
+
+*Not yet:* an Evidence tab and a supervisor Warrants queue inside the MDTs; fingerprints lifted from
+vehicles; bundling CCTV / ALPR hits into a case from the terminal.
+
+#### Citizen Hub — the civilian overhaul starts with a panel
+
+![The Citizen Hub panel](/img/changelog/citizen-hub.svg)
+
+The civilian side had four radial entries that each did one thing and showed nothing. The **Citizen
+Hub** (radial → Services → Citizen Hub, or `/citizen`) is one panel with four tabs: **Overview** (the
+character as the ID card reads it, licences colour-coded), **Vehicles** (every registration with
+insurance state), **Activities** (completion counts, a waypoint button per route) and
+**Organisation** (rank, members, open the panel). It only reads; every button goes through the same
+client paths the radial uses, so it can never do more than the wheel.
+
+*Not yet:* the visual redesign of the radial itself, org territories, character photo persistence.
+
+#### Gameplay layer: balance and a first-join loop
+
+`configs/cfg-gameplay-sh.lua` is the new home for game design. **Balance**: four damage multipliers
+(dealt with weapons / melee / vehicles, taken from weapons), applied to every player equally and
+re-applied every few seconds so nothing resets them — and all four are **live dashboard settings**.
+**Session loop**: a short onboarding sequence, once per player — one set on the first spawn as a
+civilian, one the first time duty is granted — telling a newcomer where the radial, the duty menu,
+the MDT, scene evidence and warrants are. `/onboarding civ|leo` replays a set. Docs:
+[Gameplay & Balance](/features/gameplay).
+
+*Not yet:* respawn hold, weapon-class balance tables, a proper objectives system.
+
+#### Community page — the portal becomes a roleplay website
+
+![The community page — push, portal, page](/img/changelog/community-page.svg)
+
+Every licensed server gets a **public page on the LACORE portal**, `/community/<id>`: community
+name, online state and player count, a **Join the Discord** button, one card per department with
+its on-duty count, and the live roster (callsign, name, department, status) refreshing every 30 s.
+An officer signed in with Discord sees **My unit**. The server pushes the roster every two minutes
+and on every duty change over the same write-only relay the telemetry uses; the console prints the
+URL once. Discord ids stay server-side and are never published. Nothing is stored. Master switch
+`Features.community`. Docs: [Community page](/customer-portal/community).
+
+*Not yet:* department sub-pages, application forms, a rules section, a per-server access gate.
+
+#### Config overhaul, first layer
+
+- **`/lacoreconfig wizard`** — walks through the eight settings every owner should have seen once
+  (language, branding, departments, feature switches, balance, dashboard consent, licence key,
+  restore) with the **current value** and the file each lives in. Changes nothing.
+- **More remote settings** — the dashboard allowlist gains the gameplay multipliers, onboarding,
+  the investigation lab time and collect distance (all live), and the three new feature switches.
+- **CONFIG-INDEX** lists the two new files and points to the wizard.
+
+*Not yet:* merging the 60 files into fewer themed ones — that would break `.defaults/` restore and
+the escrow split, and needs its own release.
+
+#### Web Dispatcher: published
+
+The hosted browser dispatcher — CAD state pushed every two seconds, actions riding back, Discord
+sign-in, the RP-WEB desktop at `/server/<id>` — is complete and documented, and is announced with
+this release. Nothing changed in the code. Docs: [Web Dispatcher](/features/webdispatch).
+
+### Changed
+
+- **Escape closes the Pennsylvania CAD and the Agency MDT.** Inside a text field the first Escape
+  only drops the focus, the second closes — so a half-typed comment is never lost to the key.
+- **Every visible string** of the new features is in the locale files (`lang/*.lua`, `lang/*.json`).
+
+⚠️ **Config change:** two new files — `configs/cfg-investigation-sh.lua`,
+`configs/cfg-gameplay-sh.lua` — and three new switches in `configs/cfg-features-sh.lua`
+(`investigation`, `gameplay`, `community`, all default **on**). Nothing existing changed its meaning.
+
+> **Not tested in-game.** Everything in this release passed the Lua syntax check, the NUI build and
+> the portal build; the Citizen Hub and the PennCAD were verified in the NUI preview. The world-side
+> paths (traces, collecting, the lab, warrants, the roster push) have not run on a live server yet.

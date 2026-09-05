@@ -50,6 +50,24 @@ Provider exports: `GetEmoteProvider`. Play routes through `/e <name>`; cancel is
 - **Props** — place cones, barriers, signs, chairs, etc. Server-synced (everyone sees them), with a
   per-player limit; pick up / delete your own.
 
+## Citizen Hub
+
+One panel for everything a civilian owns, opened from the radial (**Services → Citizen Hub**) or
+with `/citizen`:
+
+![The Citizen Hub panel](/img/changelog/citizen-hub.svg)
+
+- **Overview** — the character as the ID card shows it: name, date of birth, gender, address, job,
+  faction, physical description, licences (a suspended one reads red). *Show my ID* from here.
+- **Vehicles** — every `/vreg` registration with plate, model, colour and insurance. *Register a
+  vehicle* opens the form.
+- **Activities** — each configured activity with how often you completed it, and a *Set waypoint*
+  button to its clock-in hub.
+- **Organisation** — your org, rank and member count; opens the organisation panel.
+
+The hub only reads. Every button goes through the same client paths the radial uses, so it can never
+do something the wheel cannot. Escape closes it.
+
 ## Organisations / gangs
 
 An org framework lets civilians form groups:

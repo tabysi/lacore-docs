@@ -1,0 +1,90 @@
+---
+title: Investigation
+---
+
+import { Callout } from 'nextra/components'
+
+# Investigation
+
+The detective layer on top of the records system: **scene traces** a shooting leaves behind, a
+**lab** that turns a collected trace into a name on a person's record, **warrants** a supervisor
+signs off, and a hook that puts scene evidence into a **case file**.
+
+![From scene to record — traces, lab, warrants, case](/img/changelog/investigation-flow.svg)
+
+<Callout type="info">
+  **Foundation release (3.5.5).** Everything on this page works from commands and the world; the
+  MDT surfaces for it (an Evidence tab, a Warrants queue for supervisors) are the next step. The
+  data model is final — nothing you collect now is thrown away when the UI arrives.
+</Callout>
+
+## Scene traces
+
+Every shot fired drops a **shell casing** where the shooter stood; a death leaves a **blood trace**.
+Traces sit on the ground for a while (casings 15 min, blood 20 min by default) and then fade.
+
+Officers on duty see them as small markers within 30 m. Walk up and press **E** to collect. Each
+collected trace becomes a tagged piece of evidence, e.g. `SC260905-4F2A`.
+
+A trace remembers **who** left it — but that stays on the server. What every officer's client gets
+is a position and a kind, never a name. The name comes out of the lab.
+
+## Lab analysis
+
+```
+/evidence list                 what you have collected, and what the lab said
+/evidence analyze SC260905-4F2A   send it in — result after 120 s (configurable)
+```
+
+When the result comes back with a match, the item is **logged on that person's record** through
+the existing evidence locker, so an MDT person query shows it like any hand-logged item:
+*"Lab match — Shell casing SC260905-4F2A collected at scene by 2A12"*. No match (the player had no
+character) shows as exactly that.
+
+## Warrants
+
+```
+/warrant request arrest John Doe | armed robbery on Vinewood Blvd
+/warrant request search John Doe | stolen property believed at residence
+/warrant mine                  your own requests and their state
+```
+
+Supervisors (the same rank gate the Supervisor Terminal uses) are notified of every request:
+
+```
+/warrant list                  everything pending
+/warrant approve 12
+/warrant deny 12
+```
+
+An approved **arrest** warrant sets the person's warrant flag — the one every MDT, the LASD CAD,
+the Agency MDT and the Pennsylvania CAD already show in a person query. The requesting unit is
+notified either way. Pending requests expire after 48 h.
+
+## Case files
+
+A collected trace can be attached to a case:
+
+```
+/evidence attach SC260905-4F2A LAPD-26-000142
+```
+
+The case lists it under scene evidence with tag, kind, lab result and who collected it. As with
+reports, the case stores a pointer; the evidence itself stays where it was logged.
+
+## Configuration
+
+`configs/cfg-investigation-sh.lua` — trace kinds (label, lifetime, which evidence type the lab
+result is logged as, marker colour), casing interval, cap, collect and view distance, lab time,
+warrant types and expiry. Lab time and collect distance are also **live** dashboard settings.
+
+Master switch: `Features.investigation` in `configs/cfg-features-sh.lua`.
+
+## Developer API
+
+Two events fire for integrations (see the [Developer API](/developer-api)):
+
+- `lacore:api:evidenceCollected` — `{ src, tag, kind, x, y, z }`
+- `lacore:api:warrantDecided` — `{ id, kind, target, status, by }`
+
+`InvestigationGetWarrants(status)` returns the warrant list from any server script in the resource.

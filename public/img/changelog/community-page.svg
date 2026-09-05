@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6c8cff"/></marker>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 574 V602 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">COMMUNITY PAGE — <tspan fill="#6c8cff">/community/&lt;id&gt;</tspan></text>
+
+  <!-- left: the push -->
+  <text x="60" y="108" fill="#9fb0ff" font-size="13" letter-spacing="3">HOW IT GETS THERE</text>
+  <g font-size="12" fill="#e7ecf5">
+    <rect x="60" y="124" width="250" height="84" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="76" y="150" font-weight="700">Your FiveM server</text>
+    <text x="76" y="170" fill="#98a6c0" font-size="11">community-sv.lua · every 2 min + on duty change</text>
+    <text x="76" y="190" fill="#9fb0ff" font-size="11" font-family="Consolas, monospace">POST /ingest/community</text>
+
+    <rect x="60" y="248" width="250" height="84" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="76" y="274" font-weight="700">LACORE portal</text>
+    <text x="76" y="294" fill="#98a6c0" font-size="11">licence key → page id · held in memory only</text>
+    <text x="76" y="314" fill="#9fb0ff" font-size="11" font-family="Consolas, monospace">GET /api/community/state</text>
+
+    <rect x="60" y="372" width="250" height="84" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+    <text x="76" y="398" font-weight="700">Anyone with the link</text>
+    <text x="76" y="418" fill="#98a6c0" font-size="11">no sign-in needed · refreshes every 30 s</text>
+    <text x="76" y="438" fill="#98a6c0" font-size="11">signed-in officer → "My unit"</text>
+  </g>
+  <g stroke="#6c8cff" stroke-width="2.5" fill="none" marker-end="url(#arr)"><path d="M185 210 V244"/><path d="M185 334 V368"/></g>
+  <text x="60" y="500" fill="#98a6c0" font-size="11">What leaves the server: name, departments,</text>
+  <text x="60" y="518" fill="#98a6c0" font-size="11">on-duty callsigns + status. Discord ids stay</text>
+  <text x="60" y="536" fill="#98a6c0" font-size="11">server-side and are never published.</text>
+
+  <!-- right: the page -->
+  <rect x="360" y="100" width="780" height="460" rx="10" fill="#05070b" stroke="#2c3650" stroke-width="2"/>
+  <rect x="360" y="100" width="780" height="30" rx="10" fill="#0a0d13"/>
+  <text x="380" y="120" fill="#6b7689" font-size="11" font-family="Consolas, monospace">lacore.netica.dev/community/k8f3…</text>
+
+  <text x="390" y="160" fill="#9fb0ff" font-size="10" letter-spacing="3">LACORE</text>
+  <text x="390" y="190" fill="#e7ecf5" font-size="24" font-weight="700">Pacific Valley Roleplay</text>
+  <circle cx="395" cy="212" r="4" fill="#3cd296"/>
+  <text x="406" y="216" fill="#98a6c0" font-size="11">Online · 42 / 64 players · 11 on duty</text>
+  <rect x="390" y="230" width="120" height="26" rx="6" fill="#4a5cff"/>
+  <text x="450" y="247" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Join the Discord</text>
+
+  <rect x="820" y="150" width="300" height="60" rx="8" fill="#11161e" stroke="#232c42"/>
+  <text x="836" y="172" fill="#9fb0ff" font-size="9" letter-spacing="2">MY UNIT</text>
+  <text x="836" y="196" fill="#e7ecf5" font-size="13"><tspan font-weight="700">2A12</tspan> · LAPD · <tspan fill="#6c8cff">ON SCENE</tspan></text>
+
+  <text x="390" y="290" fill="#98a6c0" font-size="10" letter-spacing="2">LAW ENFORCEMENT</text>
+  <g font-size="11">
+    <rect x="390" y="300" width="170" height="70" rx="8" fill="#11161e" stroke="#232c42"/>
+    <text x="404" y="326" fill="#e7ecf5" font-size="16" font-weight="700">LAPD</text><text x="404" y="344" fill="#98a6c0">Los Angeles Police</text><text x="404" y="362" fill="#3cd296">6 on duty</text>
+    <rect x="575" y="300" width="170" height="70" rx="8" fill="#11161e" stroke="#232c42"/>
+    <text x="589" y="326" fill="#e7ecf5" font-size="16" font-weight="700">LASD</text><text x="589" y="344" fill="#98a6c0">Sheriff's Department</text><text x="589" y="362" fill="#3cd296">3 on duty</text>
+    <rect x="760" y="300" width="170" height="70" rx="8" fill="#11161e" stroke="#232c42"/>
+    <text x="774" y="326" fill="#e7ecf5" font-size="16" font-weight="700">CHP</text><text x="774" y="344" fill="#98a6c0">Highway Patrol</text><text x="774" y="362" fill="#7d879f">0 on duty</text>
+    <rect x="945" y="300" width="170" height="70" rx="8" fill="#11161e" stroke="#232c42"/>
+    <text x="959" y="326" fill="#e7ecf5" font-size="16" font-weight="700">AMR</text><text x="959" y="344" fill="#98a6c0">Fire / EMS</text><text x="959" y="362" fill="#3cd296">2 on duty</text>
+  </g>
+
+  <text x="390" y="410" fill="#98a6c0" font-size="10" letter-spacing="2">ON DUTY RIGHT NOW</text>
+  <rect x="390" y="420" width="725" height="120" rx="8" fill="#11161e" stroke="#232c42"/>
+  <g font-size="10" fill="#98a6c0" letter-spacing="1"><text x="406" y="440">UNIT</text><text x="520" y="440">NAME</text><text x="760" y="440">DEPARTMENT</text><text x="960" y="440">STATUS</text></g>
+  <line x1="390" y1="448" x2="1115" y2="448" stroke="#1a2131"/>
+  <g font-size="12" fill="#e7ecf5">
+    <text x="406" y="468" fill="#9fb0ff" font-weight="700">1L20</text><text x="520" y="468">Sgt. Miller</text><text x="760" y="468">LAPD</text><text x="960" y="468" fill="#3cd296">CLEAR</text>
+    <text x="406" y="492" fill="#9fb0ff" font-weight="700">2A12</text><text x="520" y="492">Ofc. Lopez</text><text x="760" y="492">LAPD</text><text x="960" y="492" fill="#6c8cff">ON SCENE</text>
+    <text x="406" y="516" fill="#9fb0ff" font-weight="700">S-41</text><text x="520" y="516">Dep. Chen</text><text x="760" y="516">LASD</text><text x="960" y="516" fill="#f0a500">ENROUTE</text>
+    <text x="406" y="536" fill="#7d879f" font-size="10">… 8 more</text>
+  </g>
+</svg>
