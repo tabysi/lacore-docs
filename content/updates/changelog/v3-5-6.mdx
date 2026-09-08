@@ -1,0 +1,40 @@
+---
+title: "3.5.6"
+---
+
+![LACORE 3.5.6](/changelog/v3-5-6.svg)
+
+# [3.5.6] – 2026-09-08 — Settings that existed but had no screen
+
+### Fixed
+
+#### Config editor: two groups had no tab, one key had no field
+
+![Where the three orphaned settings landed in the config editor](/img/changelog/config-editor-orphans.svg)
+
+The config editor in the customer dashboard renders **by tab**, and the public
+[config reference](/resources/config/) is generated from the same file. A settings group that is
+listed in no tab is therefore not merely hard to find — it is unreachable, on both pages at once.
+
+Two groups added in 3.5.5 were in exactly that state: **Gameplay** (the damage multipliers and the
+onboarding hints) and **Investigation** (lab time and collect distance). Both were fully wired on the
+server and both stood in the resource's own allowlist, so remote config would have accepted them —
+there was just no field anywhere to set them from. They now have a home:
+
+- **Gameplay** sits under **Features**, next to the civilian layer. It is balance, not a module.
+- **Investigation** sits under **Modules**, directly after Evidence — the two share one locker.
+
+Each also got the one-line section description that every other group already had.
+
+**`hud.crosshair`** had the mirror image of the same problem. The weapon-reticle toggle shipped with
+3.5.0 and went into the resource allowlist, but never onto the website, so remote config could only
+ever validate it on one side of the gate instead of both. It is now a field under
+**HUD & Phone → HUD**, carrying the note that it is deliberately *not* tied to the HUD master
+switch: that switch only hides what LACORE draws, never what GTA draws.
+
+Nothing changed on the server side — no config file, no allowlist, no default. This release makes
+three settings reachable that were already live.
+
+`node tests/configschema.test.mjs` is back to **79 / 79**. Those three checks — every group in a tab,
+every group described, both allowlists holding the same keys — are what caught this, and they are
+what keeps the two halves of the remote-config gate in step.
