@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" font-family="'Chakra Petch', 'Segoe UI', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#4a5cff" stroke-opacity=".07" stroke-width="1"/>
+    </pattern>
+    <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0.5 L8 4.5 L0 8.5 Z" fill="#6c8cff"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="500" fill="url(#bg)"/>
+  <rect width="1000" height="500" fill="url(#grid)"/>
+
+  <text x="40" y="52" fill="#e7ecf5" font-size="25" font-weight="700">/lacoreconfig restore — a setting you changed keeps your value</text>
+  <text x="40" y="79" fill="#9fb0ff" font-size="15">When an update changes the same line you did, the region is reconciled setting by setting.</text>
+
+  <!-- three inputs -->
+  <g>
+    <rect x="40" y="112" width="270" height="112" rx="9" fill="#11172480" stroke="#4a5cff" stroke-opacity=".38"/>
+    <text x="58" y="137" fill="#9fb0ff" font-size="12.5" letter-spacing="1.4">BASE — 3.5.4 DEFAULT</text>
+    <text x="58" y="168" fill="#e7ecf5" font-size="14" font-family="ui-monospace, Consolas, monospace">Member = "1271895…"</text>
+    <text x="58" y="192" fill="#e7ecf5" font-size="14" font-family="ui-monospace, Consolas, monospace">Staff  = "1234427…"</text>
+    <text x="58" y="213" fill="#7c8aa8" font-size="12.5">the ids LACORE happened to ship</text>
+
+    <rect x="365" y="112" width="270" height="112" rx="9" fill="#11172480" stroke="#6c8cff" stroke-opacity=".55"/>
+    <text x="383" y="137" fill="#9fb0ff" font-size="12.5" letter-spacing="1.4">YOURS — FROM THE BACKUP</text>
+    <text x="383" y="168" fill="#7dffb0" font-size="14" font-family="ui-monospace, Consolas, monospace">Member = "9988001…"</text>
+    <text x="383" y="192" fill="#7dffb0" font-size="14" font-family="ui-monospace, Consolas, monospace">Staff  = "9988001…"</text>
+    <text x="383" y="213" fill="#7c8aa8" font-size="12.5">your own guild's role ids</text>
+
+    <rect x="690" y="112" width="270" height="112" rx="9" fill="#11172480" stroke="#4a5cff" stroke-opacity=".38"/>
+    <text x="708" y="137" fill="#9fb0ff" font-size="12.5" letter-spacing="1.4">THEIRS — 3.5.5 DEFAULT</text>
+    <text x="708" y="168" fill="#ff9a9a" font-size="14" font-family="ui-monospace, Consolas, monospace">Member = ""</text>
+    <text x="708" y="192" fill="#ff9a9a" font-size="14" font-family="ui-monospace, Consolas, monospace">Staff  = ""</text>
+    <text x="708" y="213" fill="#7c8aa8" font-size="12.5">blanked, so nobody ships our ids</text>
+  </g>
+
+  <path d="M175 232 L175 268" stroke="#6c8cff" stroke-width="1.6" fill="none" marker-end="url(#arw)"/>
+  <path d="M500 232 L500 268" stroke="#6c8cff" stroke-width="1.6" fill="none" marker-end="url(#arw)"/>
+  <path d="M825 232 L825 268" stroke="#6c8cff" stroke-width="1.6" fill="none" marker-end="url(#arw)"/>
+
+  <!-- before / after -->
+  <g>
+    <rect x="40" y="280" width="440" height="150" rx="9" fill="#1a0f1480" stroke="#ff6b6b" stroke-opacity=".45"/>
+    <text x="58" y="308" fill="#ff9a9a" font-size="13" letter-spacing="1.4">BEFORE — CONFLICT KEPT THE NEW DEFAULT</text>
+    <text x="58" y="342" fill="#ff9a9a" font-size="15" font-family="ui-monospace, Consolas, monospace">Member = ""</text>
+    <text x="58" y="366" fill="#ff9a9a" font-size="15" font-family="ui-monospace, Consolas, monospace">Staff  = ""</text>
+    <text x="58" y="398" fill="#e7ecf5" font-size="14">Your role ids were gone — and nothing said which.</text>
+    <text x="58" y="418" fill="#7c8aa8" font-size="13">Discord roles dead, duty gate wide open.</text>
+
+    <rect x="520" y="280" width="440" height="150" rx="9" fill="#0f1a1480" stroke="#3ddc97" stroke-opacity=".45"/>
+    <text x="538" y="308" fill="#7dffb0" font-size="13" letter-spacing="1.4">NOW — YOUR VALUE WINS, PER SETTING</text>
+    <text x="538" y="342" fill="#7dffb0" font-size="15" font-family="ui-monospace, Consolas, monospace">Member = "9988001…"</text>
+    <text x="538" y="366" fill="#7dffb0" font-size="15" font-family="ui-monospace, Consolas, monospace">Staff  = "9988001…"</text>
+    <text x="538" y="398" fill="#e7ecf5" font-size="14">Structure, order and new keys still come from 3.6.2.</text>
+    <text x="538" y="418" fill="#7c8aa8" font-size="13">The restore reports how many settings kept your value.</text>
+  </g>
+
+  <text x="40" y="466" fill="#7c8aa8" font-size="13">Only a conflicting region that holds no settings at all — comments, pure structure — still resolves in the update's favour.</text>
+</svg>

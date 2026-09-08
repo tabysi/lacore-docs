@@ -28,6 +28,15 @@ On the running server (console or as staff):
 This snapshots every `configs/*.lua` into the database store — your edits are now safe regardless
 of what the update ships.
 
+<Callout type="error">
+  **Check what it says back.** A backup only survives the next step if it reached the **database**.
+  On a server without oxmysql (or with `UseDatabase = false` in `configs/config.lua`) the snapshot
+  can only live in `data/config_backup.json` — inside the folder you are about to replace. `backup`
+  and `status` both tell you which of the two you have. If you have no database, copy
+  `data/config_backup.json` out of the resource folder now, and put it back at the same path after
+  the update.
+</Callout>
+
 ### Replace the resource
 
 Download the new build and replace the **whole** `resources/lacore` folder with it. Don't try to
@@ -42,8 +51,12 @@ Start the server once, then:
 ```
 
 Restore is a **3-way merge**: only your changes are re-applied onto the new build's config files,
-so new keys and blocks the update added stay in place. If an update changed the exact spot you also
-edited, the new default wins and the conflict is reported in the console — review those lines.
+so new keys and blocks the update added stay in place. Where an update changed the same spot you
+did, the region is reconciled **setting by setting**: a `key = value` you had changed keeps *your*
+value, while structure, ordering and anything the update added come from the new build. The console
+reports how many settings kept your value. Only a conflicting region that holds no settings at all
+(comments, structure) resolves in the update's favour — those are reported as conflicts, and are
+worth a look.
 
 ### Restart & verify
 
@@ -71,5 +84,6 @@ Restart the resource, then check:
 <Callout type="warning">
   The one thing that does **not** survive on its own is an edited config **without a backup** — the
   new build ships default `configs/*.lua`. `/lacoreconfig backup` before you replace the folder is
-  the whole trick. Check `/lacoreconfig status` if you're unsure when the last backup was taken.
+  the whole trick. `/lacoreconfig status` tells you when the last backup was taken **and whether it
+  is in the database**, which is what decides if it survives at all.
 </Callout>

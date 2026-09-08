@@ -250,12 +250,9 @@ managed by version in the admin panel. Guild membership is checked, roles within
 > default, and it refuses to drop a collection that still holds answers unless you
 > insist, because PocketBase has no migrations and a dropped table does not come back.
 
-#### PennCAD: a status picker in the footer
-
-The status chip in the footer is now a button. It opens a picker with ENROUTE, ON SCENE, CODE SIX,
-BUSY, UNAVAILABLE, OUT TO STATION and CLEAR — the same idea as the Agency MDT's status menu, so a
-unit can change status without going through the F-key rail and without touching the incident. Only
-CLEAR detaches; every other status keeps the unit attached to its call.
+> **The survey module was not exercised against a live PocketBase or a real Discord
+> round-trip.** Verification, quota and cap logic are covered by `node tests/survey.test.mjs`,
+> and every page was walked through against the dev mock.
 
 ### Changed
 
@@ -333,6 +330,14 @@ CLEAR detaches; every other status keeps the unit attached to its call.
   PowerShell `Compress-Archive`.
 - **"What's New" in the docs was three release-series behind** — it leads with the current series again.
 
+⚠️ **Config change:** two new files — `configs/cfg-investigation-sh.lua`,
+`configs/cfg-gameplay-sh.lua` — and three new switches in `configs/cfg-features-sh.lua`
+(`investigation`, `gameplay`, `community`, all default **on**). Nothing existing changed its meaning.
+
+> **Not tested in-game.** Everything in this release passed the Lua syntax check, the NUI build and
+> the portal build; the Citizen Hub and the PennCAD were verified in the NUI preview. The world-side
+> paths (traces, collecting, the lab, warrants, the roster push) have not run on a live server yet.
+
 #### Config editor: two groups had no tab, one key had no field
 
 ![Where the three orphaned settings landed in the config editor](/img/changelog/config-editor-orphans.svg)
@@ -393,29 +398,59 @@ what keeps the two halves of the remote-config gate in step.
   `created`/`updated` like every other collection, and gained an index on `loggedAt` — the column
   the activity feed actually sorts by.
 
-#### PennCAD: the CLEAR key resolved the whole incident for everyone
+#### `/lacoreconfig restore` gave you back the new defaults instead of your settings
 
-![PennCAD: F11 resolves the incident, SHIFT+F11 detaches only your unit](/img/changelog/penncad-detach-resolve.svg)
+![How a conflicting setting is reconciled — your value wins, structure comes from the update](/img/changelog/config-merge-your-value.svg)
 
-In the Pennsylvania CAD, **F11 “Clear”** opened the disposition pane, and picking a code called
-`clearIncident` — which files the disposition, flips the call to **Resolved** and drops it from the
-active list on **every** terminal. A unit that only wanted to go clear on itself was closing the
-call for the whole shift, including the units still standing at the scene.
+The 3-way merge behind `restore` resolved a conflict — a region both you *and* the update changed —
+by keeping the new default wholesale. For a region that adds a feature that is right. For a region
+that is nothing but settings it is exactly wrong, and 3.5.5 walked straight into it: that release
+**blanked the seven Discord role ids** shipped in `configs/cfg-server-sv.lua` and opened
+`DutyRoles["Law Enforcement"]`. Every server owner who had filled in their own guild's ids had
+therefore changed the same lines the update did. A conflict. The empty defaults won, and a restore
+quietly wiped the one setting nobody can guess again — Discord roles dead, the duty gate open.
+`configs/cfg-agencies-sh.lua` had the same shape around the three sheriff's offices.
 
-The action itself was correct; its label was not, and there was no second, smaller action next to it:
+A conflicting region is now reconciled **setting by setting**. A `key = value` line you had changed
+away from the old default keeps **your** value; structure, ordering, keys you never touched and
+anything the update added still come from the new default, so a new feature still works. Settings you
+added yourself are carried over too. Only a conflicting region that holds no settings at all —
+comments, pure structure — still resolves in the update's favour, and only that is still counted as a
+conflict. The restore now reports how many settings kept your value.
 
-- **F11 is now `Resolve Incident`.** Same behaviour as before, but the key says what it does, and the
-  disposition pane carries a warning line above the codes: resolving closes the incident for every
-  unit and every terminal.
-- **`SHIFT+F11` is the new `Detach`.** It sets your status to CLEAR — which detaches your unit
-  server-side — and leaves the call open for everyone else. The disposition pane offers it as an
-  alternative as well, so the officer who lands there by muscle memory has a way back out.
+The real 3.5.4 → 3.5.5 files are the regression test (`tests/configmerge.test.lua`), and
+`escrow.ps1` runs it, so a release cannot ship this class of loss again.
 
-⚠️ **Config change:** two new files — `configs/cfg-investigation-sh.lua`,
-`configs/cfg-gameplay-sh.lua` — and three new switches in `configs/cfg-features-sh.lua`
-(`investigation`, `gameplay`, `community`, all default **on**). Nothing existing changed its meaning.
+#### A backup that only reached the local file, and a command that called it a success
 
-> **Not tested in-game.** Everything in this release passed the Lua syntax check, the NUI build and
-> the portal build; the Citizen Hub and the PennCAD were verified in the NUI preview. The world-side
-> paths (traces, collecting, the lab, warrants, the roster push), the survey round-trip and the
-> PennCAD detach/resolve flow have not run on a live server yet.
+`/lacoreconfig backup` reported `Backed up 61 of 61 config file(s)` whenever the save *function*
+existed — not when the save actually landed. On a server without oxmysql, or with
+`UseDatabase = false`, the snapshot only ever reached `data/config_backup.json` — and updating means
+replacing the whole resource folder, which ships an empty `data/`. The backup was deleted by the
+very step it was taken for, and the operator found out at `restore` time: **`No config backup
+found.`**
+
+The save is now awaited and read back, and `backup` says where the snapshot landed. If it could not
+reach the database, it says so in plain words: this copy will not survive replacing the folder,
+either start oxmysql or move the file out and back yourself. `status` carries the same line, so the
+pre-update check the docs point at actually answers the question. `restore` explains the same thing
+when it finds nothing on a server with no database.
+
+#### A product owner was told two dozen of their configs had not been backed up
+
+`backup` counted against the core's list of 61 config files, but the standalone products ship a
+subset — 56 in `lacore-mdt`, 37 in `lacore-90s-cad`. A perfectly complete backup therefore reported
+`24 file(s) could not be read and are NOT in this backup`. A file that is present in neither
+`configs/` nor `configs/.defaults/` is simply not part of that build and is no longer counted as a
+failure; `status` says how many files this build actually tracks.
+
+#### A failed read could destroy the store it failed to read
+
+If a row in `lacore_core_store` came back but could not be decoded, `DBLoadStore` fell through to its
+seed path and upserted the local file — or `{}` — straight over it. A single unreadable row therefore
+became a permanently lost one, and a second attempt could not recover what the first had overwritten.
+An undecodable row is now left alone and reported, and the local mirror is used instead.
+
+> **Not tested in-game.** The merge is covered by `tests/configmerge.test.lua` (which includes the
+> real 3.5.4 → 3.5.5 `cfg-server-sv.lua` and `cfg-agencies-sh.lua`), and every touched file passes
+> the Lua syntax check. The `/lacoreconfig` command paths themselves have not run on a live server.
