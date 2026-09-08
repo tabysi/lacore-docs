@@ -3,129 +3,6 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [3.6.1] – 2026-09-08 — Settings that existed but had no screen
-
-### Fixed
-
-#### Config editor: two groups had no tab, one key had no field
-
-![Where the three orphaned settings landed in the config editor](/img/changelog/config-editor-orphans.svg)
-
-The config editor in the customer dashboard renders **by tab**, and the public
-[config reference](/resources/config/) is generated from the same file. A settings group that is
-listed in no tab is therefore not merely hard to find — it is unreachable, on both pages at once.
-
-Two groups added in 3.5.5 were in exactly that state: **Gameplay** (the damage multipliers and the
-onboarding hints) and **Investigation** (lab time and collect distance). Both were fully wired on the
-server and both stood in the resource's own allowlist, so remote config would have accepted them —
-there was just no field anywhere to set them from. They now have a home:
-
-- **Gameplay** sits under **Features**, next to the civilian layer. It is balance, not a module.
-- **Investigation** sits under **Modules**, directly after Evidence — the two share one locker.
-
-Each also got the one-line section description that every other group already had.
-
-**`hud.crosshair`** had the mirror image of the same problem. The weapon-reticle toggle shipped with
-3.5.0 and went into the resource allowlist, but never onto the website, so remote config could only
-ever validate it on one side of the gate instead of both. It is now a field under
-**HUD & Phone → HUD**, carrying the note that it is deliberately *not* tied to the HUD master
-switch: that switch only hides what LACORE draws, never what GTA draws.
-
-Nothing changed on the server side — no config file, no allowlist, no default. This release makes
-three settings reachable that were already live.
-
-`node tests/configschema.test.mjs` is back to **79 / 79**. Those three checks — every group in a tab,
-every group described, both allowlists holding the same keys — are what caught this, and they are
-what keeps the two halves of the remote-config gate in step.
-
-## [3.6.0] – 2026-09-08 — Asking, and being able to trust the answer
-
-> ⚠️ In development — not released yet, and not exercised against a live PocketBase or a real
-> Discord round-trip. Verification, quota and cap logic are covered by tests
-> (`node tests/survey.test.mjs`), and every page has been walked through against the dev mock.
-
-### Added
-
-#### A survey module, and a rebate for running one
-
-![What a survey answer has to pass to count](/img/changelog/survey-verification.svg)
-
-Two questionnaires and a reward system, in the customer portal. The **community survey** is started
-by a server owner from their dashboard and shared with their players; the **customer survey** asks
-licence holders about price, fit and whether they are staying. For every *verified* answer a
-community collects, its owner earns a rebate on their next purchase — up to 50 %.
-
-**Verification is the whole design.** A community's player records live on that community's own
-server and reach LACORE over `/ingest/*`, uploaded by the very person the rebate pays. So the
-community's own data is treated as a signal, not as evidence, and it only counts where it reached
-LACORE *before* the campaign started — minting records the night before buys nothing. The check that
-actually decides is Discord: account age read from the snowflake, membership of the community's own
-guild, and one response per Discord account, enforced by a unique index rather than by a hopeful
-`if`. Anything that fails lands in a **review queue** with the reason kept — eight distinct statuses,
-never collapsed to a boolean — and is worth nothing until a human approves it.
-
-The quota is `verified ÷ active accounts`, and the denominator is **frozen** when the campaign
-starts. That is not a detail: with a live denominator, deleting half your player records the day
-before a wave closed would double your rebate. It is counted once, from the connection activity your
-servers report, with your concurrent player count as a floor, and never recomputed.
-
-Three caps stack on top: 50 % per community, the next purchase only, and a **wave budget** in euros.
-Waves have a fixed window and run twice a year; when a wave's budget is used up, campaigns keep
-running and the rebate is booked into the next wave. Rewards land in an **append-only ledger** — a
-correction is a counter-entry, never an edit — and are fulfilled as a Tebex coupon recorded by hand,
-the same way partner payouts already work. Nothing in this module moves money on its own.
-
-**What a community owner can see, and cannot.** Aggregates only, never a single response, and
-nothing at all until ten people have answered — below that a breakdown identifies individuals in a
-small community. Free-text answers are never shown to them at any count, and that is enforced on the
-server: the owner-facing route does not compute them, so there is nothing to reach through the API
-either. Participants consent before the first question, and can withdraw their answer afterwards from
-the link on the closing page.
-
-Both questionnaires are **bilingual (English and German)** — the first bilingual surface in the
-portal — and versioned: editing a published survey creates a new version instead, so answers stay
-attached to the questions that were actually asked.
-
-New pages: `/dashboard/surveys/` for customers; `/admin/surveys/` with waves, campaigns, the review
-queue, the reward ledger and results — including the **Van Westendorp** price analysis (four
-cumulative curves and their crossings) and a list of every customer who said they might not be here
-in six months.
-
-*Not yet:* the privacy notice and participation terms ship as **marked placeholders**, and both the
-seeder and the public route refuse to publish a survey while they are still placeholders. A
-questionnaire-builder UI does not exist — surveys are seeded from `landing/lib/surveyseed.mjs` and
-managed by version in the admin panel. Guild membership is checked, roles within a guild are not
-(the OAuth `guilds` scope does not carry them).
-
-> **New PocketBase collections to import:**
-> `landing/pocketbase/pocketbase-survey-collections.json` (`lacore_surveys`, `lacore_survey_waves`,
-> `lacore_survey_campaigns`, `lacore_survey_sessions`, `lacore_survey_responses`,
-> `lacore_survey_rewards`). The reward maths also needs `lacore_activity` — a campaign refuses to
-> start without it rather than silently reporting nobody plays here.
-> Then seed the questionnaires: `node landing/scripts/seed-surveys.mjs --apply`.
-> To take it all out again: `node landing/scripts/rollback-surveys.mjs` — dry run by
-> default, and it refuses to drop a collection that still holds answers unless you
-> insist, because PocketBase has no migrations and a dropped table does not come back.
-
-### Fixed
-
-- **PocketBase collection exports shared ids, so an import could rewrite the wrong collection.**
-  PocketBase matches collections by `id`, and four ids were each used by up to five different
-  exports in `landing/pocketbase/` — `lacore_payouts` carried the id that is live as
-  `lacore_configs`, `lacore_reports` and `lacore_entitlements` the one that is live as
-  `lacore_websettings`, and so on. Every collection now has a unique id: the ones confirmed against
-  the live instance keep theirs (`lacore_refclicks` was corrected to its real `pbc_9700000002`), the
-  six hub collections got the ids they were missing entirely, and the rest hold unique placeholders
-  until their live id is read off a dry run. `pocketbase-FULL-import.json` is generated from the
-  individual exports again — it had drifted to 26 of 34 collections — by the new
-  `landing/scripts/pb-build-full.mjs`, which refuses to emit a duplicate id. The import script's
-  default file path pointed one directory too high and never resolved. Ids, live status and the
-  remaining reconciliation step are documented in `landing/pocketbase/README.md`.
-- **`lacore_activity` can actually be imported now.** Besides the shared id, its export indexed a
-  `created` column it never declared, so the import would have failed on the index. It declares
-  `created`/`updated` like every other collection, and gained an index on `loggedAt` — the column
-  the activity feed actually sorts by.
-
 ## [3.5.5] – 2026-09-05 — Seven foundations
 
 > One release, seven building sites. Each of these ships as a **foundation**: a real, working first
@@ -288,6 +165,97 @@ collection while mirroring it into Discord.
 *Server setup:* import `landing/pocketbase/pocketbase-contacts-collection.json` and set
 `CONTACT_WEBHOOK_URL` — without them a submission has nowhere to go.
 
+#### A survey module, and a rebate for running one
+
+![What a survey answer has to pass to count](/img/changelog/survey-verification.svg)
+
+Two questionnaires and a reward system, in the customer portal. The **community survey** is started
+by a server owner from their dashboard and shared with their players; the **customer survey** asks
+licence holders about price, fit and whether they are staying. For every *verified* answer a
+community collects, its owner earns a rebate on their next purchase — up to 50 %.
+
+**Verification is the whole design.** A community's player records live on that community's own
+server and reach LACORE over `/ingest/*`, uploaded by the very person the rebate pays. So the
+community's own data is treated as a signal, not as evidence, and it only counts where it reached
+LACORE *before* the campaign started — minting records the night before buys nothing. The check that
+actually decides is Discord: account age read from the snowflake, membership of the community's own
+guild, and one response per Discord account, enforced by a unique index rather than by a hopeful
+`if`. Anything that fails lands in a **review queue** with the reason kept — eight distinct statuses,
+never collapsed to a boolean — and is worth nothing until a human approves it.
+
+The quota is `verified ÷ active accounts`, and the denominator is **frozen** when the campaign
+starts. That is not a detail: with a live denominator, deleting half your player records the day
+before a wave closed would double your rebate. It is counted once, from the connection activity your
+servers report, with your concurrent player count as a floor, and never recomputed.
+
+Three caps stack on top: 50 % per community, the next purchase only, and a **wave budget** in euros.
+Waves have a fixed window and run twice a year; when a wave's budget is used up, campaigns keep
+running and the rebate is booked into the next wave. Rewards land in an **append-only ledger** — a
+correction is a counter-entry, never an edit — and are fulfilled as a Tebex coupon recorded by hand,
+the same way partner payouts already work. Nothing in this module moves money on its own.
+
+**What a community owner can see, and cannot.** Aggregates only, never a single response, and
+nothing at all until ten people have answered — below that a breakdown identifies individuals in a
+small community. Free-text answers are never shown to them at any count, and that is enforced on the
+server: the owner-facing route does not compute them, so there is nothing to reach through the API
+either. Participants consent before the first question, and can withdraw their answer afterwards from
+the link on the closing page.
+
+Both questionnaires are **bilingual (English and German)** — the first bilingual surface in the
+portal — and versioned: editing a published survey creates a new version instead, so answers stay
+attached to the questions that were actually asked.
+
+**Deep where it matters, short everywhere else.** The player survey still asks everyone exactly ten
+questions — it has to stay a three-minute job, because a survey nobody finishes earns its community
+no rebate and us no data. The depth comes from follow-ups that only open for the person whose own
+answer made them worth asking: someone who scores under 7 is asked what would have to change, someone
+who names a previous MDT is asked what made them move, whoever says "bugs" is asked where, and a case
+file that takes over five minutes is asked what the slow part is. Give a good score and name no
+competitor and you never see one of them. The customer survey gains two on the same terms: which
+YouTube channel or person actually sent someone, and — asked only of the people who said price
+decided it — what they compared against and what that cost.
+
+New pages: `/dashboard/surveys/` for customers; `/admin/surveys/` with waves, campaigns, the review
+queue, the reward ledger and results — including the **Van Westendorp** price analysis (four
+cumulative curves and their crossings) and a list of every customer who said they might not be here
+in six months.
+
+**Community results open on the whole network**, not one community at a time: every player answer
+across every campaign, read on verified responses only. It carries the crossings, which is where the
+findings actually live — recommendation score by role, areas by role, complaints by how long a case
+takes. A table that says dispatchers rate the product five points below patrol officers is not
+visible in either question on its own, and it is the kind of thing that changes what gets built next.
+Alongside it: a tally of which MDT people came from with the spellings folded together, why they
+moved, and every detractor's own words with the ones who explained themselves first. A single
+community is still one click away.
+
+The participation terms — the rules behind the rebate — live at **`/legal/survey-terms/`** and are
+linked from the dashboard beside the button that commits to them. They are addressed to the licence
+holder, so they are deliberately not shown to the player answering the questionnaire.
+
+*Not yet:* the privacy notice and the contractual half of the participation terms ship as **marked
+placeholders**, and both the seeder and the public route refuse to publish a survey while they are. A
+questionnaire-builder UI does not exist — surveys are seeded from `landing/lib/surveyseed.mjs` and
+managed by version in the admin panel. Guild membership is checked, roles within a guild are not
+(the OAuth `guilds` scope does not carry them).
+
+> **New PocketBase collections to import:**
+> `landing/pocketbase/pocketbase-survey-collections.json` (`lacore_surveys`, `lacore_survey_waves`,
+> `lacore_survey_campaigns`, `lacore_survey_sessions`, `lacore_survey_responses`,
+> `lacore_survey_rewards`). The reward maths also needs `lacore_activity` — a campaign refuses to
+> start without it rather than silently reporting nobody plays here.
+> Then seed the questionnaires: `node landing/scripts/seed-surveys.mjs --apply`.
+> To take it all out again: `node landing/scripts/rollback-surveys.mjs` — dry run by
+> default, and it refuses to drop a collection that still holds answers unless you
+> insist, because PocketBase has no migrations and a dropped table does not come back.
+
+#### PennCAD: a status picker in the footer
+
+The status chip in the footer is now a button. It opens a picker with ENROUTE, ON SCENE, CODE SIX,
+BUSY, UNAVAILABLE, OUT TO STATION and CLEAR — the same idea as the Agency MDT's status menu, so a
+unit can change status without going through the F-key rail and without touching the incident. Only
+CLEAR detaches; every other status keeps the unit attached to its call.
+
 ### Changed
 
 - **License keys page rebuilt around "which key runs where".** Every key card now lists the
@@ -364,13 +332,92 @@ collection while mirroring it into Discord.
   PowerShell `Compress-Archive`.
 - **"What's New" in the docs was three release-series behind** — it leads with the current series again.
 
+#### Config editor: two groups had no tab, one key had no field
+
+![Where the three orphaned settings landed in the config editor](/img/changelog/config-editor-orphans.svg)
+
+The config editor in the customer dashboard renders **by tab**, and the public
+[config reference](/resources/config/) is generated from the same file. A settings group that is
+listed in no tab is therefore not merely hard to find — it is unreachable, on both pages at once.
+
+Two groups added in 3.5.5 were in exactly that state: **Gameplay** (the damage multipliers and the
+onboarding hints) and **Investigation** (lab time and collect distance). Both were fully wired on the
+server and both stood in the resource's own allowlist, so remote config would have accepted them —
+there was just no field anywhere to set them from. They now have a home:
+
+- **Gameplay** sits under **Features**, next to the civilian layer. It is balance, not a module.
+- **Investigation** sits under **Modules**, directly after Evidence — the two share one locker.
+
+Each also got the one-line section description that every other group already had.
+
+**`hud.crosshair`** had the mirror image of the same problem. The weapon-reticle toggle shipped with
+3.5.0 and went into the resource allowlist, but never onto the website, so remote config could only
+ever validate it on one side of the gate instead of both. It is now a field under
+**HUD & Phone → HUD**, carrying the note that it is deliberately *not* tied to the HUD master
+switch: that switch only hides what LACORE draws, never what GTA draws.
+
+Nothing changed on the server side — no config file, no allowlist, no default. This release makes
+three settings reachable that were already live.
+
+`node tests/configschema.test.mjs` is back to **79 / 79**. Those three checks — every group in a tab,
+every group described, both allowlists holding the same keys — are what caught this, and they are
+what keeps the two halves of the remote-config gate in step.
+
+- **The security alert webhook was compiled into the code, and shipped that way.** The IP-lock and
+  the anti-removal guard both alert to a Discord webhook, and its URL sat in the source as a string
+  — which meant it was copied verbatim into `Products/lacore-90s-cad`, and from there into the
+  product zips in plain text. It now comes from the server, not the build:
+
+  ```cfg
+  set lacore_alert_webhook "https://discord.com/api/webhooks/…"
+  ```
+
+  `set`, never `setr` — the URL is only ever read server-side; replicated, every client could read
+  it. Leave it unset and no alert is sent. Nothing else about the alerts changed.
+
+- **PocketBase collection exports shared ids, so an import could rewrite the wrong collection.**
+  PocketBase matches collections by `id`, and four ids were each used by up to five different
+  exports in `landing/pocketbase/` — `lacore_payouts` carried the id that is live as
+  `lacore_configs`, `lacore_reports` and `lacore_entitlements` the one that is live as
+  `lacore_websettings`, and so on. Every collection now has a unique id: the ones confirmed against
+  the live instance keep theirs (`lacore_refclicks` was corrected to its real `pbc_9700000002`), the
+  six hub collections got the ids they were missing entirely, and the rest hold unique placeholders
+  until their live id is read off a dry run. `pocketbase-FULL-import.json` is generated from the
+  individual exports again — it had drifted to 26 of 34 collections — by the new
+  `landing/scripts/pb-build-full.mjs`, which refuses to emit a duplicate id. The import script's
+  default file path pointed one directory too high and never resolved. Ids, live status and the
+  remaining reconciliation step are documented in `landing/pocketbase/README.md`.
+- **`lacore_activity` can actually be imported now.** Besides the shared id, its export indexed a
+  `created` column it never declared, so the import would have failed on the index. It declares
+  `created`/`updated` like every other collection, and gained an index on `loggedAt` — the column
+  the activity feed actually sorts by.
+
+#### PennCAD: the CLEAR key resolved the whole incident for everyone
+
+![PennCAD: F11 resolves the incident, SHIFT+F11 detaches only your unit](/img/changelog/penncad-detach-resolve.svg)
+
+In the Pennsylvania CAD, **F11 “Clear”** opened the disposition pane, and picking a code called
+`clearIncident` — which files the disposition, flips the call to **Resolved** and drops it from the
+active list on **every** terminal. A unit that only wanted to go clear on itself was closing the
+call for the whole shift, including the units still standing at the scene.
+
+The action itself was correct; its label was not, and there was no second, smaller action next to it:
+
+- **F11 is now `Resolve Incident`.** Same behaviour as before, but the key says what it does, and the
+  disposition pane carries a warning line above the codes: resolving closes the incident for every
+  unit and every terminal.
+- **`SHIFT+F11` is the new `Detach`.** It sets your status to CLEAR — which detaches your unit
+  server-side — and leaves the call open for everyone else. The disposition pane offers it as an
+  alternative as well, so the officer who lands there by muscle memory has a way back out.
+
 ⚠️ **Config change:** two new files — `configs/cfg-investigation-sh.lua`,
 `configs/cfg-gameplay-sh.lua` — and three new switches in `configs/cfg-features-sh.lua`
 (`investigation`, `gameplay`, `community`, all default **on**). Nothing existing changed its meaning.
 
 > **Not tested in-game.** Everything in this release passed the Lua syntax check, the NUI build and
 > the portal build; the Citizen Hub and the PennCAD were verified in the NUI preview. The world-side
-> paths (traces, collecting, the lab, warrants, the roster push) have not run on a live server yet.
+> paths (traces, collecting, the lab, warrants, the roster push), the survey round-trip and the
+> PennCAD detach/resolve flow have not run on a live server yet.
 
 ## [3.5.4] – 2026-09-05 — The whole call, not one row of it
 
