@@ -50,7 +50,7 @@
   <!-- Enforcement -->
   <rect x="70" y="340" width="1060" height="110" rx="12" fill="none" stroke="#d04a4a" stroke-width="2" stroke-dasharray="6 5"/>
   <text x="94" y="372" fill="#ffb0b0" font-size="15" font-weight="700">ENFORCEMENT — OPT-IN, TWO-SIDED</text>
-  <text x="94" y="398" fill="#9fb0ff" font-size="13" font-weight="600">① owner flips the share key to “Enforce”   ②  the consuming server sets  <tspan fill="#dcea8a">setr lacore_playerbase_enforce true</tspan>   — only then does a shared ban block a connect</text>
+  <text x="94" y="398" fill="#9fb0ff" font-size="13" font-weight="600">① owner flips the share key to “Enforce”   ②  the consuming server sets  <tspan fill="#dcea8a">set lacore_playerbase_enforce true</tspan>   — only then does a shared ban block a connect</text>
   <text x="94" y="426" fill="#6b7689" font-size="13" font-weight="600">Fail-safe: the connect check never holds the deferral — no key, relay down, or any error simply lets the join proceed. Advisory by default.</text>
 
   <text x="60" y="500" fill="#6b7689" font-size="15" font-weight="600">Partners see the player's name and ban reason — never their identifiers. Requires a licence key; upload rides the write-only relay.</text>

@@ -38,12 +38,25 @@ const out = (cmd, cwd) => execSync(cmd, { cwd, encoding: 'utf8' }).trim()
 const log = (m) => console.log(`\x1b[36m›\x1b[0m ${m}`)
 
 // ── 1. refresh changelog from the resource, then regenerate the pages ────────
-const coreChangelog = path.join(CORE, 'changelog.md')
-const webChangelog = path.join(WEBSITE, 'changelog.md')
-if (fs.existsSync(coreChangelog)) {
-  fs.copyFileSync(coreChangelog, webChangelog)
-  log('Pulled changelog.md from the resource.')
+// The file is committed as CHANGELOG.md. Matching that name case-insensitively
+// rather than hard-coding one spelling: on macOS and Windows either spelling
+// opens the same file, so a mismatch here is invisible, but on a case-sensitive
+// filesystem it would miss — and the old code answered that by skipping the
+// copy in silence, which publishes the docs with a stale changelog.
+const findChangelog = (dir) => {
+  const hit = fs.readdirSync(dir).find((f) => f.toLowerCase() === 'changelog.md')
+  return hit ? path.join(dir, hit) : null
 }
+
+const coreChangelog = findChangelog(CORE)
+const webChangelog = path.join(WEBSITE, 'changelog.md')
+if (!coreChangelog) {
+  console.error(`✗ No changelog.md next to website/ (looked in ${CORE}).`)
+  console.error('  Run this from the core repo — publishing without it would ship a stale changelog.')
+  process.exit(1)
+}
+fs.copyFileSync(coreChangelog, webChangelog)
+log(`Pulled ${path.basename(coreChangelog)} from the resource.`)
 log('Regenerating changelog pages …')
 run('node scripts/gen-changelog.mjs', WEBSITE)
 

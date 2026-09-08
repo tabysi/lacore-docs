@@ -65,7 +65,7 @@ Restart the resource, then check:
 - **Old edited `config.lua`** — since the 3.4.4 split, every table moved out of `config.lua` is
   defined as `X = X or { … }`: if your old copy still contains a moved table, **your table wins**
   and nothing breaks. Migrate your edits into the new topic files whenever convenient.
-- **License & entitlements** — `setr lacore_license_key` lives in `server.cfg`, which an update
+- **License & entitlements** — `set lacore_license_key` lives in `server.cfg`, which an update
   never touches. Paid add-ons re-unlock automatically at the first start after the update.
 
 <Callout type="warning">

@@ -6,12 +6,30 @@ import { Callout, Cards } from 'nextra/components'
 
 # What's New
 
-The latest LACORE releases at a glance — current version: **3.4.5**. Every version has its own page
+The latest LACORE releases at a glance — current version: **3.4.9.9**. Every version has its own page
 under the [Changelog](/updates/changelog).
 
 <Callout type="info">
   The authoritative, line-by-line changelog also ships with the resource in `changelog.md`.
 </Callout>
+
+## 3.4.9.x — Items, a standalone 90s CAD & per-department CADs
+
+- **Everything that can be an item is an item** (3.4.9.9) — with **ox_inventory**, **qb-inventory**
+  or **ESX**, LACORE features can be inventory items: a phone you carry, a department-bound MDT
+  tablet, an ID card, a breathalyser. Use the item and the feature opens; a feature can also
+  *require* its item — ownership is decided on the server, never the client.
+- **The 90s CAD ships on its own** (3.4.9.6) — the 9100-T CRT in-car terminal is now its own
+  standalone product, driving the same LACORE CAD backend.
+- **Every department picks its own CAD** (3.4.9.2) — the agency → CAD-design mapping is config,
+  including the three sheriff's offices on the Sheriff CAD.
+- **QBox servers get their names and jobs through** (3.4.9) — plus a portal that tells two servers
+  on one account apart (3.4.9.7) and a framework bridge that tolerates late starts (3.4.9.8).
+
+<Cards>
+  <Cards.Card title="Full 3.4.9.9 changelog" href="/updates/changelog/v3-4-9-9" arrow />
+  <Cards.Card title="All releases" href="/updates/changelog" arrow />
+</Cards>
 
 ## 3.4.x — Config & dependency housekeeping
 
@@ -83,7 +101,7 @@ Manage everything about your LACORE license from one place at
 **[lacore.netica.dev/dashboard](https://lacore.netica.dev/dashboard/)** — sign in with the Discord
 account that owns your license, no separate password needed.
 
-- **License keys** — generate a key, drop `setr lacore_license_key "…"` into your `server.cfg`, and your
+- **License keys** — generate a key, drop `set lacore_license_key "…"` into your `server.cfg`, and your
   server links to your account automatically.
 - **Servers** — see your linked servers with live status, players and version.
 - **Server config online** — change LACORE's settings from the web, no file edits or re-upload; your

@@ -1,0 +1,85 @@
+---
+title: Records, Personnel & Supervisor
+---
+
+import { Callout } from 'nextra/components'
+
+# Records, Personnel & Supervisor
+
+The oversight layer above the MDT: the Supervisor Panel and the two record systems behind it — case
+files and personnel files.
+
+## Supervisor Panel — `configs/cfg-supervisor-sh.lua`
+
+`/supervisor` opens a rank-gated oversight tablet for shift supervisors and watch commanders: a live
+unit roster, a map, assign / status / broadcast controls, and a BOLO + warrant overview.
+
+**Who is a supervisor** — a unit qualifies if *either* holds:
+
+1. **Framework grade** — on ESX / QBCore / QBox, the unit's job grade is at or above the minimum for
+   their department.
+2. **Config allowlist** — the unit's licence identifier or exact callsign is listed in `allow`. This
+   is the standalone path and needs no framework at all.
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `command` | `"supervisor"` | Chat command that opens the panel. |
+| `minGrade` | `3` | Default minimum job grade that counts as a supervisor on framework servers. |
+| `minGradeByDept` | `{}` | Per-department override, `job / dept string → minimum grade`. |
+| `allow` | `{}` | Manual allowlist. Keys are a licence identifier (`"license:xxxx…"`) **or** an exact callsign (`"1-L-30"`); value `true` grants the panel. |
+| `leoOnly` | `true` | Only on-duty LEO units are ever eligible — a civilian is never a supervisor, whatever their grade. `false` allows any job that clears the checks. |
+
+<Callout type="warning">
+  Gating is **server-authoritative**: the client only asks to open, the server verifies and also
+  authorises every action the panel takes. Every command action is written to the
+  [Big Brother audit](/configuration/security).
+</Callout>
+
+## Case files — `configs/cfg-cases-sh.lua`
+
+A case file ties an incident, the people and vehicles involved, the reports / evidence / charges
+already on their records, and a multi-section narrative into one numbered file a supervisor can
+review.
+
+<Callout type="info">
+  A case is an **index, not a copy**. Reports and evidence keep living on the person's record exactly
+  as before — the case points at them. Nothing has to be migrated, and the MDT person query is
+  unaffected.
+</Callout>
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `agency` | `"LAPD"` | Case-number prefix. Format `<AGENCY>-<YY>-<NNNNNN>`, e.g. `LAPD-26-000142`. Deliberately **not** the incident number — that one rolls over 1000–9999 and is reused, so it can never be a stable key. |
+| `types` | 9 entries | Case types offered when a case is opened (`incident`, `arrest`, `traffic`, `theft`, `assault`, `homicide`, `narcotics`, `missing`, `other`). |
+| `narrativeSections` | 4 entries | The narrative sections and the order they appear in the file: Synopsis, Investigation, Statements, Conclusion. |
+| `personRoles` | 5 entries | Roles a person can have on a case: suspect, victim, witness, reporting party, other. |
+| `vehicleRoles` | 5 entries | Roles a vehicle can have: suspect vehicle, victim vehicle, involved, recovered, other. |
+| `dispositions` | 7 entries | Dispositions available when a case is closed out: open, cleared by arrest, cleared other, unfounded, suspended, referred, closed. |
+
+Every list here is free to edit — add your own types, sections, roles or dispositions.
+
+## Personnel files — `configs/cfg-personnel-sh.lua`
+
+Personnel files live behind the Supervisor Panel (**/supervisor → Personnel**). *Reading* a file only
+needs the supervisor rank above.
+
+**Writing is a second, higher bar** on purpose: promotions, certifications and discipline are career
+records, and being able to run the watch is not the same thing as being able to write someone's
+discipline file. A writer qualifies if *either* holds:
+
+1. the ACE permission `lacore.personnel.write` (also satisfied by staff/dev and by `devmode`), or
+2. the unit's job grade is at or above `writeMinGrade`.
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `writePermission` | `"personnel.write"` | ACE permission that grants write access. |
+| `writeMinGrade` | `6` | Rank fallback for servers that don't use ACE here. Set it very high to require the ACE permission only. |
+| `entryTypes` | 5 entries | Entry types offered in the panel: Commendation, Training, Counseling, Reprimand, Note. `discipline = true` marks a type whose **reads** are audited as well as its writes. |
+| `statuses` | 5 entries | Statuses a file can be set to: active, probation, suspended, inactive, separated. |
+| `certifications` | 6 entries | Certifications your departments issue (FTO, K9, SWAT, Air Unit, Detective, EVOC). Purely labels — add your own. |
+
+<Callout type="warning">
+  Both checks run **server-side**. Every write is recorded in the file's own entry list *and* in the
+  Big Brother audit, and reads of discipline entries are audited too — a records system that cannot
+  say who looked is not a records system.
+</Callout>

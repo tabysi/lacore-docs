@@ -13,7 +13,7 @@
   <rect x="70" y="140" width="280" height="170" rx="12" fill="#0a0d13" stroke="#2c3650" stroke-width="2"/>
   <text x="210" y="172" fill="#e7ecf5" font-size="16" font-weight="700" text-anchor="middle">YOUR FIVEM SERVER</text>
   <g font-size="12" font-weight="600" fill="#9fb0ff">
-    <text x="94" y="200">setr lacore_license_key "…"</text>
+    <text x="94" y="200">set lacore_license_key "…"</text>
     <text x="94" y="222">setr lacore_webdispatch "true"</text>
   </g>
   <rect x="94" y="240" width="232" height="26" rx="6" fill="#0b0f0a" stroke="#8a9a2f"/>
