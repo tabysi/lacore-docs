@@ -1,0 +1,57 @@
+---
+title: FAQ
+---
+
+import { Callout } from 'nextra/components'
+
+# LACORE MDT — FAQ
+
+## Do I need LACORE Core as well?
+
+No. LACORE MDT is a complete, standalone resource. Core is the bigger package that also brings the
+civilian layer, phone, admin toolkit and web dispatcher — and if you upgrade, what you paid here is
+credited.
+
+## Do I need a framework?
+
+No. It runs standalone with its own identity and duty system, and it bridges to **ESX**, **QBCore**
+and **QBox** when you have one — your existing police jobs map straight onto departments.
+
+## Can I run it next to my current police scripts?
+
+Yes, but pick one owner per job. Two CAD systems writing the same records is the one setup that
+causes trouble. The setup report on first boot tells you which of your resources overlap.
+
+## Will it replace my inventory, phone or HUD?
+
+No. Those are not part of this product at all — see
+[What's included](/products/lacore-mdt/whats-included).
+
+## How do officers get in?
+
+Through departments you configure: a framework job, a Discord role, or an ACE group. Nothing is
+hard-coded, and there is no separate allowlist to maintain.
+
+## Can I rename the terminals and the agencies?
+
+Yes. Names, skins, call types and the penal code are all config. The whitelabel file renames anything
+the terminals show without touching translations.
+
+## Does it work in my language?
+
+It ships in **English, German and Russian**, and every string lives in `lang/` — a fourth language is
+a file, not a code change.
+
+## Can I run it on two servers?
+
+No. Every LACORE product is IP-locked to a single server; a second server needs a second licence.
+
+## Do I lose my settings when I update?
+
+Not if you use the backup: `/lacoreconfig backup`, replace the folder, `/lacoreconfig restore`. The
+three-way merge keeps the settings you changed and still takes new keys from the update.
+
+<Callout type="info">
+  Anything unanswered? Open a ticket in the [Discord](https://discord.gg/b6YbvVEvYp) or via
+  [Support](/customer-portal/support) in your dashboard.
+</Callout>

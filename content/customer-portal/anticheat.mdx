@@ -1,0 +1,51 @@
+---
+title: Anticheat flags
+---
+
+import { Callout } from 'nextra/components'
+
+# Anticheat flags
+
+**Dashboard → Anticheat** is where every detection your servers reported ends up. It is a review
+surface, not a control panel: you read what happened, and you tell LACORE when it got something
+wrong.
+
+<Callout type="info">
+  The anticheat ships **on**, in **observe mode** — it scores and logs what it *would* have done and
+  punishes nobody until you switch it to enforce. This page is how you check its accuracy before you
+  do that. See [Anti-Cheat & Security](/anticheat).
+</Callout>
+
+## What the page shows
+
+At the top, three numbers:
+
+| Tile | Meaning |
+|---|---|
+| **Observed only** | The action was decided but not carried out — observe mode |
+| **Called wrong** | Detections you marked as false positives |
+| **Whitelisted hits** | Flagged, but the player or detection was exempt, so nothing happened |
+
+Below that, **repeat offenders** (who is being flagged again and again), **detections you have called
+wrong** (grouped, so a noisy detection is obvious) and the full flag list.
+
+## The flag list
+
+Each row carries **when**, **player**, **detection**, **action**, **trust score** and **server**, and
+can be filtered by severity. Two pills explain themselves on hover:
+
+- `observed` — observe mode: this action was decided, not carried out.
+- `exempt` — whitelisted: logged, but never acted on.
+
+Open a row and you get the detail: the trust score at the time and the player's identifiers.
+
+## Marking a wrong call
+
+Every row has a **wrong call** button. Marking a detection counts against how accurate that detection
+is — that is the point of the number, so mark honestly. The same button undoes it and counts the flag
+as real again.
+
+<Callout type="warning">
+  Flags reach the dashboard only while your server sends telemetry — that means a valid licence key in
+  `server.cfg`. No key, no flags on this page. See [License keys](/customer-portal/license-keys).
+</Callout>

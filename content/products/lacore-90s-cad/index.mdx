@@ -1,0 +1,50 @@
+---
+title: 9100-T CAD
+---
+
+import { Callout, Cards } from 'nextra/components'
+
+# 9100-T CAD — the 1990s in-car terminal
+
+One terminal, nothing else. The **9100-T Mobile Data Terminal** is a nineties CRT computer bolted
+into the dash: a photo-real chassis, keys you click, and the clack of a mechanical keyboard under
+every keystroke. Behind the glass runs the full LACORE records backend.
+
+![The 9100-T terminal](/img/mdt/terminal-family.svg)
+
+It ships as its own resource — **`lacore-90s-cad`** — and needs neither LACORE Core nor a framework.
+
+## What it does
+
+- **Live calls.** Active incidents reach the terminal the way a unit gets them: panic buttons,
+  backup requests, special-contact calls, traffic stops and on-views.
+- **Unit status and self-assign** — take a call, update your status, close it with a disposition.
+- **Person and vehicle lookups** against LACORE's records: licences, warrants, prior incidents.
+- **Charges, citations, warrants and BOLOs** on a penal code you configure yourself.
+- **EN · DE · RU**, like the rest of LACORE.
+
+## What it deliberately is not
+
+This is the honest part. The 9100-T product contains **one** terminal:
+
+| Not included | Where it lives instead |
+|---|---|
+| LAPD, Sheriff, Agency and EMS terminals | [LACORE MDT](/products/lacore-mdt) or Core |
+| The dispatch console | LACORE MDT or Core |
+| Pennsylvania CAD | [Its own add-on](/products/pennsylvania-cad), inside Core |
+| Phone, civilian layer, radio speech-to-text | LACORE Core |
+| CCTV, K9, air unit, corrections, impound, fingerprint | LACORE MDT or Core |
+
+The NUI is rebuilt from a scoped entry, so the other terminals are not merely hidden — they are not
+in the shipped bundle at all. That keeps the download small and the interface honest.
+
+<Callout type="info">
+  Want more than one terminal? [LACORE MDT](/products/lacore-mdt) carries all five, and
+  [LACORE Core](/) adds the civilian half on top.
+</Callout>
+
+<Cards>
+  <Cards.Card title="Install it" href="/products/lacore-90s-cad/install" arrow />
+  <Cards.Card title="Using the terminal" href="/user-guide/retro-mdt" arrow />
+  <Cards.Card title="FAQ" href="/products/lacore-90s-cad/faq" arrow />
+</Cards>

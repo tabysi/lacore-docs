@@ -1,0 +1,39 @@
+---
+title: Bug reports
+---
+
+import { Callout } from 'nextra/components'
+
+# Bug reports
+
+**Dashboard → Bug Reports** collects what your players send with `/lacorereport` in game.
+
+<Callout type="info">
+  These reports go to **the LACORE dashboard**, not into your own server database — they are about
+  LACORE itself. A player never needs an account to file one.
+</Callout>
+
+## The list
+
+| Column | What it is |
+|---|---|
+| **When** | Time the report was filed |
+| **Player** | The account that reported |
+| **Character** | Which character they were playing |
+| **Category** | Picked by the player (configurable in `configs/cfg-report-sh.lua`) |
+| **Server** | Which of your servers it came from |
+| **Status** | Where the report stands |
+
+Open a report and you see the account name, the callsign and the department the player was on duty
+for — usually enough to reproduce the situation without asking them.
+
+## Reporting more than once
+
+Reports from the same player are grouped, so a single person filing five times does not look like
+five separate problems. Repeat reports about the same thing are the useful signal here.
+
+## Configuring the in-game side
+
+The command name, the cooldown, the maximum length and the category list all live in
+`configs/cfg-report-sh.lua`. The player-facing side is documented in
+[Bug reports](/user-guide/bug-reports).

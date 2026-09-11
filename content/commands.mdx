@@ -213,6 +213,8 @@ See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).
 | `/inmates` | LEO | Open the jail / corrections inmate roster. |
 | `/releaseinmate <id>` | LEO | Release an inmate. |
 | `/lpr` | LEO (LASD) | Scan the plate of the vehicle in front of you (Licence-Plate Reader). |
+| `/evidence <list\|analyze\|attach>` | LEO | [Investigation](/features/investigation): list what you are carrying, send a sample to the lab, or attach a result to a case. |
+| `/warrant <request\|mine\|list\|approve\|deny>` | LEO / supervisor | Request a warrant from your evidence, see your own, or — as a supervisor — work the queue. |
 | `/grabstretcher` | Fire-EMS | Grab / deploy a stretcher. |
 | `/jail <id> <seconds> [reason]` | LEO | Jail a player — the value is **seconds** (clamped 30–1200). |
 | `/unjail <id> [reason]` | LEO | Release a jailed player. |
@@ -351,6 +353,9 @@ The keybind **"Replay: start / stop recording"** ships **unbound** — bind it i
 | `/propspawner` 🧪 | Open the scenery prop spawner (`configs/cfg-props-cl.lua`) — search by name, filter by category, delete the nearest. Was `/prop` until that name was taken by the radial above. |
 | `/orgaccept` | Accept a pending organisation invite. |
 | `/turf` | Show turf / territory ownership and your organisation's influence. |
+| `/citizen` | Open the **Citizen Hub** — civilian services, documents and requests in one panel. |
+| `/myid` | Show your digital ID. |
+| `/onboarding` | Replay the first-join introduction. |
 
 The **civilian radial** ("Open civilian menu") is a hold-keybind — bind it in
 *FiveM Settings → Key Bindings*. See [Civilian Layer](/features/civilian).
@@ -382,7 +387,8 @@ Discord roles. See [Anti-Cheat & Security](/anticheat) and [Discord setup](/conf
 | `/time <h> [m]` 🔒 · `/freezetime` 🔒 · `/ft` · `/rft` | World time control / freeze helpers. |
 | `/deleteentity` | Delete the entity you're aiming at. |
 | `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
-| `/lacoreconfig <backup\|restore\|undo\|status>` | Back up / restore LACORE configs across reinstalls. `undo` reverses the last restore. |
+| `/lacoreconfig <backup\|restore\|undo\|status\|wizard>` | Back up / restore LACORE configs across reinstalls. `undo` reverses the last restore, `status` says where the snapshot lives and whether it survives an update, `wizard` walks first-time setup. |
+| `/lacoreitems` | **Server console only.** Prints every LACORE item as a ready-to-paste line for `ox_inventory/data/items.lua`. |
 
 ### 🗺️ NADS — worldbuilding (staff)
 
@@ -407,6 +413,8 @@ Console or staff — health checks and diagnostics:
 | `/lacore modules` | Loaded modules. |
 | `/lacore doctor` | Full first-boot health check. |
 | `/lacore autoconfig` | [Setup review](/configuration/autoconfig) — settings this server's setup suggests. Nothing is changed. |
+| `/lacore autoconfig apply` | Applies those suggestions to `data/autoconfig.json`. Your own config files and the dashboard still win over it. |
+| `/lacore autoconfig revert` | Removes everything `apply` wrote, back to the shipped values. |
 | `/lacore telemetry` | Owner telemetry status. |
 | `/lacore help` | List every subcommand. |
 

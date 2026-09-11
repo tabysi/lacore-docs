@@ -1,0 +1,38 @@
+---
+title: Activity log
+---
+
+import { Callout } from 'nextra/components'
+
+# Activity log
+
+**Dashboard → Activity log** is the audit trail of your LACORE account: who did what, and when.
+
+It exists because of [Team](/customer-portal/team). The moment more than one person can change your
+servers, "who turned that off?" becomes a real question — and this page answers it without anyone
+having to remember.
+
+## What is recorded
+
+Account-level actions, each with the person who performed it:
+
+- License keys created or revoked
+- Servers renamed, linked or removed
+- Configuration changed from the dashboard
+- Teammates added, changed or removed
+
+Filter by actor with the chips at the top — **Everyone** by default, or one person at a time.
+
+## Configuration changes show the diff
+
+A settings change is not just "config changed". The entry opens into a table of exactly what moved:
+
+| Setting | Was | Now |
+|---|---|---|
+
+That is the difference between an audit log and a list of timestamps.
+
+<Callout type="info">
+  This log covers the **portal**. In-game staff actions are a different log — Big Brother, `/bblog`,
+  see [Admin panel](/user-guide/admin-panel).
+</Callout>

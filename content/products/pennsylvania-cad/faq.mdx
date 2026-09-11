@@ -1,0 +1,51 @@
+---
+title: FAQ
+---
+
+import { Callout } from 'nextra/components'
+
+# Pennsylvania CAD — FAQ
+
+## What do I have to install?
+
+Nothing. The terminal ships **inside LACORE Core** and switches itself on once your licence key
+carries the entitlement. There is no second resource to download or `ensure`.
+
+## How do I point a department at it?
+
+By name. Any department whose name contains `pennsylvania`, `penn cad` or `mobilecom` opens this
+terminal instead of the LAPD one. Tagging a department before you own the add-on is harmless — the
+tag is simply ignored.
+
+## Is this a second dispatch system?
+
+No, and that is the point. It is a **re-skin of the same backend**: the units and incidents on it are
+the ones every other terminal sees. A call raised here appears everywhere, and a call resolved here
+is resolved for everyone.
+
+## What does it do that the other terminals don't?
+
+Elapsed time instead of a clock, units on a call reading warm, per-user column switches, a
+**Call Detail** view that shows the whole incident, **Create a Call** from the terminal itself, and a
+hold-to-fire panic button.
+
+## Does F11 close the call for everyone?
+
+Yes — **F11 is Resolve Incident**, and the pane says so above the codes. If you only want to clear
+*yourself*, use **SHIFT+F11 · Detach**, or the status picker in the footer. The full walkthrough is
+in the [user guide](/user-guide/pennsylvania-cad).
+
+## Can I change the call types and dispositions?
+
+Yes, in `configs/cfg-penn-sh.lua` — call types, dispositions, the plate button label and the cosmetic
+call-number prefix.
+
+## Does it need LACORE Core?
+
+Yes. It is an add-on to Core, not a standalone resource. For a standalone retro terminal, look at the
+[9100-T CAD](/products/lacore-90s-cad).
+
+<Callout type="info">
+  Full manual — every F-key, the command bar and the config file:
+  [Pennsylvania CAD user guide](/user-guide/pennsylvania-cad).
+</Callout>

@@ -1,0 +1,127 @@
+---
+title: "3.5.7"
+---
+
+import { Callout } from 'nextra/components'
+
+![LACORE 3.5.7](/changelog/v3-5-7.svg)
+
+# [3.5.7] – 2026-09-12 — Law enforcement, investigation and the customer portal
+
+The 3.5 line, in one release. Six weeks of work on the law-enforcement stack, a new investigation
+layer, the civilian Citizen Hub, a configuration system that explains itself, and a customer portal
+that grew into a roleplay website. Everything below ships in **3.5.7**.
+
+<Callout type="warning">
+**Config change:** this release touches shipped defaults. `CallCenter.Debug` in
+`configs/config.lua` is now `false` (the 911/311 call trace no longer floods your server console),
+and `configs/cfg-server-sv.lua` ships empty Discord role ids. `/lacoreconfig restore` keeps the
+values **you** configured — see *A restore keeps your settings* below — but check your role ids
+after updating.
+</Callout>
+
+### Law enforcement terminals
+
+![One shared CAD backend powering every LACORE terminal](/img/mdt/terminal-family.svg)
+
+Every terminal reads the same dispatch data — a call raised on one is a call on all of them.
+
+- **Thirteen agency skins.** Six more agencies got their own terminal look: CHP, state police,
+  park rangers, marshals and more. One department tag picks the right one.
+- **LASD MDC — full redesign** around real sheriff dispatch procedure, with its own incident
+  backend, roster and status flow.
+- **Pennsylvania CAD** — a retro county terminal, with a **Call Detail** view that shows the whole
+  incident instead of one clipped table row: caller, reported text, notes, attached units and the
+  complete log, with a comment field on the same screen.
+- **Resolve and Detach are separate actions.** F11 is **Resolve Incident** and says, above the
+  disposition codes, that it closes the call for every unit and every terminal. **SHIFT+F11** is
+  **Detach**: it clears *your* unit and leaves the call open for everyone still on it. The footer
+  status chip is a picker now.
+- **ALPR** — the plate reader: automatic plate recognition with hotlist hits.
+- **Five report forms** (CHP-180, DUI, use of force and more), plus a format for writing your own.
+- **Officer statistics** — every officer can see their own numbers: calls, arrests, citations,
+  time on duty.
+- **The 9100-T retro terminal ships as its own product** (`lacore-90s-cad`), and the LEO half of
+  LACORE ships as **LACORE MDT**.
+
+### Investigation and evidence
+
+![From a scene trace to a warrant](/img/changelog/investigation-flow.svg)
+
+A first, working investigation chain: **scene traces** left at incidents, an **evidence collector**,
+a **lab** (`/evidence analyze`) that turns a sample into a record, and **warrants**
+(`/warrant request | list | approve | deny`) that attach to a person's file. Evidence can be pinned
+to a case, and a supervisor decides what becomes a warrant.
+
+### Civilian side and roleplay
+
+![The Citizen Hub](/img/changelog/citizen-hub.svg)
+
+- **Citizen Hub** — the civilian overhaul starts with a panel of its own (`/citizen`): services,
+  documents and requests in one place.
+- **A gameplay layer with real dials** — damage multipliers and combat balance are configuration,
+  live-updatable from the dashboard, plus a first-join onboarding loop for new players.
+- **Every player decides where their phone sits**, the settings screen stopped being a wall of text,
+  and prompt dialogs take more than one line.
+
+### Server setup and configuration
+
+![The setup report](/img/changelog/setup-report-flow.svg)
+
+- **LACORE looks around before it complains.** It detects your framework, your other resources and
+  the overlaps between them, and writes a **setup report** instead of a wall of errors.
+- **Auto-Config now applies what it suggests** — `/lacore autoconfig apply | revert`, with a clear
+  precedence: your config files lose to an applied value, and both lose to the dashboard.
+- **Region and street presets** — a whole city in one config line.
+- **The config editor covers every setting**; two groups that had no tab and one key that had no
+  field are fixed.
+- **A restore keeps your settings.** The three-way merge behind `/lacoreconfig restore` used to
+  resolve a conflict by taking the new default wholesale — which blanked the Discord role ids every
+  owner had filled in. A conflicting region is now reconciled setting by setting: a value you
+  changed stays yours, while new structure and new keys still come from the update.
+- `/lacoreconfig undo` got the command it was missing, backups say **where** they live and whether
+  they survive an update, and an unreadable database row is reported instead of being overwritten.
+- **Features as inventory items** — anything LACORE ships can be bound to an item, and the
+  permission system is configurable again.
+
+### Customer portal and community
+
+![What a survey answer has to pass to count](/img/changelog/survey-verification.svg)
+
+- **A community page** turns the portal into a public roleplay website per server: departments,
+  applications and a live player count, without exposing anyone's Discord id.
+- **A survey module with a verified rebate** — two questionnaires, Discord-verified answers, a frozen
+  denominator and an append-only reward ledger. Owners see aggregates only, never a single response.
+- **Network activity** in the admin panel, **legal pages** and a public contact form.
+- **The web dispatcher is published** — dispatch from a browser, gated by Discord role.
+- **Support tickets keep the category you picked.** Four of the eight categories used to arrive as
+  *Other*, losing the category's guidance and the priority a player report opens at.
+- **A teammate with Config access can find the Config page** — the sidebar link asked for a
+  different permission than the page itself.
+- Two servers on one account show as **two rows**, as they should.
+
+### Reliability and security
+
+- **CAD data no longer goes to everyone on the server** — dispatch payloads are scoped to on-duty
+  units, and reading the CAD needs a badge.
+- **A wanted person can no longer clear their own warrant**, and police entries cannot be deleted
+  from the file they were written on.
+- **CAD access ends with the shift** it was granted for.
+- **Callsigns are shaped before they reach the roster**, so two units sharing one no longer blank
+  the unit list.
+- **`AMR` — the in-game EMS job — is recognised everywhere**, including start and end of watch.
+- **Dispatch radio arrives**: "Start of Watch" reached nobody, and `/xmit` could transmit an empty
+  line.
+- `/onduty` could die with `table expected, got nil` when a foreign resource sent a bad player list.
+- **Dying no longer destroys the weapon you were holding**, and the half-built weapon-drop system
+  that caused it is gone.
+- **The alert webhook is a convar** (`set lacore_alert_webhook`), never a URL in the source.
+- **LACORE starting before ESX** no longer breaks half the server, and QBox servers get their names
+  and jobs through.
+- Phone fixes: `/hangup` no longer leaves the phone stuck on the call screen, and dialling 911 or
+  311 from the keypad works and says it once.
+
+> **Not tested in-game.** Every Lua file passes the syntax check, the NUI, portal and docs builds are
+> green, the config merge is covered by `tests/configmerge.test.lua` (20 checks), and the terminals
+> were driven in the browser preview. The server-side paths in this release have not run on a live
+> server.

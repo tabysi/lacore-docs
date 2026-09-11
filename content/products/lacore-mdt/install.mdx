@@ -1,0 +1,92 @@
+---
+title: Installation
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Installing LACORE MDT
+
+<Callout type="warning">
+  The folder **must** be named `lacore-mdt`. Exports and events are derived from the resource name.
+</Callout>
+
+<Steps>
+
+### Requirements
+
+| Resource | Where it comes from |
+|---|---|
+| `oxmysql` | standard |
+| `pma-voice` | standard |
+| `spawnmanager` | ships with FiveM |
+| `lacore-maps` | **included with your download** — the map tiles the dispatch console draws on |
+
+You also need a **MySQL database**, and — if you want role-gated departments — a **Discord bot** with
+the *Server Members Intent* enabled.
+
+### Extract
+
+Unzip into `resources/`, so you get `resources/lacore-mdt/`. Put **`lacore-maps`** in `resources/`
+too; without it the dispatch map has no tiles.
+
+### server.cfg
+
+```cfg
+ensure pma-voice
+ensure oxmysql
+ensure spawnmanager
+ensure lacore-maps
+ensure lacore-mdt
+
+set mysql_connection_string "mysql://user:pass@localhost/yourdb?charset=utf8mb4"
+
+# Discord auth (optional, but needed for role-gated departments)
+set lacore_discord_token "YOUR_BOT_TOKEN"
+set lacore_discord_guild "YOUR_GUILD_ID"
+
+# Your LACORE license key (customer dashboard → License keys)
+set lacore_license_key "LACORE-XXXX-XXXX-XXXX"
+```
+
+<Callout type="warning">
+  Use `set`, **never** `setr` — these are server-side secrets and `setr` replicates them to clients.
+</Callout>
+
+### First boot
+
+After about eight seconds a **diagnostics report** prints in the server console: green ✓ is fine,
+yellow ! wants a look, red ✗ must be fixed. Re-run it any time with `/lacore doctor`.
+
+### Give officers access
+
+Departments and duty are configured, not hard-coded:
+
+- **On a framework** (ESX / QBCore / QBox) map your existing police jobs in
+  `configs/cfg-bridge-sh.lua`.
+- **Standalone**, define your agencies in `configs/cfg-agencies-sh.lua` and gate them by **Discord
+  role** or **ACE** with `DutyRoles` / `DutyAccess` in `configs/cfg-server-sv.lua`.
+
+Then go on duty and open the terminal with `/mdt`.
+
+</Steps>
+
+## Configure it
+
+Everything gameplay-related is a plain, commented file:
+
+| File | What you set |
+|---|---|
+| `configs/config.lua` | Language (en/de/ru), agencies, map style |
+| `configs/cfg-server-sv.lua` | Discord role ids, which role each job needs (`DutyRoles`) |
+| `configs/cfg-charges-sh.lua` | Your penal code — charges, fines, jail time |
+| `configs/cfg-anticheat-sh.lua` | Anticheat — ships **on**, in log-only observe mode |
+| `configs/cfg-bridge-sh.lua` | ESX / QBCore / QBox bridge and job mapping |
+| `lang/*.lua`, `lang/*.json` | Translate any visible text |
+
+Back your edits up with `/lacoreconfig backup` before an update, and `/lacoreconfig restore`
+afterwards — the merge keeps the values you changed. Full routine:
+[Updating LACORE](/getting-started/updating).
+
+<Callout type="info">
+  Escrow-protected and IP-locked: **one purchase = one server**.
+</Callout>

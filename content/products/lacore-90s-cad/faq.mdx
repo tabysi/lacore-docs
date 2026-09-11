@@ -1,0 +1,50 @@
+---
+title: FAQ
+---
+
+import { Callout } from 'nextra/components'
+
+# 9100-T CAD — FAQ
+
+## Do I need LACORE Core?
+
+No. It is a standalone resource with its own records backend. If you already run Core, you do not
+need this product — Core ships the 9100-T as one of its terminals.
+
+## Do I need a framework?
+
+No. It runs standalone, and it also bridges to **ESX**, **QBCore** and **QBox** if you have one.
+
+## Can my other departments get a different terminal?
+
+Not in this product — it is one terminal by design. Multiple terminal skins are
+[LACORE MDT](/products/lacore-mdt) or Core.
+
+## Does it work with my existing police job?
+
+Yes, through the framework bridge: on ESX/QBCore/QBox the job comes from your framework. Standalone,
+duty and departments are LACORE's own, configured in `configs/cfg-agencies-sh.lua`.
+
+## Where do calls come from?
+
+From the game: panic buttons, backup requests, special contacts, traffic stops and on-views. There is
+no separate dispatch console in this product — the terminal *is* the surface.
+
+## Can I change the penal code, the labels and the language?
+
+Yes. The penal code lives in `configs/cfg-charges-sh.lua`, terminal labels in the whitelabel config,
+and the interface ships in English, German and Russian. Config files are escrow-open.
+
+## Can I run it on two servers?
+
+No. Every LACORE product is IP-locked to one server; a second server needs a second licence.
+
+## How do I update without losing my configuration?
+
+`/lacoreconfig backup` before, replace the folder, `/lacoreconfig restore` after. Settings you
+changed stay yours.
+
+<Callout type="info">
+  Still stuck? Open a ticket in the [Discord](https://discord.gg/b6YbvVEvYp) or through
+  [Support](/customer-portal/support) in your dashboard.
+</Callout>

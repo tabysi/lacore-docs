@@ -1,0 +1,75 @@
+---
+title: Installation
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Installing the 9100-T CAD
+
+<Callout type="warning">
+  The folder **must** be named `lacore-90s-cad`. Exports and events are derived from the resource
+  name — renaming it breaks the terminal.
+</Callout>
+
+<Steps>
+
+### Dependencies first
+
+The 9100-T needs the same three resources the rest of LACORE does:
+
+- **oxmysql** — persistence (records, charges, BOLOs)
+- **pma-voice** — voice
+- **spawnmanager** — ships with FiveM
+
+### Extract into `resources/`
+
+Unzip your download so you get `resources/lacore-90s-cad/`.
+
+### server.cfg
+
+Copy what you need from the shipped `server.cfg.example`. The minimum:
+
+```cfg
+ensure pma-voice
+ensure oxmysql
+ensure spawnmanager
+ensure lacore-90s-cad
+
+set mysql_connection_string "mysql://user:pass@localhost/yourdb?charset=utf8mb4"
+
+# Your LACORE license key (customer dashboard → License keys)
+set lacore_license_key "LACORE-XXXX-XXXX-XXXX"
+```
+
+<Callout type="warning">
+  Use `set`, **never** `setr`. These values are server-side secrets — `setr` replicates them to every
+  connected client.
+</Callout>
+
+### First boot
+
+About eight seconds after start, a **diagnostics report** prints in your server console: what is
+configured, what is missing, what it would change. Run it again any time with `/lacore doctor`.
+
+### Configure
+
+`configs/` and `lang/` ship open and commented — the penal code in `configs/cfg-charges-sh.lua`,
+Discord roles in `configs/cfg-server-sv.lua`. Back your edits up with `/lacoreconfig backup` before
+you update.
+
+</Steps>
+
+## Opening the terminal
+
+Go on duty, then `/mdt`. If `MdtConfig.requireVehicle` is on, you need to be in a vehicle — which is
+the point of an in-car terminal.
+
+## Updating
+
+Replace the folder, keep your `server.cfg`, then restore your settings with `/lacoreconfig restore`.
+The three-way merge keeps the values you changed and still takes new structure from the update. The
+full routine is in [Updating LACORE](/getting-started/updating).
+
+<Callout type="info">
+  Escrow-protected and IP-locked: **one purchase = one server**.
+</Callout>

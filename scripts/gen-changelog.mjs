@@ -238,6 +238,12 @@ const slugFor = (ver) => 'v' + ver.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$
 // as old (every recent release carries a date).
 const ARCHIVE_MS = 30 * 24 * 60 * 60 * 1000
 const cutoff = Date.now() - ARCHIVE_MS
+// On top of the age rule: only the newest LIVE_MAX releases ever get a page of
+// their own. A docs site that carries three dozen release pages reads like a
+// commit log, not like a product — releases are written as ONE consolidated
+// section per version, and the older ones stay as a reference list. Raise this
+// if you deliberately want the previous versions browsable again.
+const LIVE_MAX = 1
 function isArchived(headerLine) {
   const { date } = parseHeader(headerLine)
   if (!date) return true
@@ -256,6 +262,15 @@ for (let s = 0; s < starts.length; s++) {
   const body = lines.slice(from + 1, to).join('\n').replace(/\n+$/, '')
   const bracket = (headerLine.match(/^\[([^\]]+)\]/) || [])[1] || headerLine
   sections.push({ headerLine, body, bracket, archived: isArchived(headerLine), dev: isDev(body) })
+}
+
+// Keep only the newest LIVE_MAX releases as pages; everything else is archived,
+// however recent it is. Sections are in file order, which is newest first.
+let livePages = 0
+for (const sec of sections) {
+  if (/^unreleased$/i.test(sec.bracket)) continue
+  if (!sec.archived && livePages < LIVE_MAX) { livePages++; continue }
+  sec.archived = true
 }
 
 // Clean any old generated pages (keep nothing but what we regenerate).
@@ -318,20 +333,21 @@ const idx = `---
 title: All Releases
 ---
 
-# Changelog — All Releases
+# What's new in LACORE
 
-Every LACORE release has its own page with the complete notes. Pick a version below.
+The current release, with everything it brings. Earlier versions are listed at the bottom for
+reference — their notes live in \`CHANGELOG.md\`, which ships with your download.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '18px', marginTop: '28px' }}>
 ${cards}
 </div>
 ${archived.length ? `
 <details style={{ marginTop: '36px', color: 'var(--lac-fg, #d7deea)' }}>
-  <summary style={{ cursor: 'pointer', fontWeight: 600, opacity: 0.7 }}>Archived releases (older than 30 days)</summary>
+  <summary style={{ cursor: 'pointer', fontWeight: 600, opacity: 0.7 }}>Earlier versions</summary>
   <ul style={{ marginTop: '12px', opacity: 0.65, fontSize: '0.9em' }}>
 ${archived.map((s) => {
-  const { title, date } = parseHeader(s.headerLine)
-  return `    <li><strong>${xml(s.bracket)}</strong>${date ? ' · ' + xml(date) : ''} — ${xml(title || '')}</li>`
+  const { date } = parseHeader(s.headerLine)
+  return `    <li><strong>${xml(s.bracket)}</strong>${date ? ' · ' + xml(date) : ''}</li>`
 }).join('\n')}
   </ul>
 </details>

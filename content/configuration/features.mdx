@@ -40,6 +40,7 @@ Features = {
   corrections = true,  -- jail / corrections
   impound     = true,  -- impound lot
   k9          = true,  -- K9 unit
+  alpr        = true,  -- ALPR plate reader (/alpr)
   field       = true,  -- field essentials (breathalyser)
   fingerprint = true,  -- mobile fingerprint ID scanner
   identitylink = true, -- link Discord ⇄ identifiers so the ban network works (no setup)
@@ -50,6 +51,10 @@ Features = {
   spawnselect = true,  -- map-based spawn picker (false = one fixed spawn)
   bugreport   = true,  -- /lacorereport — bug reports to the LACORE dashboard
   replay      = true,  -- replay recorder + Director's Cut (clips stored on your disk)
+  items       = true,  -- LACORE features as inventory items (ox_inventory / qb / ESX)
+  investigation = true, -- scene traces, lab analysis, warrants (cfg-investigation-sh.lua)
+  gameplay    = true,  -- balance + first-join loop (cfg-gameplay-sh.lua)
+  community   = true,  -- public community page on the LACORE portal
 
   civilian = { enabled = true, org = true, turf = true },        -- emotes / props / orgs / turf
 
@@ -97,10 +102,11 @@ With `seatbelt = false` the command is not registered at all, so the other resou
 ```lua
 Features = {
   cad = { enabled = true },   -- keep the police CAD suite …
+  alpr = true, investigation = true,   -- … and the LEO tools that hang off it
   phone = false, airunit = false, cctv = false, corrections = false,
   impound = false, k9 = false, field = false, fingerprint = false, nads = false, stt = false,
   admin = false, webdispatch = false, spawnselect = false, rpemotes = false, identitylink = false,
-  bugreport = false, replay = false,
+  bugreport = false, replay = false, items = false, gameplay = false, community = false,
   civilian = { enabled = false },
   chat     = { enabled = false },
   aop      = { enabled = false },

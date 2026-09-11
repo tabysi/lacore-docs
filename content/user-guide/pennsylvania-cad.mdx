@@ -109,7 +109,8 @@ The rail changes with the tab you are on.
 | **F8** | **Backup** — requests LEO backup, with whatever is in the command bar as the note |
 | **F9** | Case # — opens a field case |
 | **F10** | Add Comments — fills the command bar with the `COMMENT` verb |
-| **F11** | **Clear** — opens the disposition grid |
+| **F11** | **Resolve Incident** — opens the disposition grid. Resolving closes the call for **every** unit |
+| **SHIFT+F11** | **Detach** — clears *your* unit and leaves the incident open for everyone else |
 | **F12** | Day / Night |
 
 ### Create a Call
@@ -176,9 +177,17 @@ The call it raises is a normal LACORE incident. It appears in the dispatch conso
 
 ---
 
-## ✅ Clearing a call (dispositions)
+## ✅ Resolving a call, or just clearing yourself
 
-**F11 · Clear** opens the disposition grid. Pick a code, and the incident is resolved with that code in its log. The list is config (`Penn.dispositions`); the defaults:
+These are two different things, and the terminal keeps them apart.
+
+**F11 · Resolve Incident** opens the disposition grid. Pick a code and the incident is resolved with that code in its log — **for every unit and every terminal on the server**. The pane says so above the codes, because this is the heavy action.
+
+**SHIFT+F11 · Detach** is the small one: it sets your status to CLEAR, which detaches *your* unit and leaves the call open for the units still working it. The same button sits in the disposition pane, next to the warning, so you can still back out once you are looking at the codes.
+
+You can also change your status without touching the incident at all: the **status chip in the footer** is a picker — ENROUTE, ON SCENE, CODE SIX, BUSY, UNAVAILABLE, OUT TO STATION and CLEAR. Only CLEAR detaches you.
+
+The disposition list is config (`Penn.dispositions`); the defaults:
 
 | Code | Meaning | Code | Meaning |
 |------|---------|------|---------|
@@ -207,7 +216,7 @@ Everything on this page that is a list or a label lives in **`configs/cfg-penn-s
 | `Penn.callPrefix` | Cosmetic prefix in front of the call number (`"P26"` → `P261042`). Display only — the real incident number is unchanged everywhere else. |
 | `Penn.plateLabel` | Label on the plate button in the command bar. Defaults to `SA Plate`. |
 | `Penn.callTypes` | The Create-a-Call tile grid, in order. |
-| `Penn.dispositions` | The disposition codes offered on **Clear**: `code` goes into the incident log, `label` is what the unit reads. |
+| `Penn.dispositions` | The disposition codes offered on **Resolve Incident**: `code` goes into the incident log, `label` is what the unit reads. |
 
 The terminal is also gated by the `penncad` feature in `configs/cfg-features-sh.lua` — and by your licence entitlement, which is the switch that actually decides whether it opens.
 

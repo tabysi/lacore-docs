@@ -6,113 +6,76 @@ import { Callout, Cards } from 'nextra/components'
 
 # What's New
 
-The latest LACORE releases at a glance — current version: **3.4.9.9**. Every version has its own page
-under the [Changelog](/updates/changelog).
+**Current version: 3.5.7.** One release, written as one page — what LACORE gained, grouped by what it
+does for your server rather than by the day it was built.
+
+<Cards>
+  <Cards.Card title="Read the full 3.5.7 release notes" href="/updates/changelog/v3-5-7" arrow />
+  <Cards.Card title="Updating your server" href="/getting-started/updating" arrow />
+</Cards>
+
+## Law enforcement, end to end
+
+Thirteen agency terminal skins on one shared backend, a redesigned **Sheriff CAD** built around real
+dispatch procedure, a retro **9100-T** terminal, and the **Pennsylvania CAD** with a Call Detail view
+that shows the whole incident instead of one clipped row. **Resolve** and **Detach** are separate
+actions now, so going clear on yourself no longer closes the call for the entire shift.
+
+Add to that the **ALPR** plate reader, **five report forms** (CHP-180, DUI, use of force and more)
+with a format for writing your own, and **per-officer statistics** every officer can read themselves.
+
+<Cards>
+  <Cards.Card title="The terminals" href="/user-guide/mdt" arrow />
+  <Cards.Card title="ALPR" href="/user-guide/alpr" arrow />
+  <Cards.Card title="Reports & evidence" href="/features/evidence-reports" arrow />
+</Cards>
+
+## Investigation you can actually run
+
+Scene traces stay at an incident, an officer collects them, the lab turns a sample into a record, and
+a supervisor approves the **warrant** that comes out of it. Evidence pins to a case, and the file
+follows the person.
+
+<Cards>
+  <Cards.Card title="Investigation & evidence" href="/features/investigation" arrow />
+</Cards>
+
+## A server that explains itself
+
+LACORE looks at your framework and your other resources **before** it complains, and writes a setup
+report instead of a wall of errors. **Auto-Config** can apply what it suggests and revert it again,
+region presets set up a whole city in one line, and `/lacoreconfig restore` now keeps the values you
+configured instead of handing back empty defaults.
+
+<Cards>
+  <Cards.Card title="Setup review (Auto-Config)" href="/configuration/autoconfig" arrow />
+  <Cards.Card title="Backup & restore" href="/getting-started/updating" arrow />
+</Cards>
+
+## The civilian side
+
+The **Citizen Hub** gives civilians a panel of their own, a **gameplay layer** puts damage and combat
+balance into configuration you can change live from the dashboard, and new players get a first-join
+loop instead of a blank spawn.
+
+<Cards>
+  <Cards.Card title="Civilian layer" href="/features/civilian" arrow />
+  <Cards.Card title="Gameplay & balance" href="/features/gameplay" arrow />
+</Cards>
+
+## Your community, on the web
+
+Your portal account now carries a **public community page** per server — departments, applications
+and a live roster, without exposing anyone's Discord id. The **web dispatcher** is published, the
+admin panel shows network activity, and support tickets keep the category you picked.
+
+<Cards>
+  <Cards.Card title="Community page" href="/customer-portal/community" arrow />
+  <Cards.Card title="Web dispatcher" href="/features/webdispatch" arrow />
+  <Cards.Card title="Customer portal" href="/customer-portal" arrow />
+</Cards>
 
 <Callout type="info">
-  The authoritative, line-by-line changelog also ships with the resource in `changelog.md`.
+  The complete, line-by-line changelog ships with your download as `CHANGELOG.md`, and earlier
+  versions are listed at the bottom of the [release notes](/updates/changelog).
 </Callout>
-
-## 3.4.9.x — Items, a standalone 90s CAD & per-department CADs
-
-- **Everything that can be an item is an item** (3.4.9.9) — with **ox_inventory**, **qb-inventory**
-  or **ESX**, LACORE features can be inventory items: a phone you carry, a department-bound MDT
-  tablet, an ID card, a breathalyser. Use the item and the feature opens; a feature can also
-  *require* its item — ownership is decided on the server, never the client.
-- **The 90s CAD ships on its own** (3.4.9.6) — the 9100-T CRT in-car terminal is now its own
-  standalone product, driving the same LACORE CAD backend.
-- **Every department picks its own CAD** (3.4.9.2) — the agency → CAD-design mapping is config,
-  including the three sheriff's offices on the Sheriff CAD.
-- **QBox servers get their names and jobs through** (3.4.9) — plus a portal that tells two servers
-  on one account apart (3.4.9.7) and a framework bridge that tolerates late starts (3.4.9.8).
-
-<Cards>
-  <Cards.Card title="Full 3.4.9.9 changelog" href="/updates/changelog/v3-4-9-9" arrow />
-  <Cards.Card title="All releases" href="/updates/changelog" arrow />
-</Cards>
-
-## 3.4.x — Config & dependency housekeeping
-
-A cleanup series that makes LACORE easier to own:
-
-- **Three dependencies, honestly** (3.4.5) — the dependency story now matches the code. Hard
-  requirements are exactly **oxmysql**, **pma-voice** and **spawnmanager**; `blip_info` and
-  `bob74_ipl` became optional and auto-detected, and the long-dead `NativeUILua_Reloaded` is gone
-  from every install doc.
-- **config.lua on a diet** (3.4.4) — ~1000 lines of data tables (agencies, bus routes, game text,
-  phone icons) moved out of `config.lua` into topic files. Backward compatible: an old edited
-  `config.lua` keeps winning.
-- **`configs/CONFIG-INDEX.md`** (3.4.2) — the 52-file configs folder now ships its own map, one
-  line per file, grouped by topic.
-- **The Discord role is the permission** (3.4.1) / **a supervisor group, not a list of names**
-  (3.4.0) — the supervisor panel is now gated by an **ACE object** or directly by a **Discord
-  role**, instead of hand-maintained license allowlists.
-
-<Cards>
-  <Cards.Card title="Full 3.4.5 changelog" href="/updates/changelog/v3-4-5" arrow />
-  <Cards.Card title="Configuration overview" href="/configuration" arrow />
-</Cards>
-
-## 3.3.2 — Pennsylvania CAD, a replay studio & an anticheat you can review
-
-The biggest release LACORE has had:
-
-- **Pennsylvania CAD** — a sixth terminal in the style of a nineties county CAD. A re-skin, not a
-  second dispatch system. Paid add-on, unlocked by license key.
-- **Replay & Director's Cut** — record what happens around you, rebuild the scene and cut it with
-  a real camera: four modes, keyframes, shot list, letterbox, grain, grades and depth of field.
-  Made for trailers.
-- **The in-car CAD screen became usable** — legible, per-seat terminals, `/cad` leans the camera
-  in and hands you the mouse.
-- **An anticheat you can review** — ships **on** for the first time, in a new **observe mode**:
-  it detects, scores and logs what it *would* have done, but never punishes until you switch to
-  enforce. Plus a dashboard review page with false-positive marking.
-- **The menu library is gone** — settings, job picker, session menu, vehicle spawner and more are
-  proper NUI windows now.
-- **Agencies can be gated** per department by Discord role or ACE (`DutyAccess`), and txAdmin bans
-  finally land in LACORE's ban list.
-
-<Cards>
-  <Cards.Card title="Full 3.3.2 changelog" href="/updates/changelog/v3-3-2" arrow />
-  <Cards.Card title="Pennsylvania CAD" href="/user-guide/pennsylvania-cad" arrow />
-  <Cards.Card title="Replay & Director's Cut" href="/user-guide/replay" arrow />
-</Cards>
-
-## 3.3.0 / 3.3.1 — Config editor, model library & grown-up dashboards
-
-- **Config editor 2.0** (3.3.0) — dashboard settings are real controls now: sliders, colour
-  swatches, keybinds, searchable model pickers and coordinate fields, validated on both sides.
-- **Model library** — `/modelscan` inventories your server, `/modelcapture` photographs it,
-  `/preview` shows any model in 3D in-game.
-- **Rebuilt player list** — the list behind **I** became a real interface (a duty board grouped
-  by department).
-- **Dashboards grew up** (3.3.1) — admin Products / Player-database / Customer-database pages, a
-  partner payout ledger with analytics, support-ticket overhaul, and the **paid add-on** system
-  that unlocks features per license key.
-
-<Cards>
-  <Cards.Card title="Full 3.3.1 changelog" href="/updates/changelog/v3-3-1" arrow />
-  <Cards.Card title="Config Editor" href="/configuration/editor" arrow />
-</Cards>
-
-## The LACORE Customer Portal
-
-Manage everything about your LACORE license from one place at
-**[lacore.netica.dev/dashboard](https://lacore.netica.dev/dashboard/)** — sign in with the Discord
-account that owns your license, no separate password needed.
-
-- **License keys** — generate a key, drop `set lacore_license_key "…"` into your `server.cfg`, and your
-  server links to your account automatically.
-- **Servers** — see your linked servers with live status, players and version.
-- **Server config online** — change LACORE's settings from the web, no file edits or re-upload; your
-  server pulls the changes by key. Safe by design — only a vetted, typed set of settings, never files or
-  code.
-- **Payments** — your Tebex purchases in one list.
-- **Partner program** — referral stats and payouts for partners.
-- **Team** — give teammates scoped access to your account without sharing your login.
-
-<Cards>
-  <Cards.Card title="Open the Customer Portal docs" href="/customer-portal" arrow />
-  <Cards.Card title="Set up a license key" href="/customer-portal/license-keys" arrow />
-  <Cards.Card title="All Releases" href="/updates/changelog" arrow />
-</Cards>

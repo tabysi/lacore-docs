@@ -1,0 +1,90 @@
+---
+title: Surveys & rebate
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+# Surveys & rebate
+
+LACORE runs two questionnaires from the customer portal. The **community survey** is one *you* start
+and share with your players; the **customer survey** asks licence holders about price, fit and
+whether they are staying. For every **verified** answer your community collects, you earn a rebate on
+your next purchase — up to **50 %**.
+
+<Callout type="info">
+  **Dashboard → Surveys.** You need a licence key with at least one server reporting activity, because
+  that is what the quota is measured against.
+</Callout>
+
+## How a campaign works
+
+<Steps>
+
+### You start a campaign
+
+Pick the wave, confirm the participation terms, and the portal freezes your **denominator** — the
+number of active accounts your servers have reported. Frozen means frozen: deleting player records
+afterwards changes nothing.
+
+### You share the link
+
+Every campaign has its own `/s/…` link. Participants sign in with Discord — not with a LACORE
+account — answer, and can withdraw their answer afterwards from the link on the closing page.
+
+### Answers are verified
+
+Each answer is classified, and only *verified* ones count toward your rebate.
+
+### The rebate is booked
+
+`verified ÷ frozen denominator` gives your quota, capped at 50 %, applied to your next purchase and
+recorded in an append-only ledger. Corrections are counter-entries, never edits.
+
+</Steps>
+
+## What decides whether an answer counts
+
+Your own player data is treated as a **signal**, not as proof — it reaches LACORE from your server,
+uploaded by the person the rebate pays. What actually decides is Discord:
+
+| Check | Why |
+|---|---|
+| Discord account age | Read from the account's snowflake — fresh throwaway accounts do not count |
+| Membership of your guild | The answer has to come from someone actually in your community |
+| One answer per Discord account | Enforced by a unique index, not by a hopeful check |
+| Straightlining detection | An answer that ticks the same box all the way down is flagged |
+| Activity before the campaign started | Records that appeared the night before a campaign buy nothing |
+
+Anything that fails lands in a **review queue** with the reason kept — eight distinct states, never
+collapsed to a yes/no — and is worth nothing until a human approves it.
+
+## What you can see as a community owner
+
+Aggregates only — and nothing at all until **ten** people have answered, because below that a
+breakdown identifies individuals in a small community.
+
+<Callout type="warning">
+  **Free-text answers are never shown to you**, at any number of responses. That is enforced on the
+  server: the owner-facing route does not even compute them, so there is nothing to reach through the
+  API either.
+</Callout>
+
+## Caps, and what they are for
+
+- **50 %** maximum per community.
+- **Next purchase only** — a rebate is not cash and is not paid out.
+- **A wave budget** in euros. Waves run twice a year with a fixed window; when a wave's budget is
+  used up, campaigns keep running and the rebate is booked into the following wave.
+
+The caps, not the verification, are the real protection: the module can make abuse expensive, it
+cannot make it impossible.
+
+## Privacy
+
+Participants consent before the first question and can withdraw afterwards. Ninety days after a wave
+ends, the identifying fields — Discord id, identifier, IP hash and user-agent hash — are dropped; the
+anonymised answers remain. The full wording is in the participation terms linked from the survey
+itself and in the [privacy policy](https://lacore.netica.dev/legal/privacy/).
+
+Both questionnaires are bilingual (**English and German**) and versioned: editing a published survey
+creates a new version, so answers stay attached to the questions that were actually asked.

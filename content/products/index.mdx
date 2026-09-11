@@ -6,24 +6,56 @@ import { Callout, Cards } from 'nextra/components'
 
 # LACORE Products
 
-Everything LACORE ships beyond the core resource — the standalone LEO edition, paid add-ons that
-unlock inside Core with your license key, and what's in development.
+**LACORE Core** is the complete stack: law enforcement, civilian layer, phone, admin tools and
+security in one resource. Everything on this page is a way to buy *less* than that, or to add
+something on top.
+
+Each product has its own section here — what it is, what it includes, how to install it, and the
+questions people ask before buying.
 
 <Cards>
-  <Cards.Card title="LACORE MDT (Standalone)" href="/products/lacore-mdt" arrow>
-    The law-enforcement half of LACORE as its own resource — five terminals, dispatch, CCTV, jail,
-    impound, K9 & air unit.
+  <Cards.Card title="LACORE MDT" href="/products/lacore-mdt" arrow>
+    The law-enforcement half as its own resource. Five terminals, dispatch, records — for servers
+    that already run a framework and only need a proper CAD.
+  </Cards.Card>
+  <Cards.Card title="9100-T CAD" href="/products/lacore-90s-cad" arrow>
+    One terminal, nothing else: a 1990s CRT in-car CAD with a photo-real chassis, driving the full
+    LACORE records backend.
   </Cards.Card>
   <Cards.Card title="Pennsylvania CAD" href="/products/pennsylvania-cad" arrow>
-    A sixth terminal in the style of an old county CAD — unlocked by license key, inside Core.
+    A retro county terminal that unlocks **inside** Core with your licence key. Nothing to install.
   </Cards.Card>
   <Cards.Card title="LACORE for Roblox" href="/products/lacore-roblox" arrow>
-    A native Roblox developer kit — in development, not yet released.
+    The same model rebuilt for Roblox roleplay games. In development.
   </Cards.Card>
 </Cards>
 
+## Which one do I need?
+
+| | Runs as | Needs Core | Best for |
+|---|---|---|---|
+| **LACORE Core** | Own resource | — | A complete server, LEO **and** civilian |
+| **LACORE MDT** | Own resource | No | You have a framework and want a real CAD |
+| **9100-T CAD** | Own resource | No | One department, one terminal, heavy on atmosphere |
+| **Pennsylvania CAD** | Inside Core | Yes | A county-style terminal beside your other CADs |
+| **LACORE for Roblox** | Roblox project | No | Roblox roleplay games (in development) |
+
+<Callout type="info">
+  **One purchase = one server.** Every paid LACORE product is escrow-protected and IP-locked to a
+  single server. Running a second server means a second licence.
+</Callout>
+
+## How delivery works
+
+- **Standalone resources** (Core, MDT, 9100-T) arrive as a download you drop into `resources/` and
+  `ensure` in your `server.cfg`.
+- **Add-ons** (Pennsylvania CAD) ship *inside* Core and switch themselves on once your licence key
+  carries the entitlement — there is no second resource to start.
+- Either way, set your key with `set lacore_license_key "…"` in `server.cfg`. See
+  [License keys](/customer-portal/license-keys).
+
 <Callout type="default">
-  **In development:** gameplay add-ons for **Farming**, **Robbery** and **Heists** are planned —
-  they get their own pages here at release. Follow the
-  [Discord](https://discord.gg/b6YbvVEvYp) for announcements.
+  **In development:** gameplay add-ons for **Farming**, **Robbery** and **Heists** are planned and
+  get their own sections here at release. Announcements go out in the
+  [Discord](https://discord.gg/b6YbvVEvYp).
 </Callout>

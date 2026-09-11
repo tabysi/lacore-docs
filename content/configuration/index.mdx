@@ -46,6 +46,10 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `json/emojis.json` | server | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat (moved out of `configs/` in 3.4.3) |
 | `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
 | `configs/cfg-report-sh.lua` | shared | [Bug Reports](/user-guide/bug-reports) — `/lacorereport`: command name, cooldown, max length, categories |
+| `configs/cfg-autoconfig-sh.lua` | shared | [Setup review](/configuration/autoconfig) — what the setup review checks, and whether it may apply anything |
+| `configs/cfg-gameplay-sh.lua` | shared | [Gameplay & balance](/features/gameplay) — damage multipliers, combat balance, the first-join loop |
+| `configs/cfg-items-sh.lua` | shared | [Feature Toggles](/configuration/features) — which LACORE features are bound to an inventory item |
+| `configs/cfg-permissions-sv.lua` | server | [Permissions](/configuration/permissions) — ACE objects, groups and the Discord-role bridge |
 
 ### Law enforcement & CAD
 
@@ -63,6 +67,8 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-charges-sh.lua` | shared | [Penal code](/configuration/law-enforcement) — charges, fines, jail time |
 | `configs/cfg-evidence-sh.lua` | shared | [Evidence & reports](/configuration/law-enforcement) — item + report types |
 | `configs/cfg-cctv-sh.lua` | shared | [CCTV Surveillance](/features/cctv) — camera networks |
+| `configs/cfg-alpr-sh.lua` | shared | [ALPR](/user-guide/alpr) — plate reader: scan range, hotlists, alerts (`Alpr.enabled` is the module's own switch) |
+| `configs/cfg-investigation-sh.lua` | shared | [Investigation](/features/investigation) — scene traces, lab analysis time, warrant expiry |
 | `configs/cfg-airunit-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — Air Unit heli-cam (orbit, zoom, spotlight) |
 | `configs/cfg-corrections-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — jail location, sentence length |
 | `configs/cfg-impound-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — impound lot + fees |
