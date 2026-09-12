@@ -3,6 +3,38 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.8] – 2026-09-12 — A full shift of dispatch, without the board going dark
+
+Four fixes from a live patrol with 22 units, where the unit board went blank partway through the
+shift and `/dispatch on` stopped answering.
+
+![Partners sharing a callsign are merged into one row in the web dispatcher](/img/changelog/dispatch-partner-units.svg)
+
+### Fixed
+
+- **Web dispatcher: the Units list no longer goes blank.** Two officers in one car share a callsign
+  — that is intended, and the in-game console has always merged them into one row. The web
+  dispatcher did not: the second partner produced a duplicate row key, and the whole list stopped
+  rendering the moment the first two-officer car came on duty. With no units on screen, calls could
+  still be created but nobody could be assigned to them. Partners are now one row with both names,
+  in the Units program and on the dashboard dispatch page.
+- **Web dispatcher: long callsigns survive the trip.** The portal cut callsigns to 12 characters,
+  so two long ones with the same beginning collided, and an action sent back for a cut callsign
+  matched no unit in-game. The limit is now 32.
+- **`/dispatch on` accepts Fire/EMS and tells you when it says no.** The check listed `Fire/EMS`,
+  but Fire/EMS runs as the `AMR` job in-game, so EMS dispatchers were refused. Every refusal was
+  also silent. It now shows: *You must be on duty as Law Enforcement, Fire/EMS or Coroner to
+  dispatch.* Note that the in-game console is unlocked by your **duty job**, not by a Discord
+  dispatcher role — that role only gates the web dispatcher (`WebDispatchAccess`).
+- **In-game dispatch console: AMR units are listed.** The Fire/EMS group only matched `Fire/EMS`
+  and `Coroner`, so AMR units appeared in neither group.
+- **The unit board no longer waits on Discord.** Every 2 seconds, for every unit, the dispatch sync
+  asked whether that unit is a supervisor — which, with supervisor Discord roles configured, can
+  mean a Discord API request the sync waited for. On a full shift that queued the whole board (and
+  the web dispatcher push) behind Discord and its rate limit. The supervisor flag is now cached per
+  unit and re-checked in the background once a minute, and a failed Discord member lookup is
+  remembered for 30 seconds instead of being retried on every check.
+
 ## [3.5.7] – 2026-09-12 — Law enforcement, investigation and the customer portal
 
 > ⚠️ **Config change:** this release touches shipped defaults. `CallCenter.Debug` in

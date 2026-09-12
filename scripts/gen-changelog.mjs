@@ -243,7 +243,9 @@ const cutoff = Date.now() - ARCHIVE_MS
 // commit log, not like a product — releases are written as ONE consolidated
 // section per version, and the older ones stay as a reference list. Raise this
 // if you deliberately want the previous versions browsable again.
-const LIVE_MAX = 1
+// 2: a patch release on top of a consolidated one must not push the latter off
+// the site — 3.5.8 (fixes) sits beside 3.5.7 (the whole 3.5 line).
+const LIVE_MAX = 2
 function isArchived(headerLine) {
   const { date } = parseHeader(headerLine)
   if (!date) return true
