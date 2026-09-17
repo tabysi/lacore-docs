@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <pattern id="tiles" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#1d2a44" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">EMS / FIRE CAD — <tspan fill="#6c8cff">LIVE MAP</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">The Map tab shows a live map above the waypoint list it had before.</text>
+
+  <!-- terminal -->
+  <rect x="60" y="112" width="1080" height="440" rx="6" fill="#0e0f11" stroke="#2a2d33" stroke-width="2"/>
+  <rect x="60" y="112" width="1080" height="40" fill="#16181b"/>
+  <rect x="60" y="112" width="52" height="40" fill="#c0242c"/>
+  <text x="86" y="138" fill="#fff" font-size="15" font-weight="800" text-anchor="middle">RN</text>
+  <rect x="112" y="112" width="96" height="40" fill="#1a3a52"/>
+  <text x="160" y="138" fill="#7fb6dc" font-size="14" font-weight="700" text-anchor="middle">UNITS</text>
+
+  <!-- left list -->
+  <rect x="60" y="152" width="220" height="360" fill="#121317"/>
+  <text x="74" y="178" fill="#f1f4f8" font-size="15" font-weight="600">Messages</text>
+  <rect x="60" y="192" width="220" height="44" fill="#123a5c"/>
+  <text x="74" y="210" fill="#fff" font-size="12" font-weight="600">CAD · #1001</text>
+  <text x="74" y="227" fill="#bcd6ea" font-size="11">MEDICAL · Elgin Ave</text>
+  <text x="74" y="256" fill="#d6dce3" font-size="12" font-weight="600">CAD · #1002</text>
+  <text x="74" y="273" fill="#8b96a3" font-size="11">FIRE</text>
+
+  <!-- centre -->
+  <rect x="280" y="152" width="720" height="30" fill="#14161a"/>
+  <text x="640" y="172" fill="#cfe4f5" font-size="12" font-weight="600" text-anchor="middle" letter-spacing="1">MAP — CLICK AN INCIDENT OR SET A WAYPOINT</text>
+  <rect x="290" y="190" width="84" height="20" fill="#2f9fe0" stroke="#45b0ee"/>
+  <text x="332" y="204" fill="#06243a" font-size="11" text-anchor="middle">Postal map</text>
+  <rect x="290" y="216" width="700" height="210" fill="#05070b" stroke="#25282d" stroke-width="2"/>
+  <rect x="292" y="218" width="696" height="206" fill="url(#tiles)"/>
+  <rect x="340" y="236" width="240" height="170" fill="#4a5cff" fill-opacity="0.16" stroke="#6c8cff" stroke-width="2" stroke-dasharray="8 6"/>
+  <circle cx="820" cy="290" r="48" fill="#6c8cff" fill-opacity="0.1" stroke="#6c8cff" stroke-width="2"/>
+  <text x="820" y="295" fill="#e7ecf5" font-size="13" font-weight="700" text-anchor="middle">Paleto Valley Mall</text>
+  <rect x="460" y="300" width="54" height="18" rx="2" fill="#c0242c" stroke="#000"/>
+  <text x="487" y="313" fill="#fff" font-size="11" font-weight="700" text-anchor="middle" font-family="Consolas, monospace">#1001</text>
+  <rect x="540" y="360" width="50" height="18" rx="2" fill="#16181b" stroke="#6fe0a0" stroke-width="2"/>
+  <text x="565" y="373" fill="#6fe0a0" font-size="11" font-weight="700" text-anchor="middle" font-family="Consolas, monospace">M-12</text>
+  <text x="487" y="292" fill="#9fb0c8" font-size="12" text-anchor="middle">click → messages</text>
+
+  <!-- waypoint list -->
+  <g font-size="12">
+    <text x="300" y="450" fill="#8b96a3">INC</text><text x="380" y="450" fill="#8b96a3">TYPE</text><text x="500" y="450" fill="#8b96a3">LOCATION</text>
+    <text x="300" y="474" fill="#e9edf2">#1001</text><text x="380" y="474" fill="#e9edf2">MEDICAL</text><text x="500" y="474" fill="#e9edf2">Elgin Ave</text>
+    <rect x="880" y="462" width="96" height="18" rx="3" fill="#2f6fb0"/><text x="928" y="475" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">WAYPOINT</text>
+    <text x="300" y="498" fill="#e9edf2">#1002</text><text x="380" y="498" fill="#e9edf2">FIRE</text><text x="500" y="498" fill="#8b96a3">—</text>
+  </g>
+
+  <!-- right status keys -->
+  <g font-size="11" font-weight="700" text-anchor="middle" fill="#fff">
+    <rect x="1008" y="160" width="120" height="36" fill="#1fbf4d"/><text x="1068" y="183">EN RTE</text>
+    <rect x="1008" y="202" width="120" height="36" fill="#e0303a"/><text x="1068" y="225">ON SCN</text>
+    <rect x="1008" y="244" width="120" height="36" fill="#6b7480"/><text x="1068" y="267">CLEAR</text>
+    <rect x="1008" y="286" width="120" height="36" fill="#6b7480"/><text x="1068" y="309">BUSY</text>
+    <rect x="1008" y="328" width="120" height="36" fill="#37a0e0"/><text x="1068" y="351">STGD</text>
+    <rect x="1008" y="370" width="120" height="36" fill="#37a0e0"/><text x="1068" y="393">AT HSP</text>
+  </g>
+
+  <!-- bottom nav -->
+  <rect x="60" y="512" width="940" height="40" fill="#121317"/>
+  <g font-size="12" text-anchor="middle">
+    <text x="110" y="537" fill="#2f9fe0" font-weight="700">🗺 Map</text>
+    <text x="200" y="537" fill="#8b96a3">⚠ Incidents</text>
+    <text x="300" y="537" fill="#8b96a3">✉ Messages</text>
+    <text x="390" y="537" fill="#8b96a3">🗒 Forms</text>
+    <text x="480" y="537" fill="#8b96a3">⚙ Utilities</text>
+  </g>
+</svg>

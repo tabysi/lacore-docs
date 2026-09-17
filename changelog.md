@@ -28,7 +28,7 @@ this one section.
 
 ![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
 
-### LAPD MDT, Agency MDT, LASD terminal & supervisor terminal
+### LAPD MDT, Agency MDT, LASD terminal, EMS CAD & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
 
@@ -54,9 +54,16 @@ this one section.
 
 ![The MAP key in the classic PCMS function rail](/img/mdt/lasd-pcms-map.svg)
 
+- **EMS / Fire CAD: a real map in the Map tab.** The tab used to be a waypoint list only. It now shows
+  the live map on top: EMS incidents with a position, on-duty units (your own outlined), the server's
+  map images and named locations, in the CAD's own colours. Clicking an incident selects it and opens
+  its messages; the waypoint list stays below the map.
+
+![The live map in the EMS / Fire CAD's Map tab](/img/mdt/ems-cad-map.svg)
+
 - **Supervisor terminal: map images and places.** *Watch → Map* now draws the images and named
   locations from `configs/cfg-livemap-sh.lua` too, with an on/off button per image.
-- **One switch for every in-game map.** The dispatch console, the three MDTs and the supervisor map
+- **One switch for every in-game map.** The dispatch console, the MDTs, the EMS CAD and the supervisor map
   share their layer drawing and the on/off choice per image, so hiding an image in one hides it in
   all of them.
 - **Fixed: the supervisor map stayed blank after switching sub-tabs.** Leaving *Watch → Map* and
