@@ -63,6 +63,12 @@ ratio — measured, not assumed.
 - **Charges & citations** — apply penal-code charges or issue citations to a person's record.
 - **Evidence & reports** — file structured reports and log tagged evidence. See
   [Evidence & Reports](/features/evidence-reports).
+- **Map** (LAPD MDT, rail section) — a live map of active incidents and units, with the server's
+  own map images and named locations (see [Your own map](#your-own-map-overlays--named-locations)).
+  Your own unit is outlined; clicking an incident loads it into the Active Incident panel. The
+  ribbon keeps its nine tools.
+
+![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
 
 ## Dispatch console
 
@@ -127,7 +133,10 @@ CallCenter = {
 
 ![Custom overlay image and named locations on the dispatch live map](/img/dispatch/livemap-custom.svg)
 
-`configs/cfg-livemap-sh.lua` lets you fit the live map to your server:
+`configs/cfg-livemap-sh.lua` lets you fit the live map to your server. It applies to every map:
+the dispatch console, the LAPD MDT's **Map** section, the supervisor terminal (**Watch → Map**)
+and the [web dispatcher](/features/webdispatch#your-own-map-images). The on/off choice per image
+is shared by all in-game maps.
 
 - **`LiveMap.overlays`**: draw your own image (a postal map, a custom island) over the GTA tiles.
   Give the game coordinates of the image's bottom-left (`from`) and top-right (`to`) corner. Each

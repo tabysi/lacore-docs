@@ -34,3 +34,18 @@ Nothing changes until you set it.
   `showLocations = false` hides them there too. No extra setting needed.
 
 ![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
+
+### LAPD MDT & supervisor terminal
+
+![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
+
+- **LAPD MDT: new Map section.** The left rail gets a **Map** entry: a live map of active incidents
+  and units (your own unit outlined), with the server's map images and named locations. Clicking an
+  incident loads it into the Active Incident panel. The ribbon keeps its nine tools.
+- **Supervisor terminal: map images and places.** *Watch → Map* now draws the images and named
+  locations from `configs/cfg-livemap-sh.lua` too, with an on/off button per image.
+- **One switch for every in-game map.** The dispatch console, the LAPD MDT and the supervisor map
+  share their layer drawing and the on/off choice per image, so hiding an image in one hides it in
+  all of them.
+- **Fixed: the supervisor map stayed blank after switching sub-tabs.** Leaving *Watch → Map* and
+  coming back left the map attached to a removed element, so it never drew again.
