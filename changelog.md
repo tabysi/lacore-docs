@@ -28,7 +28,7 @@ this one section.
 
 ![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
 
-### LAPD MDT, Agency MDT & supervisor terminal
+### LAPD MDT, Agency MDT, LASD MDC & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
 
@@ -41,9 +41,16 @@ this one section.
 
 ![The MAP key on the Agency MDT's function bar](/img/mdt/agency-mdt-map.svg)
 
+- **LASD MDC: new MAP command.** *NEW MESSAGE → MAP* turns the Message Detail / Default window into
+  the live map, with the LASD incidents (labelled like the index rows), units, the server's map
+  images and named locations, in the terminal's teal and amber. Clicking an incident opens its
+  incident record. The top row keeps its ten keys; the classic PCMS skin has no map.
+
+![The MAP command in the LASD MDC](/img/mdt/lasd-mdc-map.svg)
+
 - **Supervisor terminal: map images and places.** *Watch → Map* now draws the images and named
   locations from `configs/cfg-livemap-sh.lua` too, with an on/off button per image.
-- **One switch for every in-game map.** The dispatch console, both MDTs and the supervisor map
+- **One switch for every in-game map.** The dispatch console, the three MDTs and the supervisor map
   share their layer drawing and the on/off choice per image, so hiding an image in one hides it in
   all of them.
 - **Fixed: the supervisor map stayed blank after switching sub-tabs.** Leaving *Watch → Map* and

@@ -95,6 +95,21 @@ Non-LAPD departments each get a terminal skinned to their agency — all sharing
 - **Function buttons** (right) — VEH / WANT / DMV / inquiries, create a call, settings, SEND.
 - **Status row** (bottom) — your unit status keys.
 
+### Map (MDC skin)
+
+![The MAP command in the LASD MDC](/img/mdt/lasd-mdc-map.svg)
+
+Press **NEW MESSAGE**, type **MAP** and press Enter. The Message Detail / Default window turns into a
+live map:
+
+- every active incident with a position (labelled like the index rows, e.g. `0042 415`) and every
+  on-duty unit, your own outlined;
+- the server's own map images (an on/off button per image) and named locations from
+  `configs/cfg-livemap-sh.lua`, as on the other terminals;
+- clicking an incident opens its incident record. **CLEAR DEF WINDOW** closes the map.
+
+The map is part of the MDC skin; the classic PCMS skin does not have it.
+
 ---
 
 ## 🔄 Status & attaching to calls
