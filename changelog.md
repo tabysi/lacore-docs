@@ -5,8 +5,6 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [3.5.9] – 2026-09-17 — Tracing 911 callers, and a live map that knows your server
 
-> ⚠️ In development — not tested on a live server yet.
-
 > ⚠️ **Config change:** `configs/config.lua` gets three new `CallCenter` keys (`Trace`,
 > `TraceMinSeconds`, `TraceMaxSeconds`) and there is a new file `configs/cfg-livemap-sh.lua`.
 > Both are off / empty by default, so nothing changes until you set them. `/lacoreconfig restore`
