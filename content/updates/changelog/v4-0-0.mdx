@@ -126,6 +126,33 @@ Everything else changes nothing until you set it.
   The queue now says *Location unknown (answer to trace)*, and the console view shows
   *AWAITING TRACE* / *TRACE PENDING* instead of *UNKNOWN* / *NO FIX*.
 
+### Customer portal & website
+
+![Customer portal overview — six linked stat tiles and the setup checklist in the rail](/img/changelog/portal-overview-4-0.svg)
+
+- **Overview page rebuilt.** The seven stat tiles became six, and each one links to the page behind
+  its number (Servers, Players, License keys, Support, Downloads, Payments). ROLE is gone because the
+  header already shows it, and so is the LICENCE cell that repeated the LICENSE tile one row below.
+  The Support tile now counts *open* tickets, with the total in its sub-line, and the *Latest build*
+  card gained a VERSIONS button into the portal's own version history.
+- **Setup checklist.** A new rail card lists the four steps between buying and running — key created,
+  server linked, server reporting online, latest release running — read from the same data as the
+  tiles, so it can never claim what the numbers contradict. Each step links to the page that
+  completes it; the card turns into *All set* once everything is done and is hidden while acting for
+  another account.
+- **Fixed: the CUSTOMER / ADMIN switch.** It remembered its position in the browser, which could paint
+  the staff sidebar over a customer page with nothing highlighted, or show CUSTOMER lit while on
+  `/admin/`. It now follows the route alone.
+- **Fixed on phones.** Title and page tabs stack instead of sharing a row (the kicker wrapped onto two
+  lines), the version pill drops below the product name, and the stat grid keeps its row rules at two
+  columns — they were missing below the second row. The two Support cards also sit side by side again.
+- **Sidebar fits a 900px-tall window.** Seventeen sections plus the build block overflowed and hid the
+  *Your build* readout behind a scrollbar; tighter rows bring it back into view.
+- **Landing page.** The hero keeps three buttons (the fourth, *Customer portal*, wrapped onto its own
+  line) and gives existing customers a one-line portal link underneath. The page now ships schema.org
+  `SoftwareApplication` data and a `theme-color`, so search results and mobile browsers treat it as a
+  product page.
+
 ### LAPD MDT, Agency MDT, LASD terminal, EMS CAD, Pennsylvania CAD & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
