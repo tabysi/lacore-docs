@@ -74,6 +74,23 @@ this one section.
 - **Fixed: the supervisor map stayed blank after switching sub-tabs.** Leaving *Watch → Map* and
   coming back left the map attached to a removed element, so it never drew again.
 
+### Server console & animations
+
+- **Region presets reach the test server.** `deploy.ps1` skipped the whole `data/` folder, including
+  the shipped `data/regionpresets/*.json`, so the server logged *could not find file
+  `data/regionpresets/*.json`* and had no region presets. That one subfolder is now deployed; the
+  rest of `data/` (your runtime data) is still never touched. The escrow and product builds already
+  shipped it.
+- **Cuffed players get a pose without the animation pack.** When the custom `anim@arrest_crooks`
+  clip is not streamed, a cuffed player stood normally and the console warned on every start. The
+  cuffs now fall back to GTA's own cuffed idle (`mp_arresting`).
+- **`/hh` works without the animation pack.** A missing `HolsterAnim` clip (`anim@holster_walk` by
+  default, see `configs/cfg-weapons-cl.lua`) falls back to a vanilla hand-on-belt idle instead of
+  doing nothing.
+- **Optional textures stay quiet.** Custom plates (`plates`) and the California map-pack images
+  (`mapimages`) are optional; a server without them no longer gets a console warning, only a debug
+  line with `set lacore_debug 1`.
+
 ## [3.5.9] – 2026-09-17 — Tracing 911 callers, and a live map that knows your server
 
 > ⚠️ **Config change:** `configs/config.lua` gets three new `CallCenter` keys (`Trace`,
