@@ -28,16 +28,22 @@ this one section.
 
 ![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
 
-### LAPD MDT & supervisor terminal
+### LAPD MDT, Agency MDT & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
 
 - **LAPD MDT: new Map section.** The left rail gets a **Map** entry: a live map of active incidents
   and units (your own unit outlined), with the server's map images and named locations. Clicking an
   incident loads it into the Active Incident panel. The ribbon keeps its nine tools.
+- **Agency MDT: new MAP key.** The function bar gets a **MAP** key between UNITS and WATCH LIST with
+  the same live map, drawn in the colours of the selected skin. Clicking an incident opens the
+  incident view.
+
+![The MAP key on the Agency MDT's function bar](/img/mdt/agency-mdt-map.svg)
+
 - **Supervisor terminal: map images and places.** *Watch → Map* now draws the images and named
   locations from `configs/cfg-livemap-sh.lua` too, with an on/off button per image.
-- **One switch for every in-game map.** The dispatch console, the LAPD MDT and the supervisor map
+- **One switch for every in-game map.** The dispatch console, both MDTs and the supervisor map
   share their layer drawing and the on/off choice per image, so hiding an image in one hides it in
   all of them.
 - **Fixed: the supervisor map stayed blank after switching sub-tabs.** Leaving *Watch → Map* and

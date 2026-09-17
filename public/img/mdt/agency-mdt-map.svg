@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <pattern id="tiles" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#1d2a44" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">AGENCY MDT — <tspan fill="#6c8cff">MAP KEY</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">A MAP key on the function bar. The map takes the colours of the terminal's skin.</text>
+
+  <!-- terminal -->
+  <rect x="60" y="112" width="1080" height="440" fill="#0b1a33" stroke="#1c3b6b" stroke-width="2"/>
+  <rect x="60" y="112" width="1080" height="30" fill="#0e2244"/>
+  <text x="76" y="132" fill="#cfe0ff" font-size="13" font-weight="700" letter-spacing="2">AGENCY MDT · CHP</text>
+
+  <!-- function bar -->
+  <g font-size="11" font-weight="700" text-anchor="middle">
+    <rect x="72" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="111" y="172" fill="#cfe0ff">FOLLOW</text>
+    <rect x="156" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="195" y="172" fill="#cfe0ff">STOP</text>
+    <rect x="240" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="279" y="172" fill="#cfe0ff">10-8</text>
+    <rect x="324" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="363" y="172" fill="#cfe0ff">11-27</text>
+    <rect x="408" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="447" y="172" fill="#cfe0ff">10-28</text>
+    <rect x="492" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="531" y="172" fill="#cfe0ff">CALLS</text>
+    <rect x="576" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="615" y="172" fill="#cfe0ff">UNITS</text>
+    <rect x="660" y="150" width="78" height="36" fill="#2f6fd0" stroke="#6c9cf0" stroke-width="2"/><text x="699" y="172" fill="#ffffff">MAP</text>
+    <rect x="744" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="783" y="166" fill="#cfe0ff">WATCH</text><text x="783" y="180" fill="#cfe0ff">LIST</text>
+    <rect x="828" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="867" y="166" fill="#cfe0ff">MAIL /</text><text x="867" y="180" fill="#cfe0ff">RETURNS</text>
+    <rect x="912" y="150" width="78" height="36" fill="#12294f" stroke="#1c3b6b"/><text x="951" y="166" fill="#cfe0ff">MY</text><text x="951" y="180" fill="#cfe0ff">STATS</text>
+  </g>
+
+  <!-- map -->
+  <rect x="72" y="198" width="80" height="20" fill="#2f6fd0"/>
+  <text x="112" y="212" fill="#ffffff" font-size="11" text-anchor="middle">Postal map</text>
+  <rect x="72" y="224" width="956" height="316" fill="#05070b" stroke="#1c3b6b" stroke-width="2"/>
+  <rect x="74" y="226" width="952" height="312" fill="url(#tiles)"/>
+
+  <rect x="150" y="262" width="320" height="220" fill="#4a5cff" fill-opacity="0.16" stroke="#6c8cff" stroke-width="2" stroke-dasharray="8 6"/>
+  <circle cx="720" cy="300" r="56" fill="#6c8cff" fill-opacity="0.1" stroke="#6c8cff" stroke-width="2"/>
+  <text x="720" y="305" fill="#e7ecf5" font-size="13" font-weight="700" text-anchor="middle">Paleto Valley Mall</text>
+  <path d="M640 400 L880 386 L900 470 L660 492 Z" fill="#ffc34d" fill-opacity="0.1" stroke="#ffc34d" stroke-width="2"/>
+  <text x="770" y="444" fill="#e7ecf5" font-size="13" font-weight="700" text-anchor="middle">Downtown</text>
+
+  <rect x="300" y="340" width="54" height="18" rx="2" fill="#b3261e" stroke="#000"/>
+  <text x="327" y="353" fill="#fff" font-size="11" font-weight="700" text-anchor="middle" font-family="Consolas, monospace">#4471</text>
+  <rect x="380" y="410" width="60" height="18" rx="2" fill="#12294f" stroke="#6c9cf0" stroke-width="2"/>
+  <text x="410" y="423" fill="#6c9cf0" font-size="11" font-weight="700" text-anchor="middle" font-family="Consolas, monospace">10-D-1</text>
+
+  <text x="300" y="332" fill="#9fb0c8" font-size="12" text-anchor="middle">click → incident view</text>
+
+  <!-- rail -->
+  <rect x="1040" y="198" width="88" height="342" fill="#0b1a33" stroke="#1c3b6b"/>
+  <g font-size="10" font-weight="700" text-anchor="middle" fill="#cfe0ff">
+    <rect x="1048" y="210" width="72" height="44" fill="#12294f" stroke="#2f6fd0"/><text x="1084" y="236">RESPOND</text>
+    <rect x="1048" y="262" width="72" height="44" fill="#12294f" stroke="#2f6fd0"/><text x="1084" y="288">ON SCENE</text>
+    <rect x="1048" y="314" width="72" height="44" fill="#12294f" stroke="#2f6fd0"/><text x="1084" y="340">MAP IT</text>
+  </g>
+</svg>

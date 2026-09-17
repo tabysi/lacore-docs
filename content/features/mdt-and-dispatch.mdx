@@ -66,9 +66,13 @@ ratio — measured, not assumed.
 - **Map** (LAPD MDT, rail section) — a live map of active incidents and units, with the server's
   own map images and named locations (see [Your own map](#your-own-map-overlays--named-locations)).
   Your own unit is outlined; clicking an incident loads it into the Active Incident panel. The
-  ribbon keeps its nine tools.
+  ribbon keeps its nine tools. The **Agency MDT** has the same map behind the **MAP** key on its
+  function bar, drawn in the colours of its skin; clicking an incident there opens the incident
+  view.
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
+
+![The MAP key on the Agency MDT's function bar](/img/mdt/agency-mdt-map.svg)
 
 ## Dispatch console
 
@@ -134,7 +138,8 @@ CallCenter = {
 ![Custom overlay image and named locations on the dispatch live map](/img/dispatch/livemap-custom.svg)
 
 `configs/cfg-livemap-sh.lua` lets you fit the live map to your server. It applies to every map:
-the dispatch console, the LAPD MDT's **Map** section, the supervisor terminal (**Watch → Map**)
+the dispatch console, the LAPD MDT's **Map** section, the Agency MDT's **MAP** key, the
+supervisor terminal (**Watch → Map**)
 and the [web dispatcher](/features/webdispatch#your-own-map-images). The on/off choice per image
 is shared by all in-game maps.
 
