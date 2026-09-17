@@ -21,8 +21,12 @@ this one section.
   the map of the hosted RP-WEB portal and of the self-hosted bridge app, each with an on/off button
   that the browser remembers. A browser cannot open `cfx-nui-` addresses, so an overlay takes a
   public `webUrl` for the web; one whose `url` is already public `https://` needs none. Only
-  `https://` images pass, and `hideBaseTiles` applies on the web too. Named locations are not drawn
-  there yet.
+  `https://` images pass, and `hideBaseTiles` applies on the web too.
+- **Named locations on the web dispatcher.** `LiveMap.locations` (circles and polygons) are drawn on
+  the RP-WEB and bridge maps with the same outlines and names as the in-game console, and
+  `showLocations = false` hides them there too. No extra setting needed.
+
+![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
 
 ## [3.5.9] – 2026-09-17 — Tracing 911 callers, and a live map that knows your server
 

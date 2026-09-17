@@ -84,9 +84,16 @@ cannot open `cfx-nui-` addresses, so give such an overlay a public copy:
 - An overlay whose `url` is already a public `https://` address needs no `webUrl`.
 - Only `https://` images are shown. An overlay with just a `cfx-nui-` url is left out.
 - `hideBaseTiles = true` hides the atlas tiles in the web dispatcher as well.
-- Named locations are not drawn on the web dispatcher's map yet.
 - The image is loaded by each dispatcher's browser straight from the address you give, so pick a
   host you trust.
+
+#### Named locations
+
+![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
+
+The named locations from `LiveMap.locations` show on the web dispatcher's map as well, with the
+same outlines and names as the in-game console. There is nothing extra to set: they come along
+with every snapshot. `LiveMap.showLocations = false` hides them on both.
 
 ### What the page tells you
 
