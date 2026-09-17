@@ -5,10 +5,12 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
 ## [4.0.0] – 2026-09-17 — LACORE 4.0
 
-> ⚠️ In development — LACORE 4.0 is being built; this section grows until release.
+> ⚠️ Beta — 4.0 is out as an **open beta**. Everything below is in the build. Run it, break it, and
+> tell us what you find; this section keeps growing until the final release.
 
-Work on the next major version starts here. Everything that changes on the way to 4.0 is listed in
-this one section.
+The biggest update LACORE has had: a live map in every terminal, 911 calls taken from the browser,
+a working Import to Incident and a new Evidence section in the MDT, warrant requests decided in the
+supervisor terminal, weapon drops that stay on the ground — and a long list of fixes.
 
 > ⚠️ **Config change:** overlays in `configs/cfg-livemap-sh.lua` take a new optional key `webUrl`,
 > and `configs/cfg-gameplay-sh.lua` gets a new block `Gameplay.weaponDrop` (on by default: `/drop`
@@ -70,6 +72,22 @@ this one section.
 - **Named locations everywhere.** The location names from `cfg-livemap-sh.lua` were only added to
   911/311 calls. They now prefix panic and backup / EMS / tow requests, traffic stops and Code 6,
   incidents raised from the LASD and EMS terminals, and the Location column of every unit list.
+
+### Config backup (`/lacoreconfig`)
+
+- **Fixed: a setting you deleted came back after a restore.** The 3-way merge kept your changed
+  values, but when you had *removed* a line (an agency taken out of `agencies`, a weapon out of a
+  list) and the update touched the same table, the restore put it back. A removal the update did
+  not contradict now stands; where the update changed that very line, the new default still wins
+  and is counted as a conflict, as before.
+- **Fixed: a new config was missing from the backup list.** `configs/cfg-livemap-sh.lua` was not
+  listed in `modules/configbackup-sv.lua`, so a `/lacoreconfig backup` would not have contained it
+  and a reinstall would have eaten your map images and places. The escrow build refuses to package
+  until every config is listed — that guard caught it.
+- Checked and unchanged: backups land in a `LONGTEXT` column and are read back to confirm the
+  length; `.defaults/` baselines are escrow-ignored, so the merge works on customer builds; a merged
+  file that does not compile is never written. Only cosmetic: a restore normalises CRLF line
+  endings to LF.
 
 ### Gameplay
 

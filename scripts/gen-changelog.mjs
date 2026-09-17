@@ -45,14 +45,15 @@ function parseHeader(headerLine) {
 }
 
 // A branded 1200×630 release card per release (lacore-release-card-template.svg).
-// `dev: true` renders the badge as IN DEVELOPMENT (version not released yet).
-function thumbnailSVG({ version, title, date, dev }) {
+// `dev: true` renders the badge as IN DEVELOPMENT (version not released yet),
+// `beta: true` as OPEN BETA (shipping to customers, but not the final release).
+function thumbnailSVG({ version, title, date, dev, beta }) {
   const ver = xml('v' + version)
   const t = xml(clip(title, 44))
   const d = xml(date || '')
-  const badge = dev ? 'IN DEVELOPMENT' : 'RELEASE'
-  const badgeW = dev ? 220 : 150
-  const badgeColor = dev ? '#ffb454' : '#9fb0ff'
+  const badge = dev ? 'IN DEVELOPMENT' : beta ? 'OPEN BETA' : 'RELEASE'
+  const badgeW = dev ? 220 : beta ? 170 : 150
+  const badgeColor = dev ? '#ffb454' : beta ? '#4ade80' : '#9fb0ff'
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -256,6 +257,10 @@ function isArchived(headerLine) {
 // the manifest but is NOT released yet → card badge "IN DEVELOPMENT".
 const isDev = (body) => /^>\s*(\[!WARNING\]\s*)?⚠️?\s*in development/im.test(body)
 
+// The same warning line, but for a version that IS out as an open beta →
+// card badge "OPEN BETA". Matches `> ⚠️ Beta …` / `> ⚠️ Open beta …`.
+const isBeta = (body) => /^>\s*(\[!WARNING\]\s*)?⚠️?\s*(open )?beta\b/im.test(body)
+
 const sections = []
 for (let s = 0; s < starts.length; s++) {
   const from = starts[s]
@@ -263,7 +268,7 @@ for (let s = 0; s < starts.length; s++) {
   const headerLine = lines[from].replace(/^## /, '').trim()
   const body = lines.slice(from + 1, to).join('\n').replace(/\n+$/, '')
   const bracket = (headerLine.match(/^\[([^\]]+)\]/) || [])[1] || headerLine
-  sections.push({ headerLine, body, bracket, archived: isArchived(headerLine), dev: isDev(body) })
+  sections.push({ headerLine, body, bracket, archived: isArchived(headerLine), dev: isDev(body), beta: isBeta(body) })
 }
 
 // Keep only the newest LIVE_MAX releases as pages; everything else is archived,
@@ -292,7 +297,7 @@ for (const sec of sections) {
   const slug = slugFor(sec.bracket)
   meta[slug] = "'" + sec.bracket + "'"
   const { title: secTitle, date: secDate } = parseHeader(sec.headerLine)
-  const cardSVG = thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate, dev: sec.dev })
+  const cardSVG = thumbnailSVG({ version: sec.bracket, title: secTitle || sec.bracket, date: secDate, dev: sec.dev, beta: sec.beta })
   fs.writeFileSync(path.join(THUMBS, slug + '.svg'), cardSVG)   // crisp in-page banner
   await renderPNG(cardSVG, path.join(THUMBS, slug + '.png'))    // PNG share card for OG
   // Warnings (e.g. config changes) become a <Callout> alert banner at the top,

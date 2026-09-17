@@ -54,9 +54,10 @@ Restore is a **3-way merge**: only your changes are re-applied onto the new buil
 so new keys and blocks the update added stay in place. Where an update changed the same spot you
 did, the region is reconciled **setting by setting**: a `key = value` you had changed keeps *your*
 value, while structure, ordering and anything the update added come from the new build. The console
-reports how many settings kept your value. Only a conflicting region that holds no settings at all
-(comments, structure) resolves in the update's favour — those are reported as conflicts, and are
-worth a look.
+reports how many settings kept your value. A line you *removed* (an agency taken out of `agencies`,
+say) stays removed unless the update changed that very line. Only a conflicting region that holds
+no settings at all (comments, structure) resolves in the update's favour — those are reported as
+conflicts, and are worth a look.
 
 ### Restart & verify
 
