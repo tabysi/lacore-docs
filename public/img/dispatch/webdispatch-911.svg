@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6c8cff"/></marker>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/><rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 544 V572 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WEB DISPATCHER — <tspan fill="#6c8cff">TAKING 911 CALLS</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">Answer, text the caller, trace, hold, end with an incident — from the browser. The game server owns the call.</text>
+
+  <!-- caller phone -->
+  <rect x="60" y="130" width="230" height="400" rx="18" fill="#0b0d12" stroke="#2c3650" stroke-width="2"/>
+  <rect x="80" y="160" width="190" height="340" rx="6" fill="#111826"/>
+  <text x="175" y="200" fill="#9fb0ff" font-size="12" text-anchor="middle" letter-spacing="2">911 EMERGENCY</text>
+  <text x="175" y="232" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">Web m.kessler</text>
+  <text x="175" y="254" fill="#3ecf8e" font-size="12" text-anchor="middle">Connected · 00:41</text>
+  <text x="175" y="284" fill="#ffc34d" font-size="11" text-anchor="middle">(text — reply with /callsay)</text>
+  <rect x="96" y="310" width="158" height="26" rx="4" fill="#1c2540"/><text x="104" y="327" fill="#cfe0ff" font-size="11">/callsay they are still here</text>
+  <text x="175" y="470" fill="#6b7a96" font-size="11" text-anchor="middle">in-game caller</text>
+
+  <path d="M296 330 H 380" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M380 350 H 296" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="338" y="318" fill="#9fb0ff" font-size="11" text-anchor="middle">text</text>
+
+  <!-- server -->
+  <rect x="386" y="290" width="140" height="80" rx="8" fill="#05070b" stroke="#243050" stroke-width="2"/>
+  <text x="456" y="322" fill="#6c8cff" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="2">GAME SERVER</text>
+  <text x="456" y="344" fill="#9fb0ff" font-size="11" text-anchor="middle">owns the call</text>
+  <path d="M532 330 H 610" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M610 350 H 532" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="571" y="318" fill="#9fb0ff" font-size="11" text-anchor="middle">every 2 s</text>
+
+  <!-- browser panel -->
+  <rect x="616" y="130" width="524" height="400" fill="#0c111a" stroke="#4a5cff" stroke-width="2"/>
+  <rect x="616" y="130" width="524" height="30" fill="#0f1524"/>
+  <text x="632" y="150" fill="#9fb0ff" font-size="11" letter-spacing="2">911 / 311 QUEUE · YOUR CALL</text>
+  <g font-size="12">
+    <rect x="632" y="172" width="34" height="18" fill="#e0303a"/><text x="649" y="185" fill="#fff" font-weight="700" text-anchor="middle">911</text>
+    <text x="676" y="185" fill="#e7ecf5" font-weight="600">Maria Hendricks</text>
+    <text x="810" y="185" fill="#2fbf71" font-weight="700">● ON LINE</text>
+    <text x="1120" y="185" fill="#e7ecf5" text-anchor="end" font-family="Consolas, monospace">00:41</text>
+    <text x="632" y="208" fill="#ffc34d" font-weight="600">Tracing caller … 19s</text>
+    <text x="1120" y="208" fill="#6b7a96" font-size="10.5" text-anchor="end">TEXT ONLY · caller answers with /callsay</text>
+  </g>
+  <rect x="632" y="222" width="492" height="150" fill="#070a11" stroke="#1b2436"/>
+  <g font-size="12">
+    <text x="644" y="246" fill="#6b7a96" font-family="Consolas, monospace">22:41</text><text x="690" y="246" fill="#6c8cff" font-weight="700">MARIA HENDRICKS</text><text x="820" y="246" fill="#e7ecf5">They are still here</text>
+    <text x="644" y="270" fill="#6b7a96" font-family="Consolas, monospace">22:41</text><text x="690" y="270" fill="#ffe14d" font-weight="700">YOU</text><text x="720" y="270" fill="#e7ecf5">Stay inside, units are on the way</text>
+    <text x="644" y="294" fill="#6b7a96" font-family="Consolas, monospace">22:42</text><text x="690" y="294" fill="#6c8cff" font-weight="700">MARIA HENDRICKS</text><text x="820" y="294" fill="#e7ecf5">One has a bat</text>
+  </g>
+  <rect x="632" y="384" width="410" height="26" fill="#070a11" stroke="#2a3650"/><text x="642" y="401" fill="#6b7a96" font-size="12">Message caller — ENTER</text>
+  <rect x="1050" y="384" width="74" height="26" fill="#4a5cff"/><text x="1087" y="401" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">SEND</text>
+  <rect x="632" y="422" width="90" height="26" fill="transparent" stroke="#2a3650"/><text x="677" y="439" fill="#9fb0ff" font-size="11" font-weight="700" text-anchor="middle">❚❚ HOLD</text>
+  <rect x="1020" y="422" width="104" height="26" fill="transparent" stroke="#4a2733"/><text x="1072" y="439" fill="#ff8d9b" font-size="11" font-weight="700" text-anchor="middle">✕ END CALL</text>
+  <rect x="632" y="460" width="492" height="56" fill="transparent" stroke="#2a3650" stroke-dasharray="4 3"/>
+  <text x="644" y="482" fill="#e7ecf5" font-size="12">☑ Create incident from this call</text>
+  <text x="644" y="504" fill="#6b7a96" font-size="11">Incident description: Two men arguing outside, one has a bat</text>
+  <text x="60" y="568" fill="#9fb0ff" font-size="13">A dispatcher on the page counts as "dispatcher online": calls queue instead of becoming auto-incidents. Leave the page and your call goes back to the queue.</text>
+</svg>

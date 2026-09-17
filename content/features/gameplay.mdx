@@ -44,6 +44,29 @@ Both lists are plain strings in `Gameplay.session` — rewrite them for your ser
 is replaced by your community name. `/onboarding civ` or `/onboarding leo` replays a set (support
 use). `Gameplay.session.onboarding = false` (or the dashboard toggle) turns the hints off.
 
+## Weapon drops
+
+![How a dropped weapon becomes a pickup](/img/features/weapon-drop.svg)
+
+`/drop`, and the weapon in hand when a player dies, stay on the ground as a pickup anyone can walk
+up to and take with **E** (with the ammo that was in it). The **server owns every drop**: a client
+can only ask to drop what it holds next to itself, and to pick up what lies within reach; a weapon
+is handed out exactly once. Drops disappear after `despawnSeconds` (default 300) and the oldest
+goes first past `maxDrops`.
+
+```lua
+-- configs/cfg-gameplay-sh.lua
+Gameplay.weaponDrop = {
+    enabled        = true,   -- false = /drop just removes the weapon, nothing drops on death
+    onDeath        = true,
+    despawnSeconds = 300,
+    pickupRadius   = 2.0,
+    maxDrops       = 50,
+}
+```
+
+The same for everyone: a dead officer's rifle lies next to them like a dead robber's pistol.
+
 ## Config wizard
 
 Not sure which of the 60 files matters? In the server console:

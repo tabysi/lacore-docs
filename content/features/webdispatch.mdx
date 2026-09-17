@@ -95,6 +95,28 @@ The named locations from `LiveMap.locations` show on the web dispatcher's map as
 same outlines and names as the in-game console. There is nothing extra to set: they come along
 with every snapshot. `LiveMap.showLocations = false` hides them on both.
 
+### Taking 911 / 311 calls
+
+![Answering a 911 call from the web dispatcher](/img/dispatch/webdispatch-911.svg)
+
+A dispatcher on the page can **take calls**, not only watch the queue:
+
+- **Answer** a queued call (the desktop's queue has a button per call; the console's F1 / ANSWER
+  takes the oldest). The call panel shows the caller, the trace countdown when
+  [caller trace](/features/mdt-and-dispatch#caller-trace-911--311) is on, and the transcript.
+- **Text only.** A browser has no in-game voice. The caller is told *"text only — answer with
+  /callsay"* and every line they type lands in the transcript; you answer in the panel.
+- **Hold / Resume**, **notes** (they go into the incident), and **End call** with *Create incident*
+  ticked: the incident is created with the caller's location, exactly as from the in-game console,
+  and the panel shows its number.
+- **You count as a dispatcher.** While a dispatcher with the *dispatch* role has the page open, a
+  911 call queues instead of becoming an auto-incident (`CallCenter.AutoIncident`), and the
+  `/911` chat command is redirected to the phone as usual. Close the page and your call goes back
+  to the queue for the next dispatcher — or ends, if nobody is left.
+
+Viewers (the *view* role) see the queue but cannot answer. The self-hosted bridge does not carry
+call sessions yet.
+
 ### What the page tells you
 
 The portal never pretends to be live when it is not. It shows one of five states, decided by how old

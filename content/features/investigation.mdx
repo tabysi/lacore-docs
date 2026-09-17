@@ -41,6 +41,13 @@ the existing evidence locker, so an MDT person query shows it like any hand-logg
 *"Lab match — Shell casing SC260905-4F2A collected at scene by 2A12"*. No match (the player had no
 character) shows as exactly that.
 
+## Evidence in the MDT
+
+The LAPD MDT's **Evidence** rail section shows, for the selected incident, every evidence record
+filed with that incident number and every scene trace collected near the call, with its lab state —
+and files new evidence with the incident and location already set. See
+[Incidents → Evidence sub-tab](/user-guide/mdt-incidents#-evidence-sub-tab).
+
 ## Warrants
 
 ```
@@ -56,6 +63,12 @@ Supervisors (the same rank gate the Supervisor Terminal uses) are notified of ev
 /warrant approve 12
 /warrant deny 12
 ```
+
+Supervisors can also decide in the **Supervisor Terminal**: *Warrants & BOLO* lists every pending
+request with **Approve** / **Deny** and the last decisions — see
+[Supervisor → Warrants & BOLO](/configuration/supervisor#warrants--bolo).
+
+![Warrant requests in the supervisor terminal](/img/mdt/supervisor-warrant-queue.svg)
 
 An approved **arrest** warrant sets the person's warrant flag — the one every MDT, the LASD CAD,
 the Agency MDT and the Pennsylvania CAD already show in a person query. The requesting unit is

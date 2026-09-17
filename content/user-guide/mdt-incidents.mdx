@@ -200,8 +200,30 @@ How it works:
 
 ## 🧑‍✈️ Persons & Vehicles sub-tabs
 
-- **Persons** — after a successful **Query** run, the matched person's record (DL, warrant, physical, notes, registered vehicles) shows here automatically. See [Query: Running People & Plates](/user-guide/mdt-query).
-- **Vehicles** — vehicles linked to the active incident.
+- **Persons** — after a successful **Query** run, the matched person's record (DL, warrant, physical, notes, registered vehicles) shows here automatically. See [Query: Running People & Plates](/user-guide/mdt-query). Above it: the persons **imported to the selected incident**.
+- **Vehicles** — vehicles imported to the selected incident.
+
+### Import to Incident
+
+![The Evidence section and the Import to Incident key of the LAPD MDT](/img/mdt/mdt-evidence-import.svg)
+
+Run a query, select an incident, press **Import to Incident** in the bottom bar. The last result
+goes onto the incident: a person query imports the person (name, DOB, address, warrant flag), a
+plate query the vehicle (plate, model, colour, owner). The incident log gets a line
+(`IMPORT // PERSON // John Doe // DOB 1990-01-01 // 1A-12`), the Persons / Vehicles counts in the
+rail light up, and every unit on the call sees the same list. A record is imported once; the
+button is greyed until there is both a selected incident and a query result.
+
+## 🔎 Evidence sub-tab
+
+Everything on file for the selected incident, in one place:
+
+- **Evidence logged on this incident** — records filed with this incident number, from any unit,
+  with the last chain-of-custody entry.
+- **Scene evidence near this incident** — traces collected within 150 m of the call (shell casings,
+  blood …), with the lab state: *not analysed*, *in the lab …*, or the match.
+- **Log evidence on this incident** — a short form (person, type, description) that files a record
+  with the incident number and location already set. **REFRESH** pulls the list again.
 
 ---
 

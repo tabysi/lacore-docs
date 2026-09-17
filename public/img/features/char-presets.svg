@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="500" fill="url(#bg)"/><rect width="1200" height="500" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 444 V472 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">/CHAR — <tspan fill="#6c8cff">PRESETS</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">Save the character form under a name and load it back later — unlimited, per player, kept on the server.</text>
+
+  <rect x="240" y="120" width="720" height="330" rx="6" fill="#0f1524" stroke="#2c3650" stroke-width="2"/>
+  <rect x="240" y="120" width="720" height="34" fill="#141c30"/>
+  <text x="258" y="143" fill="#e7ecf5" font-size="14" font-weight="700">Character — <tspan fill="#ffe14d">/char</tspan></text>
+  <g font-size="12">
+    <text x="258" y="180" fill="#9fb0ff" letter-spacing="2" font-size="11">IDENTITY</text>
+    <rect x="258" y="190" width="684" height="24" fill="#0a0d13" stroke="#2a3650"/><text x="268" y="206" fill="#e7ecf5">Max Taxi</text>
+    <rect x="258" y="222" width="336" height="24" fill="#0a0d13" stroke="#2a3650"/><text x="268" y="238" fill="#e7ecf5">1980/02/02</text>
+    <rect x="606" y="222" width="336" height="24" fill="#0a0d13" stroke="#2a3650"/><text x="616" y="238" fill="#e7ecf5">Male</text>
+    <text x="258" y="280" fill="#9fb0ff" letter-spacing="2" font-size="11">PRESETS</text>
+    <rect x="258" y="290" width="500" height="24" fill="#0a0d13" stroke="#2a3650"/><text x="268" y="306" fill="#6b7a96">Preset name (e.g. "Taxi driver")</text>
+    <rect x="766" y="290" width="176" height="24" fill="#182038" stroke="#4a5cff"/><text x="854" y="306" fill="#cfe0ff" text-anchor="middle" font-weight="700">Save as preset</text>
+    <rect x="258" y="326" width="684" height="26" fill="#0a0d13" stroke="#1f2838"/>
+    <text x="268" y="343" fill="#e7ecf5">Taxi driver</text>
+    <rect x="800" y="330" width="60" height="18" fill="#182038" stroke="#4a5cff"/><text x="830" y="343" fill="#cfe0ff" font-size="11" text-anchor="middle">Load</text>
+    <rect x="868" y="330" width="66" height="18" fill="#182038" stroke="#4a2733"/><text x="901" y="343" fill="#ff8d9b" font-size="11" text-anchor="middle">Delete</text>
+    <rect x="258" y="358" width="684" height="26" fill="#0a0d13" stroke="#1f2838"/>
+    <text x="268" y="375" fill="#e7ecf5">Off-duty cop</text>
+    <rect x="800" y="362" width="60" height="18" fill="#182038" stroke="#4a5cff"/><text x="830" y="375" fill="#cfe0ff" font-size="11" text-anchor="middle">Load</text>
+    <rect x="868" y="362" width="66" height="18" fill="#182038" stroke="#4a2733"/><text x="901" y="375" fill="#ff8d9b" font-size="11" text-anchor="middle">Delete</text>
+  </g>
+  <rect x="258" y="404" width="80" height="26" fill="#4a5cff"/><text x="298" y="421" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">Save</text>
+  <text x="60" y="478" fill="#9fb0ff" font-size="13">Load fills the form; Save (bottom) still writes the active character. Presets live in data/char_presets.json.</text>
+</svg>

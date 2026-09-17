@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6c8cff"/></marker>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)"/><rect width="1200" height="520" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 464 V492 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WEAPON DROPS — <tspan fill="#6c8cff">SERVER-OWNED PICKUPS</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">/drop, or the held weapon on death, stays on the ground for everyone. The server hands each weapon out once.</text>
+
+  <g font-size="13">
+    <rect x="60" y="130" width="240" height="110" rx="8" fill="#05070b" stroke="#243050" stroke-width="2"/>
+    <text x="80" y="158" fill="#6c8cff" font-size="12" font-weight="700" letter-spacing="2">1 · DROP</text>
+    <text x="80" y="186" fill="#e7ecf5">/drop, or you die holding it</text>
+    <text x="80" y="208" fill="#9fb0ff" font-size="12">client asks: wd:Drop(hash, ammo, xyz)</text>
+    <text x="80" y="226" fill="#9fb0ff" font-size="12">must land next to you (15 m)</text>
+    <path d="M306 185 H 370" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+    <rect x="376" y="130" width="300" height="110" rx="8" fill="#05070b" stroke="#6c8cff" stroke-width="2"/>
+    <text x="396" y="158" fill="#6c8cff" font-size="12" font-weight="700" letter-spacing="2">2 · SERVER REGISTRY</text>
+    <text x="396" y="186" fill="#e7ecf5">#17 · Pistol · 24 rounds · 16:12</text>
+    <text x="396" y="208" fill="#9fb0ff" font-size="12">broadcast to every client (wd:Add)</text>
+    <text x="396" y="226" fill="#9fb0ff" font-size="12">despawns after 300 s · max 50 on the ground</text>
+    <path d="M682 185 H 746" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+    <rect x="752" y="130" width="388" height="110" rx="8" fill="#05070b" stroke="#243050" stroke-width="2"/>
+    <text x="772" y="158" fill="#6c8cff" font-size="12" font-weight="700" letter-spacing="2">3 · PICKUP</text>
+    <text x="772" y="186" fill="#e7ecf5">Press E within 2 m → wd:Pickup(#17)</text>
+    <text x="772" y="208" fill="#9fb0ff" font-size="12">server checks the distance, removes the drop for all,</text>
+    <text x="772" y="226" fill="#9fb0ff" font-size="12">gives THIS player the weapon with its ammo (wd:Give)</text>
+  </g>
+
+  <!-- ground scene -->
+  <rect x="60" y="280" width="1080" height="160" fill="#0b0d12" stroke="#1f2838"/>
+  <line x1="60" y1="400" x2="1140" y2="400" stroke="#2c3852" stroke-width="2"/>
+  <ellipse cx="420" cy="398" rx="34" ry="8" fill="#000" opacity="0.5"/>
+  <rect x="396" y="378" width="48" height="14" rx="3" fill="#8a93a3" transform="rotate(-12 420 385)"/>
+  <rect x="380" y="322" width="240" height="30" rx="4" fill="#111826" stroke="#4a5cff"/>
+  <text x="500" y="342" fill="#e7ecf5" font-size="13" text-anchor="middle">Press <tspan fill="#ffc34d" font-weight="700">E</tspan> to pick up the weapon</text>
+  <circle cx="300" cy="360" r="14" fill="#16294d" stroke="#4ade80" stroke-width="2"/><rect x="290" y="374" width="20" height="26" fill="#16294d"/>
+  <text x="300" y="430" fill="#9fb0ff" font-size="11" text-anchor="middle">any player</text>
+
+  <text x="60" y="478" fill="#9fb0ff" font-size="13">Gameplay.weaponDrop in configs/cfg-gameplay-sh.lua: enabled · onDeath · despawnSeconds · pickupRadius · maxDrops. Off = /drop just removes the weapon, like before.</text>
+</svg>

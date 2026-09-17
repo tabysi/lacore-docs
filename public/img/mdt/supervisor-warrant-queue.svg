@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6c8cff"/></marker>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)"/><rect width="1200" height="520" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 464 V492 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">SUPERVISOR TERMINAL — <tspan fill="#6c8cff">WARRANT REQUESTS</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">A unit requests a warrant in the field; the supervisor decides in the terminal instead of with /warrant approve.</text>
+
+  <rect x="60" y="120" width="300" height="90" rx="8" fill="#05070b" stroke="#243050" stroke-width="2"/>
+  <text x="80" y="148" fill="#6c8cff" font-size="12" font-weight="700" letter-spacing="2">UNIT · IN THE FIELD</text>
+  <text x="80" y="176" fill="#e7ecf5" font-size="13" font-family="Consolas, monospace">/warrant request search</text>
+  <text x="80" y="196" fill="#e7ecf5" font-size="13" font-family="Consolas, monospace">John Doe | stolen goods</text>
+  <path d="M366 165 H 430" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+  <!-- terminal -->
+  <rect x="436" y="120" width="704" height="340" fill="#f2f4f8" stroke="#6f86a6" stroke-width="2"/>
+  <rect x="436" y="120" width="704" height="26" fill="#2f5d9a"/>
+  <text x="452" y="138" fill="#fff" font-size="12" font-weight="700" letter-spacing="2">SUPERVISOR TERMINAL · WARRANTS &amp; BOLO</text>
+  <text x="452" y="170" fill="#24374f" font-size="10" font-weight="700" letter-spacing="2">WARRANT REQUESTS · 2</text>
+  <g font-size="12">
+    <rect x="452" y="180" width="672" height="30" fill="#ffffff" stroke="#c9d5e4"/>
+    <text x="462" y="199" fill="#24374f"><tspan font-weight="700">#12</tspan> SEARCH · <tspan font-weight="700">John Doe</tspan> — stolen goods <tspan fill="#6f86a6">· 1A-12 · 5m</tspan></text>
+    <rect x="980" y="185" width="64" height="20" fill="transparent" stroke="#2e9c5a"/><text x="1012" y="199" fill="#2e9c5a" font-size="11" text-anchor="middle">Approve</text>
+    <rect x="1050" y="185" width="64" height="20" fill="transparent" stroke="#c0392b"/><text x="1082" y="199" fill="#c0392b" font-size="11" text-anchor="middle">Deny</text>
+    <rect x="452" y="214" width="672" height="30" fill="#ffffff" stroke="#c9d5e4"/>
+    <text x="462" y="233" fill="#24374f"><tspan font-weight="700">#13</tspan> ARREST · <tspan font-weight="700">Ray Cole</tspan> — armed robbery, Vinewood Blvd <tspan fill="#6f86a6">· 2A-07 · 1m</tspan></text>
+    <rect x="980" y="219" width="64" height="20" fill="transparent" stroke="#2e9c5a"/><text x="1012" y="233" fill="#2e9c5a" font-size="11" text-anchor="middle">Approve</text>
+    <rect x="1050" y="219" width="64" height="20" fill="transparent" stroke="#c0392b"/><text x="1082" y="233" fill="#c0392b" font-size="11" text-anchor="middle">Deny</text>
+  </g>
+  <text x="452" y="272" fill="#24374f" font-size="10" font-weight="700" letter-spacing="2">RECENT DECISIONS</text>
+  <text x="462" y="294" fill="#6f86a6" font-size="12">#11 ARREST · Bad Guy — <tspan font-weight="700">approved</tspan> · SGT-1</text>
+  <g font-size="10" font-weight="700" letter-spacing="2" fill="#24374f">
+    <text x="452" y="332">BOLO · 3</text><text x="800" y="332">WARRANT · 4</text>
+  </g>
+  <g font-size="12" fill="#24374f">
+    <text x="462" y="356">🚗 ABC123 — armed, 10-32 ⚠</text><text x="462" y="378">👤 Ray Cole — robbery suspect</text>
+    <text x="810" y="356">⚠ Bad Guy — Warrant #11: armed robbery</text><text x="810" y="378">⚠ Sam Vex — Warrant #9: fraud</text>
+  </g>
+  <text x="60" y="260" fill="#9fb0ff" font-size="13">An approved arrest warrant</text>
+  <text x="60" y="280" fill="#9fb0ff" font-size="13">flags the person in every CAD;</text>
+  <text x="60" y="300" fill="#9fb0ff" font-size="13">the unit is notified either way.</text>
+</svg>

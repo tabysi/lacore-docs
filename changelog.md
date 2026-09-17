@@ -10,8 +10,76 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 Work on the next major version starts here. Everything that changes on the way to 4.0 is listed in
 this one section.
 
-> ⚠️ **Config change:** overlays in `configs/cfg-livemap-sh.lua` take a new optional key `webUrl`.
-> Nothing changes until you set it.
+> ⚠️ **Config change:** overlays in `configs/cfg-livemap-sh.lua` take a new optional key `webUrl`,
+> and `configs/cfg-gameplay-sh.lua` gets a new block `Gameplay.weaponDrop` (on by default: `/drop`
+> and the held weapon on death become pickups; set `enabled = false` for the old behaviour).
+> Everything else changes nothing until you set it.
+
+### 911 calls from the web dispatcher
+
+![Answering a 911 call from the web dispatcher](/img/dispatch/webdispatch-911.svg)
+
+- **Take 911 / 311 calls in the browser.** The hosted RP-WEB portal answers a queued call, shows the
+  caller, the trace countdown and the transcript, texts the caller (they reply with `/callsay`
+  in-game and are told the line is text only), holds, keeps notes, and ends the call with an
+  incident created from it — the game server owns the call throughout, exactly like an in-game
+  session. Desktop: an **Answer** button per queued call; console: F1 / ANSWER. Viewers cannot
+  answer.
+- **A dispatcher on the page counts as a dispatcher online.** A 911 call queues instead of becoming
+  an auto-incident while somebody with the dispatch role is on the page; leave the page and your
+  call goes back to the queue (or ends if nobody is left).
+- **Fixed: the hosted portal never received the map images.** The live-map config was built for
+  the snapshot but not sent with it; the portal only ever drew images on the self-hosted bridge.
+
+### Pennsylvania CAD
+
+![Pennsylvania CAD Map View sub-tab](/img/mdt/penn-cad-map.svg)
+
+- **Map View.** *My Call Info* gets a **Map View** sub-tab next to the CAD Viewer: active calls
+  labelled with the call number (prefix included), on-duty units (your own outlined), the server's
+  map images and named locations. Clicking a call opens its Call Detail.
+
+### LAPD MDT
+
+![The Evidence section and the Import to Incident key of the LAPD MDT](/img/mdt/mdt-evidence-import.svg)
+
+- **Import to Incident works.** The bottom-bar key was greyed out with nothing behind it. It now
+  puts the last query result onto the selected incident — a person (name, DOB, address, warrant
+  flag) or, from a plate query, the vehicle (plate, model, colour, owner) — logs an
+  `IMPORT // …` line, and lists them in the **Persons** / **Vehicles** rail sections for every unit
+  on the call. Each record once; the key is greyed until there is an incident and a result.
+- **Evidence section.** A new rail entry shows everything on file for the selected incident:
+  evidence records filed with that incident number (with the last custody entry) and scene traces
+  collected within 150 m (with their lab state), plus a short form that files new evidence with
+  the incident and location already set.
+
+### Supervisor terminal
+
+![Warrant requests in the supervisor terminal](/img/mdt/supervisor-warrant-queue.svg)
+
+- **Warrant requests are decided in the terminal.** *Warrants & BOLO* lists every pending
+  `/warrant request` with kind, person, reason, requester and age, with **Approve** / **Deny** —
+  the same path as `/warrant approve` — and the last decisions below it.
+
+### Civilians
+
+![Presets in the /char form](/img/features/char-presets.svg)
+
+- **`/char` presets have a UI.** The backend existed since 3.5 with nothing calling it. The form
+  now has a *Presets* section: save the filled form under a name, load it back, delete it.
+- **Named locations everywhere.** The location names from `cfg-livemap-sh.lua` were only added to
+  911/311 calls. They now prefix panic and backup / EMS / tow requests, traffic stops and Code 6,
+  incidents raised from the LASD and EMS terminals, and the Location column of every unit list.
+
+### Gameplay
+
+![How a dropped weapon becomes a pickup](/img/features/weapon-drop.svg)
+
+- **Weapon drops.** `/drop`, and the weapon in hand when a player dies, stay on the ground as
+  pickups anyone can take with E (ammo included). The server owns every drop — a client can only
+  drop what it holds and pick up what is within reach, and a weapon is handed out once. Despawn
+  after 300 s, oldest first past 50. Replaces the dormant client-only remains of the old system.
+  `Gameplay.weaponDrop` in `cfg-gameplay-sh.lua`.
 
 ### Web dispatcher
 
@@ -33,7 +101,7 @@ this one section.
   The queue now says *Location unknown (answer to trace)*, and the console view shows
   *AWAITING TRACE* / *TRACE PENDING* instead of *UNKNOWN* / *NO FIX*.
 
-### LAPD MDT, Agency MDT, LASD terminal, EMS CAD & supervisor terminal
+### LAPD MDT, Agency MDT, LASD terminal, EMS CAD, Pennsylvania CAD & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
 
@@ -66,9 +134,16 @@ this one section.
 
 ![The live map in the EMS / Fire CAD's Map tab](/img/mdt/ems-cad-map.svg)
 
+- **Pennsylvania CAD: new Map View.** *My Call Info* gets a **Map View** sub-tab next to the CAD
+  Viewer: active calls labelled with the call number (prefix included), on-duty units (your own
+  outlined), the server's map images and named locations, framed in the terminal's light blue.
+  Clicking a call opens its Call Detail.
+
+![Pennsylvania CAD Map View sub-tab](/img/mdt/penn-cad-map.svg)
+
 - **Supervisor terminal: map images and places.** *Watch → Map* now draws the images and named
   locations from `configs/cfg-livemap-sh.lua` too, with an on/off button per image.
-- **One switch for every in-game map.** The dispatch console, the MDTs, the EMS CAD and the supervisor map
+- **One switch for every in-game map.** The dispatch console, the MDTs, the EMS and Pennsylvania CADs and the supervisor map
   share their layer drawing and the on/off choice per image, so hiding an image in one hides it in
   all of them.
 - **Fixed: the supervisor map stayed blank after switching sub-tabs.** Leaving *Watch → Map* and
