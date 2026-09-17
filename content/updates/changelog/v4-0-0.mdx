@@ -35,6 +35,11 @@ Nothing changes until you set it.
 
 ![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
 
+- **Fixed: untraced 911 calls on the web dispatcher.** With `CallCenter.Trace` on, a call nobody has
+  answered yet carries no location on purpose, but the portal dropped that flag and showed `? · —`.
+  The queue now says *Location unknown (answer to trace)*, and the console view shows
+  *AWAITING TRACE* / *TRACE PENDING* instead of *UNKNOWN* / *NO FIX*.
+
 ### LAPD MDT, Agency MDT, LASD terminal, EMS CAD & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
