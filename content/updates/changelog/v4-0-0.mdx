@@ -35,7 +35,7 @@ Nothing changes until you set it.
 
 ![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
 
-### LAPD MDT, Agency MDT, LASD MDC & supervisor terminal
+### LAPD MDT, Agency MDT, LASD terminal & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
 
@@ -51,9 +51,15 @@ Nothing changes until you set it.
 - **LASD MDC: new MAP command.** *NEW MESSAGE → MAP* turns the Message Detail / Default window into
   the live map, with the LASD incidents (labelled like the index rows), units, the server's map
   images and named locations, in the terminal's teal and amber. Clicking an incident opens its
-  incident record. The top row keeps its ten keys; the classic PCMS skin has no map.
+  incident record. The top row keeps its ten keys.
 
 ![The MAP command in the LASD MDC](/img/mdt/lasd-mdc-map.svg)
+
+- **LASD classic PCMS: new MAP key.** The coloured function rail gets a **MAP** key under BOLO that
+  opens the same map in the centre window, in the PCMS teal and amber. Clicking an incident opens
+  its incident record.
+
+![The MAP key in the classic PCMS function rail](/img/mdt/lasd-pcms-map.svg)
 
 - **Supervisor terminal: map images and places.** *Watch → Map* now draws the images and named
   locations from `configs/cfg-livemap-sh.lua` too, with an on/off button per image.

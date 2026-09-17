@@ -23,7 +23,7 @@ The classic amber/teal PCMS was **kept**. Open **OTHER FUNCTIONS → TERMINAL SK
 | Skin | Look |
 | --- | --- |
 | **MDC** *(default)* | The new design above — teal status keys, yellow section headers, the blue command bar, HANDLE / BACK / CLEARANCE FORM. |
-| **CLASSIC PCMS** | The original amber-on-black terminal with the coloured function rail — unchanged. |
+| **CLASSIC PCMS** | The original amber-on-black terminal with the coloured function rail (plus a MAP key since 4.0). |
 
 Your choice is remembered per player and survives a restart. Both skins are the **same terminal
 underneath**: the same incidents, units, queries and server rules — only the screen differs, so a
@@ -95,20 +95,24 @@ Non-LAPD departments each get a terminal skinned to their agency — all sharing
 - **Function buttons** (right) — VEH / WANT / DMV / inquiries, create a call, settings, SEND.
 - **Status row** (bottom) — your unit status keys.
 
-### Map (MDC skin)
+### Map
 
 ![The MAP command in the LASD MDC](/img/mdt/lasd-mdc-map.svg)
 
-Press **NEW MESSAGE**, type **MAP** and press Enter. The Message Detail / Default window turns into a
-live map:
+Both skins have it:
+
+- **MDC:** press **NEW MESSAGE**, type **MAP** and press Enter.
+- **Classic PCMS:** press the **MAP** key in the coloured function rail (under BOLO).
+
+The Message Detail / Default window turns into a live map:
 
 - every active incident with a position (labelled like the index rows, e.g. `0042 415`) and every
   on-duty unit, your own outlined;
 - the server's own map images (an on/off button per image) and named locations from
   `configs/cfg-livemap-sh.lua`, as on the other terminals;
-- clicking an incident opens its incident record. **CLEAR DEF WINDOW** closes the map.
+- clicking an incident opens its incident record. On the MDC, **CLEAR DEF WINDOW** closes the map.
 
-The map is part of the MDC skin; the classic PCMS skin does not have it.
+![The MAP key in the classic PCMS function rail](/img/mdt/lasd-pcms-map.svg)
 
 ---
 
