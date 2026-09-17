@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <pattern id="tiles" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#1d2a44" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">DISPATCH LIVE MAP — <tspan fill="#6c8cff">YOUR OWN MAP</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">configs/cfg-livemap-sh.lua: overlay images and named locations on top of the GTA tiles.</text>
+
+  <!-- console map mockup -->
+  <rect x="60" y="116" width="700" height="440" rx="6" fill="#050a14" stroke="#2f6fd0" stroke-width="2"/>
+  <rect x="60" y="116" width="700" height="30" rx="6" fill="#0a1f3e"/>
+  <text x="76" y="137" fill="#cfe0ff" font-size="13" font-weight="700" letter-spacing="2">DISPATCH CONSOLE</text>
+  <rect x="520" y="122" width="120" height="18" fill="#1f4d8c" stroke="#2f6fd0"/>
+  <text x="530" y="136" fill="#cfe0ff" font-size="12">🗺 Postal map</text>
+  <rect x="648" y="122" width="100" height="18" fill="#0a1f3e" stroke="#2f6fd0"/>
+  <text x="660" y="136" fill="#cfe0ff" font-size="12">Atlas ▾</text>
+  <rect x="62" y="148" width="696" height="406" fill="url(#tiles)"/>
+
+  <!-- overlay image -->
+  <rect x="120" y="200" width="330" height="290" fill="#4a5cff" fill-opacity="0.16" stroke="#6c8cff" stroke-width="2" stroke-dasharray="8 6"/>
+  <g fill="#9fb0ff" font-size="12" font-family="Consolas, 'Courier New', monospace" fill-opacity="0.8">
+    <text x="150" y="240">8001</text><text x="260" y="250">8012</text><text x="370" y="236">8020</text>
+    <text x="170" y="330">8040</text><text x="300" y="340">8042</text><text x="390" y="320">8051</text>
+    <text x="160" y="440">8070</text><text x="280" y="450">8077</text><text x="380" y="430">8090</text>
+  </g>
+  <text x="130" y="480" fill="#6c8cff" font-size="12" font-weight="700" letter-spacing="2">OVERLAY IMAGE</text>
+
+  <!-- circle location -->
+  <circle cx="560" cy="260" r="56" fill="#6c8cff" fill-opacity="0.1" stroke="#6c8cff" stroke-width="2"/>
+  <text x="560" y="265" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">Paleto Valley Mall</text>
+
+  <!-- polygon location -->
+  <path d="M500 400 L700 380 L720 470 L520 500 Z" fill="#ffc34d" fill-opacity="0.1" stroke="#ffc34d" stroke-width="2"/>
+  <text x="610" y="448" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">Sandy Shores Airfield</text>
+
+  <!-- caller blip -->
+  <circle cx="585" cy="286" r="7" fill="#ff3b50" stroke="#fff" stroke-width="2"/>
+  <text x="598" y="306" fill="#ffd1d6" font-size="12">📞 Jane Roe</text>
+
+  <!-- config card -->
+  <rect x="800" y="116" width="340" height="440" rx="8" fill="#05070b" stroke="#243050" stroke-width="2"/>
+  <g font-family="Consolas, 'Courier New', monospace" font-size="13">
+    <text x="820" y="148" fill="#6c8cff">LiveMap.overlays = {</text>
+    <text x="836" y="172" fill="#e7ecf5">{ id = "postals",</text>
+    <text x="852" y="194" fill="#e7ecf5">url  = "https://cfx-nui-</text>
+    <text x="852" y="212" fill="#e7ecf5">  my-maps/postals.png",</text>
+    <text x="852" y="234" fill="#e7ecf5">from = { x=-4140, y=-4200 },</text>
+    <text x="852" y="256" fill="#e7ecf5">to   = { x= 4600, y= 8440 } },</text>
+    <text x="820" y="278" fill="#6c8cff">}</text>
+
+    <text x="820" y="320" fill="#6c8cff">LiveMap.locations = {</text>
+    <text x="836" y="344" fill="#e7ecf5">{ name = "Paleto Valley Mall",</text>
+    <text x="852" y="366" fill="#e7ecf5">x=-150, y=6300, radius=120 },</text>
+    <text x="836" y="390" fill="#e7ecf5">{ name = "Sandy Shores Airfield",</text>
+    <text x="852" y="412" fill="#e7ecf5">points = { … } },</text>
+    <text x="820" y="434" fill="#6c8cff">}</text>
+  </g>
+  <text x="820" y="480" fill="#9fb0ff" font-size="13">A 911 call inside a location reads:</text>
+  <text x="820" y="504" fill="#e7ecf5" font-size="14" font-weight="700">Paleto Valley Mall, Great Ocean Hwy</text>
+</svg>

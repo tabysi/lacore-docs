@@ -3,6 +3,43 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [3.5.9] – 2026-09-17 — Tracing 911 callers, and a live map that knows your server
+
+> ⚠️ In development — not tested on a live server yet.
+
+> ⚠️ **Config change:** `configs/config.lua` gets three new `CallCenter` keys (`Trace`,
+> `TraceMinSeconds`, `TraceMaxSeconds`) and there is a new file `configs/cfg-livemap-sh.lua`.
+> Both are off / empty by default, so nothing changes until you set them. `/lacoreconfig restore`
+> adds the new keys to an edited `config.lua`.
+
+Two requests from 911 operators: a way to earn the caller's location, and a live map that shows
+the places a server actually uses.
+
+![A 911 caller's location is found after 20–35 seconds on the line](/img/dispatch/caller-trace.svg)
+
+### Added
+
+- **Caller trace.** With `CallCenter.Trace = true`, a 911/311 caller's postal, street and map blip
+  stay hidden until the dispatcher has been on the line with them for a random 20–35 seconds
+  (`TraceMinSeconds` / `TraceMaxSeconds`). The call panel shows a **TRACE** countdown; hold pauses
+  it. If the caller hangs up first, the call is marked *Not traced* and an incident created from it
+  has no location. The queue shows *Location unknown* for calls nobody has answered yet. With no
+  dispatcher online, the auto-incident still gets the location.
+- **Your own map on the dispatch console.** The new `configs/cfg-livemap-sh.lua` takes overlay
+  images (a postal map, a custom island) placed by two corner coordinates, each with an on/off
+  button in the console's top bar. `hideBaseTiles` shows only your images.
+- **Named locations.** Circles or polygons with a name, drawn on the live map. A 911/311 call placed
+  inside one carries the name in front of the street, e.g. *Paleto Valley Mall, Great Ocean Hwy*.
+
+![Custom overlay image and named locations on the dispatch live map](/img/dispatch/livemap-custom.svg)
+
+### Fixed
+
+- **The call panel's duration timer stayed empty.** The session never carried its start time; it
+  does now.
+- **Caller names on the live map are escaped.** A name containing HTML was drawn as markup in the
+  caller marker and its popup.
+
 ## [3.5.8] – 2026-09-12 — A full shift of dispatch, without the board going dark
 
 Four fixes from a live patrol with 22 units, where the unit board went blank partway through the

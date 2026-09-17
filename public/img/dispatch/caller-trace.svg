@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#6c8cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="560" fill="url(#bg)"/>
+  <rect width="1200" height="560" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 504 V532 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">911 CALLS — <tspan fill="#6c8cff">CALLER TRACE</tspan></text>
+  <text x="60" y="86" fill="#9fb0ff" font-size="15">CallCenter.Trace = true: the location is found only after 20–35 s on the line (random per call).</text>
+
+  <!-- timeline -->
+  <g font-size="14">
+    <rect x="60" y="140" width="230" height="120" rx="8" fill="#05070b" stroke="#243050" stroke-width="2"/>
+    <text x="80" y="172" fill="#6c8cff" font-size="13" font-weight="700" letter-spacing="2">1 · CALL QUEUED</text>
+    <text x="80" y="202" fill="#e7ecf5">911 · John Doe</text>
+    <text x="80" y="228" fill="#9fb0ff" font-size="13">Location unknown</text>
+    <text x="80" y="246" fill="#9fb0ff" font-size="13">(answer to trace)</text>
+
+    <line x1="296" y1="200" x2="350" y2="200" stroke="#6c8cff" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="356" y="140" width="440" height="120" rx="8" fill="#05070b" stroke="#6b5520" stroke-width="2"/>
+    <text x="376" y="172" fill="#ffc34d" font-size="13" font-weight="700" letter-spacing="2">2 · ANSWERED — TRACING</text>
+    <text x="376" y="202" fill="#e7ecf5">Tracing caller … 18s</text>
+    <rect x="376" y="216" width="400" height="8" rx="4" fill="#1a1f2b"/>
+    <rect x="376" y="216" width="160" height="8" rx="4" fill="#ffc34d"/>
+    <text x="376" y="246" fill="#9fb0ff" font-size="13">Counts only while connected — hold pauses it</text>
+
+    <line x1="802" y1="200" x2="856" y2="200" stroke="#6c8cff" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="862" y="140" width="278" height="120" rx="8" fill="#05070b" stroke="#2f6fd0" stroke-width="2"/>
+    <text x="882" y="172" fill="#6c8cff" font-size="13" font-weight="700" letter-spacing="2">3 · LOCATED</text>
+    <text x="882" y="202" fill="#e7ecf5">POSTAL 8042</text>
+    <text x="882" y="226" fill="#e7ecf5" font-size="13">Paleto Valley Mall,</text>
+    <text x="882" y="244" fill="#e7ecf5" font-size="13">Great Ocean Hwy  + map blip</text>
+  </g>
+
+  <!-- failure branch -->
+  <path d="M576 266 V330" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#arr)"/>
+  <rect x="356" y="340" width="440" height="110" rx="8" fill="#05070b" stroke="#5a2230" stroke-width="2"/>
+  <text x="376" y="372" fill="#ff8fa3" font-size="13" font-weight="700" letter-spacing="2">CALLER HANGS UP FIRST</text>
+  <text x="376" y="402" fill="#e7ecf5" font-size="14">Not traced (caller hung up)</text>
+  <text x="376" y="428" fill="#9fb0ff" font-size="13">The incident is created without a location —</text>
+  <text x="376" y="444" fill="#9fb0ff" font-size="13">ask for it on the line and write it down.</text>
+
+  <text x="60" y="510" fill="#9fb0ff" font-size="14">Trace = false (default): postal, street and blip show as soon as the call comes in, like before.</text>
+</svg>

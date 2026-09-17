@@ -45,9 +45,16 @@ CallCenter = {
     MaxCallLogs      = 500,    -- archived calls kept in data/call_logs.json
     MaxLogResults    = 100,    -- max results per dispatcher log query
     AllowCommands    = true,   -- allow /911 and /311 chat commands
-    Debug            = true,   -- verbose 911/311 flow prints (set false in production)
+    Trace            = false,  -- true = the caller's location is found only after time on the line
+    TraceMinSeconds  = 20,     -- shortest trace (random per call)
+    TraceMaxSeconds  = 35,     -- longest trace
+    Debug            = false,  -- verbose 911/311 flow prints
 }
 ```
+
+See [Caller trace](/features/mdt-and-dispatch#caller-trace-911--311) for how the trace plays out.
+Custom map images and named locations for the dispatch live map live in
+`configs/cfg-livemap-sh.lua` (see [Your own map](/features/mdt-and-dispatch#your-own-map-overlays--named-locations)).
 
 <Callout type="warning">
   `VoiceChannelBase` occupies 100 channels (`base … base+99`). Make sure that range doesn't collide

@@ -99,6 +99,52 @@ The console shows a **live tile map** of incidents, units and callers, plus:
   pma-voice) while dispatching. Escape closes the console without opening the GTA pause map.
 </Callout>
 
+### Caller trace (911 / 311)
+
+![A 911 caller's location is found after 20–35 seconds on the line](/img/dispatch/caller-trace.svg)
+
+By default a caller's postal, street and map blip show as soon as the call comes in. Turn on the
+**trace** to make dispatchers work for it:
+
+```lua
+-- configs/config.lua
+CallCenter = {
+    Trace           = true,
+    TraceMinSeconds = 20,
+    TraceMaxSeconds = 35,
+}
+```
+
+- Every answered call rolls a random trace time between `TraceMinSeconds` and `TraceMaxSeconds`.
+- The call panel shows a **TRACE** countdown. Only connected time counts: putting the caller on
+  hold pauses the trace.
+- When it completes, postal and street appear and the caller's blip is placed on the map.
+- If the caller hangs up first, the call is marked **Not traced**. An incident created from it has
+  no location, so ask for one on the line and write it into the description.
+- With no dispatcher online, the auto-incident still gets the location (nobody could trace it).
+
+### Your own map (overlays & named locations)
+
+![Custom overlay image and named locations on the dispatch live map](/img/dispatch/livemap-custom.svg)
+
+`configs/cfg-livemap-sh.lua` lets you fit the live map to your server:
+
+- **`LiveMap.overlays`**: draw your own image (a postal map, a custom island) over the GTA tiles.
+  Give the game coordinates of the image's bottom-left (`from`) and top-right (`to`) corner. Each
+  overlay gets an on/off button in the console's top bar. Set `LiveMap.hideBaseTiles = true` to
+  show only your images.
+- **`LiveMap.locations`**: named places, as a circle (`x`, `y`, `radius`) or a polygon
+  (`points`). They are drawn on the live map, and a 911/311 call placed inside one carries the
+  name in front of the street, e.g. *Paleto Valley Mall, Great Ocean Hwy*. The first match wins,
+  so list small places before the bigger area around them.
+
+<Callout type="info">
+  The easiest place for an overlay image is a small resource of your own: put the image in it,
+  list it under `files { 'maps/postals.png' }` in that resource's `fxmanifest.lua`, and use
+  `https://cfx-nui-<resource>/maps/postals.png` as the `url`. To find the corner coordinates,
+  switch the console to **Admin** and click the map: it shows the game coordinates of the click.
+</Callout>
+
 ## Call & unit states
 
 Incident (call) states progress:
