@@ -1,0 +1,32 @@
+---
+title: "4.0.0"
+---
+
+import { Callout } from 'nextra/components'
+
+![LACORE 4.0.0](/changelog/v4-0-0.svg)
+
+# [4.0.0] – 2026-09-17 — LACORE 4.0
+
+Work on the next major version starts here. Everything that changes on the way to 4.0 is listed in
+this one section.
+
+<Callout type="warning">
+In development — LACORE 4.0 is being built; this section grows until release.
+</Callout>
+
+<Callout type="warning">
+**Config change:** overlays in `configs/cfg-livemap-sh.lua` take a new optional key `webUrl`.
+Nothing changes until you set it.
+</Callout>
+
+### Web dispatcher
+
+![The same overlay loaded from url in-game and from webUrl in the web dispatcher](/img/dispatch/webdispatch-map-overlay.svg)
+
+- **Your map images on the web dispatcher.** Overlays from `configs/cfg-livemap-sh.lua` now show on
+  the map of the hosted RP-WEB portal and of the self-hosted bridge app, each with an on/off button
+  that the browser remembers. A browser cannot open `cfx-nui-` addresses, so an overlay takes a
+  public `webUrl` for the web; one whose `url` is already public `https://` needs none. Only
+  `https://` images pass, and `hideBaseTiles` applies on the web too. Named locations are not drawn
+  there yet.

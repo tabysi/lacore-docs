@@ -3,6 +3,27 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [4.0.0] – 2026-09-17 — LACORE 4.0
+
+> ⚠️ In development — LACORE 4.0 is being built; this section grows until release.
+
+Work on the next major version starts here. Everything that changes on the way to 4.0 is listed in
+this one section.
+
+> ⚠️ **Config change:** overlays in `configs/cfg-livemap-sh.lua` take a new optional key `webUrl`.
+> Nothing changes until you set it.
+
+### Web dispatcher
+
+![The same overlay loaded from url in-game and from webUrl in the web dispatcher](/img/dispatch/webdispatch-map-overlay.svg)
+
+- **Your map images on the web dispatcher.** Overlays from `configs/cfg-livemap-sh.lua` now show on
+  the map of the hosted RP-WEB portal and of the self-hosted bridge app, each with an on/off button
+  that the browser remembers. A browser cannot open `cfx-nui-` addresses, so an overlay takes a
+  public `webUrl` for the web; one whose `url` is already public `https://` needs none. Only
+  `https://` images pass, and `hideBaseTiles` applies on the web too. Named locations are not drawn
+  there yet.
+
 ## [3.5.9] – 2026-09-17 — Tracing 911 callers, and a live map that knows your server
 
 > ⚠️ **Config change:** `configs/config.lua` gets three new `CallCenter` keys (`Trace`,

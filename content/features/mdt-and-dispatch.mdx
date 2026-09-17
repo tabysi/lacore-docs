@@ -132,7 +132,8 @@ CallCenter = {
 - **`LiveMap.overlays`**: draw your own image (a postal map, a custom island) over the GTA tiles.
   Give the game coordinates of the image's bottom-left (`from`) and top-right (`to`) corner. Each
   overlay gets an on/off button in the console's top bar. Set `LiveMap.hideBaseTiles = true` to
-  show only your images.
+  show only your images. Add a public `webUrl` to show the image on the
+  [web dispatcher](/features/webdispatch#your-own-map-images) too.
 - **`LiveMap.locations`**: named places, as a circle (`x`, `y`, `radius`) or a polygon
   (`points`). They are drawn on the live map, and a 911/311 call placed inside one carries the
   name in front of the street, e.g. *Paleto Valley Mall, Great Ocean Hwy*. The first match wins,
