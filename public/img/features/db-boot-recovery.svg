@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="'Chakra Petch', 'Segoe UI', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#1a2130" stroke-width="1"/>
+    </pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#6c8cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)"/>
+  <rect width="1200" height="520" fill="url(#grid)"/>
+
+  <text x="60" y="70" fill="#e7ecf5" font-size="30" font-weight="700">Database connection at boot</text>
+  <text x="60" y="102" fill="#9fb0ff" font-size="17">A slow first answer no longer switches the whole session to JSON</text>
+
+  <!-- boxes -->
+  <g font-size="17">
+    <rect x="60" y="150" width="240" height="110" rx="10" fill="#111827" stroke="#4a5cff" stroke-width="2"/>
+    <text x="80" y="188" fill="#e7ecf5" font-weight="700">Resource starts</text>
+    <text x="80" y="216" fill="#9fb0ff" font-size="15">connects right away,</text>
+    <text x="80" y="238" fill="#9fb0ff" font-size="15">not on the first store</text>
+
+    <rect x="350" y="150" width="260" height="110" rx="10" fill="#111827" stroke="#4a5cff" stroke-width="2"/>
+    <text x="370" y="188" fill="#e7ecf5" font-weight="700">First 60 s: 30 s deadline</text>
+    <text x="370" y="216" fill="#9fb0ff" font-size="15">boot hitches no longer</text>
+    <text x="370" y="238" fill="#9fb0ff" font-size="15">count as "unreachable"</text>
+
+    <rect x="660" y="150" width="220" height="110" rx="10" fill="#10231a" stroke="#3ecf8e" stroke-width="2"/>
+    <text x="680" y="188" fill="#e7ecf5" font-weight="700">ready</text>
+    <text x="680" y="216" fill="#9fb0ff" font-size="15">stores sync to MySQL</text>
+
+    <rect x="660" y="320" width="220" height="130" rx="10" fill="#241a10" stroke="#f0a44b" stroke-width="2"/>
+    <text x="680" y="358" fill="#e7ecf5" font-weight="700">unreachable</text>
+    <text x="680" y="386" fill="#9fb0ff" font-size="15">JSON fallback,</text>
+    <text x="680" y="408" fill="#9fb0ff" font-size="15">reason shown in the</text>
+    <text x="680" y="430" fill="#9fb0ff" font-size="15">boot report</text>
+
+    <rect x="930" y="320" width="220" height="130" rx="10" fill="#111827" stroke="#4a5cff" stroke-width="2"/>
+    <text x="950" y="358" fill="#e7ecf5" font-weight="700">Retry every 30 s</text>
+    <text x="950" y="386" fill="#9fb0ff" font-size="15">answers again →</text>
+    <text x="950" y="408" fill="#9fb0ff" font-size="15">DB sync resumes</text>
+
+    <rect x="930" y="150" width="220" height="110" rx="10" fill="#111827" stroke="#4a5cff" stroke-width="2"/>
+    <text x="950" y="188" fill="#e7ecf5" font-weight="700">Boot report</text>
+    <text x="950" y="216" fill="#9fb0ff" font-size="15">waits while the DB</text>
+    <text x="950" y="238" fill="#9fb0ff" font-size="15">is still connecting</text>
+  </g>
+
+  <g stroke="#6c8cff" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <path d="M300 205H345"/>
+    <path d="M610 205H655"/>
+    <path d="M880 205H925"/>
+    <path d="M480 260V385H655"/>
+    <path d="M880 385H925"/>
+    <path d="M1040 320V300H770V265"/>
+  </g>
+</svg>

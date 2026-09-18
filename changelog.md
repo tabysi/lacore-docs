@@ -89,6 +89,23 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   file that does not compile is never written. Only cosmetic: a restore normalises CRLF line
   endings to LF.
 
+### Database
+
+![How the database connection is handled at boot](/img/features/db-boot-recovery.svg)
+
+- **Fixed: "oxmysql not reachable" on a server where oxmysql was fine.** Every query had 5 seconds
+  to answer, and the first one that missed switched the resource to the local JSON files for the
+  rest of the session. During boot the server thread hitches for seconds while other resources load,
+  so on bigger servers a healthy database regularly missed that window. Queries in the first minute
+  now get 30 seconds, the connection starts right away instead of on the first store, and the boot
+  report waits for it before judging.
+- **The database comes back on its own.** When it really was unreachable, LACORE now retries every
+  30 seconds and resumes syncing as soon as MySQL answers — no restart needed. The boot report and
+  `/lacore doctor` show why it was marked unreachable.
+- **Clearer report when the persistence layer itself is missing.** `/lacore doctor` now says so
+  instead of blaming oxmysql, and saving a character from a QBCore player-save event no longer throws
+  `attempt to call a nil value (field 'DBSaveStore')` into qb-core in that case.
+
 ### Gameplay
 
 ![How a dropped weapon becomes a pickup](/img/features/weapon-drop.svg)
