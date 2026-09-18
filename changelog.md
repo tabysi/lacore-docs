@@ -105,6 +105,11 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
 - **Clearer report when the persistence layer itself is missing.** `/lacore doctor` now says so
   instead of blaming oxmysql, and saving a character from a QBCore player-save event no longer throws
   `attempt to call a nil value (field 'DBSaveStore')` into qb-core in that case.
+- **Fixed: the standalone products shipped the wrong ACE lines.** The `server.cfg.example` of
+  LACORE MDT and LACORE 90s CAD granted `add_ace` / `add_principal` to `resource.lacore` — a
+  resource those servers don't have. Copied as-is, the console printed "Access denied for command
+  add_ace" about 20 times per start and the staff groups stayed empty. The examples now name
+  `resource.lacore-mdt` / `resource.lacore-90s-cad`.
 
 ### Gameplay
 
