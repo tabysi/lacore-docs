@@ -184,6 +184,11 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   > `https://lacore.netica.dev/form/auth/callback` as a redirect in the Discord application —
   > see `landing/DASHBOARD.md`.
 
+- **Fixed: blank survey and form pages.** A page opened at `/survey/<token>/` (where every survey
+  link lands) or `/f/<id>/` asked for its scripts one folder too deep and got the page back instead,
+  so participants saw nothing but the LACORE footer. The server now resolves those requests to the
+  real files.
+
 ### LAPD MDT, Agency MDT, LASD terminal, EMS CAD, Pennsylvania CAD & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
