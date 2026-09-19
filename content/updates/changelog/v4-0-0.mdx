@@ -175,6 +175,22 @@ Everything else changes nothing until you set it.
   `SoftwareApplication` data and a `theme-color`, so search results and mobile browsers treat it as a
   product page.
 
+![Admin forms — build a form, share the /f/ link, read the answers](/img/changelog/admin-forms.svg)
+
+- **New: Forms — a Google-Forms-style builder for the LACORE team.** *Admin → Forms* builds a form
+  out of cards: short answer, paragraph, multiple choice, checkboxes, dropdown, linear scale, number,
+  date and time, plus title blocks and sections that split it into pages. Options can carry an
+  “Other” field, questions can be required, and a question can be shown only when an earlier answer
+  matches. The editor saves as you type. Each form gets its own link (`/f/<id>/`); respondents sign
+  in with Discord (name and ID only, nothing is posted), and by default each account answers once —
+  optionally with the right to come back and change the answer. A form can close itself at a date
+  or after a number of answers. *Responses* shows a summary with bars and averages, every answer one
+  by one, a table, and a CSV export (safe to open in Excel). Separate from the rebate surveys, which
+  are unchanged.
+  > ⚠️ **Setup:** import `landing/pocketbase/pocketbase-forms-collections.json` and add
+  > `https://lacore.netica.dev/form/auth/callback` as a redirect in the Discord application —
+  > see `landing/DASHBOARD.md`.
+
 ### LAPD MDT, Agency MDT, LASD terminal, EMS CAD, Pennsylvania CAD & supervisor terminal
 
 ![The Map rail section of the LAPD MDT with an overlay image and named locations](/img/mdt/lapd-mdt-map.svg)
