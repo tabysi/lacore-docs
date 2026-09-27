@@ -60,6 +60,11 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   **Calculator**, **Clock**, **Task Manager** (with End task), **Settings** (wallpaper, accent
   colour, window opacity and size, About this PC) and an intranet page with the BOLO / call / unit
   counts. Plus a Recycle Bin for the look.
+- **Every app works on the narrow machines too.** On a screen the size of the LAPD client's strip
+  the apps open full-screen and the taskbar switches between them, instead of a cascade of windows
+  walking off the right edge where they could not be reached again. The taskbar scrolls, the Start
+  menu fills the width, the desk icons flow into columns, and the record card in Query wraps into
+  the 380 px it has.
 - **More apps:** **Query** (run a person or a plate and read the full record card), **Map** (the
   live map with every call), **History**, **Citations** (the charge picker: who, citation or arrest,
   tick, issue), **My Activity** (your own arrest / citation / call numbers and duty time),
