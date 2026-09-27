@@ -142,9 +142,10 @@ That's **33 bindings** in total: 11 with a default key, 22 unbound.
 
 | Command | Who | What it does |
 |---------|-----|--------------|
-| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Which terminal you get is the department's [`cad` setting](/configuration/main); without one it is guessed from the name: LAPD → LACORE Mobile Client, LASD/Sheriff/BCSO → LASD CAD, other LE → Agency MDT, Fire/EMS → EMS CAD. |
+| `/mdt` | LEO / Fire-EMS / Coroner | Open / close the MDT (default key **O**). Opens the [MDT Desktop](/user-guide/mdt-desktop) first — boot, sign-in, then the CAD as an app — unless `cad.os = false`. Which terminal you get is the department's [`cad` setting](/configuration/main); without one it is guessed from the name: LAPD → LACORE Mobile Client, LASD/Sheriff/BCSO → LASD CAD, other LE → Agency MDT, Fire/EMS → EMS CAD. |
 | `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
 | `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
+| `/spillman` | LEO | Always opens the [Spillman Flex Mobile CAD](/user-guide/spillman-flex) (toggles). Off when `cad.spillman = false`. |
 | `/penncad` | LEO | Always opens the [Pennsylvania CAD](/user-guide/pennsylvania-cad) — a paid add-on, unlocked by licence key. |
 | `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
 | `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |

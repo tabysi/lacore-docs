@@ -22,7 +22,72 @@ tell us what you find; this section keeps growing until the final release.
 and `configs/cfg-gameplay-sh.lua` gets a new block `Gameplay.weaponDrop` (on by default: `/drop`
 and the held weapon on death become pickups; set `enabled = false` for the old behaviour).
 Everything else changes nothing until you set it.
+
+⚠️ **Config change:** new file `configs/cfg-spillman-sh.lua` (the Spillman Flex Mobile CAD), a new
+sub-toggle `cad.spillman` in `configs/cfg-features-sh.lua` (on by default — a missing key also
+counts as on), and `cad = "spillman"` is a new value in `configs/cfg-agencies-sh.lua`. No department
+is routed to it until you set that value or name a department after one of its tags
+(`spillman`, `flex`).
+
+⚠️ **Config change:** new file `configs/cfg-mdtos-sh.lua` (the MDT desktop) and a new sub-toggle
+`cad.os` in `configs/cfg-features-sh.lua` (on by default — a missing key also counts as on).
+`cad.os = false` gives you the old behaviour: every terminal opens directly.
 </Callout>
+
+### The MDT runs on a computer now
+
+![What /mdt does: boot, sign in, desktop, CAD](/img/mdt/mdt-desktop-flow.svg)
+
+- **`/mdt` boots a computer.** A POST screen with the hardware and radio checks, a Windows-style
+  sign-in screen with your character, callsign and department, then a desktop with your
+  department's CAD as an app on it. Click the icon and the terminal you always had opens on top;
+  Escape closes it and lands back on the desktop, because the computer is still on.
+- **Once per shift.** Boot and sign-in run the first time you open the MDT after `/onduty`; every
+  `/mdt` after that resumes from standby straight to the desktop. `/offduty` puts it back to a cold
+  boot, and **Sign out** in the Start menu asks for the sign-in again.
+- **The sign-in is an animation, not a password check.** There is no per-player computer password
+  on the server, so a real prompt would accept everything and only look like security. Username,
+  callsign and department are filled in; one click (or Enter) plays the welcome.
+- **On the desktop:** the department's CAD, the dispatch console for an actual dispatcher, the
+  supervisor terminal for an actual supervisor, plus Notes (the bulletin board, including posting),
+  Settings (window opacity, size, wallpaper), Clock (time and uptime), an intranet page with the
+  BOLO / call / unit counts and the latest board notes, and a Recycle Bin for the look. One click
+  opens an icon — no double-clicking in a moving car. Taskbar with Start menu, machine name,
+  callsign and clock.
+- Works in front of **every** terminal (LAPD, Sheriff, Agency, EMS, 9100-T, Pennsylvania,
+  Spillman Flex) and changes nothing about which one a department gets. The in-car dashboard screen
+  keeps showing the CAD itself — a dashboard has no cursor to click an icon with.
+- Off with one switch: `cad.os = false`. Timings, wallpaper, machine name and which extra icons
+  exist are in `configs/cfg-mdtos-sh.lua`.
+
+### Spillman Flex Mobile CAD
+
+![Spillman Flex Mobile call screen layout](/img/mdt/spillman-flex-layout.svg)
+
+- **A new terminal in the Flex style.** Blue toolbar with Back / Forward / Home, a menu bar, the
+  big *FLEX* mark and a status bar with your status timer, shift total, clock, state returns,
+  messages and alerts. Like every LACORE CAD it is a re-skin of the shared dispatch data — same
+  calls, same units, same log. Open it with `/mdt` on a department with `cad = "spillman"` (or a
+  name containing `spillman` / `flex`), or directly with `/spillman`.
+- **Call screen.** Call header (type, number, address, area, priority, complainant), your callsign
+  with the status code in yellow, the live map with every active call, the newest comment in a red
+  frame, **Add Comment**, **Radio Log Entry**, hold-to-fire **PANIC**, **BACKUP**, and the call log
+  underneath with the newest entry highlighted.
+- **Status keys F2–F11.** ASSGN, RCVD, ENRT, ARRVD, CMPLT, ONAIR, ONDT, BUSY, OSTN, UNAV — each one
+  a LACORE status or an action (assign / acknowledge / complete with a disposition). Labels, keys
+  and order come from `Spillman.statusKeys`.
+- **Message Center.** Alerts (BOLOs), Messages and Sent (dispatch channel), **State Returns** and the
+  Bulletin Board, with a preview pane, **Add to Call**, **Forward**, **Delete** and an IM list of
+  every unit on duty.
+- **State returns.** Every name and plate search from this terminal lands as an NCIC-style return —
+  `LIC/`, `VMA/`, `OWN/`, `NAM/`, `DOB/` with the values highlighted, red for a stolen plate, a
+  wanted person or a suspended licence, and a *Stolen Vehicle* / *Wanted Person* / *BOLO* badge.
+- **Name / Vehicle / Law search and the name record.** Name Search (Last / First / Middle, birth
+  date and sex narrow the result), plate search, the charge picker, and the Flex name record with
+  Critical Notices, Licenses, Alerts, Vehicles, Involvements, Comments and Files; **Actions** opens
+  the full record card (warrant, charges, report, evidence).
+- **Classic and Night themes**, own settings panel (opacity, size, position reset), full screen,
+  keyboard shortcuts under *Help*. English, German and Russian.
 
 ### 911 calls from the web dispatcher
 
@@ -127,6 +192,10 @@ Everything else changes nothing until you set it.
   drop what it holds and pick up what is within reach, and a weapon is handed out once. Despawn
   after 300 s, oldest first past 50. Replaces the dormant client-only remains of the old system.
   `Gameplay.weaponDrop` in `cfg-gameplay-sh.lua`.
+- **K9 engages real players.** `/k9 engage` only ever attacked NPCs: the dog sat in the `PLAYER`
+  relationship group, so every player counted as its friend and the attack was dropped at once. It
+  now has its own group and is hostile to players only while it is sent after one. Any other
+  command, the target going down, or the handler going down calls it off and it goes back to heel.
 
 ### Web dispatcher
 
@@ -187,6 +256,9 @@ Everything else changes nothing until you set it.
   or after a number of answers. *Responses* shows a summary with bars and averages, every answer one
   by one, a table, and a CSV export (safe to open in Excel). Separate from the rebate surveys, which
   are unchanged.
+  A form can be **locked to owners** (*Settings → Only owners can edit*): staff can still open it,
+  read and export its answers, but only a dashboard owner can change, publish, close or delete it —
+  and only an owner can set or lift the lock. The server enforces it on every request.
   > ⚠️ **Setup:** import `landing/pocketbase/pocketbase-forms-collections.json` and add
   > `https://lacore.netica.dev/form/auth/callback` as a redirect in the Discord application —
   > see `landing/DASHBOARD.md`.

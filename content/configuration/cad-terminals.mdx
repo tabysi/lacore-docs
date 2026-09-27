@@ -21,9 +21,36 @@ actually use a terminal, see the [User Guide](/user-guide/mdt).
 | EMS / Fire CAD | `"ems"` | Dark medical CAD |
 | 9100-T Terminal | `"90s"` (`"retro"` is accepted as an alias) | Green-phosphor 90s CRT |
 | Pennsylvania CAD | `"penn"` | Retro county terminal (add-on) |
+| Spillman Flex Mobile | `"spillman"` (`"flex"` is accepted as an alias) | Flex-style mobile CAD: message center, call screen with map |
 
 Each one can be switched off individually in [`cfg-features-sh.lua`](/configuration/features) under
 `cad`.
+
+## MDT Desktop — `configs/cfg-mdtos-sh.lua`
+
+`/mdt` boots a computer first: a POST screen, a sign-in screen, then a desktop with the
+department's CAD as an app on it — see the [MDT Desktop](/user-guide/mdt-desktop) guide. It sits in
+front of **every** terminal below and changes nothing about which one a department gets.
+
+![What /mdt does: boot, sign in, desktop, CAD](/img/mdt/mdt-desktop-flow.svg)
+
+Boot and sign-in run once per shift; every later `/mdt` resumes from standby. Switch the whole
+thing off with `cad.os = false` in [`cfg-features-sh.lua`](/configuration/features) and the
+terminals open directly again.
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `name` | `""` | Name on the boot screen and in the Start menu. Empty uses the community name from `cfg-branding-sh.lua`. |
+| `bootSeconds` | `4.5` | Length of the boot screen. `0` skips straight to the sign-in. |
+| `loginSeconds` | `2.0` | The "Welcome" animation after **Sign in**. |
+| `resumeSeconds` | `0.9` | The resume-from-standby fade every later `/mdt` uses. |
+| `wallpaper` | `"auto"` | `"auto"` paints the department colours; a path under `nui/` or an `https://` URL uses that image. |
+| `systemApps` | `true` | Notes, Settings, Clock and the intranet page on the desktop. |
+| `decoIcons` | `true` | The decorative Recycle Bin and intranet shortcut. |
+| `machineName` | `"auto"` | Machine name on the sign-in screen and the taskbar. `"auto"` builds one from the callsign (`MDT-1L30`). |
+
+The sign-in is an animation, not a password check — LACORE has no per-player computer password on
+the server, and a prompt that accepts everything would only look like security.
 
 ## Choosing a terminal per agency
 
@@ -49,12 +76,14 @@ first terminal that matches:
 1. **The agency's own `cad` field** — if the agency has one and that terminal is available here.
 2. **Pennsylvania CAD** — the department name contains one of `Penn.deptTags`, and the add-on is
    unlocked.
-3. **9100-T** — the department name contains `90s`.
-4. **Sheriff CAD** — the department name contains `lasd`, `sheriff` or `bcso`.
-5. **EMS / Fire CAD** — the *job* is Fire/EMS, AMR or Coroner, or the department name contains
+3. **Spillman Flex Mobile** — the department name contains one of `Spillman.deptTags`, and
+   `cad.spillman` is on.
+4. **9100-T** — the department name contains `90s`.
+5. **Sheriff CAD** — the department name contains `lasd`, `sheriff` or `bcso`.
+6. **EMS / Fire CAD** — the *job* is Fire/EMS, AMR or Coroner, or the department name contains
    `fire`, `ems`, `fd`, `medic` or `amr`.
-6. **Agency MDT** — any other law-enforcement department.
-7. **LACORE Mobile Client** — the department name contains `lapd`.
+7. **Agency MDT** — any other law-enforcement department.
+8. **LACORE Mobile Client** — the department name contains `lapd`.
 
 If none match, no terminal opens and the player is told they have no agency.
 
@@ -109,6 +138,28 @@ they had before.
 | `dispositions` | 12 entries | Disposition codes offered when clearing a call (**F11 → Dispositions**). `code` goes into the incident log, `label` is what the unit reads. |
 
 Setting `cad = "penn"` on an agency is the direct alternative to naming the department after a tag.
+
+## Spillman Flex Mobile — `configs/cfg-spillman-sh.lua`
+
+A Flex-style mobile terminal for the same dispatch data: message center, call screen with the live
+map and status keys down the left, name/vehicle searches and the name record. Part of the core —
+switch it off with `cad.spillman = false` in [`cfg-features-sh.lua`](/configuration/features).
+
+![Spillman Flex Mobile call screen layout](/img/mdt/spillman-flex-layout.svg)
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `deptTags` | `{ "spillman", "flex" }` | Department-name substrings that route a player here. Lowercase, matched as plain text. |
+| `callPrefix` | `""` | Cosmetic prefix in front of the call number (`"26-"` → `26-1042`). Display only. |
+| `stateCode` | `"SA"` | State shown in plate and licence returns (`LIS/SA`). |
+| `statusKeys` | 10 keys, F2–F11 | The status keys down the left of the call screen. Each is `{ code, key, status }` (sets a LACORE status) or `{ code, key, action }` with `action` = `"assign"`, `"ack"` or `"resolve"`. `code` is only the label. |
+| `dispositions` | 10 entries | Disposition codes offered when completing a call (**CMPLT**). |
+
+`status` must be one of LACORE's unit statuses — `CLEAR`, `ENROUTE`, `ON SCENE`, `CODE SIX`, `BUSY`,
+`UNAVAILABLE`, `OUT TO STATION`. Only `CLEAR` detaches the unit from its call.
+
+Setting `cad = "spillman"` on an agency is the direct alternative to naming the department after a
+tag.
 
 ## In-car screen — `configs/cfg-vehiclescreen-sh.lua`
 

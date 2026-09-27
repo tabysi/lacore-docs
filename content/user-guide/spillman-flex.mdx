@@ -1,0 +1,123 @@
+---
+title: "Spillman Flex Mobile"
+---
+
+import { Callout } from 'nextra/components'
+
+# Spillman Flex Mobile
+
+**Spillman Flex Mobile** is a Flex-style mobile CAD: a blue toolbar with Back / Forward / Home, a
+**Message Center** full of state returns, a **call screen** with the live map and the status keys
+down the left, name and vehicle searches, and the Flex **name record**.
+
+![Spillman Flex Mobile call screen layout](/img/mdt/spillman-flex-layout.svg)
+
+It is a **re-skin, not a second dispatch system.** The calls and units on it are the same ones the
+[LAPD Mobile Client](/user-guide/mdt), the [dispatch console](/user-guide/dispatch-console) and every
+other terminal see. A status you press here, a comment you write and a call you complete land
+everywhere.
+
+> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [Pennsylvania CAD](/user-guide/pennsylvania-cad) · [Query: People & Plates](/user-guide/mdt-query) · [CAD Terminals & Routing](/configuration/cad-terminals) · [Command Reference](/commands)
+
+---
+
+## 🚔 Opening it
+
+A department gets this terminal when its agency entry says `cad = "spillman"` in
+`configs/cfg-agencies-sh.lua`, or when the department name contains one of `Spillman.deptTags`
+(`spillman`, `flex` by default).
+
+```
+/mdt          # opens Spillman Flex Mobile for a department routed to it
+/spillman     # the same terminal, directly (toggles)
+```
+
+The player still needs one of the CAD jobs (Law Enforcement, Fire/EMS, AMR, Coroner). The window
+has a title bar you can drag, a full-screen button, and its own **File → Settings** for theme
+(Classic / Night), opacity, size and a position reset.
+
+---
+
+## 🧭 Toolbar & screens
+
+| Button | Key | Screen |
+| --- | --- | --- |
+| Back / Forward | `Alt+←` / `Alt+→` (also `Backspace`) | Walks the screens you visited, like a browser |
+| Home | `Alt+Home` | **My Agency's Calls and Units** — every active call and every unit on duty |
+| Search | `Ctrl+J` | **Name Search** (Names / Vehicle / Law tabs underneath) |
+| Messages | `Ctrl+M` | **Message Center** |
+| Call | `Ctrl+L` | The **call screen** for the selected call — or your own |
+| Alerts | `Ctrl+B` | Message Center → Alerts (active BOLOs) |
+| History | `Ctrl+O` | Closed incidents |
+
+**Help → Keyboard shortcuts** lists every key, including the status keys your server configured.
+None of the keys fire while you are typing in a field.
+
+---
+
+## 📞 The call screen
+
+- **Header** — call type and number, the address, the area and the priority on the left; your
+  callsign and your status code (yellow) on the right, with the call narrative under it.
+- **Status keys** (left) — by default:
+
+| Key | Code | What it does |
+| --- | --- | --- |
+| F2 | ASSGN | Attach yourself to the selected call |
+| F3 | RCVD | Log "call received" on the call |
+| F4 | ENRT | Status `ENROUTE` |
+| F5 | ARRVD | Status `ON SCENE` |
+| F6 | CMPLT | Complete the call — pick a disposition. **Closes the call for everyone.** |
+| F7 | ONAIR | Status `CLEAR` — leaves the call, the call itself stays open |
+| F8 | ONDT | Status `CODE SIX` |
+| F9 | BUSY | Status `BUSY` |
+| F10 | OSTN | Status `OUT TO STATION` |
+| F11 | UNAV | Status `UNAVAILABLE` |
+
+  The key matching your current status is highlighted. Server owners can relabel, reorder or
+  replace them in `configs/cfg-spillman-sh.lua`.
+- **Live map** — every active call; click a pin to select that call.
+- **Right column** — the narrative, the **newest comment** (red frame), **Add Comment** (goes into
+  the call log), **Radio Log Entry** (goes to the dispatch channel, tagged with the call number),
+  **PANIC** (hold ~1 second — a stray click never fires it) and **BACKUP**.
+- **Call log** (bottom) — every comment on the call, newest first and highlighted.
+
+---
+
+## ✉ Message Center
+
+| Folder | Holds |
+| --- | --- |
+| **Alerts** | Active BOLOs — dangerous ones flagged red |
+| **Messages** / **Sent** | The dispatch channel / only what you sent |
+| **State Returns** | Every name and plate search you ran this shift, newest first |
+| **Bulletin Board** | The shared board notes |
+
+Select a message to read it underneath. **Add to Call** writes it into the selected call's log,
+**Forward** sends it to the dispatch channel, **Delete** removes a state return from your list.
+The **IM** panel lists every unit on duty — click one to start a message to them.
+
+A **state return** reads like the real thing: `LIC/`, `VMA/`, `OWN/`, `NAM/`, `DOB/` with the values
+highlighted, **red** for a stolen plate, a wanted person or a suspended licence, and a big badge
+(`Stolen Vehicle`, `Wanted Person`, `BOLO`) on the right. Only searches you ran from this terminal
+land here.
+
+---
+
+## 🔎 Searches & the name record
+
+- **Names** — Last / First / Middle build the search. Birth date and sex only narrow the result.
+  A single match opens straight into the **name record**; several go to State Returns.
+- **Vehicle** — the plate. The return shows the registration, the owner and the stolen check.
+- **Law** — the charge picker: subject name, citation or arrest, filter, tick the charges, **Issue**.
+
+The **name record** shows the Flex layout: address, driver licence, age, birth date, sex, height,
+weight, eyes, hair and the photo, then **Critical Notices**, **Licenses**, **Alerts**,
+**Vehicles**, **Involvements**, **Comments** and **Files** — click ⊞ to expand a row.
+**Refresh Data** runs the search again; **Actions** opens the full record card with warrant,
+charges, report and evidence tools.
+
+<Callout type="info">
+The live map needs the map tiles your server already uses for the other terminals. Birth date and
+sex filtering happen on the terminal — the server search itself is by name.
+</Callout>

@@ -1,6 +1,7 @@
 export default {
   index: 'Overview',
   mdt: 'Using the MDT',
+  'mdt-desktop': 'MDT Desktop',
   'mdt-toolbar': 'MDT Toolbar & Status',
   statuses: 'Status Labels',
   'mdt-incidents': 'Working with Incidents',
@@ -13,6 +14,7 @@ export default {
   'lasd-cad': 'LASD CAD / PCMS',
   'retro-mdt': '9100-T Retro Terminal',
   'pennsylvania-cad': 'Pennsylvania CAD',
+  'spillman-flex': 'Spillman Flex Mobile',
   'in-car-screen': 'In-Car Screen',
   'leo-field-tools': 'LEO Field Tools',
   phone: 'Phone',

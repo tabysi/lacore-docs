@@ -1,0 +1,81 @@
+---
+title: "MDT Desktop"
+---
+
+import { Callout } from 'nextra/components'
+
+# MDT Desktop
+
+`/mdt` does not throw a CAD window at you any more — it **boots the computer the CAD runs on**:
+a POST screen, a sign-in screen, then a desktop with your department's CAD as an app on it.
+
+![What /mdt does: boot, sign in, desktop, CAD](/img/mdt/mdt-desktop-flow.svg)
+
+Boot and sign-in run **once per shift**. Every `/mdt` after that resumes from standby straight to
+the desktop; going off duty puts the computer back to a cold boot.
+
+> 📑 **Related:** [Using the MDT](/user-guide/mdt) · [CAD Terminals & Routing](/configuration/cad-terminals) · [Dispatch Console](/user-guide/dispatch-console) · [Command Reference](/commands)
+
+---
+
+## 🖥 The three screens
+
+1. **Boot** — the firmware line, the hardware checks and the radio link, then the CAD services.
+   Length is set in `configs/cfg-mdtos-sh.lua` (`bootSeconds`, `0` skips it).
+2. **Sign in** — clock, date, your character with the callsign and department under it, the
+   password already filled in. **Sign in** (or Enter) plays the welcome animation and drops you on
+   the desktop.
+3. **Desktop** — icons on the left, a taskbar at the bottom with the Start menu, the machine name,
+   your callsign and the clock.
+
+<Callout type="info">
+The sign-in is deliberately an **animation**, not a password check: LACORE has no per-player
+computer password on the server, so a real prompt would let every password through and only look
+like security.
+</Callout>
+
+---
+
+## 🧩 What is on the desktop
+
+| Icon | Opens |
+| --- | --- |
+| **Your department's CAD** | Exactly the terminal `/mdt` would have opened — LAPD, Sheriff, Agency, EMS, 9100-T, Pennsylvania or Spillman Flex |
+| **Dispatch** | The dispatch console — only for a unit that is actually a dispatcher |
+| **Supervisor** | The oversight terminal — only when the server knows you as a supervisor |
+| **Notes** | The bulletin board: read it and pin a note, same board every terminal shows |
+| **Settings** | Window opacity, window size and the wallpaper. Opacity and size apply to every CAD window |
+| **Clock** | Time, date and how long the computer has been running this shift |
+| **Intranet** | The department page: active BOLOs, open calls, units on duty and the latest board notes |
+| **Recycle Bin** | Empty. It is there for the look |
+
+One click opens an icon — no double-click, you are in a moving car. The Start menu holds the same
+list plus **Sign out** and **Shut down**.
+
+---
+
+## ⌨ Getting around
+
+| Key / click | What happens |
+| --- | --- |
+| Click an icon | Opens that app |
+| `Esc` in the CAD | Closes the CAD and lands back on the desktop — the computer stays on |
+| `Esc` on the desktop | Closes the open window, then the Start menu, then shuts the computer down |
+| `/mdt` again | Shuts everything down (the same toggle it always was) |
+| Start → **Sign out** | Closes it and asks for the sign-in again on the next `/mdt` |
+| Start → **Shut down** | Closes it; the next `/mdt` resumes from standby |
+
+---
+
+## 🔧 Turning it off
+
+The desktop is one switch: `cad.os = false` in
+[`cfg-features-sh.lua`](/configuration/features), and every terminal opens directly again, exactly
+like before. Everything else — timings, wallpaper, the machine name and whether the small apps and
+the decorative icons are there at all — lives in
+[`configs/cfg-mdtos-sh.lua`](/configuration/cad-terminals#mdt-desktop--configscfg-mdtos-shlua).
+
+<Callout type="warning">
+The in-car dashboard screen never shows the desktop — a dashboard has no cursor to click an icon
+with, so it keeps mirroring the CAD itself.
+</Callout>
