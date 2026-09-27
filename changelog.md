@@ -60,6 +60,10 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   **Calculator**, **Clock**, **Task Manager** (with End task), **Settings** (wallpaper, accent
   colour, window opacity and size, About this PC) and an intranet page with the BOLO / call / unit
   counts. Plus a Recycle Bin for the look.
+- **Fixed: the computer could boot in the wrong place.** It only remembered how big a terminal was,
+  not where it sat, and took the shared MDT position for the rest. The EMS / Fire CAD keeps its own
+  window settings and centres itself, so the machine booted in the corner and the CAD then appeared
+  somewhere else. The measured box now carries its position too — checked on all seven terminals.
 - **Each app opens at its own size.** One 440 px default for everything looked wrong on the wide
   screens: the map got the same box as the calculator. The map, call list, unit list and citation
   picker now open wide, Query tall enough for a record card, the calculator and Minesweeper narrow —
