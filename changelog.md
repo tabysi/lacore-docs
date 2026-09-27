@@ -232,8 +232,10 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   health and distance, every order as a button, and the subjects within 30 m — players by server id,
   NPCs as civilians, with direction and distance — each with its own Engage button, so the dog goes
   after exactly the person you pick instead of whoever stands closest. An activity log keeps what the
-  dog reported. While the dog is out, a small status card on the right edge shows its order, health
-  and distance. Deploy / recall moved to `/k9 deploy`; the old keybind still does it, and a new
+  dog reported. The moment the dog is deployed, a status card on the right edge shows its order,
+  health and distance plus the **quick commands** — the key you bound to each order (also shown on
+  the console buttons), or the `/k9 …` command where no key is bound. Deploy / recall moved to
+  `/k9 deploy`; the old keybind still does it, and a new
   unbound one (*K9: Open console*) opens the window.
 
   ![The K9 console and the status card](/img/features/k9-console.svg)
