@@ -73,9 +73,12 @@ set it lower for a shorter boot, or `0` to go straight to the sign-in.
   had up. A new shift starts clean.
 - **The computer can be moved:** drag the taskbar. It uses the shared MDT position, so the terminals
   move with it rather than opening somewhere else; **Settings → Position → Reset** puts it back.
-- **Sounds.** One beep when the POST passes, a three-note chime on the system splash, a short
-  flourish after Sign in and a descending one on shutdown. Synthesised — no sound files in the
-  resource. Off per player in **Settings → Sounds**, or server-wide with `sounds = false`.
+- **Sounds.** A dry square-wave blip through a narrow band-pass when the POST passes — a mainboard
+  speaker, not a chime. Then the system splash: filtered noise sweeping up like a machine spinning
+  up, and a C-major-ninth chord walking in over it, two detuned voices per note with an octave
+  shimmer, a low-pass opening as the chord arrives and a long tail in a small hall. A short
+  two-note flourish after Sign in, three notes down on shutdown. All synthesised — no sound files
+  in the resource. Off per player in **Settings → Sounds**, or server-wide with `sounds = false`.
 - **Fixed: the computer could boot in the wrong place.** It only remembered how big a terminal was,
   not where it sat, and took the shared MDT position for the rest. The EMS / Fire CAD keeps its own
   window settings and centres itself, so the machine booted in the corner and the CAD then appeared
