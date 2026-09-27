@@ -26,6 +26,7 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
 > ⚠️ **Config change:** new file `configs/cfg-mdtos-sh.lua` (the MDT desktop) and a new sub-toggle
 > `cad.os` in `configs/cfg-features-sh.lua` (on by default — a missing key also counts as on).
 > `cad.os = false` gives you the old behaviour: every terminal opens directly.
+> `MdtOs.sounds` (new, on) turns the boot noises on or off server-wide.
 > `MdtOs.bootSeconds` defaults to **7.0** (the full firmware → POST → loader → splash sequence);
 > set it lower for a shorter boot, or `0` to go straight to the sign-in.
 
@@ -60,6 +61,14 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   **Calculator**, **Clock**, **Task Manager** (with End task), **Settings** (wallpaper, accent
   colour, window opacity and size, About this PC) and an intranet page with the BOLO / call / unit
   counts. Plus a Recycle Bin for the look.
+- **It comes back the way you left it.** Switch the computer off with the MDT open and the next
+  `/mdt` this shift opens the MDT again, not an empty desktop — the same for the desk windows you
+  had up. A new shift starts clean.
+- **The computer can be moved:** drag the taskbar. It uses the shared MDT position, so the terminals
+  move with it rather than opening somewhere else; **Settings → Position → Reset** puts it back.
+- **Sounds.** One beep when the POST passes, a three-note chime on the system splash, a short
+  flourish after Sign in and a descending one on shutdown. Synthesised — no sound files in the
+  resource. Off per player in **Settings → Sounds**, or server-wide with `sounds = false`.
 - **Fixed: the computer could boot in the wrong place.** It only remembered how big a terminal was,
   not where it sat, and took the shared MDT position for the rest. The EMS / Fire CAD keeps its own
   window settings and centres itself, so the machine booted in the corner and the CAD then appeared
