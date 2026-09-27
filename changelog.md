@@ -60,6 +60,15 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   **Calculator**, **Clock**, **Task Manager** (with End task), **Settings** (wallpaper, accent
   colour, window opacity and size, About this PC) and an intranet page with the BOLO / call / unit
   counts. Plus a Recycle Bin for the look.
+- **Each app opens at its own size.** One 440 px default for everything looked wrong on the wide
+  screens: the map got the same box as the calculator. The map, call list, unit list and citation
+  picker now open wide, Query tall enough for a record card, the calculator and Minesweeper narrow —
+  each clamped to the screen, and a window is never taller than the room left below the edge it
+  starts at (the Sheriff screen is only 640 px tall).
+- **Fixed: the desktop could mistake a narrow screen for a wide one.** Its width came from a
+  `ResizeObserver`, which only reports while the page is actually painting — a CAD opened while the
+  game window was not rendering left the desktop thinking it had a wide screen, and it put its
+  windows partly outside a narrow one. It now measures the screen directly as well.
 - **Every app works on the narrow machines too.** On a screen the size of the LAPD client's strip
   the apps open full-screen and the taskbar switches between them, instead of a cascade of windows
   walking off the right edge where they could not be reached again. The taskbar scrolls, the Start
