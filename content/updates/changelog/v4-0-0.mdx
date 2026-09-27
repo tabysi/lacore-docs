@@ -71,8 +71,13 @@ set it lower for a shorter boot, or `0` to go straight to the sign-in.
 - **It comes back the way you left it.** Switch the computer off with the MDT open and the next
   `/mdt` this shift opens the MDT again, not an empty desktop — the same for the desk windows you
   had up. A new shift starts clean.
-- **The computer can be moved:** drag the taskbar. It uses the shared MDT position, so the terminals
-  move with it rather than opening somewhere else; **Settings → Position → Reset** puts it back.
+- **The computer can be moved.** It has a grab bar above the screen now — dotted grip, machine name,
+  power LED — and the taskbar still works as a handle. Every terminal moves with it: the ones that
+  read the shared MDT position always did, and the **Sheriff CAD and the EMS CAD now keep their
+  position in the same place** (`lib/cadplace.js`), which also means the Sheriff terminal finally
+  remembers where you put it instead of jumping back to its default on every open. A machine parked
+  half outside the game window pulls itself back in, like the terminals already did.
+  **Settings → Position → Reset** puts it back.
 - **Sounds.** A dry square-wave blip through a narrow band-pass when the POST passes — a mainboard
   speaker, not a chime. Then the system splash: filtered noise sweeping up like a machine spinning
   up, and a C-major-ninth chord walking in over it, two detuned voices per note with an octave
