@@ -15,16 +15,27 @@ scanner** and the **breathalyser/drug swab**. All are LEO-gated and individually
 
 ## 🐕 K9
 
-`/k9` deploys (and recalls) your dog; orders go by subcommand or by the nine bindable keys
+`/k9` opens the **K9 console**: deploy or recall the dog, see its status, health and distance,
+give every order with one click, and pick **who** it goes after from the list of subjects in range
+(30 m — players by server id, NPCs as civilians, with direction and distance). An activity log keeps
+what the dog reported, such as a search alert. `ESC` closes the console.
+
+![The K9 console and the status card](/img/features/k9-console.svg)
+
+While the dog is out and the console is closed, a small **status card** on the right edge shows its
+order, health and distance.
+
+The console is optional — orders also go by subcommand or by the ten bindable keys
 (*FiveM Settings ▸ Key Bindings*, all unbound by default):
 
 | Order | Does |
 |---|---|
+| `/k9 deploy` | Deploy or recall the dog |
 | `/k9 heel` | Follow you |
 | `/k9 stay` · `sit` · `lay` | Hold position / pose |
 | `/k9 bark` | Bark once |
 | `/k9 search` | Trot ahead and sweep the area — alerts on an **armed** person nearby, otherwise reports clear |
-| `/k9 engage` | Attack the ped you're aiming at (or the nearest) |
+| `/k9 engage` | Attack the person you're aiming at (or the nearest) — NPCs and players alike. It breaks off when the target or you go down, or on any other order |
 | `/k9 car` | Jump into your (or the nearest) vehicle |
 
 Owner tuning (model, name, follow distance, leash, search radius, blip): `configs/cfg-k9-sh.lua`.

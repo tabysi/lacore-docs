@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="1200" height="680" font-family="'Chakra Petch', 'Segoe UI', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#4a5cff" stroke-opacity=".07"/>
+    </pattern>
+    <linearGradient id="win" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#181a21"/><stop offset="1" stop-color="#12161f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="680" fill="url(#bg)"/>
+  <rect width="1200" height="680" fill="url(#grid)"/>
+
+  <text x="60" y="54" fill="#9fb0ff" font-size="14" letter-spacing="3">LACORE · K9 UNIT</text>
+  <text x="60" y="84" fill="#e7ecf5" font-size="26" font-weight="700">The K9 console — /k9</text>
+
+  <!-- window -->
+  <rect x="60" y="110" width="860" height="530" rx="14" fill="url(#win)" stroke="#2c3650"/>
+  <rect x="60" y="110" width="860" height="58" rx="14" fill="#181a21"/>
+  <rect x="60" y="150" width="860" height="18" fill="#181a21"/>
+  <line x1="60" y1="168" x2="920" y2="168" stroke="#2c3650"/>
+  <rect x="78" y="122" width="34" height="34" rx="9" fill="#4a5cff" fill-opacity=".16" stroke="#4a5cff" stroke-opacity=".55"/>
+  <g fill="#6c8cff" transform="translate(86 130) scale(.75)">
+    <ellipse cx="5.5" cy="10" rx="2" ry="2.6"/><ellipse cx="9.5" cy="5.8" rx="2" ry="2.7"/>
+    <ellipse cx="14.5" cy="5.8" rx="2" ry="2.7"/><ellipse cx="18.5" cy="10" rx="2" ry="2.6"/>
+    <path d="M12 11c-3 0-6.2 4.1-6.2 6.6 0 1.8 1.4 2.6 3 2.6 1.3 0 2.1-.7 3.2-.7s1.9.7 3.2.7c1.6 0 3-.8 3-2.6C18.2 15.1 15 11 12 11z"/>
+  </g>
+  <text x="124" y="138" fill="#e7ecf5" font-size="16" font-weight="700">K9 Unit</text>
+  <text x="124" y="156" fill="#6b7689" font-size="12">Handler console</text>
+  <rect x="820" y="129" width="74" height="20" rx="5" fill="none" stroke="#2c3650"/>
+  <text x="857" y="143" fill="#6b7689" font-size="10" text-anchor="middle">ESC to close</text>
+
+  <!-- left column -->
+  <line x1="400" y1="168" x2="400" y2="640" stroke="#ffffff" stroke-opacity=".08"/>
+  <rect x="80" y="186" width="300" height="200" rx="10" fill="#1a2030" stroke="#2c3650"/>
+  <text x="96" y="210" fill="#6b7689" font-size="10" font-weight="700" letter-spacing="1.5">POLICE K9</text>
+  <text x="96" y="236" fill="#e7ecf5" font-size="20" font-weight="800">Rex</text>
+  <rect x="282" y="198" width="84" height="22" rx="11" fill="#e0303a" fill-opacity=".12" stroke="#e0303a" stroke-opacity=".5"/>
+  <text x="324" y="213" fill="#ff9a9a" font-size="10" font-weight="700" text-anchor="middle" letter-spacing="1">ENGAGING</text>
+  <text x="96" y="264" fill="#9fb0cc" font-size="12">Health</text>
+  <text x="364" y="264" fill="#e7ecf5" font-size="12" font-weight="700" text-anchor="end">84%</text>
+  <rect x="96" y="272" width="268" height="6" rx="3" fill="#0f1622"/>
+  <rect x="96" y="272" width="225" height="6" rx="3" fill="#3cd296"/>
+  <text x="96" y="300" fill="#6b7689" font-size="10">Distance</text>
+  <text x="96" y="316" fill="#e7ecf5" font-size="13" font-weight="600">9 m</text>
+  <text x="232" y="300" fill="#6b7689" font-size="10">Location</text>
+  <text x="232" y="316" fill="#e7ecf5" font-size="13" font-weight="600">On foot</text>
+  <text x="96" y="336" fill="#6b7689" font-size="10">Target</text>
+  <text x="140" y="336" fill="#ff9a9a" font-size="12" font-weight="600">Player #12</text>
+  <rect x="96" y="348" width="268" height="28" rx="8" fill="#0f1622" stroke="#2c3650"/>
+  <text x="230" y="367" fill="#e7ecf5" font-size="13" font-weight="700" text-anchor="middle">Recall K9</text>
+
+  <text x="80" y="412" fill="#6b7689" font-size="10" font-weight="700" letter-spacing="1.5">COMMANDS</text>
+  <g font-size="13" font-weight="600" fill="#e7ecf5">
+    <rect x="80"  y="422" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="96"  y="444">↩  Heel</text>
+    <rect x="234" y="422" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="250" y="444">■  Stay</text>
+    <rect x="80"  y="464" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="96"  y="486">▾  Sit</text>
+    <rect x="234" y="464" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="250" y="486">▁  Lie down</text>
+    <rect x="80"  y="506" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="96"  y="528">◉  Bark</text>
+    <rect x="234" y="506" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="250" y="528">⌕  Search</text>
+    <rect x="80"  y="548" width="146" height="34" rx="8" fill="#1a2030" stroke="#2c3650"/><text x="96"  y="570">▭  Into vehicle</text>
+    <rect x="234" y="548" width="146" height="34" rx="8" fill="#2a1820" stroke="#5a2d39"/><text x="250" y="570" fill="#ff9a9a">➤  Engage nearest</text>
+  </g>
+
+  <!-- right column -->
+  <text x="420" y="200" fill="#6b7689" font-size="10" font-weight="700" letter-spacing="1.5">SUBJECTS IN RANGE</text>
+  <g font-size="13">
+    <rect x="420" y="212" width="480" height="48" rx="10" fill="#e0303a" fill-opacity=".08" stroke="#e0303a"/>
+    <rect x="434" y="226" width="54" height="20" rx="5" fill="#2f9fe0" fill-opacity=".14"/><text x="461" y="240" fill="#8cc0ff" font-size="10" font-weight="700" text-anchor="middle">PLAYER</text>
+    <text x="502" y="232" fill="#e7ecf5" font-weight="600">Player #12</text><text x="502" y="250" fill="#9fb0cc" font-size="11">↑  7 m · ahead</text>
+    <text x="880" y="241" fill="#ff9a9a" font-size="12" font-weight="700" text-anchor="end" opacity=".5">Engaged</text>
+
+    <rect x="420" y="268" width="480" height="48" rx="10" fill="#1a2030" stroke="#2c3650"/>
+    <rect x="434" y="282" width="54" height="20" rx="5" fill="#0f1622"/><text x="461" y="296" fill="#9fb0cc" font-size="10" font-weight="700" text-anchor="middle">NPC</text>
+    <text x="502" y="288" fill="#e7ecf5" font-weight="600">Civilian (NPC)</text><text x="502" y="306" fill="#9fb0cc" font-size="11">←  11 m · left</text>
+    <rect x="812" y="280" width="74" height="26" rx="8" fill="#2a1820" stroke="#5a2d39"/><text x="849" y="298" fill="#ff9a9a" font-size="12" font-weight="700" text-anchor="middle">Engage</text>
+
+    <rect x="420" y="324" width="480" height="48" rx="10" fill="#1a2030" stroke="#2c3650"/>
+    <rect x="434" y="338" width="54" height="20" rx="5" fill="#2f9fe0" fill-opacity=".14"/><text x="461" y="352" fill="#8cc0ff" font-size="10" font-weight="700" text-anchor="middle">PLAYER</text>
+    <text x="502" y="344" fill="#e7ecf5" font-weight="600">Player #4</text><text x="502" y="362" fill="#9fb0cc" font-size="11">→  18 m · right · In vehicle</text>
+    <rect x="812" y="336" width="74" height="26" rx="8" fill="#2a1820" stroke="#5a2d39"/><text x="849" y="354" fill="#ff9a9a" font-size="12" font-weight="700" text-anchor="middle">Engage</text>
+  </g>
+
+  <text x="420" y="404" fill="#6b7689" font-size="10" font-weight="700" letter-spacing="1.5">ACTIVITY</text>
+  <rect x="420" y="414" width="480" height="206" rx="10" fill="#0f1622" stroke="#2c3650"/>
+  <g font-family="Consolas, 'Courier New', monospace" font-size="12">
+    <text x="436" y="440" fill="#6b7689">22:18:31</text><text x="510" y="440" fill="#ff9a9a">Rex: engage!</text>
+    <text x="436" y="464" fill="#6b7689">22:18:02</text><text x="510" y="464" fill="#ff9a9a">Rex ALERTED — subject is armed!</text>
+    <text x="436" y="488" fill="#6b7689">22:17:58</text><text x="510" y="488" fill="#9fb0cc">Rex is searching…</text>
+    <text x="436" y="512" fill="#6b7689">22:17:40</text><text x="510" y="512" fill="#9fb0cc">Rex deployed.</text>
+  </g>
+
+  <!-- HUD card callout -->
+  <text x="960" y="200" fill="#9fb0ff" font-size="12" letter-spacing="2">STATUS CARD</text>
+  <text x="960" y="220" fill="#9fb0cc" font-size="12">on screen while the dog</text>
+  <text x="960" y="236" fill="#9fb0cc" font-size="12">is out and the console</text>
+  <text x="960" y="252" fill="#9fb0cc" font-size="12">is closed</text>
+  <rect x="960" y="270" width="190" height="70" rx="10" fill="#12161f" fill-opacity=".92" stroke="#2c3650"/>
+  <rect x="960" y="270" width="3" height="70" fill="#f0a500"/>
+  <rect x="972" y="282" width="24" height="16" rx="4" fill="#4a5cff" fill-opacity=".16"/><text x="984" y="294" fill="#6c8cff" font-size="10" font-weight="800" text-anchor="middle">K9</text>
+  <text x="1004" y="295" fill="#e7ecf5" font-size="13" font-weight="700">Rex</text>
+  <text x="1140" y="294" fill="#ffd27a" font-size="10" font-weight="700" text-anchor="end" letter-spacing="1">SEARCHING</text>
+  <rect x="972" y="306" width="166" height="4" rx="2" fill="#0f1622"/><rect x="972" y="306" width="76" height="4" rx="2" fill="#f0a500"/>
+  <text x="972" y="328" fill="#9fb0cc" font-size="11">6 m</text>
+</svg>

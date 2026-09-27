@@ -215,6 +215,15 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   relationship group, so every player counted as its friend and the attack was dropped at once. It
   now has its own group and is hostile to players only while it is sent after one. Any other
   command, the target going down, or the handler going down calls it off and it goes back to heel.
+- **K9 console.** `/k9` now opens a window for the handler: deploy / recall, the dog's order,
+  health and distance, every order as a button, and the subjects within 30 m — players by server id,
+  NPCs as civilians, with direction and distance — each with its own Engage button, so the dog goes
+  after exactly the person you pick instead of whoever stands closest. An activity log keeps what the
+  dog reported. While the dog is out, a small status card on the right edge shows its order, health
+  and distance. Deploy / recall moved to `/k9 deploy`; the old keybind still does it, and a new
+  unbound one (*K9: Open console*) opens the window.
+
+  ![The K9 console and the status card](/img/features/k9-console.svg)
 
 ### Web dispatcher
 
