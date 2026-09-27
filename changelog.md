@@ -26,6 +26,8 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
 > ⚠️ **Config change:** new file `configs/cfg-mdtos-sh.lua` (the MDT desktop) and a new sub-toggle
 > `cad.os` in `configs/cfg-features-sh.lua` (on by default — a missing key also counts as on).
 > `cad.os = false` gives you the old behaviour: every terminal opens directly.
+> `MdtOs.bootSeconds` defaults to **7.0** (the full firmware → POST → loader → splash sequence);
+> set it lower for a shorter boot, or `0` to go straight to the sign-in.
 
 ### The MDT runs on a computer now
 
@@ -41,6 +43,11 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
 - **The sign-in is an animation, not a password check.** There is no per-player computer password
   on the server, so a real prompt would accept everything and only look like security. Username,
   callsign and department are filled in; one click (or Enter) plays the welcome.
+- **A real boot.** Four stages instead of a splash: the firmware screen (brand, firmware version,
+  processor, a memory test counting up to 8192 MB), the POST table detecting storage, radio, GPS,
+  plate camera, printer and the dispatch link, the boot loader (`Booting from MDT-DISK0`), then the
+  system splash with the logo, the dots, a progress bar and the service it is waiting for. The whole
+  sequence scales to `bootSeconds`, now 7 s by default.
 - **The screen is the CAD's screen.** The computer is exactly as big as the terminal that runs on
   it — the LAPD client's tall strip, the EMS box, the 9100-T's 3:2 CRT — so the CAD fills it edge to
   edge instead of floating on a machine of the wrong size. The size is measured from the terminal on
@@ -53,6 +60,10 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
   **Calculator**, **Clock**, **Task Manager** (with End task), **Settings** (wallpaper, accent
   colour, window opacity and size, About this PC) and an intranet page with the BOLO / call / unit
   counts. Plus a Recycle Bin for the look.
+- **More apps:** **Query** (run a person or a plate and read the full record card), **Map** (the
+  live map with every call), **History**, **Citations** (the charge picker: who, citation or arrest,
+  tick, issue), **My Activity** (your own arrest / citation / call numbers and duty time),
+  **Minesweeper** for the quiet shift, and **Help**.
 - **Windows behave like windows:** minimise, maximise, close, drag; a Start menu with a search box,
   the app list and tiles; a taskbar with pinned terminals, open windows, tray icons and the clock;
   and a right-click menu on the desktop. One click opens an icon — no double-clicking in a moving

@@ -46,7 +46,7 @@ for a machine that has never opened that terminal.
 | Setting | Default | Description |
 | --- | --- | --- |
 | `name` | `""` | Name on the boot screen and in the Start menu. Empty uses the community name from `cfg-branding-sh.lua`. |
-| `bootSeconds` | `4.5` | Length of the boot screen. `0` skips straight to the sign-in. |
+| `bootSeconds` | `7.0` | Length of the whole boot sequence — firmware, POST, boot loader, system splash. `0` skips straight to the sign-in. |
 | `loginSeconds` | `2.0` | The "Welcome" animation after **Sign in**. |
 | `resumeSeconds` | `0.9` | The resume-from-standby fade every later `/mdt` uses. |
 | `wallpaper` | `"auto"` | `"auto"` paints the department colours; a path under `nui/` or an `https://` URL uses that image. |

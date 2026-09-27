@@ -20,8 +20,12 @@ the desktop; going off duty puts the computer back to a cold boot.
 
 ## 🖥 The three screens
 
-1. **Boot** — the firmware line, the hardware checks and the radio link, then the CAD services.
-   Length is set in `configs/cfg-mdtos-sh.lua` (`bootSeconds`, `0` skips it).
+1. **Boot** — four stages, like a machine that actually starts:
+   the **firmware screen** (brand, firmware version, processor, a memory test counting up to
+   8192 MB), the **POST** table detecting storage, radio, GPS, plate camera, printer and the
+   dispatch link, the **boot loader** (`Booting from MDT-DISK0`), and the **system splash** — logo,
+   dots, a progress bar and the service it is waiting for. The whole sequence is scaled to
+   `bootSeconds` in `configs/cfg-mdtos-sh.lua` (default 7 s, `0` skips it).
 2. **Sign in** — clock, date, your character with the callsign and department under it, the
    password already filled in. **Sign in** (or Enter) plays the welcome animation and drops you on
    the desktop.
@@ -61,12 +65,19 @@ use the full width.
 | **Units** | Everyone on duty with their status, crew and department |
 | **BOLOs** | The active BOLOs, dangerous ones marked |
 | **Radio** | The dispatch channel: read it and talk on it |
+| **Query** | Run a person or a plate, exactly like the CAD does — the result is the full record card |
+| **Map** | The live map with every call, the same tiles the terminals use |
+| **History** | Closed incidents; click one to look at it |
+| **Citations** | The charge picker: who, citation or arrest, tick the charges, issue |
+| **My Activity** | Your own numbers — arrests, citations, warnings, calls closed, reports, evidence and duty time |
 | **Penal Code** | The charge list, searchable by code or title — fines and jail time included |
 | **Notes** | The bulletin board: read it and pin a note, same board every terminal shows |
 | **Notepad** | Your own scratchpad. Stays on this computer, one per callsign |
 | **Calculator** | A calculator that calculates |
 | **Clock** | Time, date and how long the computer has been running this shift |
 | **Task Manager** | What is open, including the CAD, with **End task** |
+| **Minesweeper** | For the quiet shift. Left click opens, right click flags |
+| **Help** | What the keys do and what this machine is |
 | **Settings** | Wallpaper, accent colour, window opacity and size, and *About this PC* |
 | **Intranet** | The department page: active BOLOs, open calls, units on duty and the latest board notes |
 | **Recycle Bin** | Empty. It is there for the look |
