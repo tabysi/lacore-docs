@@ -41,12 +41,22 @@ supervisor terminal, weapon drops that stay on the ground — and a long list of
 - **The sign-in is an animation, not a password check.** There is no per-player computer password
   on the server, so a real prompt would accept everything and only look like security. Username,
   callsign and department are filled in; one click (or Enter) plays the welcome.
-- **On the desktop:** the department's CAD, the dispatch console for an actual dispatcher, the
-  supervisor terminal for an actual supervisor, plus Notes (the bulletin board, including posting),
-  Settings (window opacity, size, wallpaper), Clock (time and uptime), an intranet page with the
-  BOLO / call / unit counts and the latest board notes, and a Recycle Bin for the look. One click
-  opens an icon — no double-clicking in a moving car. Taskbar with Start menu, machine name,
-  callsign and clock.
+- **The screen is the CAD's screen.** The computer is exactly as big as the terminal that runs on
+  it — the LAPD client's tall strip, the EMS box, the 9100-T's 3:2 CRT — so the CAD fills it edge to
+  edge instead of floating on a machine of the wrong size. The size is measured from the terminal on
+  first open and remembered, so a re-skin or a resize keeps matching. A narrow screen packs itself
+  down: no labels on the taskbar, no tile column in the Start menu, full-width windows.
+- **On the desktop:** the department's CAD, the dispatch console for an actual dispatcher and the
+  supervisor terminal for an actual supervisor, plus **Calls** (click one and the CAD opens on it),
+  **Units**, **BOLOs**, **Radio** (the dispatch channel, read and talk), **Penal Code** (searchable),
+  **Notes** (the bulletin board, including posting), **Notepad** (your own, per callsign),
+  **Calculator**, **Clock**, **Task Manager** (with End task), **Settings** (wallpaper, accent
+  colour, window opacity and size, About this PC) and an intranet page with the BOLO / call / unit
+  counts. Plus a Recycle Bin for the look.
+- **Windows behave like windows:** minimise, maximise, close, drag; a Start menu with a search box,
+  the app list and tiles; a taskbar with pinned terminals, open windows, tray icons and the clock;
+  and a right-click menu on the desktop. One click opens an icon — no double-clicking in a moving
+  car.
 - Works in front of **every** terminal (LAPD, Sheriff, Agency, EMS, 9100-T, Pennsylvania,
   Spillman Flex) and changes nothing about which one a department gets. The in-car dashboard screen
   keeps showing the CAD itself — a dashboard has no cursor to click an icon with.

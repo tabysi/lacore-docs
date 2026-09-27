@@ -38,6 +38,11 @@ Boot and sign-in run once per shift; every later `/mdt` resumes from standby. Sw
 thing off with `cad.os = false` in [`cfg-features-sh.lua`](/configuration/features) and the
 terminals open directly again.
 
+The computer is **exactly the size of the terminal that runs on it** — the LAPD strip, the EMS box,
+the 9100-T's 3:2 screen. The size is measured from the terminal on first open and remembered, so a
+re-skin or a changed size keeps matching; `web/src/lib/cadframe.js` holds the first-boot defaults
+for a machine that has never opened that terminal.
+
 | Setting | Default | Description |
 | --- | --- | --- |
 | `name` | `""` | Name on the boot screen and in the Start menu. Empty uses the community name from `cfg-branding-sh.lua`. |
