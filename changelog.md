@@ -3,6 +3,157 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [4.1.0] – 2026-09-29 — Closing the doors a player could walk through
+
+> ⚠️ In development — 4.1.0 is being built and is not released yet.
+
+A security pass after a full code audit, and the features that audit found broken. The
+security part closes ways an ordinary player — no role, sometimes not even a cheat menu — could
+do something only staff or on-duty units should. Nothing needs to be configured; a few things
+that used to work for everyone now don't, and that is the point.
+
+### Permissions
+
+- **`/lacore` and `/lacoreconfig` are staff-only again.** FiveM gives every player the right
+  `command.<name>` for any command registered as unrestricted, and the permission check accepted
+  that right as proof. `/lacore` is such a command, so the check said yes to everybody: config
+  backups could be overwritten or restored, the server IP read, bans uploaded. The check now
+  ignores any right that every player holds.
+- **`/deleteentity` needs the ACE `command.deleteentity`.** It was open to every player and
+  deleted any vehicle or prop on the server.
+- **`/dev` only works on a server running in devmode.** It was a client command anyone could
+  type, and it lifted the member locks on weapons and vehicles.
+
+### Duty and police powers
+
+- **Only real jobs go on duty.** The job a player picks arrives as text from their game; an
+  invented job skipped the Discord role check and made the player a unit everywhere. The server
+  now accepts only the job types from `configs/cfg-agencies-sh.lua`, plus `AMR` and `Civilian`.
+- **`AMR` needs the Fire/EMS role.** `DutyRoles` had no entry for it, so the EMS job went through
+  unchecked on servers that restrict Fire/EMS. It now uses `DutyRoles["Fire/EMS"]` unless you give
+  it its own entry.
+- **Warrants, charges and case files are for law enforcement.** They were open to every duty job,
+  so EMS, Fire and the Coroner could set warrants and send people to jail. Nobody can set a
+  warrant or issue charges against their own character any more.
+
+### MDT and dispatch
+
+- **A unit can only change its own status.** `mdt:SetStatus` took the callsign from the request,
+  so anyone could put any unit on CLEAR and pull it off its call. Statuses are also checked for
+  shape now (short, letters, digits, spaces, `-` and `/`).
+- **Call notes, call state and call details need an on-duty unit.** Before, any player could
+  overwrite the notes of every call, move calls on, or read a full call record including the
+  caller. Note changes now go to units only, are capped at 4000 characters and rate-limited.
+- **`/ddispatcher onduty` goes through the same check as the console button.** The `/d*`
+  commands kept their own list of dispatchers that anyone could join with one command.
+
+### Live maps
+
+- **Unit names, statuses, camera labels and zone names are escaped on every map.** The Leaflet
+  markers in the dispatch console, the terminal map and the supervisor panel were built from raw
+  text, so a status set by a player could run code in every dispatcher's screen. The web
+  dispatch console in the customer portal had the same gap in its marker labels.
+
+### Things that did not work
+
+- **Investigation works.** Collecting traces, `/evidence`, `/warrant` and the lab never did
+  anything: the module asked for two helpers that only existed inside another file, got nothing
+  back, and treated every officer as off duty. Approving an arrest warrant in the supervisor
+  terminal also stopped halfway. Evidence and warrants are law-enforcement actions.
+- **`/kick`, `/ban`, `/tempban`, `/warn`, `/report` and the chat auto-kick work on players
+  without Discord.** Their log line failed on the missing Discord ID before the action ran, so
+  the kick never happened and a banned player stayed online.
+- **`/bus` no longer breaks the vehicle system.** Coming back to the first stop of a route threw
+  an error that stopped the loop behind the vehicle HUD, seatbelt, cruise control and weapon locks
+  until you reconnected.
+- **`/hangup` ends 911 and 311 calls again.** Two files registered the command and the second
+  one — for dispatcher radio calls — replaced the first. There is now one `/hangup` that ends
+  whichever call you are in.
+- **EMS on framework servers (`AMR`) can use `/p`, `/hospital`, `/unhospital` and `/run`.**
+  Those checks only knew the `Fire/EMS` job. EMS units also no longer show up as a separate
+  contact in the phone booth and the old phone.
+- **Notifications have their colours back.** Every toast came out as the blue info style;
+  errors are red, successes green and warnings yellow again.
+- **Pressing S as a passenger no longer freezes the HUD for five seconds**, and you only count
+  as the driver once you are actually in the driver's seat.
+- **A person or plate query from the Spillman terminal or the MDT desktop stays there** instead
+  of opening the LAPD MDT on top.
+- **Shutting down the MDT desktop closes the dispatch console too.** It used to stay on screen
+  with the cursor already gone.
+- **`/unrack` hands the weapon to you after a respawn or outfit change**, not to the ped you had
+  when you went on duty.
+- **The Pennsylvania CAD shows who wrote a message**, and when.
+- **The EMS CAD's close button says ✕ instead of NEW**, and the F1/F2 hints on its status
+  buttons are gone — nothing listened for those keys, and F1 opens the phone.
+- **A broken `json/emojis.json` no longer breaks OOC chat.** The server prints a warning and
+  chat works without emoji shortcodes until the file is fixed.
+
+### Server load
+
+One player — or one modified client — could keep the whole server busy. These limits close that.
+
+- **Big stores are written at most every five seconds.** Characters, the civilian mirror, phones,
+  calls and the LASD/EMS incidents were written in full (file and database) on every change, and
+  plenty of changes come straight from a client event. Changes now collect for up to 5 s and go
+  out as one write. Pending writes are flushed when the resource stops and when txAdmin warns of a
+  shutdown.
+- **The player list is only sent when it changes**, and otherwise every five seconds so the pings
+  stay current. It used to go to every player every second. The same goes for the unit counts and
+  the flavour texts.
+- **The player list is no longer empty for a moment.** It was cleared and refilled every second,
+  and while a new player's Discord roles were being read (up to 10 s) every lookup found nobody.
+- **Limits per character:** 10 characters per player, 200 file records and 50 relationships per
+  character, with a message when you reach one. Saving, editing and deleting are rate-limited.
+- **Limits per phone:** 60 conversations (the one that has been quiet longest makes room), the last
+  100 messages in each, 200 contacts. SMS and contact changes are rate-limited.
+- **Incidents:** each incident log keeps its last 100 comments. Creating LASD/EMS incidents,
+  911/311 calls and panic/backup requests is rate-limited per player, and their text fields are
+  capped. Resolved calls older than `CallRetentionDays` are now also cleared while the server runs,
+  not only at start.
+- **LASD and EMS terminals get active incidents plus the ten newest resolved ones**, instead of
+  every incident of the last seven days every five seconds.
+- **`/ft` flavour texts:** 120 characters, 5 per player, 100 on the server; a player's texts are
+  removed when they leave.
+- **Death sync** passes on at most four updates a second per player, and only to players close
+  enough to see the body (with OneSync; without it, to everyone as before).
+- **Only units report their position**, once a second. Every civilian did too, and nothing used it.
+- **Dispatch chat goes to units only**, and its history is only handed to units.
+- **The jail countdown** looks each inmate up in one pass over the online players instead of
+  searching every player for every inmate every second.
+- **Kill statistics** only count a kill when the killer was within 300 m of the victim, and a
+  death is counted at most once every two seconds.
+
+### Easier to use
+
+![Escape leaves the field first and closes the window second; permanent actions ask first](/img/changelog/escape-and-confirm.svg)
+
+- **Escape works the same in every window.** In a text field it only leaves the field; the next
+  Escape closes the window. Before, Escape in some fields closed the whole MDT and threw away what
+  you had typed — a report narrative, a BOLO, supervisor notes. The Agency MDT and the
+  Pennsylvania CAD, which already worked this way, are no longer closed from behind their back.
+- **The LASD MDC and PCMS close with Escape.** They were the only terminals that did not, and
+  Escape opened the GTA pause menu instead. LASD, Spillman and the MDT desktop now also block the
+  pause menu while they are open, like the other terminals.
+- **Permanent actions ask first:** deleting a character, a file record or a relationship,
+  kicking a member, leaving or disbanding an organisation, and resolving an incident in the
+  Agency MDT (a single click closed it for every unit).
+- **After closing the phone, typing no longer moves your character.** The phone lets you walk
+  while it is open, and that setting stayed on after it closed — so typing in the profile, the
+  bug report or the staff panel walked the character and fired hotkeys.
+- **Organisation changes no longer pop the panel open for every member.** Someone joining,
+  leaving or changing the message of the day took the mouse from every online member. The panel
+  now only opens when you open it; if it is already open, it updates.
+- **Do not disturb and airplane mode decline incoming calls** instead of opening the phone and
+  taking the mouse, mid-drive or mid-fight.
+- **X no longer uncuffs the nearest suspect.** "Release carried / Uncuff nearest" and "Hand on
+  holster" were both on X, and FiveM runs both — a hand on the holster next to a cuffed suspect set
+  them free. Release now has no default key; bind it under *Settings ▸ Key Bindings ▸ FiveM*.
+- **A scaled-up terminal keeps its title bar on screen.** Above about 105 % the LAPD client's
+  title bar — the only way back to its settings — left the screen, and the LASD and EMS terminals
+  grew past the screen edge too. Because scale and position are saved, they came back that way on
+  every open. The window is now pulled back into view when it opens, after a drag, when the scale
+  changes and when the resolution does.
+
 ## [4.0.0] – 2026-09-17 — LACORE 4.0
 
 > ⚠️ Beta — 4.0 is out as an **open beta**. Everything below is in the build. Run it, break it, and

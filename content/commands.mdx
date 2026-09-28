@@ -33,17 +33,10 @@ All keybinds are rebindable in *FiveM Settings ▸ Key Bindings ▸ FiveM*.
 | **O** | Open / close the MDT |
 | **U** | Hands up *(only when `Features.rpemotes` is on)* |
 | **X** | Hand on holster *(only when `Features.rpemotes` is on)* |
-| **X** | Put down carried person / uncuff nearest |
 | **F1** | Open the phone (`PhoneCfg.openKey`) |
 | **F5** | Air Unit: heli cam (`AirUnit.keys.helicam`) |
 | **F6** | Air Unit: auto-orbit (`AirUnit.keys.orbit`) |
 | **F7** | Air Unit: spotlight (`AirUnit.keys.spotlight`) |
-
-<Callout type="warning">
-  **X is bound twice** — "Place hand on holster" and "Release carried / Uncuff nearest". Both
-  handlers fire. Either turn `Features.rpemotes` off (if another resource owns your RP emotes) or
-  rebind one of them in the FiveM key settings.
-</Callout>
 
 ### Unbound by default
 
@@ -52,6 +45,7 @@ Bind these yourself in *FiveM Settings ▸ Key Bindings ▸ FiveM*:
 | Binding | Action |
 |---------|--------|
 | LACORE: Open settings menu | Open your profile on its Settings tab |
+| Release carried / Uncuff nearest | Put down a carried person / uncuff the nearest cuffed person (was **X** until 4.1.0) |
 | Change Firing Mode | Toggle your weapon's firing mode |
 | Open/Close Front Driver Door | `door 1` |
 | Open/Close Front Passenger Door | `door 2` |
@@ -183,7 +177,7 @@ These mirror the dispatch console buttons (dispatcher duty required):
 
 | Command | What it does |
 |---------|--------------|
-| `/ddispatcher <onduty\|offduty>` | Go on / off dispatcher duty. |
+| `/ddispatcher <onduty\|offduty>` | Go on / off dispatcher duty. Same check as the console button: you must be on duty as LEO, Fire/EMS or Coroner. |
 | `/denroute <callsign> <inc>` | Mark a unit en route to an incident. |
 | `/donscene <callsign>` | Mark a unit on scene. |
 | `/dcode6 <callsign>` | Put a unit on Code 6. |
@@ -203,7 +197,7 @@ See [Dispatch Console](/user-guide/dispatch-console#-text-command-equivalents).
 | `/xmit <message>` | LEO / Fire-EMS | Transmit a dispatch radio message. |
 | `/cb <message>` | LEO | Crime broadcast with your callsign & current street. |
 | `/leoreq <unit>` | On-duty | Request a unit to your scene (RP, unit "arrives" after 20–120 s). |
-| `/release` · `/uncuff` | LEO | Put down a carried person / uncuff the nearest cuffed person (default key **X**). |
+| `/release` · `/uncuff` | LEO | Put down a carried person / uncuff the nearest cuffed person (no default key since 4.1.0 — bind "Release carried / Uncuff nearest"). |
 | `/putin` | LEO | Put the person you're dragging into the nearest vehicle. |
 | `/mobileid` | LEO | Scan a restrained suspect's fingerprint and return their identity; also takes their prints and lists open crime-scene prints. See [Mobile Fingerprint ID](/configuration/gameplay-modules). |
 | `/liftprint [incident]` | LEO | Lift a latent print off the nearest vehicle. Anonymous until you run it against the print register. |
@@ -386,8 +380,9 @@ Discord roles. See [Anti-Cheat & Security](/anticheat) and [Discord setup](/conf
 | `/dc <id>` | Force-disconnect a player (checks the `timeout` ACE). |
 | `/msg <id> <text>` · `/smsg <id> <text>` 🔒 | Direct message / staff message. |
 | `/patrolhost` 🔒 | Patrol host controls. |
-| `/time <h> [m]` 🔒 · `/freezetime` 🔒 · `/ft` · `/rft` | World time control / freeze helpers. |
-| `/deleteentity` | Delete the entity you're aiming at. |
+| `/time <h> [m]` 🔒 · `/freezetime` 🔒 | World time control / freeze time. |
+| `/ft <text>` · `/rft` | Place a flavour text where you stand (up to 120 characters, 5 per player, 100 on the server) · remove the one you stand on. Your texts go when you leave. |
+| `/deleteentity` 🔒 | Delete the entity you're aiming at. Needs the ACE `command.deleteentity`. |
 | `/rs <text>` · `/rr <text>` · `/rd` | Handle the report queue: reply-and-solve · reply · dismiss. |
 | `/lacoreconfig <backup\|restore\|undo\|status\|wizard>` | Back up / restore LACORE configs across reinstalls. `undo` reverses the last restore, `status` says where the snapshot lives and whether it survives an update, `wizard` walks first-time setup. |
 | `/lacoreitems` | **Server console only.** Prints every LACORE item as a ready-to-paste line for `ox_inventory/data/items.lua`. |
@@ -429,7 +424,7 @@ Not meant for players — these exist for development, content creation and trou
 
 | Command | What it does |
 |---------|--------------|
-| `/dev` | Toggle dev mode. |
+| `/dev` | Toggle the dev overlay. Only works while the server itself runs in devmode. |
 | `/citydebug` | Print city / zone debug info. |
 | `/spawnpoint` | Capture a spawn point where you stand and print a config line for it. |
 | `/preview <model>` | Look at a model in 3D, in game. |
@@ -445,8 +440,6 @@ Not meant for players — these exist for development, content creation and trou
 A few names collide, either with each other or with what other resources commonly claim. None of
 these break anything, but they're worth knowing when something behaves unexpectedly:
 
-- **`X` is bound twice** — "hand on holster" and "release / uncuff". Rebind one, or turn
-  `Features.rpemotes` off.
 - **`/run` runs twice** — the MDT query (client) and the RP action (server) both fire. Turn
   `Features.chat.actions` off if you don't want the RP line.
 - **`/settings` is claimed by many HUD resources** — rename ours via `HudCfg.settingsCommand`, or
