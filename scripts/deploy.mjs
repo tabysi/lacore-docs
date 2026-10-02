@@ -78,17 +78,21 @@ for (const entry of fs.readdirSync(CLONE)) {
   if (entry === '.git') continue
   fs.rmSync(path.join(CLONE, entry), { recursive: true, force: true })
 }
-function copyDir(src, dst) {
-  fs.mkdirSync(dst, { recursive: true })
-  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
-    if (EXCLUDE.has(e.name)) continue
-    const s = path.join(src, e.name)
-    const d = path.join(dst, e.name)
-    if (e.isDirectory()) copyDir(s, d)
-    else fs.copyFileSync(s, d)
-  }
+// Only what git would publish: tracked files plus new, NOT-ignored ones (the
+// freshly generated changelog pages). The old recursive copy took everything in
+// the folder — ignored and untracked files included, such as website/.claude/
+// or a stray .env — into a PUBLIC repository.
+const files = out('git ls-files --cached --others --exclude-standard -z', WEBSITE)
+  .split('\0').filter(Boolean)
+  .filter((rel) => !rel.split(/[\/]/).some((part) => EXCLUDE.has(part)))
+for (const rel of files) {
+  const s = path.join(WEBSITE, rel)
+  if (!fs.existsSync(s) || !fs.statSync(s).isFile()) continue   // deleted but still in the index
+  const d = path.join(CLONE, rel)
+  fs.mkdirSync(path.dirname(d), { recursive: true })
+  fs.copyFileSync(s, d)
 }
-copyDir(WEBSITE, CLONE)
+log(`Copied ${files.length} files.`)
 // GitHub Pages needs .nojekyll so /_next assets are served.
 fs.writeFileSync(path.join(CLONE, '.nojekyll'), '')
 

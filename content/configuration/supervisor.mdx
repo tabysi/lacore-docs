@@ -37,7 +37,9 @@ themselves *are* the permission, so nothing goes into `server.cfg` at all.
 
 ### Config allowlist
 
-The unit's **license identifier** or **exact callsign** is listed in `allow`. This is the standalone
+The unit's **license identifier** is listed in `allow`. (Callsign keys are ignored since 4.1.0: players
+choose their own callsign at `/onduty`, so anyone could type a supervisor's. The server prints a
+warning for each one it finds.) This is the standalone
 path — it works with no framework at all, and it's also how you grant the panel to specific people
 regardless of their grade.
 
@@ -77,8 +79,8 @@ Everything lives in `configs/cfg-supervisor-sh.lua`.
 | `aceByDept` | *(empty)* | Per-department ACE object, e.g. `["LSPD"] = "lacore.supervisor.lspd"`. Checked before `ace`. |
 | `roles` | *(empty)* | Discord role **names** from `DiscordAuth.roles`. Holding any of them grants the panel. |
 | `rolesByDept` | *(empty)* | Per-department role list, e.g. `["LSPD"] = { "LAPDSupervisor" }`. Checked in addition to `roles`. |
-| `allow` | *(empty)* | Allowlist keyed by **license identifier** (`license:…`) **or exact callsign** (`"1-L-30"`), value `true`. |
-| `leoOnly` | `true` | Only on-duty LEO units are ever eligible. Set `false` to allow any job that clears the checks. |
+| `allow` | *(empty)* | Allowlist keyed by **license identifier** (`license:…`), value `true`. Callsign keys are ignored since 4.1.0. |
+| `leoOnly` | `true` | Only on-duty Law Enforcement units are eligible (since 4.1.0 strictly the Law Enforcement job; before, any non-civilian job passed). Set `false` to allow any job that clears the checks, e.g. Fire/EMS supervisors. |
 
 ```lua filename="configs/cfg-supervisor-sh.lua"
 SupervisorConfig = {
@@ -101,7 +103,6 @@ SupervisorConfig = {
 
     allow = {
         ["license:0000000000000000000000000000000000000000"] = true,
-        ["1-L-30"] = true,
     },
 
     leoOnly = true,

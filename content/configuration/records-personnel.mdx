@@ -18,7 +18,7 @@ unit roster, a map, assign / status / broadcast controls, and a BOLO + warrant o
 
 1. **Framework grade** — on ESX / QBCore / QBox, the unit's job grade is at or above the minimum for
    their department.
-2. **Config allowlist** — the unit's licence identifier or exact callsign is listed in `allow`. This
+2. **Config allowlist** — the unit's licence identifier is listed in `allow` (callsign keys are ignored since 4.1.0). This
    is the standalone path and needs no framework at all.
 
 | Setting | Default | Description |
@@ -26,7 +26,7 @@ unit roster, a map, assign / status / broadcast controls, and a BOLO + warrant o
 | `command` | `"supervisor"` | Chat command that opens the panel. |
 | `minGrade` | `3` | Default minimum job grade that counts as a supervisor on framework servers. |
 | `minGradeByDept` | `{}` | Per-department override, `job / dept string → minimum grade`. |
-| `allow` | `{}` | Manual allowlist. Keys are a licence identifier (`"license:xxxx…"`) **or** an exact callsign (`"1-L-30"`); value `true` grants the panel. |
+| `allow` | `{}` | Manual allowlist. Keys are licence identifiers (`"license:xxxx…"`); value `true` grants the panel. Callsign keys are ignored since 4.1.0 — players choose their own callsign. |
 | `leoOnly` | `true` | Only on-duty LEO units are ever eligible — a civilian is never a supervisor, whatever their grade. `false` allows any job that clears the checks. |
 
 <Callout type="warning">

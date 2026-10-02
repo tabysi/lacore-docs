@@ -3,14 +3,19 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
-## [4.1.0] – 2026-09-29 — Closing the doors a player could walk through
-
-> ⚠️ In development — 4.1.0 is being built and is not released yet.
+## [4.1.0] – 2026-10-02 — Closing the doors a player could walk through
 
 A security pass after a full code audit, and the features that audit found broken. The
 security part closes ways an ordinary player — no role, sometimes not even a cheat menu — could
 do something only staff or on-duty units should. Nothing needs to be configured; a few things
 that used to work for everyone now don't, and that is the point.
+
+> ⚠️ **Config change:** `SupervisorConfig.allow` in `configs/cfg-supervisor-sh.lua` only accepts
+> licence identifiers now. Callsign entries (`["1-L-30"] = true`) are ignored — players choose their
+> own callsign, so anyone could type a supervisor's. The server prints a warning for each callsign
+> entry it finds; replace them with the player's `license:…` identifier. `leoOnly = true` (the
+> default) now means Law Enforcement only, as documented; set it to `false` if Fire/EMS supervisors
+> should use the panel.
 
 ### Permissions
 
@@ -53,6 +58,89 @@ that used to work for everyone now don't, and that is the point.
   markers in the dispatch console, the terminal map and the supervisor panel were built from raw
   text, so a status set by a player could run code in every dispatcher's screen. The web
   dispatch console in the customer portal had the same gap in its marker labels.
+
+### Security, second pass
+
+- **Anticheat:** the respawn immunity window is granted for the first spawn and after a death the
+  server saw — a client could request it every few seconds and switch off the server's godmode,
+  teleport and speed checks for good. Screenshot evidence is only accepted when the server asked
+  for it.
+- **Weapon drops** refuse the anticheat's blacklisted weapons, cap the ammo at 250 and allow one
+  drop every three seconds; the weapon and ammo were whatever the client said.
+- **Old phone (Bleeter, adverts, calls):** the verified badge and icon come from the server's own
+  list, messages are capped and rate-limited, mentions never ping anyone on Discord, adverts belong
+  to whoever posted them (and only they or staff can delete them), and calls and messages only go
+  to a real player — a target of -1 rang every phone on the server.
+- **New phone:** pictures in the feed and the gallery must come from where your server uploads
+  (`PhoneCfg.cameraUpload` or `Library.imageHosts`); an image from any other address was an IP
+  logger for everyone who scrolled past. Only the person being called can pick up — the caller
+  could accept their own call and listen in before the other side answered — and nobody is pulled
+  out of a call they are already in.
+- **Police records stay visible to the police.** Officer entries were hidden from officers as soon
+  as the person had a faction, which anyone gets by joining a gang or typing one into their profile.
+- **Reports and relays:** player reports go to staff only (they went to every client), report
+  replies and "handled" messages need staff, `/report` only takes a player id, the server-log and
+  radio relays no longer post any text a client sends, and `/xmit` speaks as your own unit.
+- **Staff tiers in Big Brother:** banning and jailing from the Big Brother panel need the admin
+  tier, as in the staff panel; a moderator (kick only) could ban for good there.
+- **CCTV:** Private Security still sees names and plates, but no longer dates of birth, addresses,
+  licences, warrants or priors; a placed camera can only be removed or renamed by whoever put it
+  up, law enforcement or staff.
+- **Supervisor panel:** see the config note above; the framework grade only counts when the
+  framework job is the one mapped to your LACORE department.
+- **LASD plate and warrant lookups** send the same cleaned profile as the name lookup — they sent
+  the whole stored profile, private and archived entries included.
+- **911 contacts, radio transcripts and the radio log** go to on-duty units only.
+- **Distance:** cuffing, dragging, seating, jailing, admitting to hospital and to the coroner need
+  the two players within a few metres of each other (with OneSync).
+- **Vehicle registration:** a plate registered to someone else stays theirs, a character holds at
+  most 30 vehicles, and only the driver answering an officer's check can clear a stolen flag.
+- **AOP vote:** one vote per player, only for the options on the ballot.
+- **Licences** only take the six known slots and known states; on a framework server with licence
+  import on, a profile save no longer rewrites them. Migrated playtime from old clients is capped
+  just below the membership threshold.
+- **Devmode** puts players in the staff group instead of the dev group, which carried every server
+  console command (`quit`, `stop`, `exec` …).
+- **Discord logs never ping anyone.** Player-written text in log lines could ping roles and users.
+
+### Portal, bridge and repository
+
+- **Web dispatch bridge:** one request with a malformed address or a `null` body took the whole
+  bridge down (and every dispatcher with it). It now answers with an error and keeps running; the
+  bridge token is compared in constant time.
+- **Customer portal:** developer accounts can no longer run a team of their own (two of them could
+  keep each other in and mint licence keys after the customer removed them); only the owner may
+  change who counts as owner, staff and customer; record ids are checked before they reach the
+  database; community notifications never go to LACORE's own Discord or to @everyone.
+- **Shared playerbase:** a ban now applies when the ban itself carries one of the connecting
+  player's identifiers — a customer could attach an innocent player's identifier to a banned
+  record and have them refused on partner servers. IP addresses are no longer stored or matched,
+  and a partner's records show the player's name without their raw identifiers.
+- **Ban appeals reach the right server.** A Ban ID is each server's own running number, so the
+  same id exists on many servers and an appeal went to whichever came first. Give players the link
+  `/appeal/?c=<your community id>`; without it an appeal is only delivered when the number is
+  unique.
+- **Sign-ins:** staff, owner and developer sessions last one day instead of seven, the owner can
+  sign one account or everyone out under *Admin ▸ Settings ▸ Sign-ins*, and the Discord login is
+  tied to the browser that started it.
+- **Global bans and server blocks are read in full.** Only the newest 500 bans and 200 blocks were
+  served, lifted ones included, so older bans silently stopped applying once the list grew.
+- **Rate limits count per account, not per address.** Several customers' servers behind one
+  hoster address used to starve each other of web dispatch and player checks.
+- **A Roblox game's server row belongs to its owner.** Another customer's heartbeat with the same
+  place id could take the row over.
+- **Smaller things:** writes to the dashboard API must come from the dashboard's own pages, pages
+  send `X-Frame-Options` / `nosniff` headers, database error texts stay in the log, survey and form
+  cookies are never signed with a built-in fallback key, and survey session data (IP and browser
+  hashes, referrer) is cleared with the answers once a wave is over — hourly, not only when staff
+  open the admin page.
+- **PocketBase:** the server-licence and global-ban collections are superuser-only in the schema
+  files too, so a future import cannot open them again.
+- **Repository:** the ban list (with players' IPs and identifiers), Bleeter posts and the call
+  history are no longer tracked — they are live data and the server creates them on first use; the
+  Roblox kit ships without a licence key; old 90s-CAD product zips are no longer tracked; the docs
+  deploy publishes only files git would track (it copied ignored ones too); the release workflow
+  picks the core package by name instead of the first zip it finds.
 
 ### Things that did not work
 
@@ -153,6 +241,29 @@ One player — or one modified client — could keep the whole server busy. Thes
   grew past the screen edge too. Because scale and position are saved, they came back that way on
   every open. The window is now pulled back into view when it opens, after a drag, when the scale
   changes and when the resolution does.
+- **An incoming call no longer takes the mouse.** The phone comes up ringing on screen, and a
+  notification tells you which key picks it up; mouse, camera and weapons stay yours until you
+  open it. If the caller hangs up first, the phone goes away again.
+- **The 9100-T and the EMS CAD act on the incident you chose.** Without a choice they showed the
+  newest call and ACK, the disposition, messages and the patient care report went to it — a call
+  nobody picked, and one that changed whenever a new call came in. They now say "Select an
+  incident first."
+- **The EMS CAD speaks your language.** It had a single translated line; menus, tables, the
+  patient care report and its utilities now follow the UI language (English, German, Russian).
+- **No more German in the English UI:** the dispatch console's unit buttons, the speech-to-text
+  test (`/sttcheck`), and call-centre messages. The browser dispatcher's sign-in page was German
+  only and still called itself "PVP Dispatch"; it now follows the browser language.
+- **"Use Metric System" works.** The profile setting existed, but the speedometer and the speed
+  limiter always said mph. They now show km/h when it is on.
+- **The MDT desktop's lock screen shows the date in the UI language**, not the one Windows uses.
+- **Easier to read:** muted text in the profile, the MDT desktop's app windows and the radio log
+  now meets the usual contrast minimum (4.5:1); phone app names and the clock stay legible on the
+  light wallpaper; the LAPD client is never narrower than 460 px, so its status bar no longer
+  shrinks to single letters at 1280×720; the dispatch console's side panel and chat give the unit
+  list more room on small screens.
+- **Customer portal:** the admin overview no longer shows a green "nothing pending" when it could
+  not load the numbers — the tile says it could not load. Banning a player from the admin lookup
+  needs an explicit length; 0 (permanent) asks for confirmation.
 
 ## [4.0.0] – 2026-09-17 — LACORE 4.0
 
