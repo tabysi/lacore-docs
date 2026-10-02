@@ -3,6 +3,115 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [4.2.0] – 2026-10-02 — Civilians can answer back
+
+> ⚠️ In development — 4.2.0 is the version in `fxmanifest.lua`, but it is not released yet. The
+> Lua syntax check and the NUI build are green and the new panels were looked at in the NUI
+> preview; **nothing in this section has run on a live server.** The job shifts, the money paths
+> on ESX / QBCore / QBox and the depot coordinates in particular still need an in-game pass.
+
+Until now everything the police wrote about a civilian ended there. A fine was a number on a
+record, a warrant was a banner you found by accident, an impounded car simply vanished, and a
+stolen flag could never be taken back. This release gives the civilian the other half: the
+Citizen Hub shows what is held against you, and lets you do something about it. And the one
+sample "activity" with placeholder coordinates is replaced by real job shifts.
+
+![What an officer writes, what the hub shows, what the civilian can do](/img/features/citizen-loop.svg)
+
+### Citizen Hub
+
+- **Two new tabs, and the hub can act now.** `/citizen` has *Overview · Legal · Vehicles · Jobs ·
+  Organisation*. Until now it only read; the new buttons change things, each checked on the
+  server. Anything that costs money or cannot be undone takes two clicks. A red dot on a tab
+  means something there wants attention.
+- **Legal** — an active warrant with its reason, a running jail sentence, and every citation and
+  arrest with the status of its fine and a *Pay* button.
+- **Vehicles** — insurance switch, stolen report, impound release and *Remove registration*, per
+  vehicle. There was no way back from `/vreg` before: a sold or mistyped plate stayed for good
+  and kept counting against the 30-vehicle limit.
+- **Fixed: "Job" in the hub was always empty.** The hub read the job and the phone number from
+  the character mirror, and the mirror never carried either. Both are copied now, and the
+  officer's person card shows *Occupation* and *Phone* when the character has them.
+
+![The Citizen Hub — Legal and Vehicles tabs](/img/features/citizen-hub.svg)
+
+### Fines are owed
+
+- **A fine has a status.** A citation or arrest with a fine starts *unpaid* with a due date
+  (7 days, `CivConfig.fines.dueDays`) and reads *overdue* after it — in the hub and on the
+  officer's person card, whose priors strip also shows the unpaid total.
+- **Paying.** LACORE still has no money of its own. With `CivConfig.fines.payment = "auto"` (the
+  default) a framework server charges the bank account, cash if the bank is short; a standalone
+  server asks for an RP confirmation and marks the fine paid. `"rp"` always confirms, `"external"`
+  hands the charge to your own economy script (`lacore:api:finePayRequested` →
+  `exports.lacore:MarkFinePaid`).
+- **Waive fine** on the person card closes a fine an officer wrote in error. The citation stays.
+- Citations from before 4.2.0 carry no status and are never billed afterwards.
+
+### Warrants and licences
+
+- **A warrant is announced.** The person is notified when one is set or lifted, and the hub shows
+  it with its reason. `CivConfig.notify.warrant = false` keeps it a surprise.
+- **Officers can suspend, revoke and reinstate a licence** — *Licence* on the person card, with a
+  reason the person sees. There was no way to do this at all.
+- **A held licence stays held.** On a standalone server players set their own licences in the
+  profile, CCW included, so a suspension would have lasted until the next save. The hold now wins
+  over the profile form, a preset and the framework licence import. *Reinstate* returns the
+  licence to what it was before — it never grants one the person did not have.
+- **The ID card prints the real licence.** Class, endorsements and restrictions were a fixed
+  `C / NONE / NONE`. They come from the character now, a suspended or revoked driver licence is
+  stamped across the card, and a character without one gets an *Identification Card*.
+
+### Vehicles
+
+- **Report your own vehicle stolen**, and withdraw the report when it is back. On-duty law
+  enforcement are told; ALPR, CCTV and every plate query flag the plate.
+- **Fixed: a stolen flag could never be removed.** The only code that cleared one needed an open
+  registration request, and no request starts for a plate that is already flagged. Officers have
+  *Flag stolen / Clear stolen* next to each vehicle on the person card. The owner can only
+  withdraw a report they made themselves.
+- **Impound reaches the owner.** They are notified, see reason, date and fee in the hub, and can
+  release the vehicle themselves (`Impound.ownerRelease`, default on). The fee — until now a
+  number nothing charged — is taken on a framework server.
+
+### Jobs
+
+![A civilian job shift and the three shipped jobs](/img/features/civ-jobs.svg)
+
+- **Real shifts.** Clock in at a depot, get a work vehicle, work the stops, clock out for the
+  completion bonus. Three jobs ship: **Sanitation Worker**, **Bus Driver** and **Courier** (five
+  of ten stores, drawn anew each shift). All data-driven in `CivConfig.jobs`.
+- **The server owns the shift.** It hands out the stops and checks each one: the right stop, in
+  order, the player standing there, and not sooner than the work takes. The old activities
+  trusted the client for everything but the last waypoint.
+- **Pay** goes into the framework bank account on ESX / QBCore / QBox. On a standalone server a
+  shift counts towards your totals and achievements.
+- **Clocking in sets your occupation** — *Job* in the hub, *Occupation* on the person card.
+  Framework characters keep their framework job.
+- `/quitjob` ends a shift anywhere, without the bonus. The radial entry is called *Jobs* now.
+
+> ⚠️ **Config change:** `CivConfig.activities` ships empty. The old "Garbage Run" sample had
+> placeholder coordinates and is replaced by the *Sanitation Worker* job. Activities you added
+> yourself keep working unchanged. New in `configs/cfg-civilian-sh.lua`: `CivConfig.notify`,
+> `CivConfig.fines`, `CivConfig.jobs`; in `configs/cfg-impound-sh.lua`: `Impound.ownerRelease`.
+> A server that keeps its old config files gets the defaults of all of them.
+
+### Developer API (1.3.0)
+
+- New exports: `MarkFinePaid(license, recordId)`, `GetCitizenLegal(license)`.
+- New server events: `lacore:api:finePaid`, `finePayRequested`, `licenseChanged`,
+  `vehicleStolen`, `impoundReleased`, `civJobStarted`, `civJobEnded`.
+- `lacore:api:chargesIssued` also carries `recordId` and `license`.
+- The framework bridge has `Bridge.HasEconomy()`, `Bridge.RemoveMoney()` and `Bridge.AddMoney()`
+  for ESX, QBCore and QBox.
+
+### Docs
+
+- The civilian pages said things the code did not do: that officers see a person's gang in an
+  MDT query (the faction is stripped from the result on purpose), that an org is created with a
+  colour and a message of the day, that placing a prop over the limit removes the oldest (it is
+  refused), and they described the scenery prop spawner's config as the radial's. Corrected.
+
 ## [4.1.0] – 2026-10-02 — Closing the doors a player could walk through
 
 A security pass after a full code audit, and the features that audit found broken. The

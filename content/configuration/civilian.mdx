@@ -76,9 +76,26 @@ Turf.zones = {
   Anti-farm protection requires the killer to be inside the zone and applies a per-victim cooldown.
 </Callout>
 
-## Placeable props — `configs/cfg-props-cl.lua`
+## Radial props — `CivConfig.props`
 
-The props civilians can place via the prop tool, grouped into categories:
+The props on the civilian radial (and `/prop <id>`). Server-synced, so everyone sees them, and only
+models from this list can be placed.
+
+```lua
+CivConfig.propLimit = 10
+CivConfig.props = {
+    { id = "cone",    label = "Traffic Cone", model = "prop_roadcone02a" },
+    { id = "barrier", label = "Barrier",      model = "prop_barrier_work05" },
+    -- …
+}
+```
+
+Each player may place up to **`CivConfig.propLimit`** props at once (default `10`). At the limit a
+further prop is refused with a notification — pick one up first.
+
+## Scenery prop spawner — `configs/cfg-props-cl.lua`
+
+A separate tool (`/propspawner`), with its own catalogue grouped into categories:
 
 ```lua
 PropConfig = {
@@ -98,31 +115,85 @@ PropConfig = {
 Add a category with a `categoryName`, `description`, and a `components` list of `{ name, spawn }`
 (the `spawn` is the GTA prop model name).
 
-Each player may place up to **`CivConfig.propLimit`** props at once (default `10`, in `cfg-civilian-sh.lua`);
-placing more removes their oldest.
-
-## Civilian activities — `CivConfig.activities`
-
-RP-only "jobs": a chain of ordered waypoints a civilian can run for an **achievement + a progress count**
-(no money — LACORE has no economy). The first step is the clock-in hub (a blip + marker shows there);
-reaching the last step completes the run and grants the reward. Fully data-driven — add your own.
+## Fines & notifications — `CivConfig.fines`, `CivConfig.notify`
 
 ```lua
-CivConfig.activities = {
-    {
-        id    = "garbage",
-        label = "Garbage Run",
-        blip  = { sprite = 318, color = 2, scale = 0.8 },
-        achievement = nil,   -- optional: an id from your achievements config to unlock on completion
-        steps = {
-            { x = -322.6, y = -1545.4, z = 27.5, r = 3.5, label = "Depot — start your route" },
-            { x = -245.0, y = -1469.0, z = 30.5, r = 3.5, label = "Pickup 1" },
-            -- … the last step completes the run
+-- What a civilian is told about. false = they only find it in /citizen → Legal.
+CivConfig.notify = {
+    warrant = true,   -- a warrant was issued / lifted on your character
+    license = true,   -- an officer suspended / revoked / reinstated a licence
+}
+
+CivConfig.fines = {
+    enabled = true,     -- false = fines are a number on the record again, nothing is owed
+    payment = "auto",   -- "auto" | "rp" | "external"
+    dueDays = 7,        -- unpaid fines past this show as OVERDUE
+}
+```
+
+| `payment` | Meaning |
+| --- | --- |
+| `"auto"` | Framework running → bank (then cash) is charged. Standalone → RP confirmation. |
+| `"rp"` | Always the RP confirmation. |
+| `"external"` | LACORE fires `lacore:api:finePayRequested`; your script charges the player and calls `exports.lacore:MarkFinePaid(license, recordId)`. |
+
+See [Civilian Layer → Fines](/features/civilian#fines).
+
+## Civilian jobs — `CivConfig.jobs`
+
+![A civilian job shift and the three shipped jobs](/img/features/civ-jobs.svg)
+
+```lua
+CivConfig.jobs = {
+    enabled       = true,
+    payment       = "auto",   -- "auto" = pay through the framework when one runs · "off" = never pay
+    setOccupation = true,     -- clocking in writes the job onto the character
+    list = {
+        {
+            id = "courier", label = "Courier",
+            depot   = { x = 215.8, y = -810.1, z = 30.7, r = 3.5 },
+            blip    = { sprite = 478, color = 46, scale = 0.8 },
+            vehicle = { model = "boxville2" },          -- optional: spawn = { x, y, z, h }
+            mode = "random", pick = 5,                  -- or mode = "route" (every stop, in order)
+            action = { seconds = 5, label = "Handing over the parcel", onFoot = true },
+            pay = { perStop = 80, bonus = 200 },
+            stops = {
+                { x = 25.7, y = -1347.3, z = 29.5, r = 22.0, label = "24/7 Strawberry" },
+                -- …
+            },
         },
     },
 }
 ```
 
+| Field | Meaning |
+| --- | --- |
+| `id` / `label` | Unique key / name shown in the hub, on the blip and as the occupation. |
+| `depot` | `{ x, y, z, r }` — where you clock in and out. |
+| `vehicle` | `{ model, spawn }`. Without `spawn` the vehicle appears on the road nearest to the depot. Leave `vehicle` out for a job on foot. |
+| `mode` | `"route"` = every stop in the listed order · `"random"` = `pick` stops drawn from the list, new each shift. |
+| `stops` | `{ x, y, z, r, label }` — `r` is how close counts as "there". Distances are measured flat, so a `z` that is a little off does not break a stop. |
+| `action` | `seconds`, `label`, and one of `onFoot = true` (get out first) or `inVehicle = true` (stay seated, full stop). `scenario` optionally plays a GTA scenario on foot. |
+| `pay` | `{ perStop, bonus }` in USD. Only paid on a framework server with `payment = "auto"`. |
+| `achievement` | Optional achievement id unlocked by a finished shift. |
+
 <Callout type="warning">
-  The shipped coordinates are **placeholders** — set them to spots on your own map.
+  The **depots** are a starting point — check them once on your map. The stops of the shipped bus
+  and sanitation jobs are the bus stops from `cfg-busroutes-cl.lua`; the courier stops are the
+  standard store locations.
 </Callout>
+
+### Legacy activities — `CivConfig.activities`
+
+The pre-4.2.0 waypoint chains (no vehicle, no pay, no server-side stop check) still work, so an
+existing config keeps running. The shipped list is empty now; new work belongs in `CivConfig.jobs`.
+
+```lua
+CivConfig.activities = {
+    { id = "tour", label = "City Tour", blip = { sprite = 318, color = 2, scale = 0.8 },
+      steps = {
+          { x = -322.6, y = -1545.4, z = 27.5, r = 3.5, label = "Start" },
+          { x = -245.0, y = -1469.0, z = 30.5, r = 3.5, label = "Last step completes the run" },
+      } },
+}
+```

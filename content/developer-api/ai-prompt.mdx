@@ -90,6 +90,8 @@ Server exports:
     are attached under `bolos`. Useful fields: name, dob, gender, vehicles (map by plate), bolos.
 - GetInsurance(plate) -> true|false|nil     (nil = unknown plate)
 - SetInsurance(plate, insured) -> bool      (emits insuranceChanged)
+- MarkFinePaid(license, recordId) -> bool   (closes an unpaid fine; emits finePaid)
+- GetCitizenLegal(license) -> { warrant, fines, holds, owed, overdue } | nil
 - GetPersonnelFile(license) -> file|nil     (read-only)
     file = { license, name, badge, dept, job, callsign, rank, status, counters, duty,
              firstSeenUnix, lastSeenUnix }
@@ -133,6 +135,13 @@ Events LACORE fires (AddEventHandler on the consumer side; all [server] unless n
 - 'lacore:api:insuranceChanged'    (plate, insured, by)
 - 'lacore:api:boloCreated'         (bolo)   bolo = { id, kind, subject, plate, reason, danger, by }
 - 'lacore:api:boloCancelled'       (id)
+- 'lacore:api:finePaid'            ({ license, recordId, amount, by, name, status })
+- 'lacore:api:finePayRequested'    ({ src, license, recordId, amount, name })   only with fines.payment = "external"
+- 'lacore:api:licenseChanged'      ({ src, target, license, slot, state, reason, officer })
+- 'lacore:api:vehicleStolen'       ({ plate, stolen, by, src, owner })
+- 'lacore:api:impoundReleased'     ({ id, plate, by, src, fee, charged })
+- 'lacore:api:civJobStarted'       ({ src, job, label })
+- 'lacore:api:civJobEnded'         ({ src, job, label, complete, stops, earned })
 - 'lacore:mdt:opened' / 'lacore:mdt:closed'  ()           [client]
 
 Now write the resource for MY SETUP above.

@@ -99,7 +99,27 @@ When you issue charges, the system:
 - **Files a record** on the subject (a *Citation* or *Arrest Report*) listing every charge, the total fine and jail time, your callsign and the date.
 - That record is **faction-visible**, so it shows up on the person whenever an officer runs them — in both the **MDT** and the **[LASD CAD](/user-guide/lasd-cad)**.
 - **Notifies the subject** (if they're online) that they've been charged, with the total fine.
+- **Makes the fine owed.** It starts *unpaid* with a due date; the subject pays it from their
+  Citizen Hub (`/citizen` → Legal). The record on the person card shows **Fine unpaid / overdue /
+  paid / waived**, and the priors strip shows the unpaid total.
 - Logs the action for staff (admin audit) and the dispatch log.
+
+### Waiving a fine
+
+Wrote a citation in error? **Waive fine** next to the status on the record closes it — the citation
+stays on file, the money is no longer owed. Law enforcement only; you cannot waive a fine on your
+own character.
+
+### Licences and stolen flags
+
+The person card has two more officer actions since 4.2.0:
+
+- **Licence** — suspend, revoke or reinstate one of the six licences, with a reason the person
+  sees. The hold stays until an officer lifts it; the person cannot save it away in their profile.
+- **Flag stolen / Clear stolen** — next to each registered vehicle. Clearing is how a flag from a
+  timed-out registration request is removed again.
+
+![What an officer writes, what the hub shows, what the civilian can do](/img/features/citizen-loop.svg)
 
 > ℹ️ The fine and jail totals are calculated **on the server** from the penal code — they can't be tampered with from the client.
 

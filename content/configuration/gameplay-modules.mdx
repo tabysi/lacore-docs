@@ -56,7 +56,8 @@ Officers impound a nearby vehicle; owners see an informational retrieval fee in 
 
 ```lua
 Impound.enabled     = true
-Impound.fee         = 500     -- retrieval fee shown in the lot (USD) — informational/RP only, LACORE has no economy so nothing is charged automatically
+Impound.fee         = 500     -- release fee (USD) — charged to the OWNER on ESX/QBCore/QBox when they release from the Citizen Hub; shown only on standalone
+Impound.ownerRelease = true   -- the registered owner may release their own vehicle in /citizen → Vehicles
 Impound.maxDistance = 8.0     -- how close an officer must be to impound
 Impound.persist     = true    -- remember impounded vehicles across restarts
 ```

@@ -129,7 +129,7 @@ That's **34 bindings** in total: 11 with a default key, 23 unbound.
 | `/offduty` 🔒 | On-duty | Go off duty, clear weapons & callsign. |
 | `/job [name]` 🔒 | Everyone | Start a civilian job by name; no name = set yourself unemployed. (LEO/Fire jobs must use `/onduty`.) |
 | `/jobmenu` | Everyone | Duty picker — pick an agency from a searchable list, set a callsign, go on duty. Agencies your [`DutyAccess`](/configuration/discord#agency-whitelist) permissions refuse are shown locked. |
-| `/canceljob` | Everyone | Cancel your current civilian activity. |
+| `/canceljob` | Everyone | Cancel your current legacy activity, or end a job shift (same as `/quitjob`). |
 | `/dutyaccess` | Everyone | Print which agencies you may go on duty for, and what each one wants (role or ACE). Also runs in the server console. `/dutyaces` is an older alias of the same command. |
 
 ## 🚓 MDT & CAD
@@ -349,7 +349,8 @@ The keybind **"Replay: start / stop recording"** ships **unbound** — bind it i
 | `/propspawner` 🧪 | Open the scenery prop spawner (`configs/cfg-props-cl.lua`) — search by name, filter by category, delete the nearest. Was `/prop` until that name was taken by the radial above. |
 | `/orgaccept` | Accept a pending organisation invite. |
 | `/turf` | Show turf / territory ownership and your organisation's influence. |
-| `/citizen` | Open the **Citizen Hub** — civilian services, documents and requests in one panel. |
+| `/citizen` | Open the **Citizen Hub** — your ID, warrant and fines (pay them here), vehicles (insurance, stolen report, impound release), jobs and organisation. |
+| `/quitjob` | End your current job shift anywhere. No completion bonus. |
 | `/myid` | Show your digital ID. |
 | `/onboarding` | Replay the first-join introduction. |
 

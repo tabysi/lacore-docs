@@ -6,8 +6,13 @@ import { Callout, Steps } from 'nextra/components'
 
 # Civilian Layer
 
-The civilian layer gives non-LEO players meaningful roleplay tools. It is intentionally
-**RP-only — no economy, no money**; progression is handled by the achievements/XP layer instead.
+The civilian layer gives non-LEO players meaningful roleplay tools — and, since 4.2.0, a way to
+**answer what the police write about them**: pay a fine, see a warrant, release an impounded car,
+report their own vehicle stolen, work a shift.
+
+LACORE still has **no money of its own**. Where money is involved (fines, the impound fee, job pay)
+it uses the **framework's** money when ESX, QBCore or QBox is running, and falls back to an RP
+confirmation on a standalone server. Progression is handled by the achievements/XP layer.
 
 ![The civilian layer — radial, tools, orgs and opt-in turf](/img/features/civilian-layer.svg)
 
@@ -44,7 +49,9 @@ Provider exports: `GetEmoteProvider`. Play routes through `/e <name>`; cancel is
 ## Tools & identity
 
 - **Digital ID** — a driver licence / ID card built from the active character (name, DOB, photo).
-  Show it to nearby players (they receive it on their screen).
+  Show it to nearby players (they receive it on their screen). The licence block is real: class,
+  endorsements (boating, pilot, CCW, hunting) and a **SUSPENDED / REVOKED** stamp come from the
+  character's licences. A character with no driver licence gets an *Identification Card*.
 - **Self-service vehicle registration** — register a plate to your character; it then appears in LEO
   queries and on your profile.
 - **Props** — place cones, barriers, signs, chairs, etc. Server-synced (everyone sees them), with a
@@ -56,21 +63,124 @@ Provider exports: `GetEmoteProvider`. Play routes through `/e <name>`; cancel is
 
 ## Citizen Hub
 
-One panel for everything a civilian owns, opened from the radial (**Services → Citizen Hub**) or
-with `/citizen`:
+One panel for everything a civilian owns and owes, opened from the radial
+(**Services → Citizen Hub**) or with `/citizen`:
 
-![The Citizen Hub panel](/img/changelog/citizen-hub.svg)
+![The Citizen Hub — Legal and Vehicles tabs](/img/features/citizen-hub.svg)
 
 - **Overview** — the character as the ID card shows it: name, date of birth, gender, address, job,
-  faction, physical description, licences (a suspended one reads red). *Show my ID* from here.
-- **Vehicles** — every `/vreg` registration with plate, model, colour and insurance. *Register a
-  vehicle* opens the form.
-- **Activities** — each configured activity with how often you completed it, and a *Set waypoint*
-  button to its clock-in hub.
+  faction, phone, physical description, licences. A licence an officer suspended or revoked reads
+  red, with who did it and why. *Show my ID* from here.
+- **Legal** — an active warrant with its reason, a running jail sentence, and every citation and
+  arrest with the **status of its fine** (unpaid, overdue, paid, waived) and a **Pay** button.
+- **Vehicles** — every registration with insurance, a stolen flag and the impound lot. Insure or
+  cancel, **report it stolen** (and withdraw that), **release it from impound**, remove the
+  registration, or register another one.
+- **Jobs** — each job with its pay, your shifts and stops so far, and a *Set waypoint* button to its
+  depot.
 - **Organisation** — your org, rank and member count; opens the organisation panel.
 
-The hub only reads. Every button goes through the same client paths the radial uses, so it can never
-do something the wheel cannot. Escape closes it.
+A red dot on a tab means something there wants attention. Anything that costs money or cannot be
+undone takes **two clicks** — the button arms first. Every action is checked on the server; the
+panel only asks. Escape closes it.
+
+![What an officer writes, what the hub shows, what the civilian can do](/img/features/citizen-loop.svg)
+
+### Fines
+
+A citation or arrest with a fine is **owed** until it is paid. It starts *unpaid* with a due date
+(`CivConfig.fines.dueDays`, default 7) and turns *overdue* after that — for the civilian in the hub
+and for the officer on the person card, where the priors strip also shows the unpaid total.
+
+What **Pay** does depends on `CivConfig.fines.payment`:
+
+| Value | What happens |
+| --- | --- |
+| `"auto"` *(default)* | Framework running → the amount is taken from the bank account, cash if the bank is short. Standalone → an RP confirmation: the fine is marked paid. |
+| `"rp"` | Always the RP confirmation, even with a framework. |
+| `"external"` | LACORE only fires `lacore:api:finePayRequested`. Your economy script charges the player and calls `exports.lacore:MarkFinePaid(license, recordId)`. |
+
+An officer can **waive** an unpaid fine from the person card. Nothing happens automatically when a
+fine goes overdue — what that means is your roleplay.
+
+<Callout type="info">
+  Citations written **before 4.2.0** have no status and are never billed afterwards. Only new ones
+  are owed.
+</Callout>
+
+### Licences
+
+Officers can **suspend, revoke and reinstate** a licence from the person card (*Licence* button).
+The hold belongs to the officer the way a warrant does: on a standalone server players set their
+own licences in the profile, and a held licence can no longer be saved back to *Valid*. A framework
+licence import does not overwrite it either. *Reinstate* puts the licence back to what it was
+before the hold — it never grants a licence the person did not have.
+
+### Vehicles
+
+- **Stolen** — the owner of a registered vehicle can report it stolen; on-duty law enforcement are
+  told, and ALPR and every plate query flag it. The owner can withdraw their own report. A flag set
+  by the police (or by an officer's timed-out registration request) is cleared by an officer with
+  *Clear stolen* on the person card — until 4.2.0 such a flag could never be removed.
+- **Impound** — the owner is notified when their vehicle is impounded and sees reason, date and fee
+  in the hub. With `Impound.ownerRelease = true` (default) they release it themselves; the fee is
+  charged on a framework server.
+- **Remove registration** — takes a `/vreg` registration off the character again. Vehicles that
+  come from a framework garage cannot be removed here.
+
+## Jobs
+
+Real shifts instead of a waypoint chain: clock in at the depot, get a work vehicle, work the stops,
+come back and clock out.
+
+![A civilian job shift and the three shipped jobs](/img/features/civ-jobs.svg)
+
+<Steps>
+
+### Clock in
+
+Stand on the depot marker (blip on the map, or *Set waypoint* in the hub) and press **E**. The
+server hands out the stops of this shift and the work vehicle appears on the nearest road.
+
+### Work the stops
+
+Follow the GPS to each stop and do the action there — get out and empty the bins, hand over a
+parcel, or wait at the bus stop with the bus at a standstill. Leaving mid-action interrupts it.
+
+### Clock out
+
+After the last stop, drive back to the depot and press **E**: the shift is counted and the
+completion bonus is paid. `/quitjob` ends a shift anywhere, without the bonus.
+
+</Steps>
+
+| Job | Vehicle | Stops | At a stop |
+| --- | --- | --- | --- |
+| Sanitation Worker | Trashmaster | 6, fixed route | get out, empty the bins |
+| Bus Driver | Bus | 8, fixed route | full stop, passengers board |
+| Courier | Boxville | 5 of 10 stores, drawn anew each shift | get out, hand over the parcel |
+
+The server checks every stop — the right one, in order, with the player standing there, and not
+sooner after the last one than the work takes — so a shift cannot be reported from somewhere else.
+
+**Pay** goes into the framework bank account on ESX / QBCore / QBox. A standalone server has no
+money: the shift counts towards your totals and achievements. Clocking in also writes the job onto
+the character — *Job* in the hub, *Occupation* on the officer's person card.
+
+Add your own jobs, or change stops, pay and vehicles, in
+[`CivConfig.jobs`](/configuration/civilian#civilian-jobs--civconfigjobs).
+
+<Callout type="warning">
+  The bus and sanitation stops are the kerbside bus stops LACORE already ships; the courier
+  addresses are the standard store locations. The **depots** are a starting point — walk them once
+  on your map and move anything that sits badly. The shift logic has not been run on a live server
+  yet (see the 4.2.0 changelog).
+</Callout>
+
+<Callout type="info">
+  **Tow truck drivers** already had a real duty: `/onduty` with one of the tow companies puts you
+  on the dispatch board, where *Tow Truck* requests arrive as calls.
+</Callout>
 
 ## Organisations / gangs
 
@@ -80,12 +190,14 @@ An org framework lets civilians form groups:
 
 ### Create or join
 
-Create an org with a name, tag, colour and MOTD, or join an existing one. Membership and ranks are
-persisted server-side and use the character's `faction` field.
+Create an org with a name and a tag, or accept an invite from a member standing next to you. The
+owner and officers set the message of the day. Membership and ranks are persisted server-side and
+written to the character's `faction` field.
 
 ### Territory & visibility
 
-Orgs can be tagged to zones, and LEO see gang affiliation in the MDT query.
+With the opt-in turf system (below) orgs capture zones. The faction is **not** shown to law
+enforcement in an MDT query — it is stripped from the result on purpose.
 
 </Steps>
 

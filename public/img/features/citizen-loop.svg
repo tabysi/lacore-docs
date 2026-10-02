@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6c8cff"/></marker>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 574 V602 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WHAT THE POLICE WRITE, <tspan fill="#6c8cff">THE CIVILIAN CAN ANSWER</tspan></text>
+
+  <!-- column heads -->
+  <g font-size="13" letter-spacing="3" fill="#9fb0ff">
+    <text x="60" y="112">OFFICER — MDT</text>
+    <text x="452" y="112">CITIZEN HUB — /citizen</text>
+    <text x="852" y="112">CIVILIAN — WHAT YOU CAN DO</text>
+  </g>
+
+  <!-- rows -->
+  <g font-size="14">
+    <!-- row 1: fine -->
+    <rect x="60" y="130" width="300" height="74" rx="10" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="78" y="160" fill="#e7ecf5" font-weight="700">Citation / arrest with a fine</text>
+    <text x="78" y="184" fill="#98a6c0" font-size="12">Cite / Charge — total set by the server</text>
+    <rect x="452" y="130" width="300" height="74" rx="10" fill="#141a26" stroke="#4a5cff" stroke-width="2"/>
+    <text x="470" y="160" fill="#e7ecf5" font-weight="700">Legal → fine: UNPAID</text>
+    <text x="470" y="184" fill="#98a6c0" font-size="12">due date · OVERDUE after 7 days</text>
+    <rect x="852" y="130" width="288" height="74" rx="10" fill="#12362a" stroke="#3cd296" stroke-width="2"/>
+    <text x="870" y="160" fill="#3cd296" font-weight="700">Pay it</text>
+    <text x="870" y="184" fill="#98a6c0" font-size="12">framework bank, or an RP confirmation</text>
+
+    <!-- row 2: warrant -->
+    <rect x="60" y="218" width="300" height="74" rx="10" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="78" y="248" fill="#e7ecf5" font-weight="700">Warrant set / cleared</text>
+    <text x="78" y="272" fill="#98a6c0" font-size="12">person card, or an approved request</text>
+    <rect x="452" y="218" width="300" height="74" rx="10" fill="#141a26" stroke="#4a5cff" stroke-width="2"/>
+    <text x="470" y="248" fill="#e7ecf5" font-weight="700">Legal → warrant banner</text>
+    <text x="470" y="272" fill="#98a6c0" font-size="12">with the reason, the moment it is set</text>
+    <rect x="852" y="218" width="288" height="74" rx="10" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="870" y="248" fill="#e7ecf5" font-weight="700">Get told</text>
+    <text x="870" y="272" fill="#98a6c0" font-size="12">a notification — turn yourself in</text>
+
+    <!-- row 3: licence -->
+    <rect x="60" y="306" width="300" height="74" rx="10" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="78" y="336" fill="#e7ecf5" font-weight="700">Licence suspended / revoked</text>
+    <text x="78" y="360" fill="#98a6c0" font-size="12">new: Licence button on the person card</text>
+    <rect x="452" y="306" width="300" height="74" rx="10" fill="#141a26" stroke="#4a5cff" stroke-width="2"/>
+    <text x="470" y="336" fill="#e7ecf5" font-weight="700">Overview → licence, red</text>
+    <text x="470" y="360" fill="#98a6c0" font-size="12">who did it and why · stamped on the ID</text>
+    <rect x="852" y="306" width="288" height="74" rx="10" fill="#3a1418" stroke="#e0303a" stroke-width="2"/>
+    <text x="870" y="336" fill="#ff8a90" font-weight="700">Cannot save it back to Valid</text>
+    <text x="870" y="360" fill="#98a6c0" font-size="12">only an officer lifts the hold</text>
+
+    <!-- row 4: impound -->
+    <rect x="60" y="394" width="300" height="74" rx="10" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="78" y="424" fill="#e7ecf5" font-weight="700">Vehicle impounded</text>
+    <text x="78" y="448" fill="#98a6c0" font-size="12">/impound — plate, reason, fee</text>
+    <rect x="452" y="394" width="300" height="74" rx="10" fill="#141a26" stroke="#4a5cff" stroke-width="2"/>
+    <text x="470" y="424" fill="#e7ecf5" font-weight="700">Vehicles → IMPOUNDED</text>
+    <text x="470" y="448" fill="#98a6c0" font-size="12">reason, date and fee on the vehicle</text>
+    <rect x="852" y="394" width="288" height="74" rx="10" fill="#12362a" stroke="#3cd296" stroke-width="2"/>
+    <text x="870" y="424" fill="#3cd296" font-weight="700">Release it yourself</text>
+    <text x="870" y="448" fill="#98a6c0" font-size="12">fee charged on a framework server</text>
+
+    <!-- row 5: stolen -->
+    <rect x="60" y="482" width="300" height="74" rx="10" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="78" y="512" fill="#e7ecf5" font-weight="700">Stolen flag on a plate</text>
+    <text x="78" y="536" fill="#98a6c0" font-size="12">new: Flag stolen / Clear stolen</text>
+    <rect x="452" y="482" width="300" height="74" rx="10" fill="#141a26" stroke="#4a5cff" stroke-width="2"/>
+    <text x="470" y="512" fill="#e7ecf5" font-weight="700">Vehicles → REPORTED STOLEN</text>
+    <text x="470" y="536" fill="#98a6c0" font-size="12">yours, or flagged by the police</text>
+    <rect x="852" y="482" width="288" height="74" rx="10" fill="#12362a" stroke="#3cd296" stroke-width="2"/>
+    <text x="870" y="512" fill="#3cd296" font-weight="700">Report your own car stolen</text>
+    <text x="870" y="536" fill="#98a6c0" font-size="12">and withdraw it when it is back</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <path d="M364 167 H446"/><path d="M756 167 H846"/>
+    <path d="M364 255 H446"/><path d="M756 255 H846"/>
+    <path d="M364 343 H446"/><path d="M756 343 H846"/>
+    <path d="M364 431 H446"/><path d="M756 431 H846"/>
+    <path d="M364 519 H446"/><path d="M846 519 H756"/>
+  </g>
+  <text x="60" y="592" fill="#6b7689" font-size="11">Before 4.2.0 every row ended in the first column: the record was written, and the person it was about could only read it — or not even that.</text>
+</svg>

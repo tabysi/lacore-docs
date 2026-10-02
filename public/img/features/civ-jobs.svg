@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08090c"/><stop offset="1" stop-color="#0e131c"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/></pattern>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6c8cff"/></marker>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none"><path d="M28 56 V28 H56"/><path d="M1172 574 V602 H1144"/></g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">CIVILIAN JOBS — <tspan fill="#6c8cff">ONE SHIFT, START TO FINISH</tspan></text>
+
+  <!-- the shift flow -->
+  <text x="60" y="112" fill="#9fb0ff" font-size="13" letter-spacing="3">A SHIFT</text>
+  <g font-size="14">
+    <rect x="60" y="130" width="236" height="110" rx="12" fill="#141a26" stroke="#3cd296" stroke-width="2"/>
+    <text x="78" y="160" fill="#3cd296" font-weight="700">1 · Clock in</text>
+    <text x="78" y="186" fill="#e7ecf5" font-size="13">E at the depot marker</text>
+    <text x="78" y="208" fill="#98a6c0" font-size="12">server checks you are there</text>
+    <text x="78" y="226" fill="#98a6c0" font-size="12">and hands out the stop list</text>
+
+    <rect x="336" y="130" width="236" height="110" rx="12" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="354" y="160" fill="#e7ecf5" font-weight="700">2 · Work vehicle</text>
+    <text x="354" y="186" fill="#e7ecf5" font-size="13">spawns on the nearest road</text>
+    <text x="354" y="208" fill="#98a6c0" font-size="12">blip on the map · removed</text>
+    <text x="354" y="226" fill="#98a6c0" font-size="12">again when the shift ends</text>
+
+    <rect x="612" y="130" width="250" height="110" rx="12" fill="#141a26" stroke="#4a5cff" stroke-width="2"/>
+    <text x="630" y="160" fill="#9fb0ff" font-weight="700">3 · Work the stops</text>
+    <text x="630" y="186" fill="#e7ecf5" font-size="13">GPS → marker → the action</text>
+    <text x="630" y="208" fill="#98a6c0" font-size="12">each stop checked server-side:</text>
+    <text x="630" y="226" fill="#98a6c0" font-size="12">right stop, in order, on site</text>
+
+    <rect x="902" y="130" width="238" height="110" rx="12" fill="#141a26" stroke="#3cd296" stroke-width="2"/>
+    <text x="920" y="160" fill="#3cd296" font-weight="700">4 · Clock out</text>
+    <text x="920" y="186" fill="#e7ecf5" font-size="13">back at the depot</text>
+    <text x="920" y="208" fill="#98a6c0" font-size="12">completion bonus · shift counted</text>
+    <text x="920" y="226" fill="#98a6c0" font-size="12">/quitjob ends early, no bonus</text>
+  </g>
+  <g stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <path d="M300 185 H330"/><path d="M576 185 H606"/><path d="M866 185 H896"/>
+  </g>
+
+  <!-- the three shipped jobs -->
+  <text x="60" y="296" fill="#9fb0ff" font-size="13" letter-spacing="3">SHIPPED JOBS — configs/cfg-civilian-sh.lua</text>
+  <g font-size="14">
+    <rect x="60" y="314" width="346" height="150" rx="12" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="80" y="346" fill="#e7ecf5" font-size="17" font-weight="700">Sanitation Worker</text>
+    <text x="80" y="372" fill="#98a6c0" font-size="12">Trashmaster · 6 stops, fixed route</text>
+    <text x="80" y="394" fill="#98a6c0" font-size="12">Get out, empty the bins (6 s)</text>
+    <rect x="80" y="412" width="136" height="26" rx="13" fill="#12362a" stroke="#3cd296"/><text x="148" y="430" text-anchor="middle" fill="#3cd296" font-size="12">$60 / stop + $250</text>
+
+    <rect x="428" y="314" width="346" height="150" rx="12" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="448" y="346" fill="#e7ecf5" font-size="17" font-weight="700">Bus Driver</text>
+    <text x="448" y="372" fill="#98a6c0" font-size="12">Bus · 8 stops, the shipped bus stops</text>
+    <text x="448" y="394" fill="#98a6c0" font-size="12">Stay seated, full stop, boarding (7 s)</text>
+    <rect x="448" y="412" width="136" height="26" rx="13" fill="#12362a" stroke="#3cd296"/><text x="516" y="430" text-anchor="middle" fill="#3cd296" font-size="12">$45 / stop + $300</text>
+
+    <rect x="796" y="314" width="344" height="150" rx="12" fill="#141a26" stroke="#2c3650" stroke-width="2"/>
+    <text x="816" y="346" fill="#e7ecf5" font-size="17" font-weight="700">Courier</text>
+    <text x="816" y="372" fill="#98a6c0" font-size="12">Boxville · 5 of 10 stores, new every shift</text>
+    <text x="816" y="394" fill="#98a6c0" font-size="12">Get out, hand over the parcel (5 s)</text>
+    <rect x="816" y="412" width="136" height="26" rx="13" fill="#12362a" stroke="#3cd296"/><text x="884" y="430" text-anchor="middle" fill="#3cd296" font-size="12">$80 / stop + $200</text>
+  </g>
+
+  <!-- pay note -->
+  <rect x="60" y="490" width="1080" height="70" rx="12" fill="#0f1420" stroke="#2c3650"/>
+  <text x="80" y="518" fill="#e7ecf5" font-size="14" font-weight="700">Pay</text>
+  <text x="80" y="542" fill="#98a6c0" font-size="13">ESX / QBCore / QBox → paid into the framework bank account. Standalone has no money: the shift counts towards your totals and achievements.</text>
+  <text x="60" y="592" fill="#6b7689" font-size="11">Clocking in also writes the job onto the character — "Job" in the Citizen Hub, "Occupation" on the officer's person card.</text>
+</svg>

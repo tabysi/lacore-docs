@@ -65,7 +65,11 @@ once — exiting the cam keeps the orbit flying. Tuning: `configs/cfg-airunit-sh
   world and lands in the lot record (plate, model, reason, officer). Logged to the dispatch
   Discord webhook.
 - `/impounds` — the lot panel (LEO): browse records and **release**. Release clears the record;
-  handing the car back is roleplay. The shown fee is display-only — LACORE has no economy.
+  handing the car back is roleplay.
+- The **registered owner** is notified, sees the vehicle as *Impounded* in their Citizen Hub
+  (`/citizen` → Vehicles) with reason and fee, and can release it there themselves
+  (`Impound.ownerRelease`). The fee is charged on an ESX / QBCore / QBox server; on a standalone
+  server it is shown and nothing is charged.
 
 Tuning (fee, range, persistence): `configs/cfg-impound-sh.lua`.
 
