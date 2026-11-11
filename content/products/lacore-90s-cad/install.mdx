@@ -36,10 +36,9 @@ ensure spawnmanager
 ensure lacore-90s-cad
 
 set mysql_connection_string "mysql://user:pass@localhost/yourdb?charset=utf8mb4"
-
-# Your LACORE license key (customer dashboard → License keys)
-set lacore_license_key "LACORE-XXXX-XXXX-XXXX"
 ```
+
+No licence key is needed — since 4.2.0 the 9100-T CAD runs fully offline.
 
 <Callout type="warning">
   Use `set`, **never** `setr`. These values are server-side secrets — `setr` replicates them to every
@@ -71,5 +70,5 @@ The three-way merge keeps the values you changed and still takes new structure f
 full routine is in [Updating LACORE](/getting-started/updating).
 
 <Callout type="info">
-  Escrow-protected and IP-locked: **one purchase = one server**.
+  Escrow-protected and licensed per server: **one purchase = one server**.
 </Callout>

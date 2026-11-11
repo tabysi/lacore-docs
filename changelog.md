@@ -96,6 +96,35 @@ sample "activity" with placeholder coordinates is replaced by real job shifts.
 > `CivConfig.fines`, `CivConfig.jobs`; in `configs/cfg-impound-sh.lua`: `Impound.ownerRelease`.
 > A server that keeps its old config files gets the defaults of all of them.
 
+### LACORE runs offline
+
+LACORE no longer talks to a LACORE server. The home service behind the website and the
+dashboard is being shut down, and every build that still called it would have kept sending to
+an address that will not answer — or, once the domain is gone, to whoever owns it next. This
+build makes no calls to it at all.
+
+![What keeps working and what is gone](/img/features/offline-build.svg)
+
+- **Nothing changes in-game.** MDTs, CADs, dispatch, civilians, local bans, Big Brother and your
+  own Discord webhooks work exactly as before. No licence key is needed any more.
+- **Pennsylvania CAD is included for everyone.** It was a paid add-on unlocked by the dashboard.
+  It now ships on and only takes over a department you tag in `configs/cfg-penn-sh.lua`.
+- **Gone:** the online dashboard and remote config, the global ban network, the shared
+  playerbase (`/lacore bans upload` says so), telemetry and the update notice, bug reports and
+  activity sent to the dashboard, the community page, hosted web dispatch (the self-hosted
+  bridge still works), the account link and the model library upload.
+- **IP lock off.** The licence server it checked against is gone, so the start-up wait and its
+  warnings are gone too.
+- `/lacore doctor` reports the licence key as *not needed* instead of *not activated*. The
+  `/lacoreconfig wizard` drops its dashboard and licence-key lines, `/lacore bans` lists only
+  `list` and `import`, and web dispatch no longer suggests the hosted portal at start.
+- **If you used the dashboard:** settings you changed there are cached in
+  `data/remote-config.json` and still override your `configs/` files. The console says so at
+  start. Delete that file to go back to your local configs only.
+
+> ⚠️ **Config change:** `GlobalBan.enabled` ships `false` and has no effect any more.
+> `cfg-features-sh.lua` has `penncad = true`; the `extracad` example entry is removed.
+
 ### Developer API (1.3.0)
 
 - New exports: `MarkFinePaid(license, recordId)`, `GetCitizenLegal(license)`.
@@ -111,6 +140,10 @@ sample "activity" with placeholder coordinates is replaced by real job shifts.
   MDT query (the faction is stripped from the result on purpose), that an org is created with a
   colour and a message of the day, that placing a prop over the limit removes the oldest (it is
   refused), and they described the scenery prop spawner's config as the radial's. Corrected.
+- Every page that described the dashboard or a shut-down feature is rewritten for the offline
+  build. The Customer Portal section is one page now, listing where each former portal page went.
+  *Telemetry* became *Nothing Leaves Your Server*, *Playerbase* became *Ban List & txAdmin Import*,
+  and *Web Dispatcher* covers the self-hosted bridge only.
 
 ## [4.1.0] – 2026-10-02 — Closing the doors a player could walk through
 

@@ -75,7 +75,7 @@ That's **34 bindings** in total: 11 with a default key, 23 unbound.
 | `/vehicle` | Everyone* | Toggle the vehicle spawner — search by name or model code, filter by class and manufacturer. **\*Restrictable** via `VehicleSpawner.permission` (see below); open to everyone by default. |
 | `/session` | Everyone | Session window — switch between the roleplay session and a personal one, and set that session's map, time and AI population. |
 | `/playerlist` | Everyone | Toggle the player list (default **I**). |
-| `/lacorereport` | Everyone | Report a bug straight to the [LACORE dashboard](/user-guide/bug-reports) — not your own server database. Renameable via `Report.command`. |
+| `/lacorereport` | Everyone | Report a [bug](/user-guide/bug-reports) to your server's own Discord (`lacore_webhook_bugreport`) — not your own server database. Renameable via `Report.command`. |
 | `/playtime` 🔒 | — | Show your playtime. |
 | `/showid` | Everyone | Show your server ID. |
 
@@ -140,7 +140,7 @@ That's **34 bindings** in total: 11 with a default key, 23 unbound.
 | `/lasd` | LEO | Always opens the LASD CAD / PCMS. |
 | `/ems` | Fire-EMS | Always opens the EMS / Fire CAD. |
 | `/spillman` | LEO | Always opens the [Spillman Flex Mobile CAD](/user-guide/spillman-flex) (toggles). Off when `cad.spillman = false`. |
-| `/penncad` | LEO | Always opens the [Pennsylvania CAD](/user-guide/pennsylvania-cad) — a paid add-on, unlocked by licence key. |
+| `/penncad` | LEO | Always opens the [Pennsylvania CAD](/user-guide/pennsylvania-cad) — included with LACORE. |
 | `/run <name or plate>` | LEO / Fire-EMS / Coroner | Run a person or plate; auto-opens the MDT on the result and broadcasts the run. |
 | `/mdttheme [white\|normal]` | Everyone | Switch the MDT colour theme (no arg = toggle). |
 | `/dispatch [on\|off\|open]` | LEO / Dispatcher | `on`/`off` = dispatcher duty; no arg or `open` = open the dispatch console. |
@@ -411,13 +411,20 @@ Console or staff — health checks and diagnostics:
 | `/lacore modules` | Loaded modules. |
 | `/lacore doctor` | Full first-boot health check. |
 | `/lacore autoconfig` | [Setup review](/configuration/autoconfig) — settings this server's setup suggests. Nothing is changed. |
-| `/lacore autoconfig apply` | Applies those suggestions to `data/autoconfig.json`. Your own config files and the dashboard still win over it. |
+| `/lacore autoconfig apply` | Applies those suggestions to `data/autoconfig.json`. Your own config files still win over it. |
 | `/lacore autoconfig revert` | Removes everything `apply` wrote, back to the shipped values. |
-| `/lacore telemetry` | Owner telemetry status. |
+| `/lacore telemetry` | Telemetry status. Since 4.2.0 nothing is sent to LACORE. |
+| `/lacore bans list` | Count the local bans and warns in `data/banlist.json`. |
+| `/lacore bans import` | Pull your txAdmin bans into the local ban list once. |
 | `/lacore help` | List every subcommand. |
 
 Modules can register their own subcommands, so `/lacore help` is always the authoritative list on
 your build.
+
+> ℹ️ **Gone in 4.2.0:** the global ban subcommands (`/lacore gban`, `gunban`, `gcheck`) and
+> `/lacore bans upload` ran against the LACORE home service, which has been shut down. The global ban
+> module no longer loads; `bans upload` only replies that the shared playerbase is shut down. Your
+> local `/ban` and `/warn` are unaffected.
 
 ## 🧪 Developer & debug commands
 
@@ -430,9 +437,9 @@ Not meant for players — these exist for development, content creation and trou
 | `/spawnpoint` | Capture a spawn point where you stand and print a config line for it. |
 | `/preview <model>` | Look at a model in 3D, in game. |
 | `/capturetest` | Test the model renderer. |
-| `/modelcapture <model>` | Render preview images for a model. |
-| `/modelscan` | Inventory every model this server streams. |
-| `/streambudget` | Report on the stream budget. |
+| `/modelcapture` | No longer works since 4.2.0 — the pictures were for the dashboard model library, which is shut down. |
+| `/modelscan` | Inventory every model this server streams. Since 4.2.0 it only prints the count in the console; the result was for the dashboard library and is not uploaded. |
+| `/streambudget` | Measure what your add-on vehicles cost to stream; prints the result in the console. |
 | `/devphone` 🔒 | Open the new phone module in dev mode. |
 | `/phonehold` 🔒 | Phone hold animation (debug). |
 

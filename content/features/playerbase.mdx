@@ -1,54 +1,42 @@
 ---
-title: Enhanced Playerbase
+title: Ban List & txAdmin Import
 ---
 
-import { Callout, Steps } from 'nextra/components'
+import { Callout } from 'nextra/components'
 
-# Enhanced Playerbase <span style={{fontSize:'0.6em',verticalAlign:'middle',opacity:0.7}}>BETA</span>
+# Ban List & txAdmin Import
 
-The **Enhanced Playerbase** turns your local bans and warns into a shared, cross-community reputation
-layer. Upload your records to the LACORE playerbase, share them with partner communities by a key, and
-— if you choose — **enforce** partner bans automatically when a player connects.
-
-![The shared playerbase — hashed records, share keys and two-sided enforcement](/img/features/playerbase.svg)
+LACORE keeps its bans and warns **on your server**, in `data/banlist.json` (warns carry
+`type="Warning"`). They are written by `/ban` and `/warn`, and LACORE can pull in what txAdmin
+holds, so the two lists do not drift apart.
 
 <Callout type="info">
-  The playerbase is **advisory by default**. Nothing auto-bans anyone until you deliberately turn on
-  enforcement on *both* sides. Uploading and sharing only ever expose **hashed** identifiers.
+  **The shared LACORE playerbase was shut down in 4.2.0.** Uploading records, share keys with
+  partner communities and the shared-ban check on connect (`lacore_playerbase_enforce`) depended on
+  the LACORE website and no longer do anything; `/lacore bans upload` sends nothing. Your local bans
+  and warns are unaffected.
 </Callout>
 
-## How it works
+![What keeps working and what is gone](/img/features/offline-build.svg)
 
-- **Records** — every ban and warn keeps its provenance (which community, which server, who issued it).
-- **Players** — records attach to a shared *player*, matched across servers by **hashed identifiers**
-  (SHA-256, no per-server salt) so the same person lines up everywhere without exposing raw identifiers.
-- **Ghosts** — if you ban someone the playerbase has never seen, a **ghost** player is minted to hold
-  the record. The next time that person connects to a participating server, the ghost is **claimed**
-  (their real identifiers attach, the ghost flag drops).
+## Your local list
 
-## 1 · Upload your records
-
-Local bans and warns live in `data/banlist.json` (warns carry `type="Warning"`). Share them from the
-server console:
+From the server console:
 
 ```
-/lacore bans list     # count your local bans + warns
-/lacore bans upload    # push them to the LACORE playerbase
+/lacore bans list      # count your local bans + warns
+/lacore bans import    # pull in txAdmin's bans and warns now
 ```
 
-Upload rides the write-only relay and your **license key** — no key, nothing is sent. Server-side the
-records are hashed, deduped and attached to a shared player (a ghost if unknown).
+`list` counts what is in `data/banlist.json` and how many of those came from txAdmin. In the
+**server console** (including txAdmin's live console) type the commands without the leading slash:
+`lacore bans list`.
 
-<Callout type="info">
-  Requires a [license key](/customer-portal/license-keys) (`set lacore_license_key "…"`). Duplicate
-  records (same local id from the same community, or same player + reason) are skipped automatically.
-</Callout>
-
-### If you ban from txAdmin
+## If you ban from txAdmin
 
 Most teams do — and txAdmin keeps its **own** database. `data/banlist.json` only ever held bans issued
-with LACORE's `/ban` and `/warn`, so a txAdmin server would upload a handful of records while hundreds
-stayed behind.
+with LACORE's `/ban` and `/warn`, so on a txAdmin server the LACORE list would hold a handful of
+records while hundreds stayed in the panel.
 
 **You do not have to do anything.** On every start LACORE looks for txAdmin's `playersDB.json` beside
 your server and carries over what it finds — bans, warns, the lot. It runs at each boot rather than
@@ -65,11 +53,10 @@ ships as `"auto"`, which mirrors every new txAdmin ban and warn the moment it is
 
 <Callout type="info">
   Run `/lacore bans import` to do it on demand and see exactly what happened — which file was found,
-  how many actions it holds, and what was skipped and why. In the **server console** (including
-  txAdmin's live console) type it without the leading slash: `lacore bans import`.
+  how many actions it holds, and what was skipped and why.
 </Callout>
 
-#### Where it looks
+### Where it looks
 
 A configured data path first, then txAdmin's own; then the artifacts folder, which is where txAdmin
 puts `txData` by default; and finally the folders above the resource — plus the ones **beside** them.
@@ -102,59 +89,5 @@ copy it to. Live mirroring is unaffected either way; it never touches the filesy
   the same machine looks identical from the outside.
 </Callout>
 
-<Callout type="info">
-  Mirroring is **local bookkeeping** — nothing leaves your server. Sharing is still the deliberate
-  `/lacore bans upload`.
-</Callout>
-
-## 2 · Share with partner communities
-
-In the dashboard under **Community → Players → Bans/Warns Database** you generate a **share key**
-(`PBSHARE-XXXXX-XXXXX-XXXXX`). Hand it to a partner and they paste it to pull your records into their
-list, tagged with your name. See [Players & sharing](/customer-portal/players) for the dashboard flow.
-
-Sharing is **directional** (giving a partner your key lets *them* read *you*, not the reverse) and
-**revocable** (revoke the key to cut every subscriber at once).
-
-## 3 · Enforcement (opt-in, two-sided)
-
-Enforcement makes a server actually **reject** a connecting player who carries an active ban in its
-playerbase. It requires agreement from **both** sides:
-
-<Steps>
-
-### Owner marks the key "Enforce"
-
-On the sharing side, flip your key's scope from **Read only** to **Enforce**. This permits partners to
-auto-reject players *you* banned. Plain read grants stay advisory.
-
-### Consuming server enables the convar
-
-The server that wants to enforce sets:
-
-```cfg
-set lacore_playerbase_enforce true
-```
-
-</Steps>
-
-Only when the owner grants **Enforce** *and* the consuming server enables the convar does a shared ban
-block a connect. A server always enforces **its own** bans when the convar is on; partner bans are
-enforced only for partners who granted the Enforce scope.
-
-<Callout type="warning">
-  **Fail-safe by design.** The connect check never holds the deferral — it runs asynchronously and only
-  drops a player on a *confirmed* ban. No license key, relay down, or any API error simply lets the
-  connect proceed. A slow or offline playerbase can never stall your server's join flow.
-</Callout>
-
-## Privacy
-
-Raw identifiers never appear in shared reads — matching is done entirely on SHA-256 hashes. Your own
-raw identifiers are kept only so *you* can lift your *own* records. Communities you share with see the
-player's name and ban reason, never their identifiers.
-
-## Roadmap
-
-Uploading, sharing and opt-in enforcement are live (Beta). Warn-point thresholds and richer revocation
-propagation are planned. Feedback welcome via [Support](/support).
+Mirroring and importing are **local bookkeeping** — nothing leaves your server. How bans are checked
+when a player connects is on [Security & Admin](/features/security#bans).

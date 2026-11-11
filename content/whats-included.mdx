@@ -100,9 +100,10 @@ These are the ones people most often already have — each can be handed back.
 | --- | --- | --- |
 | **Admin menu** | vMenu-style staff tools | `admin` |
 | **Big Brother log** | Admin logging scripts | `admin` |
-| **Web dispatcher bridge** | — | `webdispatch` |
-| **Community page** | A separate community website | `community` |
-| **Discord ⇄ identifier link** | Identity-link scripts | `identitylink` |
+| **Web dispatcher bridge** (self-hosted, `lacore_bridge_url`) | — | `webdispatch` |
+
+> ℹ️ The **community page** (`community`) and the **Discord ⇄ identifier link** (`identitylink`) ran
+> on the LACORE dashboard, which was shut down in 4.2.0. Their toggles have no effect any more.
 
 ## Always on
 
@@ -117,8 +118,11 @@ would break everything above.
 | **Anti-cheat** | Event honeypot, heartbeat, server-side sweep |
 | **Player profile / multi-character** | Characters, records, vehicles |
 | **Developer API** | `exports` + `lacore:api:*` events for your own scripts |
-| **Remote config** | Pulls dashboard settings by licence key |
-| **Security** | Licence / IP-lock, telemetry, global ban network |
+| **Security** | Anti-removal heartbeat; local bans and warns |
+
+> ℹ️ Since 4.2.0 LACORE runs **fully offline**: no licence key, no remote config, no telemetry, no
+> global ban network. A `data/remote-config.json` left over from the old dashboard still overrides
+> `configs/` at start — delete it to use only your local configs.
 
 ## Configuring without switching off
 
@@ -135,11 +139,7 @@ them instead:
 | `cfg-weapons-cl.lua` | Holster behaviour and weapon rules |
 | `cfg-spawns-sh.lua` | Spawn points (capture them in-game with `/spawnpoint`) |
 | `cfg-licenses-sh.lua` | Driver / firearm licence types |
-| `cfg-globalban-sh.lua` | The cross-server ban network |
 | `cfg-presence-sh.lua` | Discord Rich Presence |
-
-Most of these are also editable from the [customer portal](/customer-portal/server-config)
-without touching a file.
 
 ## Deciding what to swap
 

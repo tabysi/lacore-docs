@@ -43,10 +43,9 @@ set mysql_connection_string "mysql://user:pass@localhost/yourdb?charset=utf8mb4"
 # Discord auth (optional, but needed for role-gated departments)
 set lacore_discord_token "YOUR_BOT_TOKEN"
 set lacore_discord_guild "YOUR_GUILD_ID"
-
-# Your LACORE license key (customer dashboard → License keys)
-set lacore_license_key "LACORE-XXXX-XXXX-XXXX"
 ```
+
+No licence key is needed — since 4.2.0 LACORE MDT runs fully offline.
 
 <Callout type="warning">
   Use `set`, **never** `setr` — these are server-side secrets and `setr` replicates them to clients.
@@ -88,5 +87,5 @@ afterwards — the merge keeps the values you changed. Full routine:
 [Updating LACORE](/getting-started/updating).
 
 <Callout type="info">
-  Escrow-protected and IP-locked: **one purchase = one server**.
+  Escrow-protected and licensed per server: **one purchase = one server**.
 </Callout>

@@ -27,8 +27,7 @@ minutes. One config file, one client module, nothing per player.
 | `weaponDefense` | damage the player **takes** from weapons (`0.8` = tankier) | `1.0` |
 
 The client re-applies the modifiers every five seconds and on every spawn, because GTA and other
-scripts reset them. All four are **live dashboard settings** — change them in the customer portal
-and every client picks them up within one cycle, no restart.
+scripts reset them. Change the values in the file and restart the resource.
 
 ## Session loop — onboarding
 
@@ -42,7 +41,7 @@ once. Two sets:
 
 Both lists are plain strings in `Gameplay.session` — rewrite them for your server. `%s` in a line
 is replaced by your community name. `/onboarding civ` or `/onboarding leo` replays a set (support
-use). `Gameplay.session.onboarding = false` (or the dashboard toggle) turns the hints off.
+use). `Gameplay.session.onboarding = false` turns the hints off.
 
 ## Weapon drops
 
@@ -75,8 +74,8 @@ Not sure which of the 60 files matters? In the server console:
 /lacoreconfig wizard
 ```
 
-walks through the eight settings every owner should have seen once — language, branding,
-departments, feature switches, balance, dashboard consent, licence key, restore — each with its
-**current value** and the file it lives in. It changes nothing.
+walks through the settings every owner should have seen once — language, branding, departments,
+feature switches, balance, restore — each with its **current value** and the file it lives in. It
+changes nothing.
 
 Master switch: `Features.gameplay` in `configs/cfg-features-sh.lua`.

@@ -49,6 +49,9 @@ Or set them yourself in configs/ or the dashboard's config editor; anything you
 set in the dashboard overrides what AutoConfig applied.
 ```
 
+The last two lines still mention the dashboard. It was shut down in 4.2.0 — set values yourself in
+`configs/`.
+
 Two sections, on purpose:
 
 - **Settings** — there is a key you can change, and a value it suggests.
@@ -92,12 +95,23 @@ read before the list is built.
 the files in `configs/` — rewriting your config files at runtime would be fragile, and there would
 be no clean way back.
 
-That file is a layer of its own, and the three layers have a fixed order:
+That file is a layer of its own, applied on top of your `configs/` files: a value AutoConfig applied
+beats the one in the file, and `revert` takes it back. The order is enforced by load order alone, so
+there is no rule that could disagree with itself.
 
-![Which settings layer wins](/img/features/autoconfig-layers.svg)
+### Leftover dashboard config
 
-Anything you set in the **dashboard beats what AutoConfig applied**, always. The order is enforced
-by load order alone, so there is no rule that could disagree with itself.
+One layer can still sit above AutoConfig: **`data/remote-config.json`**, the config the old LACORE
+dashboard cached on your server before it was shut down in 4.2.0. Nothing updates that file any more,
+but if it exists it is still applied at every start, after AutoConfig, and its values override your
+`configs/` files. The console says so at start:
+
+```
+[lacore] these values come from the old LACORE dashboard and override your configs/ files. Delete data/remote-config.json to use only your local configs.
+```
+
+Delete `data/remote-config.json` (on a server without a writable `data/` folder it sits at
+the resource root as `remote-config.json`) and restart, and only your own config files and AutoConfig apply.
 
 Settings marked *live* (branding) take effect the moment they are applied. The rest are read once
 when the server loads, so they need one restart — the command says so when that is the case.
@@ -151,11 +165,3 @@ rule, and it never wins against one.
 An advisor can therefore be wrong, but it cannot be dangerous: the worst it can do is propose an
 allowlisted, correctly-typed, non-sensitive setting — which you can still decline, and which
 `revert` can still undo.
-
-## What the team sees
-
-The suggestions (keys and values, not the reasons) ride along on the
-[setup report](/features/telemetry), together with what you have actually applied — so a support
-conversation starts from what your server really looks like instead of asking, and nobody suggests
-a change you made weeks ago. The reasons stay in your console — those are written for a
-person, not for a database row.

@@ -79,8 +79,12 @@ Restart the resource, then check:
 - **Old edited `config.lua`** — since the 3.4.4 split, every table moved out of `config.lua` is
   defined as `X = X or { … }`: if your old copy still contains a moved table, **your table wins**
   and nothing breaks. Migrate your edits into the new topic files whenever convenient.
-- **License & entitlements** — `set lacore_license_key` lives in `server.cfg`, which an update
-  never touches. Paid add-ons re-unlock automatically at the first start after the update.
+- **Licence key** — not needed since 4.2.0, LACORE runs fully offline. An old
+  `set lacore_license_key` line in `server.cfg` is ignored. The [Pennsylvania CAD](/user-guide/pennsylvania-cad)
+  is included and needs nothing to unlock.
+- **Old dashboard config** — if `data/remote-config.json` exists (a cached copy of settings from the
+  shut-down dashboard), it still overrides your `configs/*.lua` at start, and the console says so.
+  Delete the file to run on your local configs only.
 
 <Callout type="warning">
   The one thing that does **not** survive on its own is an edited config **without a backup** — the

@@ -20,7 +20,7 @@ export default {
   products: 'Products',
 
   '--account': { type: 'separator', title: 'Account & Community' },
-  'customer-portal': 'Customer Portal',
+  'customer-portal': 'Customer Portal (shut down)',
   support: 'Support & FAQ',
   partners: 'Partners & Creators',
 

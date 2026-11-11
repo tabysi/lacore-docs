@@ -6,20 +6,9 @@ import { Callout } from 'nextra/components'
 
 # Security & Admin
 
-LACORE ships a hardened security stack and a staff toolkit.
+LACORE ships a hardened security stack and a staff toolkit. All of it runs on your own server.
 
-![The LACORE security stack and the staff panel](/img/features/security-stack.svg)
-
-## IP-lock (license enforcement)
-
-LACORE includes **IP-lock license enforcement** backed by a license server. If a server violates the
-license agreement, its IP can be locked. This is the author's anti-piracy protection and is **not
-customer-configurable**.
-
-<Callout type="error">
-  Tampering with the IP-lock, telemetry, or license checks is a breach of the EULA (`LICENSE.md`) and
-  will lock the server.
-</Callout>
+![The LACORE security stack and the staff panel](/img/features/security-admin.svg)
 
 ## Anticheat
 
@@ -37,6 +26,9 @@ groups; modules then check `HasPermission(src, perm)`. See [Discord & Duty](/con
 The connect flow validates bans safely (guarded against malformed entries and DB hiccups so a bad
 record can never leave a player stuck on "Checking bans..."). Bans record who issued them, when, and
 the reason.
+
+Bans and warns live in `data/banlist.json`, and LACORE can carry over what txAdmin holds — see
+[Ban List & txAdmin Import](/features/playerbase).
 
 ## Staff panel (`/admin`)
 
@@ -82,15 +74,11 @@ of it logged — it never leaves your own game.
 Noclip and spectate clean up correctly on resource stop, so a restart mid-action can't leave a player
 ghosted or stuck in spectator mode.
 
-## Owner telemetry
+## Offline since 4.2.0
 
-Every LACORE server **auto-registers** with the author's service on start / heartbeat / stop, and
-reports **how it is set up** (framework + resource listing) when that changes. You configure
-nothing. Both are server-level metadata only and travel through a write-only relay
-(`lacore.netica.dev`); the resource never holds a database host or credential.
+LACORE no longer talks to a LACORE service. The licence server and IP lock, the global ban network,
+the shared playerbase and the telemetry reports were all shut down with the LACORE website, and
+none of them protects or checks anything any more. No licence key is needed.
 
-**Never** reported: player identifiers, chat, positions or actions; database contents; file
-contents; or secrets (bot tokens, MySQL credentials, Steam web API key, webhook URLs).
-
-Every field of both reports is listed on its own page — see
-[Telemetry & Setup Report](/features/telemetry).
+The only web requests LACORE makes go to addresses you configure yourself — see
+[Nothing Leaves Your Server](/features/telemetry).

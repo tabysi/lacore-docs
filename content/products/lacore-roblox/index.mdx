@@ -42,11 +42,9 @@ way LACORE MDT is the CAD layer for a FiveM server.
   choose.
 - **BOLO board** shared live across every unit — and persisted, so a BOLO is still on the board
   after a restart until it ages out.
-- **Browser dispatcher** — an optional dispatch console in your LACORE dashboard (see below).
 - **Roblox-native permissions** — departments gate on group ranks, with an admin bypass list.
-- **The LAPD Mobile Client look**, the same terminal design the FiveM core runs — delivered to
-  licensed servers from your dashboard, so the kit you install carries a neutral fallback and every
-  feature works either way.
+- **A neutral terminal look.** Every feature works with it. The LAPD Mobile Client look used to be
+  delivered from the LACORE dashboard, which is shut down (see below).
 
 Everything is server-authoritative: the server validates every action, and player-written text
 (call descriptions, notes, BOLOs) goes through Roblox text filtering before anyone else sees it.
@@ -55,7 +53,7 @@ Everything is server-authoritative: the server validates every action, and playe
 
 - **Roblox Studio** and a place you own. No external libraries — the kit ships with zero dependencies.
 - **Game Settings → Security → Enable Studio Access to API Services** — for saved callsigns and records.
-- **Game Settings → Security → Allow HTTP Requests** — only if you want the browser dispatcher.
+- **Game Settings → Security → Allow HTTP Requests** — only if you want Discord logging.
 
 ## Install
 
@@ -83,40 +81,19 @@ Four files, nothing else:
 | `LacoreShared/Zones` | named areas of your map (an automatic grid postal works until you do) |
 | `LacoreShared/PenalCode` | the charges your officers can file |
 | `LacoreShared/Config` → `Jail` | sentence length, and the part your cell is named after |
-| `LacoreServer/ServerConfig` | license key + dashboard URL, Discord webhooks + proxy |
+| `LacoreServer/ServerConfig` | Discord webhooks + proxy |
 
 </Steps>
 
-## Browser dispatcher
+## Browser dispatcher — no longer available
 
-The kit can stream its CAD state to your **LACORE dashboard**, giving you a dispatcher seat in the
-browser — no second Roblox client, no extra hosting.
-
-<Steps>
-
-### Point the kit at your dashboard
-
-In `ServerScriptService/LACORE/LacoreServer/ServerConfig`:
-
-```lua
-RelayUrl = "https://lacore.netica.dev",
-LicenseKey = "LACORE-XXXXX-XXXXX-XXXXX",   -- Dashboard → License keys
-```
-
-Then enable **Allow HTTP Requests** in Game Settings → Security.
-
-### Open the console
-
-Sign in to your dashboard and go to **Dispatch**. Your units and calls appear within about two
-seconds, and the console can set a unit's status, assign it to an incident, or Code 4 a call — the
-game picks the order up on its next push.
-
-</Steps>
-
-<Callout type="info">
-  Your game server also appears under **Servers** in the dashboard, so a Roblox place sits next to
-  your FiveM servers with the same license status.
+<Callout type="warning">
+  **Shut down.** The browser dispatcher, the server listing and the LAPD terminal look ran on the
+  LACORE dashboard (`RelayUrl` / `LicenseKey` in `ServerConfig`), which has been shut down.
+  Everything else in the kit runs inside your Roblox game and is unaffected.
 </Callout>
+
+![What keeps working and what is gone](/img/features/offline-build.svg)
 
 ## Jail
 
@@ -155,17 +132,13 @@ does not log.
   connection. Testing alone will not show you this. Something has to forward.
 </Callout>
 
-**If you already set `RelayUrl` and `LicenseKey`, you are done** — your dashboard forwards for you,
-and there is nothing else to sign up for. The webhook only ever travels server to server, LACORE
-rebuilds the embed rather than passing your payload through, and only real Discord webhook URLs are
-accepted.
-
-Running without the uplink? Set `DiscordProxy` to a forwarding host (the public
+Forwarding through the LACORE relay (`RelayUrl` + `LicenseKey`) is no longer available — the relay
+was part of the shut-down dashboard. Set `DiscordProxy` to a forwarding host (the public
 [WebhookProxy](https://webhook.lewisakura.moe/) at `webhook.lewisakura.moe`, or your own) and LACORE
-swaps the host in — paste the webhook URLs exactly as Discord gave them either way.
+swaps the host in — paste the webhook URLs exactly as Discord gave them.
 
-The startup line tells you which path is live: `Discord logging: via LACORE relay`, `via <proxy>`,
-`direct` (the one that breaks on publish) or `off`.
+The startup line tells you which path is live: `via <proxy>`, `direct` (the one that breaks on
+publish) or `off`.
 
 ## Game integration
 
@@ -206,13 +179,11 @@ Being straight about the edges, because a CAD that promises the world helps nobo
   BOLOs are merged when they are saved, so nothing is lost, but a BOLO posted next door shows up
   when that instance restarts, not a second later.
 - **Roblox has no escrow.** Anything you buy on the platform ships as readable source — that is true
-  of every Roblox kit, ours included. The kit is licensed per customer, and the dashboard,
-  dispatcher, terminal look and updates are what the licence keeps you connected to.
+  of every Roblox kit, ours included. The kit is licensed per customer.
 
 ## Related
 
 <Cards>
   <Cards.Card title="LACORE MDT (Standalone)" href="/products/lacore-mdt" arrow />
-  <Cards.Card title="Customer Portal" href="/customer-portal" arrow />
   <Cards.Card title="Developer API" href="/developer-api" arrow />
 </Cards>

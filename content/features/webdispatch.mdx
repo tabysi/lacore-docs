@@ -4,71 +4,84 @@ title: Web Dispatcher
 
 import { Callout, Steps } from 'nextra/components'
 
-# Web Dispatcher (browser portal)
+# Web Dispatcher (self-hosted bridge)
 
 Beyond the in-game console, LACORE can feed a **browser dispatcher** so a dispatcher can work from a
-second screen — or entirely off the game server.
+second screen — or entirely off the game server. It does that through a **bridge you run
+yourself**: LACORE pushes the CAD state to your bridge, the bridge serves it to the browsers, and
+dispatcher actions come back to the game server through a token-gated endpoint.
 
-There are two ways to get one. The **hosted portal** needs nothing but a licence key and a line in
-your `server.cfg`; the **self-hosted bridge** is the original path and still works unchanged.
+![The self-hosted web dispatcher — your server, your bridge, the browser](/img/features/webdispatch-bridge.svg)
 
-![The hosted web dispatcher — push, snapshot, actions ride back](/img/features/webdispatch.svg)
+<Callout type="info">
+  **The hosted portal was shut down in 4.2.0.** `setr lacore_webdispatch "true"` and the RP-WEB
+  desktop on the LACORE website no longer work, and the licence key is not used for anything. The
+  self-hosted bridge below is unaffected.
+</Callout>
 
-## The hosted portal (recommended)
-
-Your server pushes its CAD state to LACORE every two seconds and reads the dispatcher's actions out
-of the reply. Nothing listens on your server, and there is no second machine to run.
+## How it works
 
 ```
-FiveM (lacore)  ──push every 2s──▶  lacore.netica.dev  ──▶  /server/<id> (browser)
-      ▲                                                          │
-      └────────── actions ride back in the reply ◀───────────────┘
+FiveM (lacore)  ──POST /ingest (token)──▶  your bridge  ──WebSocket──▶  browser(s)
+      ▲                                         │
+      └──── POST /<resource>/action (token) ◀───┘
 ```
+
+- **Outbound.** Every two seconds LACORE builds a snapshot — calls, units, the call queue, and the
+  map images and named locations from `configs/cfg-livemap-sh.lua` — and posts it as JSON to
+  `<lacore_bridge_url>/ingest`, with the token in the `X-Bridge-Token` header. It only sends when
+  something changed. On an empty server it still pushes, just less often.
+- **Inbound.** The resource answers on FiveM's own HTTP port at
+  `http://<server>:<port>/<resourceName>/action`. A request needs the same `X-Bridge-Token`;
+  without it the answer is `401`. `GET /health` is the only route that needs no token.
+- The actions it accepts are `status`, `assign`, `resolve` and `create`. They run through the same
+  functions the in-game MDT uses.
+
+The snapshot goes to the address you set and nowhere else. LACORE itself receives nothing.
+
+## Setting it up
 
 <Steps>
 
-### Set a licence key
+### Run a bridge
 
-The same key the dashboard uses. Generate it under **Dashboard → Licence keys** and put it in your
-`server.cfg`:
+Any service that accepts the `/ingest` push, serves the browsers and forwards actions to the
+`/action` endpoint will do. Run it on a machine you control and put it behind **HTTPS**.
 
-```ini
-set lacore_license_key "LACORE-XXXXX-XXXXX-XXXXX"
-```
+### Point LACORE at it
 
-### Turn the web dispatcher on
-
-It is **off by default** — call data leaves your server only once you say so:
+In your `server.cfg`:
 
 ```ini
-setr lacore_webdispatch "true"
+set lacore_bridge_url   "https://dispatch.example.com"
+set lacore_bridge_token "SHARED_SECRET"
 ```
 
-Restart the resource. The console prints `[webdispatch] hosted portal enabled`.
+Use a long random value for the token, and the same value on the bridge. Both convars have to be
+set; with either one empty, nothing is sent.
 
-### Open it
+### Restart the resource
 
-Go to **Dashboard → Servers** and press **DISPATCH** on the server you want. That opens
-`lacore.netica.dev/server/<id>` — the desktop with Dispatch, Map, Units and Radio.
+The console prints `[webdispatch] self-hosted bridge enabled → <url>`. Without the convars it says
+`[webdispatch] off`.
 
 </Steps>
 
-### The map
+The module is switched on by `webdispatch = true` in `configs/cfg-features-sh.lua` (the default).
 
-The Map window draws the **game's own atlas tiles**, on the same calibration the in-game dispatch
-console uses — a unit sits on the same street on both screens. Units are round and coloured by
-status, calls are square, and clicking a call marker selects it in the Dispatch window. It opens
-where the shift actually is rather than in the middle of the island; from there it is yours to pan
-and zoom.
+<Callout type="info">
+  The reference bridge from the LACORE source (a Node service with a setup wizard and Discord login)
+  is **not part of the resource download**. The resource only provides the two ends described above.
+</Callout>
 
-#### Your own map images
+## Your own map images
 
 ![The same overlay loaded from url in-game and from webUrl in the web dispatcher](/img/dispatch/webdispatch-map-overlay.svg)
 
 Map images from `configs/cfg-livemap-sh.lua` (see
-[Your own map](/features/mdt-and-dispatch#your-own-map-overlays--named-locations)) show on the
-web dispatcher's map too, each with an on/off button under the map. A browser outside the game
-cannot open `cfx-nui-` addresses, so give such an overlay a public copy:
+[Your own map](/features/mdt-and-dispatch#your-own-map-overlays--named-locations)) travel with every
+snapshot to the bridge. A browser outside the game cannot open `cfx-nui-` addresses, so give such an
+overlay a public copy:
 
 ```lua
 {
@@ -82,109 +95,25 @@ cannot open `cfx-nui-` addresses, so give such an overlay a public copy:
 ```
 
 - An overlay whose `url` is already a public `https://` address needs no `webUrl`.
-- Only `https://` images are shown. An overlay with just a `cfx-nui-` url is left out.
-- `hideBaseTiles = true` hides the atlas tiles in the web dispatcher as well.
+- Only `https://` images are sent. An overlay with just a `cfx-nui-` url is left out.
+- `hideBaseTiles = true` is passed along as well.
 - The image is loaded by each dispatcher's browser straight from the address you give, so pick a
   host you trust.
 
-#### Named locations
+The named locations from `LiveMap.locations` ride along in the same snapshot.
+`LiveMap.showLocations = false` hides them.
 
-![Named locations from cfg-livemap-sh.lua on the RP-WEB map](/img/dispatch/webdispatch-map-locations.svg)
+## Who may open it
 
-The named locations from `LiveMap.locations` show on the web dispatcher's map as well, with the
-same outlines and names as the in-game console. There is nothing extra to set: they come along
-with every snapshot. `LiveMap.showLocations = false` hides them on both.
-
-### Taking 911 / 311 calls
-
-![Answering a 911 call from the web dispatcher](/img/dispatch/webdispatch-911.svg)
-
-A dispatcher on the page can **take calls**, not only watch the queue:
-
-- **Answer** a queued call (the desktop's queue has a button per call; the console's F1 / ANSWER
-  takes the oldest). The call panel shows the caller, the trace countdown when
-  [caller trace](/features/mdt-and-dispatch#caller-trace-911--311) is on, and the transcript.
-- **Text only.** A browser has no in-game voice. The caller is told *"text only — answer with
-  /callsay"* and every line they type lands in the transcript; you answer in the panel.
-- **Hold / Resume**, **notes** (they go into the incident), and **End call** with *Create incident*
-  ticked: the incident is created with the caller's location, exactly as from the in-game console,
-  and the panel shows its number.
-- **You count as a dispatcher.** While a dispatcher with the *dispatch* role has the page open, a
-  911 call queues instead of becoming an auto-incident (`CallCenter.AutoIncident`), and the
-  `/911` chat command is redirected to the phone as usual. Close the page and your call goes back
-  to the queue for the next dispatcher — or ends, if nobody is left.
-
-Viewers (the *view* role) see the queue but cannot answer. The self-hosted bridge does not carry
-call sessions yet.
-
-### What the page tells you
-
-The portal never pretends to be live when it is not. It shows one of five states, decided by how old
-the last snapshot is and what your account is allowed to do:
-
-| State | What it means |
-| --- | --- |
-| **LIVE** | A snapshot arrived in the last ten seconds. Everything works. |
-| **STALE** | Nothing for more than ten seconds. The windows dim, actions are held. |
-| **OFFLINE** | Nothing for more than a minute. You are looking at the last state that arrived. |
-| **READ ONLY** | You may look at everything and change nothing — the acting controls are gone, not greyed out. Refused server-side too, not just hidden. |
-| **NO ACCESS** | You are signed in, but no role of yours grants dispatch here (or none has been granted to anybody). |
-
-### Who may open it
-
-Two ways in, and the second one is how you give a seat to somebody who is not on your dashboard:
-
-1. **You**, and anyone on your dashboard team with the *servers* scope. Always, no Discord needed.
-2. **A Discord role you name**, per server, in `configs/cfg-server-sv.lua`:
-
-```lua
-WebDispatchAccess = {
-    dispatch = { "Staff", "Dispatch" },  -- may act: status, assign, create, close
-    view     = { "Member" },             -- may watch, cannot act
-}
-```
-
-Both lists are **empty by default**, which means nobody but you. The names come from
-`DiscordAuth.roles` — the same table the in-game role checks use, so a role ID is written once.
-
-The check runs **on your server**, with your own bot token. The portal only ever asks *"may this
-Discord id dispatch?"* and gets back yes, read-only or no; your token, your guild and the roles
-themselves never leave the machine. Anyone whose roles cannot be read — not in the guild, Discord
-unreachable, no token configured — is refused rather than let through.
-
-<Callout type="info">
-  Because the answer comes from the game server, the first visit shows a short **"checking your
-  access"** screen while the question rides along with the next snapshot, and a server that is
-  offline cannot let anybody new in. Verdicts are remembered for five minutes.
-</Callout>
-
-## The self-hosted bridge
-
-If you would rather run the whole thing yourself, LACORE still pushes to your own Node bridge and
-accepts actions back through a token-gated endpoint.
-
-```ini
-set lacore_bridge_url   "https://dispatch.example.com"
-set lacore_bridge_token "SHARED_SECRET"
-```
-
-The bridge broadcasts over WebSocket to your web app and relays dispatcher actions back into FiveM.
-Both paths can run at the same time. Your map images (`webUrl`, see
-[Your own map images](#your-own-map-images)) reach the bridge's web app the same way; rebuild the
-app into the bridge (`cd web && npm run build:web`) after updating LACORE.
-
-<Callout type="info">
-  Because either portal accepts actions that affect the live server, keep `lacore_bridge_token`
-  secret and expose the bridge over HTTPS only.
-</Callout>
+That is the bridge's job. LACORE only checks the token on each request, so anyone the bridge lets
+in can act on the live server. Put a login in front of the bridge and keep the token secret.
 
 ## What is audited
 
-Every action a web dispatcher takes — status change, assignment, new call, disposition — runs through
-the same functions the in-game MDT uses and is logged in **Big Brother** with the dispatcher's
-Discord identity, marked as source `web`.
+Every action a web dispatcher takes — status change, assignment, new call, disposition — is logged
+in **Big Brother** as a web dispatch, with the name the bridge sends along for the dispatcher.
 
 <Callout type="warning">
   The web dispatcher is **optional**. The in-game `/dispatch` console works fully on its own — the
-  portal is for teams that want an out-of-game dispatcher on a separate machine.
+  bridge is for teams that want an out-of-game dispatcher on a separate machine.
 </Callout>

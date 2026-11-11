@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">LACORE <tspan fill="#6c8cff">RUNS OFFLINE</tspan> — nothing leaves your server</text>
+
+  <!-- Your server -->
+  <rect x="60" y="100" width="470" height="440" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="84" y="136" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">YOUR SERVER · KEEPS WORKING</text>
+  <text x="84" y="160" fill="#7d8798" font-size="12.5">everything in-game, configured in configs/</text>
+  <g fill="#e7ecf5" font-size="14.5">
+    <text x="84" y="200">✓  MDTs, CADs, dispatch, BOLOs, records</text>
+    <text x="84" y="232">✓  Civilians, Citizen Hub, jobs, fines</text>
+    <text x="84" y="264">✓  Local bans and warns (/ban)</text>
+    <text x="84" y="296">✓  Big Brother log (/bblog), anticheat</text>
+    <text x="84" y="328">✓  Discord webhooks you set yourself</text>
+    <text x="84" y="360">✓  Self-hosted web dispatch bridge</text>
+    <text x="84" y="400" fill="#6c8cff" font-weight="700">✓  Pennsylvania CAD — now included</text>
+  </g>
+  <text x="84" y="460" fill="#7d8798" font-size="12.5">No licence key needed. No start-up wait for a</text>
+  <text x="84" y="480" fill="#7d8798" font-size="12.5">licence server, no warnings about one.</text>
+
+  <!-- Cut connection -->
+  <g stroke="#4a5cff" stroke-width="3" stroke-dasharray="10 8" stroke-opacity="0.5">
+    <path d="M540 320 H660"/>
+  </g>
+  <circle cx="600" cy="320" r="26" fill="#08090c" stroke="#ff5a6a" stroke-width="3"/>
+  <path d="M588 308 L612 332 M612 308 L588 332" stroke="#ff5a6a" stroke-width="4" stroke-linecap="round"/>
+  <text x="600" y="380" fill="#9fb0ff" font-size="12.5" text-anchor="middle" letter-spacing="2">NO CONNECTION</text>
+
+  <!-- Home service -->
+  <rect x="670" y="100" width="470" height="440" rx="8" fill="#05070b" stroke="#3a4150" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="694" y="136" fill="#7d8798" font-size="15" font-weight="700" letter-spacing="2">LACORE HOME SERVICE · SHUT DOWN</text>
+  <text x="694" y="160" fill="#5d6676" font-size="12.5">what depended on it is gone</text>
+  <g fill="#8a93a3" font-size="14.5">
+    <text x="694" y="200">✕  Online dashboard and remote config</text>
+    <text x="694" y="232">✕  Global ban network</text>
+    <text x="694" y="264">✕  Shared playerbase upload and check</text>
+    <text x="694" y="296">✕  Telemetry and update notice</text>
+    <text x="694" y="328">✕  Bug reports and activity to the dashboard</text>
+    <text x="694" y="360">✕  Community page, hosted web dispatch</text>
+    <text x="694" y="392">✕  Account link, model library upload</text>
+    <text x="694" y="424">✕  Licence server / IP lock</text>
+  </g>
+</svg>

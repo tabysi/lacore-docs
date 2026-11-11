@@ -1,58 +1,42 @@
 ---
-title: Customer Portal
+title: Customer Portal (shut down)
 ---
 
-import { Callout, Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
 
-# Customer Portal
+# Customer Portal (shut down)
 
-Your LACORE account lives at **[lacore.netica.dev/dashboard](https://lacore.netica.dev/dashboard/)**.
-Sign in with the **Discord account that owns your licence** — no separate password, no new account to
-create. Your role in our Discord decides what you see.
+The customer portal and online dashboard at **lacore.netica.dev** have been shut down with
+**4.2.0**. LACORE now runs **fully offline**: the resource makes no calls to the LACORE home
+service, and nothing needs to be linked, activated or signed in to.
 
-<Callout type="info">
-  **How access works.** The portal reads your roles in the LACORE Discord: a **customer** role opens
-  the customer dashboard, **staff / owner** roles open the admin console, and a **partner** role adds
-  the Partner page. Nothing to configure — just sign in.
+Everything in-game keeps working — MDTs/CADs, dispatch, BOLOs, records, civilians, local bans and
+warns, Big Brother, the anticheat and the in-game [admin panel](/user-guide/admin-panel).
+
+![What keeps working and what is gone](/img/features/offline-build.svg)
+
+## What the portal did — and where that is now
+
+| Portal page | Now |
+|---|---|
+| **License keys** | Not needed. `set lacore_license_key` is no longer read; `/lacore doctor` reports it as *not needed*. You can remove the line from `server.cfg`. |
+| **Servers** | Gone. There is no online server list any more. `/lacore version` shows what a server runs. |
+| **Community page** | Gone. The public roster page and its applications are no longer available. |
+| **Server config** | Edit the files in `configs/` and restart. See [Configuration](/configuration). |
+| **Dispatch (live ops)** | The hosted dispatcher is gone. The self-hosted bridge still works — see [Web dispatcher](/features/webdispatch). |
+| **Downloads & versions** | Downloads and updates come through **FiveM Keymaster**, tied to the Cfx account you used at purchase. Then follow the [update guide](/getting-started/updating). |
+| **Players & sharing** | Local bans and warns only (`data/banlist.json`, `/lacore bans list` / `import`). The shared playerbase and cross-community sharing are shut down. |
+| **Anticheat flags** | Use the in-game [admin panel](/user-guide/admin-panel) (`/admin`), `/bblog` and your own Discord webhooks. |
+| **Activity log** | Use the in-game admin panel and Big Brother (`/bblog`). |
+| **Bug reports** | `/lacorereport` still works and goes to your own Discord when `Webhooks.BugReport` is set in `configs/cfg-server-sv.lua`. See [Bug reports](/user-guide/bug-reports). |
+| **Support tickets** | Ask on the [Discord](https://discord.gg/b6YbvVEvYp) or in [GitHub Discussions](https://github.com/tabysi/pvp-corev3-community/discussions) — see [Support & FAQ](/support). |
+| **Payments** | Discontinued. Use the confirmation Tebex emailed you at checkout. |
+| **Surveys & rebate** | Discontinued. |
+| **Team** | Discontinued. |
+| **Partner program** | Discontinued. |
+
+<Callout type="warning">
+  **If you changed settings on the old dashboard:** they are cached in `data/remote-config.json` and
+  still override your `configs/` files at start — the server console says so. Delete that file to
+  go back to your local configs only.
 </Callout>
-
-## What you can do
-
-<Cards>
-  <Cards.Card title="License keys" href="/customer-portal/license-keys" arrow>
-    Create a key, paste it into server.cfg, link your server to your account.
-  </Cards.Card>
-  <Cards.Card title="Servers" href="/customer-portal/servers" arrow>
-    See your linked servers — live status, players, version.
-  </Cards.Card>
-  <Cards.Card title="Server config" href="/customer-portal/server-config" arrow>
-    Change LACORE settings online — no file edits, no re-upload.
-  </Cards.Card>
-  <Cards.Card title="Payments" href="/customer-portal/payments" arrow>
-    Your Tebex purchases and invoices.
-  </Cards.Card>
-  <Cards.Card title="Players & sharing" href="/customer-portal/players" arrow>
-    Your servers' player roster, bans/warns, and cross-community sharing.
-  </Cards.Card>
-  <Cards.Card title="Downloads & versions" href="/customer-portal/downloads" arrow>
-    The current version, release history, and how Keymaster delivery works.
-  </Cards.Card>
-  <Cards.Card title="Support tickets" href="/customer-portal/support" arrow>
-    Open a private ticket with the team and follow it up in Discord.
-  </Cards.Card>
-  <Cards.Card title="Partner program" href="/customer-portal/partner" arrow>
-    Referral stats and payouts (partners only).
-  </Cards.Card>
-  <Cards.Card title="Team" href="/customer-portal/team" arrow>
-    Give teammates scoped access to your account.
-  </Cards.Card>
-</Cards>
-
-## Roles at a glance
-
-| Role | Sees |
-|------|------|
-| **Customer** | Servers · License keys · Config · Dispatch · Downloads · Payments · Players · Anticheat · Bug reports · Support |
-| **Partner** | The above **+** the Partner page (referral stats & earnings) |
-| **Team member** | Whatever the account owner grants — scoped to *their* account |
-| **Staff / Owner** | The admin console (servers, bans, tickets, bot control, settings) |

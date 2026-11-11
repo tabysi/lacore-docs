@@ -4,15 +4,17 @@ title: "Bug Reports"
 
 # Bug Reports
 
-**`/lacorereport`** opens a small form for reporting a bug in LACORE itself — not a player, not an in-character incident. What you write goes straight to the **LACORE dashboard**, the team's own review inbox, over the same connection the resource already uses to report telemetry home. It does **not** go into your server's own database, and it is not a replacement for `/report` (reporting a *player*) or a support ticket.
+**`/lacorereport`** opens a small form for reporting a bug in LACORE itself — not a player, not an in-character incident. What you write goes to **your server's own Discord**, through the `lacore_webhook_bugreport` webhook your server owner sets. It does **not** go into your server's own database, and it is not a replacement for `/report` (reporting a *player*) or a support ticket.
 
-![Where a /lacorereport goes](/img/guide/bugreport-flow.svg)
+> ⚠️ **Changed in 4.2.0:** reports no longer reach the LACORE dashboard — the dashboard has been shut down and LACORE runs fully offline. The Discord webhook is now the only place a report goes. If your server has none set, the form still accepts the report, but it is not delivered anywhere.
+
+![What keeps working and what is gone](/img/features/offline-build.svg)
 
 > 📑 **Related:** [Commands & Keybinds](/commands) · [In-Car Screen](/user-guide/in-car-screen)
 
-**Which channel for what?** `/lacorereport` is the quickest path **in-game** and goes straight to
-the LACORE team. Outside the game — or for feature requests and discussion — use the
-[community repo & Discord](/support) instead. Both land with the same team.
+**Which channel for what?** `/lacorereport` is the quickest path **in-game** and reaches your
+server team. To reach the LACORE team — bugs in the product, feature requests, discussion — use the
+[Discord & GitHub Discussions](/support).
 
 ---
 
@@ -26,32 +28,25 @@ A form opens: pick a **category** (Bug, Exploit, Translation, Suggestion, Other 
 
 > ℹ️ **No typing shortcuts here either way** — this is the real game UI, not a dashboard screen rendered onto a texture, so there is nothing unusual about the keyboard. If you have trouble typing, check that nothing else is holding NUI focus.
 
-What travels with your report, automatically:
+What the Discord message contains:
 
-- Your account name and, if you have one, your **character name**, department and callsign — so a report about "the MDT drops my status" can actually be traced to a unit.
-- Your position in the world, if available — useful for anything location-specific.
-- Which server it came from.
+- The category and what you wrote.
+- Your account name and, if you have one, your **character name** — so a report can be traced back to you.
 
-Nothing you type is sent anywhere else. The report is read by the LACORE team; your server owner can also see **that you reported something and what category it was**, on their own dashboard, but only if the server is running under an active licence key — see below.
+Nothing you type is sent anywhere else.
 
 ---
 
 ## 🛠 For server owners
 
-### It reaches you too — if the server is licensed
-
-Every report is stored regardless of licensing, because the point of the command is that bugs about the *product* reach the people who fix it, even from a server that has never set anything up. But your **own** dashboard only shows the reports filed **on your servers**, and that link only exists when the server carries an active `lacore_license_key` (the same key used for [remote config](/configuration/main) and telemetry). Find it under **Bug Reports** in your dashboard nav.
-
-An unlicensed server's reports still reach the LACORE team — they just have no account to additionally show up on.
-
-### Your own copy, in Discord
+### Where reports go: your Discord
 
 ```lua
 -- configs/cfg-server-sv.lua
 Webhooks.BugReport = GetConvar("lacore_webhook_bugreport", "")
 ```
 
-Set the `lacore_webhook_bugreport` convar in `server.cfg` to also log every report to your own Discord — the same "your local output is never replaced, only added to" principle every other webhook in that file follows. This is entirely optional and has no bearing on whether the report reaches the LACORE dashboard.
+Set the `lacore_webhook_bugreport` convar in `server.cfg` to receive every report in your own Discord. Without it, reports have nowhere to go. `@everyone` / `@here` in a report are stripped, so the form cannot be used to ping a role.
 
 ### Turning it off, renaming it, tuning it
 

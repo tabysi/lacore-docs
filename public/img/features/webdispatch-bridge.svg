@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="'Chakra Petch', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090c"/>
+      <stop offset="1" stop-color="#0e131c"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#4a5cff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#6c8cff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <g stroke="#4a5cff" stroke-width="3" fill="none">
+    <path d="M28 56 V28 H56"/>
+    <path d="M1172 544 V572 H1144"/>
+  </g>
+  <text x="60" y="58" fill="#e7ecf5" font-size="24" font-weight="700" letter-spacing="4">WEB DISPATCHER — <tspan fill="#6c8cff">YOUR OWN BRIDGE</tspan></text>
+
+  <!-- FiveM server -->
+  <rect x="60" y="100" width="330" height="360" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="84" y="136" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">YOUR FIVEM SERVER</text>
+  <text x="84" y="160" fill="#7d8798" font-size="12.5">lacore · modules/webdispatch</text>
+  <g fill="#e7ecf5" font-size="13" font-family="Consolas, 'Courier New', monospace">
+    <text x="84" y="200">set lacore_bridge_url   "…"</text>
+    <text x="84" y="222">set lacore_bridge_token "…"</text>
+  </g>
+  <g fill="#e7ecf5" font-size="14">
+    <text x="84" y="268">snapshot: calls · units · queue</text>
+    <text x="84" y="292">+ your map images and places</text>
+    <text x="84" y="332">inbound: /&lt;resource&gt;/action</text>
+    <text x="84" y="356">token-gated, same functions</text>
+    <text x="84" y="380">as the in-game MDT</text>
+  </g>
+  <text x="84" y="428" fill="#7d8798" font-size="12.5">every action logged in Big Brother</text>
+
+  <!-- Bridge -->
+  <rect x="470" y="100" width="300" height="360" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="494" y="136" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">YOUR BRIDGE</text>
+  <text x="494" y="160" fill="#7d8798" font-size="12.5">on a machine you run · HTTPS only</text>
+  <g fill="#e7ecf5" font-size="14">
+    <text x="494" y="208">POST /ingest</text>
+    <text x="494" y="232" fill="#7d8798" font-size="12.5">holds the latest snapshot</text>
+    <text x="494" y="280">WebSocket to the browsers</text>
+    <text x="494" y="328">sends dispatcher actions</text>
+    <text x="494" y="352">back to the game server</text>
+    <text x="494" y="400">who may log in is decided</text>
+    <text x="494" y="424">here, not by LACORE</text>
+  </g>
+
+  <!-- Browser -->
+  <rect x="850" y="100" width="290" height="360" rx="8" fill="#05070b" stroke="#4a5cff" stroke-width="2"/>
+  <text x="874" y="136" fill="#9fb0ff" font-size="15" font-weight="700" letter-spacing="2">BROWSER</text>
+  <text x="874" y="160" fill="#7d8798" font-size="12.5">dispatcher on a second screen</text>
+  <g fill="#e7ecf5" font-size="14">
+    <text x="874" y="208">calls and units, live</text>
+    <text x="874" y="244">status · assign · resolve</text>
+    <text x="874" y="280">map with webUrl images</text>
+  </g>
+
+  <!-- Arrows -->
+  <g stroke="#6c8cff" stroke-width="3" fill="none" marker-end="url(#arr)">
+    <path d="M392 230 H466"/>
+    <path d="M466 350 H394"/>
+    <path d="M772 270 H846"/>
+    <path d="M846 320 H774"/>
+  </g>
+  <text x="430" y="218" fill="#9fb0ff" font-size="11.5" text-anchor="middle">push</text>
+  <text x="430" y="372" fill="#9fb0ff" font-size="11.5" text-anchor="middle">actions</text>
+  <text x="810" y="258" fill="#9fb0ff" font-size="11.5" text-anchor="middle">ws</text>
+
+  <!-- Gone -->
+  <rect x="60" y="490" width="1080" height="62" rx="8" fill="#05070b" stroke="#3a4150" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="84" y="519" fill="#8a93a3" font-size="14">✕  Hosted portal on the LACORE website (setr lacore_webdispatch, licence key) — shut down in 4.2.0.</text>
+  <text x="84" y="540" fill="#5d6676" font-size="12.5">Nothing goes to LACORE. The snapshot only goes to the bridge address you set.</text>
+</svg>

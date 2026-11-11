@@ -31,6 +31,12 @@ to **ESX / QBCore / QBox** when you already run a framework.
      style={{ background: '#f1465a', color: '#fff', padding: '9px 16px', borderRadius: 8, fontWeight: 600, textDecoration: 'none' }}>❤ Patreon</a>
 </div>
 
+<Callout type="warning">
+  **LACORE is no longer actively developed.** Maintenance and support continue. Since 4.2.0 the
+  resource runs **fully offline** — the LACORE website and customer dashboard are shut down, and
+  nothing is sent to a LACORE service. No licence key is needed. Everything in-game keeps working.
+</Callout>
+
 <Callout type="info">
   All in-game text is English and fully localised (`en` / `de` / `ru`). This documentation covers
   setup, configuration, every feature, the command reference, and the changelog.
@@ -56,7 +62,7 @@ to **ESX / QBCore / QBox** when you already run a framework.
 - **Mobile Data Terminals** — five skins on one shared backend: **LAPD** (LACORE Mobile Client), **LASD**
   (CAD/PCMS), **Agency** (CHP-styled re-skin for every other department), **EMS/Fire**, and the
   **9100-T** (a 1990s green-CRT terminal). The [Pennsylvania CAD](/user-guide/pennsylvania-cad) is a
-  sixth, available as a paid add-on.
+  sixth, included with LACORE.
 - **Dispatch console** (`/dispatch`) — a live tile map of incidents, units and callers, with zone
   polygons, districts, BOLOs, charges, a dispatcher ⇄ unit workflow, and CCTV cameras on the map.
 - **CCTV surveillance** (`/cctv`) — a fixed-position camera viewer with a **targeting scanner**
@@ -72,10 +78,10 @@ to **ESX / QBCore / QBox** when you already run a framework.
 ### Operations & security
 - **Staff panel** (`/admin`) — players, the activity log and self tools in one window; server-authoritative moderation with access tiers.
 - **Big Brother** (`/bblog`) — admin action logging with Discord webhooks, read in the staff panel.
-- **Security** — IP-lock license enforcement, event-honeypot anticheat, permissions (ACE + Discord
-  role bridge).
-- **Web dispatcher** — optional external browser dispatcher via a FiveM ↔ Node bridge with Discord
-  OAuth.
+- **Security** — event-honeypot anticheat, local bans and warns, permissions (ACE + Discord role
+  bridge).
+- **Web dispatcher** — optional external browser dispatcher via a self-hosted FiveM ↔ Node bridge
+  with Discord OAuth.
 
 ## Requirements
 
@@ -91,5 +97,5 @@ to **ESX / QBCore / QBox** when you already run a framework.
 ## License
 
 LACORE is a paid product by [@tabysi](https://github.com/tabysi). Redistribution of the source is
-prohibited, and it ships with IP-lock license enforcement. See the EULA (`LICENSE.md`) that ships
+prohibited. See the EULA (`LICENSE.md`) that ships
 with the resource.

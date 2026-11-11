@@ -8,14 +8,13 @@ import { Callout } from 'nextra/components'
 
 ## What do I have to install?
 
-Nothing. The terminal ships **inside LACORE Core** and switches itself on once your licence key
-carries the entitlement. There is no second resource to download or `ensure`.
+Nothing. The terminal ships **inside LACORE Core** and, since 4.2.0, is included for every server —
+no licence key, no separate purchase. There is no second resource to download or `ensure`.
 
 ## How do I point a department at it?
 
 By name. Any department whose name contains `pennsylvania`, `penn cad` or `mobilecom` opens this
-terminal instead of the LAPD one. Tagging a department before you own the add-on is harmless — the
-tag is simply ignored.
+terminal instead of the LAPD one. The tags are `Penn.deptTags` in `configs/cfg-penn-sh.lua`.
 
 ## Is this a second dispatch system?
 
@@ -42,7 +41,7 @@ call-number prefix.
 
 ## Does it need LACORE Core?
 
-Yes. It is an add-on to Core, not a standalone resource. For a standalone retro terminal, look at the
+Yes. It is part of Core, not a standalone resource. For a standalone retro terminal, look at the
 [9100-T CAD](/products/lacore-90s-cad).
 
 <Callout type="info">

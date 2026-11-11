@@ -99,23 +99,19 @@ set lacore_bb_webhook "https://discord.com/api/webhooks/xxx/yyy"   # default / f
 # set lacore_bb_webhook_mdt        ""
 ```
 
-### Web dispatcher (optional)
+### Web dispatcher bridge (optional)
 
-Off by default — the shift's call data leaves your server only once you turn it on. With a licence
-key set, this is all the hosted portal needs; open it from **Dashboard → Servers → DISPATCH**.
+Pushes the dispatch data to **your own** Node bridge. Leave both empty to disable that outbound push.
 See [Web Dispatcher](/features/webdispatch).
-
-```ini
-setr lacore_webdispatch "false"
-```
-
-Running your own bridge instead? Leave the two below empty to disable that outbound push. Both paths
-may run at once.
 
 ```ini
 set lacore_bridge_url   ""
 set lacore_bridge_token ""
 ```
+
+> ℹ️ Shut down in 4.2.0: `lacore_license_key`, `lacore_webdispatch`, `lacore_playerbase_enforce` and
+> `lacore_globalban_token` only fed the LACORE home service, which no longer exists. LACORE runs fully
+> offline; these convars do nothing and can be removed from your `server.cfg`.
 
 ## Start order
 

@@ -99,9 +99,7 @@ waiting for a flag:
 
 <Callout type="info">
   **It stays on your server.** The buffer lives in memory, is dropped the moment the player
-  disconnects, and is attached only to the Discord log you were already receiving. It is deliberately
-  **not** added to the dashboard report — that payload is documented line by line in
-  `configs/cfg-anticheat-sh.lua`, and quietly widening it would be the wrong way to add a feature.
+  disconnects, and is attached only to the Discord log you were already receiving.
   Turn the buffer off entirely with `Anticheat.Context.enabled = false`.
 </Callout>
 
@@ -193,60 +191,18 @@ Closes the "client anti-cheat was patched out" gap for weapons. All server-side
 | `Evidence.uploadUrl` | `""` | Your own upload endpoint. |
 | `Evidence.onSeverity` | `"alert"` | Capture at this severity and above (`info` < `warn` < `alert`). |
 
-### Reporting flags to your dashboard
+### Reporting flags to your dashboard — shut down in 4.2.0
 
-Off by default, and deliberately so: this sends flags — which are **accusations about individual
-players, with their identifiers** — out of your server to the LACORE backend so you can review them
-in the dashboard instead of scrolling a Discord channel.
-
-What leaves your server per flag: the detection code, severity, the action taken, the current trust
-score, the player's name and identifiers, the server, and a timestamp. Nothing else — no chat, no
-positions, no screenshots. Flags keep going to your own database and Discord webhook exactly as
-before; this is an **additional copy, never a move**.
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `Report.enabled` | `false` | Requires an active licence key (`set lacore_license_key`) — that is what attributes flags to your dashboard account. Without one this is inert. |
-| `Report.minSeverity` | `"warn"` | `"info"` / `"warn"` / `"alert"` — quieter than the log by default. |
-| `Report.batchSec` | `30` | Flush at most every N seconds, so a flag storm sends one batch. |
-| `Report.maxBatch` | `50` | Hard cap per flush; the rest is dropped, never queued forever. |
+The `Report.*` block in `configs/cfg-anticheat-sh.lua` used to send a copy of each flag to the LACORE
+dashboard. The dashboard has been shut down and LACORE runs fully offline, so `Report.enabled` no
+longer sends anything, whatever it is set to. Flags keep going to your own database and Discord
+webhook as before.
 
 ### Bypasses
 
 - The convar `lacore_devmode` on (`1` / `true` / `yes`) turns the anti-cheat **fully off**.
 - Discord role **Staff** or **Dev**, or the `Whitelist.permission` ACE, is never punished — but is
   still logged.
-
-## Reviewing flags in your dashboard
-
-Detections always land in **your** database and **your** Discord webhook. If you would rather review
-them as a filterable table than by scrolling a channel, you can also have them copied to your LACORE
-dashboard under **Anticheat**: what tripped, what the system did about it, the player's running score,
-and which players keep coming back.
-
-<Callout type="warning">
-  This is **off by default and stays off until you turn it on**, because a flag is an accusation about a
-  named player. Switching it on sends the detection, the action taken and that player's identifiers to
-  your dashboard account. It never *moves* anything — your own database and Discord log keep receiving
-  everything exactly as before.
-</Callout>
-
-Turn it on with `Anticheat.Report.enabled = true` in `configs/cfg-anticheat-sh.lua`. The server needs an
-active licence key, since that is what attributes the flags to your account. Whitelisted hits are shown
-too, marked as such — an admin repeatedly tripping a check is the clearest signal that a threshold wants
-adjusting.
-
-### Tell it when it was wrong
-
-Any flag can be marked a **false positive**, and the page turns those marks into the number that
-actually helps: the share of each detection you have called wrong. One mislabelled row is noise — a
-detection sitting at 40% is a threshold to raise, and you can raise it yourself in the config, where
-your value always wins over the default.
-
-<Callout type="info">
-  Marks are reversible and never leave your account. They are a tuning signal for **your** server, not
-  a vote on anyone else's.
-</Callout>
 
 ## Recommended server hardening
 

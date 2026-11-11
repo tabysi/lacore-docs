@@ -1,18 +1,3 @@
 export default {
   index: 'Overview',
-  'license-keys': 'License keys',
-  servers: 'Servers',
-  community: 'Community page',
-  'server-config': 'Server config',
-  dispatch: 'Dispatch (live ops)',
-  downloads: 'Downloads & versions',
-  payments: 'Payments',
-  players: 'Players & sharing',
-  anticheat: 'Anticheat flags',
-  reports: 'Bug reports',
-  surveys: 'Surveys & rebate',
-  team: 'Team',
-  logs: 'Activity log',
-  support: 'Support tickets',
-  partner: 'Partner program',
 }

@@ -20,7 +20,7 @@ actually use a terminal, see the [User Guide](/user-guide/mdt).
 | Agency MDT | `"agency"` | CHP-style dark blue |
 | EMS / Fire CAD | `"ems"` | Dark medical CAD |
 | 9100-T Terminal | `"90s"` (`"retro"` is accepted as an alias) | Green-phosphor 90s CRT |
-| Pennsylvania CAD | `"penn"` | Retro county terminal (add-on) |
+| Pennsylvania CAD | `"penn"` | Retro county terminal |
 | Spillman Flex Mobile | `"spillman"` (`"flex"` is accepted as an alias) | Flex-style mobile CAD: message center, call screen with map |
 
 Each one can be switched off individually in [`cfg-features-sh.lua`](/configuration/features) under
@@ -81,8 +81,7 @@ When a player runs `/mdt` (default key **O**), LACORE walks this list top to bot
 first terminal that matches:
 
 1. **The agency's own `cad` field** — if the agency has one and that terminal is available here.
-2. **Pennsylvania CAD** — the department name contains one of `Penn.deptTags`, and the add-on is
-   unlocked.
+2. **Pennsylvania CAD** — the department name contains one of `Penn.deptTags`.
 3. **Spillman Flex Mobile** — the department name contains one of `Spillman.deptTags`, and
    `cad.spillman` is on.
 4. **9100-T** — the department name contains `90s`.
@@ -108,7 +107,7 @@ Two things happen before any of this:
 ### When a chosen terminal isn't available
 
 If an agency asks for a terminal that is switched off in `cfg-features-sh.lua`, whose module isn't
-loaded, or which is a locked add-on, that choice is skipped and the name guess applies instead. A
+loaded, that choice is skipped and the name guess applies instead. A
 department never ends up with no terminal because of a setting elsewhere.
 
 A `cad` value that isn't one of the six above is reported once in the server console
@@ -132,9 +131,9 @@ and LASD.
 
 ## Pennsylvania CAD — `configs/cfg-penn-sh.lua`
 
-A retro county terminal for the same dispatch data. Unlocked as an add-on
-(`Features.penncad`); on a server without it, departments tagged for it fall back to the terminal
-they had before.
+A retro county terminal for the same dispatch data. Included for every server since 4.2.0 (it used
+to be a paid add-on; `Features.penncad` is now always on). It only takes over departments whose name
+matches `deptTags` — every other department keeps the terminal it had before.
 
 | Setting | Default | Description |
 | --- | --- | --- |

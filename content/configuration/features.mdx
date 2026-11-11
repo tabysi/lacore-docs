@@ -45,18 +45,18 @@ Features = {
   alpr        = true,  -- ALPR plate reader (/alpr)
   field       = true,  -- field essentials (breathalyser)
   fingerprint = true,  -- mobile fingerprint ID scanner
-  identitylink = true, -- link Discord ⇄ identifiers so the ban network works (no setup)
+  identitylink = true, -- no effect since 4.2.0 (fed the shut-down ban network)
   nads        = true,  -- New Address System
   stt         = true,  -- push-to-talk radio speech-to-text
   admin       = true,  -- staff tools (Big Brother log + admin menu)
-  webdispatch = true,  -- external web dispatcher bridge
+  webdispatch = true,  -- web dispatcher bridge to your own Node bridge
   spawnselect = true,  -- map-based spawn picker (false = one fixed spawn)
-  bugreport   = true,  -- /lacorereport — bug reports to the LACORE dashboard
+  bugreport   = true,  -- /lacorereport — bug reports to your Discord (Webhooks.BugReport)
   replay      = true,  -- replay recorder + Director's Cut (clips stored on your disk)
   items       = true,  -- LACORE features as inventory items (ox_inventory / qb / ESX)
   investigation = true, -- scene traces, lab analysis, warrants (cfg-investigation-sh.lua)
   gameplay    = true,  -- balance + first-join loop (cfg-gameplay-sh.lua)
-  community   = true,  -- public community page on the LACORE portal
+  community   = true,  -- no effect since 4.2.0 (the community page is shut down)
 
   civilian = { enabled = true, org = true, turf = true },        -- emotes / props / orgs / turf
 
@@ -69,6 +69,8 @@ Features = {
 
   extras = { enabled = true, props = true, stretcher = true,     -- misc gameplay
              trains = true, deathsync = true },
+
+  penncad = true,      -- Pennsylvania CAD (included since 4.2.0, always on)
 }
 ```
 
@@ -121,12 +123,10 @@ Features = {
   file is escrow-open and covered by config backup.
 </Callout>
 
-## Paid add-ons (entitlement-gated)
+## Pennsylvania CAD — `penncad`
 
-The end of the `Features` table holds **paid add-on flags** — currently `penncad` (the
-[Pennsylvania CAD](/user-guide/pennsylvania-cad)) and `extracad` — shipped **off**. Unlike the
-toggles above, you don't switch these on locally — they're **unlocked per account from the LACORE
-dashboard** and delivered to your server by its license key. The unlock is **fail-closed**: an add-on your
-account isn't entitled to is forced off at load even if the config says `true`, so a licensed server can't
-enable a paid feature by editing the file. When you buy an add-on it appears after your **next restart**
-(once the server has pulled its entitlements). Requires `lacore_license_key` set in `server.cfg`.
+The last key, `penncad`, turns on the [Pennsylvania CAD](/user-guide/pennsylvania-cad). It used to be a
+paid add-on unlocked from the LACORE dashboard; since 4.2.0 it is **included for every server** and
+forced on at load, so setting it to `false` has no effect. It only takes over departments you tag in
+`configs/cfg-penn-sh.lua` (`Penn.deptTags`) — with no matching department, nobody ever sees it. See
+[CAD terminals & routing](/configuration/cad-terminals).

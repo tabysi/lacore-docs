@@ -66,7 +66,7 @@ AccessControl = {
 
 | Toggle | `false` means |
 | --- | --- |
-| `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans and the global-ban network still apply.** |
+| `whitelist` | The members-only gate is off: `/wl` does nothing and no one is ever rejected with “members only”. **Bans still apply.** |
 | `discordRoles` | LACORE no longer requires Discord at connect (no “join our Discord” rejection), doesn't read Discord roles, and doesn't bridge them to ACE. Duty-role gating (`DutyRoles`) is skipped, and Staff/Dev powers come from **ACE / txAdmin** only. |
 
 ### Player-name limits
@@ -156,7 +156,7 @@ in this `roles` table.
 | `LE` | The default requirement for going on Law Enforcement duty (see [Duty whitelist](#duty-whitelist)). |
 | `SupporterSGT`, `SupporterIII1`, `SupporterIII`, `SupporterII`, `SupporterI` | Any one of them marks the player as a **supporter** — the role colour in the player list. Empty by default. |
 | `AssetDonatorIII`, `AssetDonatorII`, `AssetDonatorI` | Any one of them marks the player as a **donator**, likewise. Empty by default. |
-| `LeadDeveloper`, `leodoorkeys` | Mapped and fetched, but nothing in LACORE reads them — they are there for your own scripts and for the dashboard's remote config. |
+| `LeadDeveloper`, `leodoorkeys` | Mapped and fetched, but nothing in LACORE reads them — they are there for your own scripts. |
 
 <Callout type="warning">
   `LOA` is a **connect block**, not a badge. Give it to someone on leave and they cannot join until it
@@ -184,19 +184,9 @@ DutyRoles = {
 
 ## Web dispatcher access
 
-Who may use the [hosted web dispatcher](/features/webdispatch) for **your** server:
-
-```lua
-WebDispatchAccess = {
-    dispatch = {},  -- e.g. { "Staff", "Dispatch" } — may act: status, assign, create, close
-    view     = {},  -- e.g. { "Member" }            — may watch, cannot act
-}
-```
-
-**Both lists empty = nobody but you** — that is the default on purpose. You (the license-key owner)
-and your dashboard team always have access without appearing here. Role **names** come from
-`DiscordAuth.roles`; the check runs on your server with your own bot token — the website only asks
-"may this Discord id dispatch?" and gets yes/no/read-only back.
+> ℹ️ Shut down in 4.2.0. `WebDispatchAccess` decided who could use the hosted web dispatcher on the
+> LACORE website, which no longer exists. The setting has no effect; a self-hosted
+> [web dispatcher bridge](/features/webdispatch) handles its own access.
 
 ## Agency whitelist
 

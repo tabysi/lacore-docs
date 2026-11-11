@@ -12,7 +12,7 @@ It is a **re-skin, not a second dispatch system.** The units and incidents on it
 
 > 📑 **Related:** [Using the MDT](/user-guide/mdt) · [LASD CAD / PCMS](/user-guide/lasd-cad) · [9100-T Retro Terminal](/user-guide/retro-mdt) · [Dispatch Console](/user-guide/dispatch-console) · [Command Reference](/commands)
 
-> 💳 **This terminal is a paid add-on.** It is listed in the dashboard as its own product ("Pennsylvania CAD") and unlocks per **licence key** — there is nothing to install, it ships inside the resource and turns itself on once your key carries the entitlement. Until then a department tagged for it simply keeps whatever terminal it had, so tagging a department early is harmless.
+> ℹ️ **Included with LACORE.** Since 4.2.0 this terminal is no longer a separate paid add-on — it ships inside the resource and is on for every server, with no licence key and nothing to install. It only takes over a department you tag for it (see below); every other department keeps its own terminal.
 
 ---
 
@@ -227,6 +227,6 @@ Everything on this page that is a list or a label lives in **`configs/cfg-penn-s
 | `Penn.callTypes` | The Create-a-Call tile grid, in order. |
 | `Penn.dispositions` | The disposition codes offered on **Resolve Incident**: `code` goes into the incident log, `label` is what the unit reads. |
 
-The terminal is also gated by the `penncad` feature in `configs/cfg-features-sh.lua` — and by your licence entitlement, which is the switch that actually decides whether it opens.
+The terminal is listed as the `penncad` feature in `configs/cfg-features-sh.lua`. Since 4.2.0 LACORE forces it on at start; to keep it off a department, leave that department's name out of `Penn.deptTags`.
 
 > ℹ️ **Two columns from the reference terminal are deliberately absent: Site/District and Latitude.** LACORE has no station, beat or district concept to fill the first, and no latitude at all — call coordinates are GTA world units, not degrees. A column that is blank on every server forever is not a column, it is a header.

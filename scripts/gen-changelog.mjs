@@ -268,7 +268,10 @@ for (let s = 0; s < starts.length; s++) {
   const headerLine = lines[from].replace(/^## /, '').trim()
   const body = lines.slice(from + 1, to).join('\n').replace(/\n+$/, '')
   const bracket = (headerLine.match(/^\[([^\]]+)\]/) || [])[1] || headerLine
-  sections.push({ headerLine, body, bracket, archived: isArchived(headerLine), dev: isDev(body), beta: isBeta(body) })
+  // A version still in development is the current one, however long ago its
+  // section was started — it never drops into the archive.
+  const dev = isDev(body)
+  sections.push({ headerLine, body, bracket, archived: !dev && isArchived(headerLine), dev, beta: isBeta(body) })
 }
 
 // Keep only the newest LIVE_MAX releases as pages; everything else is archived,

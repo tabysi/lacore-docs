@@ -45,7 +45,7 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-spawns-sh.lua` | shared | [World, blips & props](/configuration/world) — map-based spawn picker (capture points with `/spawnpoint`) |
 | `json/emojis.json` | server | [Gameplay modules](/configuration/gameplay-modules) — emoji shortcodes used in chat (moved out of `configs/` in 3.4.3) |
 | `configs/locale-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — registered languages for the `T()` system |
-| `configs/cfg-report-sh.lua` | shared | [Bug Reports](/user-guide/bug-reports) — `/lacorereport`: command name, cooldown, max length, categories |
+| `configs/cfg-report-sh.lua` | shared | [Bug Reports](/user-guide/bug-reports) — `/lacorereport`: command name, cooldown, max length, categories (reports go to your `Webhooks.BugReport` Discord webhook) |
 | `configs/cfg-autoconfig-sh.lua` | shared | [Setup review](/configuration/autoconfig) — what the setup review checks, and whether it may apply anything |
 | `configs/cfg-gameplay-sh.lua` | shared | [Gameplay & balance](/features/gameplay) — damage multipliers, combat balance, the first-join loop |
 | `configs/cfg-items-sh.lua` | shared | [Feature Toggles](/configuration/features) — which LACORE features are bound to an inventory item |
@@ -56,7 +56,7 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | File | Scope | Controls |
 | --- | --- | --- |
 | `configs/cfg-mdt-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — MDT options (vehicle-only, close on exit, query broadcast) |
-| `configs/cfg-penn-sh.lua` | shared | [Pennsylvania CAD](/user-guide/pennsylvania-cad) — department tags, call types, dispositions (paid add-on) |
+| `configs/cfg-penn-sh.lua` | shared | [Pennsylvania CAD](/user-guide/pennsylvania-cad) — department tags, call types, dispositions (included since 4.2.0) |
 | `configs/cfg-vehiclescreen-sh.lua` | shared | [CAD terminals & routing](/configuration/cad-terminals) — the CAD on the vehicle dashboard |
 | `configs/cfg-mdt-labels-sh.lua` | shared | [Localisation](/configuration/localisation) — whitelabel: rename any MDT/CAD label |
 | `configs/cfg-supervisor-sh.lua` | shared | [Records & personnel](/configuration/records-personnel) — who counts as a supervisor |
@@ -105,13 +105,13 @@ resource as **`configs/CONFIG-INDEX.md`** (since 3.4.2).
 | `configs/cfg-integrations-sh.lua` | shared | [Frameworks & Scripts](/frameworks-scripts) — third-party resources |
 | `configs/cfg-anticheat-sh.lua` | shared | [Anti-Cheat & Security](/anticheat) — detections, trust score, whitelist, server sweep |
 | `configs/cfg-blacklist-sh.lua` | shared | [Anticheat & security](/configuration/security) — member-only vehicles |
-| `configs/cfg-globalban-sh.lua` | shared | [Global-ban network](/configuration/gameplay-modules) — read the shared LACORE ban list |
-| `configs/cfg-identitylink-sh.lua` | shared | [Anticheat & security](/configuration/security) — link Discord ⇄ identifiers for the ban network (no setup) |
-| `configs/cfg-remoteconfig-sh.lua` | server | [Anticheat & security](/configuration/security) — dashboard remote-config consent gate |
+| `configs/cfg-globalban-sh.lua` | shared | No effect since 4.2.0 — the global-ban network is shut down |
+| `configs/cfg-identitylink-sh.lua` | shared | No effect since 4.2.0 — nothing is sent to LACORE ([Anticheat & security](/configuration/security)) |
+| `configs/cfg-remoteconfig-sh.lua` | server | No effect since 4.2.0 — the dashboard is shut down; see [leftover dashboard config](/configuration/autoconfig#leftover-dashboard-config) |
 | `configs/cfg-bigbrother-sv.lua` | server | [Anticheat & security](/configuration/security) — admin logging |
 | `configs/cfg-presence-sh.lua` | shared | [Discord & Duty](/configuration/discord) — Discord Rich Presence |
-| `configs/cfg-report-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — the `/lacorereport` bug form |
-| `configs/cfg-library-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — model library uploads (empty `uploadUrl` = LACORE hosts them; set it to keep them on your own infrastructure) |
+| `configs/cfg-report-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — the `/lacorereport` bug form (to your own Discord webhook) |
+| `configs/cfg-library-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — model library uploads — **no effect since 4.2.0** (the library lived on the shut-down dashboard) |
 | `configs/cfg-replay-sh.lua` | shared | [Gameplay modules](/configuration/gameplay-modules) — replay recording, quotas, colour grades |
 
 ## Start here

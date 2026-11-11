@@ -77,18 +77,11 @@ token, webhooks, owner ID). See [Configuration](/configuration) for the full ref
   [Permissions & ACE](/configuration/permissions#first-let-lacore-create-its-groups).
 </Callout>
 
-### Add your license key
-
-Generate a license key in the [Customer Portal](/customer-portal/license-keys) and add it to your
-`server.cfg`:
-
-```ini
-set lacore_license_key "LACORE-XXXX-XXXX-XXXX"
-```
-
-The key links your server to your dashboard account. It is required for **remote config**, the
-**playerbase upload**, the **hosted web dispatcher**, **dashboard bug reports** and paid add-ons
-like **Pennsylvania CAD**. The core CAD runs without it — but set it now so everything works later.
+<Callout type="info">
+  **No licence key, no registration.** Since 4.2.0 LACORE runs fully offline — there is nothing to
+  set for LACORE's own service. If an older `server.cfg` still has `set lacore_license_key "…"`, you
+  can remove the line; it is not used.
+</Callout>
 
 ### Start the resource
 
@@ -127,7 +120,7 @@ command suite lets you re-check anytime (console, or in-game as staff):
 | `/lacore db` | Database connectivity + table state. |
 | `/lacore modules` | Loaded modules. |
 | `/lacore doctor` | Full first-boot health check. |
-| `/lacore telemetry` | Owner telemetry status. |
+| `/lacore telemetry` | Telemetry status (nothing is sent since 4.2.0). |
 | `/lacore help` | List every subcommand. |
 
 ## Troubleshooting

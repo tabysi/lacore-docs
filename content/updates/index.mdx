@@ -6,11 +6,12 @@ import { Callout, Cards } from 'nextra/components'
 
 # What's New
 
-**Current version: 3.5.7.** One release, written as one page — what LACORE gained, grouped by what it
-does for your server rather than by the day it was built.
+**Current version: 4.2.0** (in development). The sections below are the highlights up to 3.5.7,
+written as one page — what LACORE gained, grouped by what it does for your server rather than by the
+day it was built. What 4.2.0 changes is in its release notes and in the last section here.
 
 <Cards>
-  <Cards.Card title="Read the full 3.5.7 release notes" href="/updates/changelog/v3-5-7" arrow />
+  <Cards.Card title="Read the 4.2.0 release notes" href="/updates/changelog/v4-2-0" arrow />
   <Cards.Card title="Updating your server" href="/getting-started/updating" arrow />
 </Cards>
 
@@ -55,7 +56,7 @@ configured instead of handing back empty defaults.
 ## The civilian side
 
 The **Citizen Hub** gives civilians a panel of their own, a **gameplay layer** puts damage and combat
-balance into configuration you can change live from the dashboard, and new players get a first-join
+balance into configuration, and new players get a first-join
 loop instead of a blank spawn.
 
 <Cards>
@@ -63,16 +64,19 @@ loop instead of a blank spawn.
   <Cards.Card title="Gameplay & balance" href="/features/gameplay" arrow />
 </Cards>
 
-## Your community, on the web
+## Fully offline since 4.2.0
 
-Your portal account now carries a **public community page** per server — departments, applications
-and a live roster, without exposing anyone's Discord id. The **web dispatcher** is published, the
-admin panel shows network activity, and support tickets keep the category you picked.
+The LACORE website and customer dashboard are shut down, and the resource no longer calls any LACORE
+service. That ends the features that lived there — the community page, the hosted web dispatcher,
+remote config, licence keys, the shared playerbase and global ban network, and dashboard bug reports.
+Everything in-game keeps working, and the **self-hosted** web dispatcher bridge still runs on your own
+server.
+
+![What keeps working and what is gone](/img/features/offline-build.svg)
 
 <Cards>
-  <Cards.Card title="Community page" href="/customer-portal/community" arrow />
-  <Cards.Card title="Web dispatcher" href="/features/webdispatch" arrow />
-  <Cards.Card title="Customer portal" href="/customer-portal" arrow />
+  <Cards.Card title="Web dispatcher (self-hosted)" href="/features/webdispatch" arrow />
+  <Cards.Card title="Customer portal (shut down)" href="/customer-portal" arrow />
 </Cards>
 
 <Callout type="info">

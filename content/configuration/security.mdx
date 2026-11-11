@@ -74,45 +74,13 @@ Add class **numbers** or model **name strings**. Who counts as a "member" is set
 driven by the Discord **Member** role, not by playtime. (`ProfileConfig.membershipHours` only decides when
 the "you've played enough to apply for membership" notice fires — it does **not** unlock these vehicles.)
 
-## Dashboard remote-config gate — `configs/cfg-remoteconfig-sh.lua`
+## Dashboard remote config and identity link — shut down
 
-The customer dashboard can push config changes to your server. This **server-side** file is the consent
-gate for the sensitive ones — it lives on your box, so the dashboard can never flip it for you. By default
-the dashboard may change everything **except** three categories.
-
-```lua
-RemoteConfig.allowSensitive = false   -- master switch for the sensitive categories below (safe default)
-
-RemoteConfig.sensitive = {
-    destinations = false,   -- upload targets / webhook URLs (phone camera, model library, log hooks)
-    anticheat    = false,   -- anti-cheat thresholds + actions (off = dashboard can READ but not change them)
-    roles        = false,   -- the Discord role IDs in cfg-server-sv.lua that grant staff/dev access
-}
-
--- Extra belt for `destinations`: even when enabled, a pushed URL must be https AND its host must be here.
-RemoteConfig.allowedHosts = { "discord.com", "discordapp.com" }   -- empty = any https host (never http)
-```
-
-<Callout type="warning">
-  Leave `allowSensitive = false` unless you specifically want the dashboard to manage upload destinations,
-  anti-cheat, or your staff role IDs — and even then, open only the one category you need. `allowedHosts`
-  keeps the blast radius small: a pushed URL must be `https` and, unless the list is empty, on one of these
-  hosts.
-</Callout>
-
-## Identity link — `configs/cfg-identitylink-sh.lua`
-
-Posts a player's stable identifiers + Discord ID to LACORE's write-only ingest service (once per player
-per session), so the [global-ban network](/configuration/gameplay-modules) can match them. No token, keys
-or extra `server.cfg` lines — it just works when players are Discord-linked.
-
-```lua
-IdentityLink.enabled = true            -- false = nothing is ever sent
-IdentityLink.types   = {               -- which identifier types to store (mirrors the ban-match types)
-    license = true, license2 = true, discord = true, steam = true, live = true, xbl = true, fivem = true,
-}
-IdentityLink.requireDiscord = true     -- only store players with a linked Discord (the key the bot looks up by)
-```
+> ℹ️ Shut down in 4.2.0. LACORE runs fully offline, so there is no dashboard that can push config to
+> your server and nothing is sent to a LACORE ingest service. `configs/cfg-remoteconfig-sh.lua` and
+> `configs/cfg-identitylink-sh.lua` have no effect any more; you can leave them as they are. A config
+> file the old dashboard cached on your server is covered under
+> [Setup review](/configuration/autoconfig#leftover-dashboard-config).
 
 ## Big Brother (admin logging) — `configs/cfg-bigbrother-sv.lua`
 
@@ -143,43 +111,11 @@ BigBrother = {
 Discord mirroring uses the `lacore_bb_webhook*` convars — see
 [Server Convars](/configuration/convars#big-brother-admin-logging).
 
-### What Big Brother sends to LACORE
+### Nothing leaves your server
 
-<Callout type="warning">
-  **Every line Big Brother logs is also copied to the LACORE dashboard.** This is part of the licence
-  and has no off switch — unlike the anticheat's dashboard reporting (`Anticheat.Report`), which is
-  opt-in. If you run a server with your own privacy obligations, this is the section you need to
-  disclose to your players.
-</Callout>
-
-Per line, what leaves your server is: the **category**, **severity**, **action**, the **detail text**,
-the **player name and identifier**, the in-game **server id**, **coordinates and zone** where the event
-carries them, a **timestamp**, plus your server's **hostname** and **licence key**.
-
-For the `chat` and `command` categories, "detail text" is **the message or command itself**.
-
-What does not change: the local database table and your Discord webhooks keep working exactly as
-before. This is an additional copy, never a move.
-
-What you still control, because the reporting rides on `BBLog()` rather than around it:
-
-| You set | Effect on reporting |
-| --- | --- |
-| `enabled = false` | Nothing is logged at all, so nothing is sent. |
-| `categories.chat = false` (any category) | That category is never logged, so it is never sent. |
-| `retentionDays` | Your local table only. The dashboard copy has its own retention. |
-
-Transport is batched and bounded, so a busy server is not an HTTP storm and an offline uplink cannot
-grow a buffer without limit:
-
-| Setting | Default | Description |
-| --- | --- | --- |
-| `dashboard.batchSeconds` | `30` | Seconds between uploads. |
-| `dashboard.maxBatch` | `200` | Rows per upload. Anything over is dropped, **oldest first**. |
-
-Reporting needs an active licence key (`set lacore_license_key`) — that is what attributes rows to a
-dashboard account. Without one the module stays inert and says so once in the console; local logging
-is unaffected.
+Big Brother logs only to your own database and to the Discord webhooks you set. Up to 4.1.0 every line
+was also copied to the LACORE dashboard; since 4.2.0 nothing is sent there. The `dashboard.batchSeconds`
+and `dashboard.maxBatch` settings in the file no longer do anything.
 
 ## Discord Rich Presence — `configs/cfg-presence-sh.lua`
 
